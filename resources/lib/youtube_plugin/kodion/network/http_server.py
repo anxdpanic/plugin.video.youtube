@@ -60,11 +60,12 @@ class HTTPServer(ThreadingMixIn, TCPServer):
         try:
             handler.handle()
         finally:
+            output = handler.wfile
             while (not handler._close_all
-                   and not handler.wfile.closed
-                   and not select((), (handler.wfile,), (), 0)[1]):
+                   and not output.closed
+                   and not select((), (output,), (), 0)[1]):
                 pass
-            if handler._close_all or handler.wfile.closed:
+            if handler._close_all or output.closed:
                 return
             handler.finish()
 
@@ -142,11 +143,12 @@ class RequestHandler(BaseHTTPRequestHandler, object):
     def handle_one_request(self):
         # Allow self.rfile.readline call to be interrupted by
         # HTTPServer.server_close when connection is kept open by keep-alive
+        input = self.rfile
         while (not self._close_all
-               and not self.rfile.closed
-               and not select((self.rfile,), (), (), 0)[0]):
+               and not input.closed
+               and not select((input,), (), (), 0)[0]):
             pass
-        if self._close_all or self.rfile.closed:
+        if self._close_all or input.closed:
             self.close_connection = True
             return
 
@@ -385,7 +387,8 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             original_path = params.pop('__path', empty)[0] or '/videoplayback'
 
             servers = params.pop('__netloc', empty)
-            stream_id = params.pop('__id', empty)[0]
+            stream_id = (params.pop('__id', empty)[0],
+                         params.get('itag', empty)[0])
             if stream_id != self.server_priority_list['id']:
                 self.server_priority_list['id'] = stream_id
                 _server_list = []
@@ -430,8 +433,11 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                 with self.requests.request(stream_url,
                                            method='GET',
                                            headers=headers,
-                                           stream=True) as response:
-                    if not response or not response.ok:
+                                           stream=True,
+                                           allow_redirects=False) as response:
+                    if not response or not response.ok or response.is_redirect:
+                        if server in _server_list:
+                            _server_list.remove(server)
                         continue
                     if server not in _server_list:
                         _server_list.append(server)
@@ -441,14 +447,16 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                         self.send_header(header, value)
                     self.end_headers()
 
-                    for chunk in response.iter_content(chunk_size=None):
-                        while (not self._close_all
-                               and not self.wfile.closed
-                               and not select((), (self.wfile,), (), 0)[1]):
-                            pass
-                        if self._close_all or self.wfile.closed:
-                            break
-                        self.wfile.write(chunk)
+                    input = response.raw
+                    output = self.wfile
+                    while (not self._close_all
+                           and not output.closed
+                           and not select((), (output,), (), 0)[1]):
+                        pass
+                    if self._close_all or output.closed:
+                        break
+                    for chunk in input.stream(None, decode_content=False):
+                        output.write(chunk)
                 break
             else:
                 self.send_error(response and response.status_code or 500)

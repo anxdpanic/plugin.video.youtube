@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from traceback import format_stack
 
 from ..abstract_plugin import AbstractPlugin
-from ...compatibility import parse_qsl, urlsplit, xbmcplugin
+from ...compatibility import parse_qsl, urlsplit, xbmc, xbmcplugin
 from ...constants import (
     BUSY_FLAG,
     CONTAINER_FOCUS,
@@ -22,6 +22,7 @@ from ...constants import (
     CONTENT_TYPE,
     PATHS,
     PLAY_FORCED,
+    PLAY_FORCE_AUDIO,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
     PLUGIN_SLEEPING,
@@ -30,6 +31,9 @@ from ...constants import (
     RELOAD_ACCESS_MANAGER,
     REROUTE_PATH,
     VIDEO_ID,
+    WINDOW_FALLBACK,
+    WINDOW_REPLACE,
+    WINDOW_RETURN,
 )
 from ...exceptions import KodionException
 from ...items import (
@@ -65,7 +69,7 @@ class XbmcPlugin(AbstractPlugin):
     def __init__(self):
         super(XbmcPlugin, self).__init__()
 
-    def run(self, provider, context, focused=None):
+    def run(self, provider, context, forced=None):
         handle = context.get_handle()
         ui = context.get_ui()
 
@@ -161,9 +165,9 @@ class XbmcPlugin(AbstractPlugin):
         if ui.get_property(PLUGIN_SLEEPING):
             context.wakeup(PLUGIN_WAKEUP)
 
-        if ui.pop_property(REFRESH_CONTAINER):
+        if ui.pop_property(REFRESH_CONTAINER) or not forced:
             focused = False
-        elif focused:
+        elif forced:
             focused = ui.get_property(VIDEO_ID)
 
         if ui.pop_property(RELOAD_ACCESS_MANAGER):
@@ -273,9 +277,9 @@ class XbmcPlugin(AbstractPlugin):
                         _, _post_run_action = self.uri_action(
                             context,
                             context.get_parent_uri(params={
-                                'window_fallback': True,
-                                'window_replace': True,
-                                'window_return': False,
+                                WINDOW_FALLBACK: True,
+                                WINDOW_REPLACE: True,
+                                WINDOW_RETURN: False,
                             }),
                         )
                     else:
@@ -293,7 +297,7 @@ class XbmcPlugin(AbstractPlugin):
 
         if ui.pop_property(PLAY_FORCED):
             context.set_path(PATHS.PLAY)
-            return self.run(provider, context, focused=focused)
+            return self.run(provider, context, forced=forced)
 
         xbmcplugin.endOfDirectory(
             handle,
@@ -301,6 +305,7 @@ class XbmcPlugin(AbstractPlugin):
             updateListing=update_listing,
             cacheToDisc=cache_to_disc,
         )
+
         container = ui.pop_property(CONTAINER_ID)
         position = ui.pop_property(CONTAINER_POSITION)
         if container and position:
@@ -366,7 +371,10 @@ class XbmcPlugin(AbstractPlugin):
                 action = context.create_uri(
                     (_uri.path.rstrip('/'),),
                     params,
-                    play=True,
+                    play=(xbmc.PLAYLIST_MUSIC
+                          if (context.get_ui().get_property(PLAY_FORCE_AUDIO)
+                              or context.get_settings().audio_only()) else
+                          xbmc.PLAYLIST_VIDEO),
                 )
                 result = True
 

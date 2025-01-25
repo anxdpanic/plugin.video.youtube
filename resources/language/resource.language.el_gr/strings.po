@@ -205,12 +205,12 @@ msgid ""
 msgstr ""
 
 msgctxt "#30105"
-msgid ""
+msgid "filtered"
 msgstr ""
 
 msgctxt "#30106"
-msgid "Next Page (%d)"
-msgstr "Επόμενη Σελίδα (%d)"
+msgid "Next page: %d"
+msgstr ""
 
 msgctxt "#30107"
 msgid "Watch Later"
@@ -457,7 +457,7 @@ msgid "Disliked Videos"
 msgstr "Βίντεο που δεν σας αρέσουν"
 
 msgctxt "#30539"
-msgid ""
+msgid "Play recently added"
 msgstr ""
 
 msgctxt "#30540"
@@ -1583,6 +1583,10 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30106"
+#~ msgid "Next Page (%d)"
+#~ msgstr "Επόμενη Σελίδα (%d)"
 
 #~ msgctxt "#30585"
 #~ msgid "Filtered channel list (comma delimited)"

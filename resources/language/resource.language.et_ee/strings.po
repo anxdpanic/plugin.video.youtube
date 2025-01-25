@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2025-01-16 23:27+0000\n"
 "Last-Translator: rimasx <riks_12@hot.ee>\n"
@@ -205,11 +205,11 @@ msgid ""
 msgstr ""
 
 msgctxt "#30105"
-msgid ""
+msgid "filtered"
 msgstr ""
 
 msgctxt "#30106"
-msgid "Next Page (%d)"
+msgid "Next page: %d"
 msgstr ""
 
 msgctxt "#30107"
@@ -457,7 +457,7 @@ msgid "Disliked Videos"
 msgstr ""
 
 msgctxt "#30539"
-msgid ""
+msgid "Play recently added"
 msgstr ""
 
 msgctxt "#30540"

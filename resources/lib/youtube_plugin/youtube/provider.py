@@ -339,6 +339,9 @@ class Provider(AbstractProvider):
 
         url_resolver = UrlResolver(context)
         resolved_url = url_resolver.resolve(uri)
+        if not resolved_url:
+            return False, None
+
         url_converter = UrlToItemConverter(flatten=True)
         url_converter.add_url(resolved_url, context)
         items = url_converter.get_items(provider=provider,
@@ -425,6 +428,7 @@ class Provider(AbstractProvider):
                             'url': 'DefaultVideo.png',
                         }},
                     },
+                    '_available': True,
                     '_partial': True,
                 },
                 {
@@ -594,10 +598,12 @@ class Provider(AbstractProvider):
             context.log_debug('Trying to get channel ID for |{0}|'.format(
                 identifier['identifier']
             ))
-            json_data = function_cache.run(client.get_channel_by_identifier,
-                                           function_cache.ONE_DAY,
-                                           _refresh=params.get('refresh'),
-                                           **identifier)
+            json_data = function_cache.run(
+                client.get_channel_by_identifier,
+                function_cache.ONE_DAY,
+                _refresh=params.get('refresh', 0) > 0,
+                **identifier
+            )
             if not json_data:
                 return False
 
@@ -688,7 +694,9 @@ class Provider(AbstractProvider):
             result.extend(v3.response_to_items(provider, context, v3_response))
 
         if uploads:
-            uploads = uploads.replace('UU', 'UULF', 1)
+            # The "UULF" videos playlist can only be used if videos in a channel
+            # are made public. Use "UU" all uploads playlist and filter instead
+            # uploads = uploads.replace('UU', 'UULF', 1)
             batch_id = (uploads, page_token or 0)
 
             json_data = resource_manager.get_playlist_items(batch_id=batch_id)
@@ -702,6 +710,7 @@ class Provider(AbstractProvider):
             result.extend(v3.response_to_items(
                 provider, context, json_data[batch_id],
                 item_filter={
+                    # 'shorts': False,
                     'live': False,
                     'upcoming_live': False,
                 },
@@ -815,23 +824,24 @@ class Provider(AbstractProvider):
             return v3.response_to_items(self, context, json_data)
         return None
 
-    def on_search_run(self, context, query):
-        context.set_param('q', query)
+    def on_search_run(self, context, query=None):
+        params = context.get_params()
+        if query is None:
+            query = to_unicode(params.get('q', ''))
 
         # Search by url to access unlisted videos
         if query.startswith(('https://', 'http://')):
             return self.on_uri2addon(provider=self, context=context, uri=query)
         if context.is_plugin_path(query):
-            return UriItem(query), None
+            return UriItem(query), {self.RESULT_CACHE_TO_DISC: False}
 
         result = self._search_channel_or_playlist(context, query)
         if result:  # found a channel or playlist matching search query
-            return result, None
+            return result, {self.RESULT_CACHE_TO_DISC: False}
         result = []
 
         context.set_param('category_label', query)
 
-        params = context.get_params()
         channel_id = params.get('channel_id') or params.get('channelId')
         event_type = params.get('event_type') or params.get('eventType')
         hide_folders = params.get('hide_folders')
@@ -941,7 +951,7 @@ class Provider(AbstractProvider):
         search_params, json_data = function_cache.run(
             self.get_client(context).search_with_params,
             function_cache.ONE_MINUTE * 10,
-            _refresh=params.get('refresh'),
+            _refresh=params.get('refresh', 0) > 0,
             params=search_params,
         )
         if not json_data:
@@ -959,7 +969,7 @@ class Provider(AbstractProvider):
                 'live': False,
             },
         ))
-        return result, None
+        return result, {self.RESULT_CACHE_TO_DISC: False}
 
     @AbstractProvider.register_path('^/config/(?P<action>[^/]+)/?$')
     @staticmethod

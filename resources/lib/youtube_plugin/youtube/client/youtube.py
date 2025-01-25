@@ -1551,7 +1551,7 @@ class YouTube(LoginClient):
                              logged_in=False,
                              do_filter=False,
                              refresh=False,
-                             use_cache=False,
+                             use_cache=True,
                              progress_dialog=None,
                              **kwargs):
         """
@@ -1618,7 +1618,7 @@ class YouTube(LoginClient):
             'channel_ids': [],
             'playlist_ids': [],
             'feeds': {},
-            'do_refresh': [],
+            'to_refresh': [],
         }
 
         bookmarks = context.get_bookmarks_list().get_items()
@@ -1629,13 +1629,13 @@ class YouTube(LoginClient):
                 if isinstance(item, DirectoryItem):
                     item_id = getattr(item, 'playlist_id', None)
                     if item_id:
-                        playlist_ids.append({'playlist_id': item_id})
+                        playlist_ids.append(item_id)
                         continue
                     item_id = getattr(item, 'channel_id', None)
                 elif not isinstance(item, float):
                     continue
                 if item_id:
-                    channel_ids.append({'channel_id': item_id})
+                    channel_ids.append(item_id)
 
         headers = {
             'Host': 'www.youtube.com',
@@ -1652,56 +1652,38 @@ class YouTube(LoginClient):
             'Accept-Language': 'en-US,en;q=0.7,de;q=0.3'
         }
 
-        def _get_channel_feed_cache(output,
-                                    channel_id,
-                                    _cache=cache,
-                                    _refresh=refresh):
-            cached = _cache.get_item(channel_id)
-            if cached:
-                feed_details = cached['value']
-                _refresh = _refresh or cached['age'] > _cache.ONE_HOUR
-            else:
-                feed_details = {
-                    'channel_name': None,
-                    'cached_items': None,
-                }
-                _refresh = True
-
-            if _refresh:
-                output['do_refresh'].append({'channel_id': channel_id})
-                feed_details['refresh'] = True
-
+        def _get_feed_cache(output,
+                            inputs,
+                            item_type,
+                            _cache=cache,
+                            _refresh=refresh,
+                            _ttl=cache.ONE_HOUR):
             feeds = output['feeds']
-            if channel_id in feeds:
-                feeds[channel_id].update(feed_details)
-            else:
-                feeds[channel_id] = feed_details
-            return True, False
+            to_refresh = output['to_refresh']
+            cached_items = _cache.get_items(inputs, seconds=_ttl)
+            for item_id in inputs:
+                if item_id in cached_items:
+                    cached = cached_items[item_id]
+                else:
+                    cached = _cache.get_item(item_id, seconds=_ttl)
+                if cached:
+                    feed_details = cached['value']
+                    do_refresh = _refresh
+                else:
+                    feed_details = {
+                        'channel_name': None,
+                        'cached_items': None,
+                    }
+                    do_refresh = True
 
-        def _get_playlist_feed_cache(output,
-                                     playlist_id,
-                                     _cache=cache,
-                                     _refresh=refresh):
-            cached = _cache.get_item(playlist_id)
-            if cached:
-                feed_details = cached['value']
-                _refresh = _refresh or cached['age'] > _cache.ONE_HOUR
-            else:
-                feed_details = {
-                    'channel_name': None,
-                    'cached_items': None,
-                }
-                _refresh = True
-
-            if _refresh:
-                output['do_refresh'].append({'playlist_id': playlist_id})
-                feed_details['refresh'] = True
-
-            feeds = output['feeds']
-            if playlist_id in feeds:
-                feeds[playlist_id].update(feed_details)
-            else:
-                feeds[playlist_id] = feed_details
+                feed_details['refresh'] = do_refresh
+                if item_id in feeds:
+                    feeds[item_id].update(feed_details)
+                else:
+                    feeds[item_id] = feed_details
+                    if do_refresh:
+                        to_refresh.append({item_type: item_id})
+            del inputs[:]
             return True, False
 
         def _get_feed(output,
@@ -1717,15 +1699,19 @@ class YouTube(LoginClient):
             else:
                 return True, False
 
+            response = self.request(
+                ''.join((
+                    'https://www.youtube.com/feeds/videos.xml?',
+                    'channel_id=' if is_channel else 'playlist_id=',
+                    item_id,
+                )),
+                headers=_headers,
+            )
+            if not response or response.status_code == 429:
+                return False, True
+
             _output = {
-                'content': self.request(
-                    ''.join((
-                        'https://www.youtube.com/feeds/videos.xml?',
-                        'channel_id=' if is_channel else 'playlist_id=',
-                        item_id,
-                    )),
-                    headers=_headers,
-                ),
+                'content': response,
                 'refresh': True,
             }
 
@@ -1752,11 +1738,18 @@ class YouTube(LoginClient):
                          _cache=cache):
             if progress_dialog:
                 total = len(feeds)
-                progress_dialog.reset_total(total)
+                progress_dialog.reset_total(
+                    total,
+                    _message=context.localize('feeds'),
+                )
+
+            dict_get = {}.get
+            find = ET.Element.find
+            findtext = ET.Element.findtext
 
             all_items = {}
             new_cache = {}
-            for channel_id, feed in feeds.items():
+            for item_id, feed in feeds.items():
                 channel_name = feed.get('channel_name')
                 cached_items = feed.get('cached_items')
                 refresh_feed = feed.get('refresh')
@@ -1767,31 +1760,46 @@ class YouTube(LoginClient):
                     content = to_unicode(content.content).replace('\n', '')
 
                     root = ET.fromstring(content if utf8 else to_str(content))
-                    channel_title = root.findtext('atom:title', '', _ns)
+                    channel_title = findtext(root, 'atom:title', '', _ns)
+                    channel_id = findtext(root, 'yt:channelId', '', _ns)
+                    if not channel_id.startswith('UC'):
+                        channel_id = 'UC' + channel_id
+                    playlist_id = findtext(root, 'yt:playlistId', '', _ns)
                     channel_name = channel_title.lower().replace(',', '')
-                    dict_get = {}.get
+
                     feed_items = [{
-                        'kind': 'youtube#video',
-                        'id': item.findtext('yt:videoId', '', _ns),
+                        'kind': ('youtube#video'
+                                 if channel_id else
+                                 'youtube#playlistitem'),
+                        'id': (findtext(item, 'yt:videoId', '', _ns)
+                               if channel_id else
+                               None),
                         'snippet': {
-                            'channelId': channel_id,
+                            'videoOwnerChannelId': channel_id,
+                            'playlistId': playlist_id,
                             'channelTitle': channel_title,
-                            'title': item.findtext('atom:title', '', _ns),
-                            'description': item.findtext(
+                            'resourceId': {
+                                'videoId': findtext(item, 'yt:videoId', '', _ns)
+                            } if playlist_id else None,
+                            'title': findtext(item, 'atom:title', '', _ns),
+                            'description': findtext(
+                                item,
                                 'media:group/media:description',
                                 '',
                                 _ns,
                             ),
                             'publishedAt': dt.strptime(
-                                item.findtext('atom:published', '', _ns)
+                                findtext(item, 'atom:published', '', _ns)
                             ),
                         },
                         'statistics': {
-                            'likeCount': getattr(item.find(
+                            'likeCount': getattr(find(
+                                item,
                                 'media:group/media:community/media:starRating',
                                 _ns,
                             ), 'get', dict_get)('count', 0),
-                            'viewCount': getattr(item.find(
+                            'viewCount': getattr(find(
+                                item,
                                 'media:group/media:community/media:statistics',
                                 _ns,
                             ), 'get', dict_get)('views', 0),
@@ -1816,7 +1824,7 @@ class YouTube(LoginClient):
                     feed_items = cached_items
 
                 if refresh_feed:
-                    new_cache[channel_id] = {
+                    new_cache[item_id] = {
                         'channel_name': channel_name,
                         'cached_items': feed_items,
                     }
@@ -1827,11 +1835,11 @@ class YouTube(LoginClient):
                     filtered = channel_name and channel_name in filters['names']
                     if filters['blacklist']:
                         if not filtered:
-                            all_items[channel_id] = feed_items
+                            all_items[item_id] = feed_items
                     elif filtered:
-                        all_items[channel_id] = feed_items
+                        all_items[item_id] = feed_items
                 else:
-                    all_items[channel_id] = feed_items
+                    all_items[item_id] = feed_items
 
                 if progress_dialog:
                     progress_dialog.update(position=len(all_items))
@@ -1849,24 +1857,26 @@ class YouTube(LoginClient):
             return None
 
         def _threaded_fetch(kwargs,
+                            do_batch,
                             output,
                             worker,
                             threads,
                             pool_id,
-                            input_wait,
+                            check_inputs,
                             **_kwargs):
+            counts = threads['counts']
             complete = False
             while not threads['balance'].is_set():
                 threads['loop'].set()
                 if kwargs is True:
                     _kwargs = {}
                 elif kwargs:
-                    _kwargs = kwargs.pop()
-                elif input_wait:
-                    with input_wait:
+                    _kwargs = {'inputs': kwargs} if do_batch else kwargs.pop()
+                elif check_inputs:
+                    if check_inputs.wait(0.1):
                         if kwargs:
                             continue
-                        break
+                    break
                 else:
                     complete = True
                     break
@@ -1882,17 +1892,17 @@ class YouTube(LoginClient):
                     context.log_error(msg)
                     continue
 
-                if complete or not success:
+                if complete or not success or not counts[pool_id]:
                     break
             else:
                 threads['balance'].clear()
 
             threads['counter'].release()
             if complete:
-                threads['counts'][pool_id] = None
-            else:
-                threads['counts'][pool_id] -= 1
-            threads['counts']['all'] -= 1
+                counts[pool_id] = None
+            elif counts[pool_id]:
+                counts[pool_id] -= 1
+            counts['all'] -= 1
             threads['current'].discard(threading.current_thread())
             threads['loop'].set()
 
@@ -1917,7 +1927,7 @@ class YouTube(LoginClient):
             function_cache = context.get_function_cache()
 
             channel_params = {
-                'part': 'snippet',
+                'part': 'snippet,contentDetails',
                 'maxResults': str(self.max_results()),
                 'order': 'unread',
                 'mine': True,
@@ -1929,7 +1939,9 @@ class YouTube(LoginClient):
                               function_cache=function_cache):
                 json_data = function_cache.run(
                     self.api_request,
-                    function_cache.ONE_HOUR,
+                    function_cache.ONE_HOUR
+                    if 'pageToken' in _params else
+                    5 * function_cache.ONE_MINUTE,
                     _refresh=_refresh,
                     method='GET',
                     path='subscriptions',
@@ -1939,9 +1951,18 @@ class YouTube(LoginClient):
                 if not json_data:
                     return False, True
 
-                output['channel_ids'].extend([{
-                    'channel_id': item['snippet']['resourceId']['channelId']
-                } for item in json_data.get('items', [])])
+                items = json_data.get('items', [])
+                if not items:
+                    return False, True
+
+                updated_items = [
+                    item['snippet']['resourceId']['channelId']
+                    for item in items
+                    if item['contentDetails']['newItemCount']
+                ]
+                output['channel_ids'].extend(updated_items)
+                if len(items) != len(updated_items):
+                    return True, True
 
                 subs_page_token = json_data.get('nextPageToken')
                 if subs_page_token:
@@ -1982,11 +2003,12 @@ class YouTube(LoginClient):
             payloads[1] = {
                 'worker': _get_channels,
                 'kwargs': True,
+                'do_batch': False,
                 'output': threaded_output,
                 'threads': threads,
                 'limit': 1,
-                'input_wait': None,
-                'input_wait_for': None,
+                'check_inputs': False,
+                'inputs_to_check': None,
             }
             # payloads[2] = {
             #     'worker': _get_playlists,
@@ -1994,40 +2016,44 @@ class YouTube(LoginClient):
             #     'output': threaded_output,
             #     'threads': threads,
             #     'limit': 1,
-            #     'input_wait': None,
-            #     'input_wait_for': None,
+            #     'check_inputs': False,
+            #     'inputs_to_check': None,
             # }
         payloads[3] = {
-            'worker': _get_channel_feed_cache,
+            'worker': partial(_get_feed_cache, item_type='channel_id'),
             'kwargs': threaded_output['channel_ids'],
-            'output': threaded_output,
-            'threads': threads,
-            'limit': 1,
-            'input_wait': threading.Lock(),
-            'input_wait_for': (1,),
-        }
-        payloads[4] = {
-            'worker': _get_playlist_feed_cache,
-            'kwargs': threaded_output['playlist_ids'],
-            'output': threaded_output,
-            'threads': threads,
-            'limit': 1,
-            # 'input_wait': threading.Lock(),
-            # 'input_wait_for': (2,),
-            'input_wait': None,
-            'input_wait_for': None,
-        }
-        payloads[5] = {
-            'worker': _get_feed,
-            'kwargs': threaded_output['do_refresh'],
+            'do_batch': True,
             'output': threaded_output,
             'threads': threads,
             'limit': None,
-            'input_wait': threading.Lock(),
-            'input_wait_for': (3, 4,),
+            'check_inputs': threading.Event(),
+            'inputs_to_check': {1},
+        }
+        payloads[4] = {
+            'worker': partial(_get_feed_cache, item_type='playlist_id'),
+            'kwargs': threaded_output['playlist_ids'],
+            'do_batch': True,
+            'output': threaded_output,
+            'threads': threads,
+            'limit': None,
+            # 'check_inputs': threading.Event(),
+            # 'inputs_to_check': {2},
+            'check_inputs': False,
+            'inputs_to_check': None,
+        }
+        payloads[5] = {
+            'worker': _get_feed,
+            'kwargs': threaded_output['to_refresh'],
+            'do_batch': False,
+            'output': threaded_output,
+            'threads': threads,
+            'limit': None,
+            'check_inputs': threading.Event(),
+            'inputs_to_check': {3, 4},
         }
 
         completed = []
+        remaining = payloads.keys()
         iterator = iter(payloads)
         loop_enable.set()
         while loop_enable.wait():
@@ -2040,10 +2066,12 @@ class YouTube(LoginClient):
                 for pool_id in completed:
                     del payloads[pool_id]
                 completed = []
+                remaining = payloads.keys()
                 iterator = iter(payloads)
                 if progress_dialog:
                     progress_dialog.grow_total(
-                        len(threaded_output['channel_ids']),
+                        len(threaded_output['channel_ids'])
+                        + len(threaded_output['playlist_ids']),
                     )
                     progress_dialog.update(
                         position=len(threaded_output['feeds']),
@@ -2057,19 +2085,14 @@ class YouTube(LoginClient):
                 completed.append(pool_id)
                 continue
 
-            input_wait = payload['input_wait']
-            if input_wait:
+            check_inputs = payload['check_inputs']
+            if check_inputs:
                 if payload['kwargs']:
-                    if input_wait.locked():
-                        input_wait.release()
+                    check_inputs.set()
                 else:
-                    waiting = payload['input_wait_for']
-                    if waiting and any(wait in payloads for wait in waiting):
-                        if not input_wait.locked():
-                            input_wait.acquire(True)
-                    else:
-                        if input_wait.locked():
-                            input_wait.release()
+                    inputs = payload['inputs_to_check']
+                    if not inputs or inputs.isdisjoint(remaining):
+                        check_inputs.set()
                         completed.append(pool_id)
                     continue
 

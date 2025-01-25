@@ -31,6 +31,10 @@ from ..constants import (
     PLAY_TIMESHIFT,
     PLAY_WITH,
     VALUE_FROM_STR,
+    WINDOW_CACHE,
+    WINDOW_FALLBACK,
+    WINDOW_REPLACE,
+    WINDOW_RETURN,
 )
 from ..json_store import AccessManager
 from ..sql_store import (
@@ -71,9 +75,10 @@ class AbstractContext(Logger):
         'logged_in',
         'resume',
         'screensaver',
-        'window_fallback',
-        'window_replace',
-        'window_return',
+        WINDOW_CACHE,
+        WINDOW_FALLBACK,
+        WINDOW_REPLACE,
+        WINDOW_RETURN,
     }
     _INT_PARAMS = {
         'fanart_type',
@@ -277,8 +282,9 @@ class AbstractContext(Logger):
                    params=None,
                    parse_params=False,
                    run=False,
-                   play=False,
-                   replace=False):
+                   play=None,
+                   replace=False,
+                   command=False):
         if isinstance(path, (list, tuple)):
             uri = self.create_path(*path, is_uri=True)
         elif path:
@@ -305,12 +311,18 @@ class AbstractContext(Logger):
                 ])
             uri = '?'.join((uri, params))
 
+        command = 'command://' if command else ''
         if run:
-            return ''.join(('RunPlugin(', uri, ')'))
-        if play:
-            return ''.join(('PlayMedia(', uri, ',playlist_type_hint=1)'))
+            return ''.join((command, 'RunPlugin(', uri, ')'))
+        if play is not None:
+            return ''.join((
+                command,
+                'PlayMedia(',
+                uri,
+                ',playlist_type_hint=', str(play), ')',
+            ))
         if replace:
-            return ''.join(('ReplaceWindow(Videos, ', uri, ')'))
+            return ''.join((command, 'ReplaceWindow(Videos, ', uri, ')'))
         return uri
 
     def get_parent_uri(self, **kwargs):
@@ -321,7 +333,7 @@ class AbstractContext(Logger):
         include_parts = kwargs.get('parts')
         parts = [
             part for part in [
-                str(arg).strip('/').replace('\\', '/').replace('//', '/')
+                to_str(arg).strip('/').replace('\\', '/').replace('//', '/')
                 for arg in args
             ] if part
         ]
