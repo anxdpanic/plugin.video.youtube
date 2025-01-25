@@ -415,7 +415,7 @@ class Provider(AbstractProvider):
 
         resource_manager = provider.get_resource_manager(context)
         playlists = resource_manager.get_related_playlists(channel_id)
-        uploads = playlists.get('uploads')
+        uploads = playlists.get('uploads') if playlists else None
         if uploads and uploads.startswith('UU'):
             result = [
                 {
@@ -487,7 +487,7 @@ class Provider(AbstractProvider):
 
         resource_manager = provider.get_resource_manager(context)
         playlists = resource_manager.get_related_playlists(channel_id)
-        uploads = playlists.get('uploads')
+        uploads = playlists.get('uploads') if playlists else None
         if uploads and uploads.startswith('UU'):
             uploads = uploads.replace('UU', 'UULV', 1)
             batch_id = (uploads, context.get_param('page_token') or 0)
@@ -523,7 +523,7 @@ class Provider(AbstractProvider):
 
         resource_manager = provider.get_resource_manager(context)
         playlists = resource_manager.get_related_playlists(channel_id)
-        uploads = playlists.get('uploads')
+        uploads = playlists.get('uploads') if playlists else None
         if uploads and uploads.startswith('UU'):
             uploads = uploads.replace('UU', 'UUSH', 1)
             batch_id = (uploads, context.get_param('page_token') or 0)
@@ -633,7 +633,7 @@ class Provider(AbstractProvider):
         hide_folders = params.get('hide_folders')
 
         playlists = resource_manager.get_related_playlists(channel_id)
-        uploads = playlists.get('uploads')
+        uploads = playlists.get('uploads') if playlists else None
         if uploads and not uploads.startswith('UU'):
             uploads = None
 

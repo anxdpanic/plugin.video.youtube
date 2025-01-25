@@ -370,14 +370,18 @@ class ResourceManager(object):
             insert_point = batch_ids.index(batch_id, insert_point)
             while 1:
                 batch_id = (playlist_id, page_token)
-                new_batch_ids.append(batch_id)
                 batch = client.get_playlist_items(*batch_id)
+                if not batch:
+                    break
+                new_batch_ids.append(batch_id)
                 new_data[batch_id] = batch
                 page_token = batch.get('nextPageToken') if fetch_next else None
                 if page_token is None:
-                    batch_ids[insert_point:insert_point] = new_batch_ids
-                    insert_point += len(new_batch_ids)
                     break
+
+            if new_batch_ids:
+                batch_ids[insert_point:insert_point] = new_batch_ids
+                insert_point += len(new_batch_ids)
 
         if new_data:
             context.debug_log and context.log_debug(

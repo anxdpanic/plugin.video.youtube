@@ -215,7 +215,8 @@ def _process_select_playlist(provider, context):
     resource_manager = provider.get_resource_manager(context)
 
     # add the 'Watch Later' playlist
-    if 'watchLater' in resource_manager.get_related_playlists('mine'):
+    playlists = resource_manager.get_related_playlists('mine')
+    if playlists and 'watchLater' in playlists:
         watch_later_id = context.get_access_manager().get_watch_later_id()
     else:
         watch_later_id = None

@@ -202,7 +202,7 @@ def _process_description_links(provider, context):
             resource_manager = provider.get_resource_manager(context)
 
             video_data = resource_manager.get_videos((video_id,))
-            yt_item = video_data[video_id]
+            yt_item = video_data[video_id] if video_data else None
             if not yt_item or 'snippet' not in yt_item:
                 context.get_ui().on_ok(
                     title=context.localize('video.description.links'),
