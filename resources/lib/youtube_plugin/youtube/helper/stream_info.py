@@ -36,7 +36,7 @@ from ...kodion.compatibility import (
 )
 from ...kodion.constants import PATHS, TEMP_PATH
 from ...kodion.network import get_connect_address
-from ...kodion.utils import make_dirs, merge_dicts, redact_ip
+from ...kodion.utils import make_dirs, merge_dicts, redact_ip_in_uri
 from ...kodion.utils.datetime_parser import fromtimestamp
 
 
@@ -1223,7 +1223,7 @@ class StreamInfo(YouTubeRequestClient):
                     playback_stats=playback_stats,
                 )
                 if yt_format is None:
-                    stream_info = redact_ip(match.group(1))
+                    stream_info = redact_ip_in_uri(match.group(1))
                     log_debug('Unknown itag - {itag}'
                               '\n\t{stream}'
                               .format(itag=itag, stream=stream_info))
@@ -1312,11 +1312,11 @@ class StreamInfo(YouTubeRequestClient):
                 )
                 if yt_format is None:
                     if url:
-                        stream_map['url'] = redact_ip(url)
+                        stream_map['url'] = redact_ip_in_uri(url)
                     if conn:
-                        stream_map['conn'] = redact_ip(conn)
+                        stream_map['conn'] = redact_ip_in_uri(conn)
                     if stream:
-                        stream_map['stream'] = redact_ip(stream)
+                        stream_map['stream'] = redact_ip_in_uri(stream)
                     log_debug('Unknown itag - {itag}'
                               '\n\t{stream}'
                               .format(itag=itag, stream=stream_map))

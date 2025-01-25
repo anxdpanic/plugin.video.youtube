@@ -23,9 +23,7 @@ from ..compatibility import (
     BaseHTTPRequestHandler,
     TCPServer,
     ThreadingMixIn,
-    parse_qs,
     urlencode,
-    urlsplit,
     urlunsplit,
     xbmc,
     xbmcgui,
@@ -38,7 +36,7 @@ from ..constants import (
     PATHS,
     TEMP_PATH,
 )
-from ..utils import redact_auth, redact_ip, wait
+from ..utils import parse_and_redact_uri, wait
 
 
 class HTTPServer(ThreadingMixIn, TCPServer):
@@ -193,36 +191,11 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         client_ip = self.client_address[0]
         ip_allowed, is_local, is_whitelisted = self.ip_address_status(client_ip)
 
-        path_parts = urlsplit(self.path)
-        if path_parts.query:
-            params = parse_qs(path_parts.query)
-            log_params = params.copy()
-            for param, value in params.items():
-                value = value[0]
-                if param in {'key', 'api_key', 'api_secret', 'client_secret'}:
-                    log_params[param] = '...'.join((value[:3], value[-3:]))
-                elif param in {'api_id', 'client_id'}:
-                    log_params[param] = '...'.join((value[:3], value[-5:]))
-                elif param in {'access_token', 'refresh_token', 'token'}:
-                    log_params[param] = '<redacted>'
-                elif param == 'url':
-                    log_params[param] = redact_ip(value)
-                elif param == 'ip':
-                    log_params[param] = '<redacted>'
-                elif param == 'location':
-                    log_params[param] = '|xx.xxxx,xx.xxxx|'
-                elif param == '__headers':
-                    log_params[param] = redact_auth(value)
-            log_path = urlunsplit((
-                '', '', path_parts.path, urlencode(log_params), '',
-            ))
-        else:
-            params = log_params = None
-            log_path = path_parts.path
+        parts, params, log_path, log_params = parse_and_redact_uri(self.path)
         path = {
             'full': self.path,
-            'path': path_parts.path,
-            'query': path_parts.query,
+            'path': parts.path,
+            'query': parts.query,
             'params': params,
             'log_params': log_params,
             'log_path': log_path,
