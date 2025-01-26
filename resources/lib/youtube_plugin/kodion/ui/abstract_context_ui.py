@@ -64,6 +64,7 @@ class AbstractContextUI(object):
 
 class AbstractProgressDialog(object):
     def __init__(self,
+                 ui,
                  dialog,
                  background,
                  heading,
@@ -71,8 +72,15 @@ class AbstractProgressDialog(object):
                  total=0,
                  message_template=None,
                  template_params=None):
-        self._dialog = dialog()
-        self._dialog.create(heading, message)
+        self._ui = ui
+        if ui.busy_dialog_active():
+            self._dialog = dialog()
+            self._dialog.create(heading, message)
+            self._created = True
+        else:
+            self._dialog = dialog()
+            self._created = False
+
         self._background = background
 
         self._position = None
@@ -110,12 +118,15 @@ class AbstractProgressDialog(object):
         return self._position
 
     def close(self):
-        if self._dialog:
+        if self._dialog and self._created:
             self._dialog.close()
             self._dialog = None
+            self._created = False
 
     def is_aborted(self):
-        return getattr(self._dialog, 'iscanceled', bool)()
+        if self._dialog and self._created:
+            return getattr(self._dialog, 'iscanceled', bool)()
+        return False
 
     def set_total(self, total):
         self._total = int(total)
@@ -169,6 +180,12 @@ class AbstractProgressDialog(object):
                 **template_params
             )
             self._message = message
+
+        if not self._created:
+            if self._ui.busy_dialog_active():
+                return
+            self._dialog.create(self._heading, self._message)
+            self._created = True
 
         # Kodi 18 renamed XbmcProgressDialog.update argument line1 to message.
         # Only use positional arguments to maintain compatibility

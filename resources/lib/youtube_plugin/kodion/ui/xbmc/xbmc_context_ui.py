@@ -10,6 +10,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from weakref import proxy
+
 from ..abstract_context_ui import AbstractContextUI, AbstractProgressDialog
 from ...compatibility import xbmc, xbmcgui
 from ...constants import ADDON_ID, REFRESH_CONTAINER
@@ -32,6 +34,7 @@ class XbmcContextUI(AbstractContextUI):
             message_template = '{_message} {_current}/{_total}'
 
         return AbstractProgressDialog(
+            ui=proxy(self),
             dialog=(xbmcgui.DialogProgressBG
                     if background else
                     xbmcgui.DialogProgress),
