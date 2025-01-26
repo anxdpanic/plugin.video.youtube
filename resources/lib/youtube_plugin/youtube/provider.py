@@ -1074,7 +1074,7 @@ class Provider(AbstractProvider):
             refresh_tokens = access_manager.get_refresh_token()
             success = True
             if any(refresh_tokens):
-                for refresh_token in set(refresh_tokens):
+                for refresh_token in frozenset(refresh_tokens):
                     try:
                         if refresh_token:
                             client.revoke(refresh_token)
