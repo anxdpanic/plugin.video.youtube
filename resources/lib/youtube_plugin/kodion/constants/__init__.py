@@ -59,6 +59,7 @@ VIDEO_ID = 'video_id'
 # Events
 CHECK_SETTINGS = 'check_settings'
 PLAYBACK_INIT = 'playback_init'
+PLAYBACK_FAILED = 'playback_failed'
 PLAYBACK_STARTED = 'playback_started'
 PLAYBACK_STOPPED = 'playback_stopped'
 REFRESH_CONTAINER = 'refresh_container'
@@ -78,6 +79,13 @@ PLAY_PROMPT_SUBTITLES = 'prompt_for_subtitles'
 PLAY_STRM = 'strm'
 PLAY_TIMESHIFT = 'timeshift'
 PLAY_WITH = 'play_with'
+FORCE_PLAY_PARAMS = frozenset((
+    PLAY_FORCE_AUDIO,
+    PLAY_TIMESHIFT,
+    PLAY_PROMPT_QUALITY,
+    PLAY_PROMPT_SUBTITLES,
+    PLAY_WITH,
+))
 
 # Stored data
 CONTAINER_ID = 'container_id'
@@ -126,6 +134,7 @@ __all__ = (
     # Events
     'CHECK_SETTINGS',
     'PLAYBACK_INIT',
+    'PLAYBACK_FAILED',
     'PLAYBACK_STARTED',
     'PLAYBACK_STOPPED',
     'REFRESH_CONTAINER',
@@ -145,6 +154,7 @@ __all__ = (
     'PLAY_STRM',
     'PLAY_TIMESHIFT',
     'PLAY_WITH',
+    'FORCE_PLAY_PARAMS',
 
     # Stored data
     'CONTAINER_ID',

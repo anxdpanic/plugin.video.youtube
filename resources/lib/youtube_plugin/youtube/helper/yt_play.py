@@ -20,6 +20,7 @@ from ...kodion.compatibility import string_type, urlencode, urlunsplit, xbmc
 from ...kodion.constants import (
     BUSY_FLAG,
     CONTENT,
+    FORCE_PLAY_PARAMS,
     PATHS,
     PLAYBACK_INIT,
     PLAYER_DATA,
@@ -27,9 +28,7 @@ from ...kodion.constants import (
     PLAYLIST_POSITION,
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
-    PLAY_PROMPT_SUBTITLES,
     PLAY_STRM,
-    PLAY_TIMESHIFT,
     PLAY_WITH,
     SERVER_WAKEUP,
 )
@@ -322,13 +321,7 @@ def process(provider, context, **_kwargs):
     video_ids = params.get('video_ids')
     playlist_id = params.get('playlist_id')
 
-    force_play_params = {
-        PLAY_FORCE_AUDIO,
-        PLAY_TIMESHIFT,
-        PLAY_PROMPT_QUALITY,
-        PLAY_PROMPT_SUBTITLES,
-        PLAY_WITH,
-    }.intersection(param_keys)
+    force_play_params = FORCE_PLAY_PARAMS.intersection(param_keys)
 
     if video_id and not playlist_id and not video_ids:
         for param in force_play_params:

@@ -13,16 +13,18 @@ from __future__ import absolute_import, division, unicode_literals
 from traceback import format_stack
 
 from ..abstract_plugin import AbstractPlugin
-from ...compatibility import parse_qsl, urlsplit, xbmc, xbmcplugin
+from ...compatibility import parse_qsl, urlsplit, xbmc, xbmcgui, xbmcplugin
 from ...constants import (
     BUSY_FLAG,
     CONTAINER_FOCUS,
     CONTAINER_ID,
     CONTAINER_POSITION,
     CONTENT_TYPE,
+    FORCE_PLAY_PARAMS,
     PATHS,
     PLAY_FORCED,
     PLAY_FORCE_AUDIO,
+    PLAYBACK_FAILED,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
     PLUGIN_SLEEPING,
@@ -260,25 +262,51 @@ class XbmcPlugin(AbstractPlugin):
             succeeded = bool(result)
             if not succeeded:
                 ui.clear_property(CONTENT_TYPE)
+                ui.clear_property(BUSY_FLAG)
+                for param in FORCE_PLAY_PARAMS:
+                    ui.clear_property(param)
 
                 if not options or options.get(provider.RESULT_FALLBACK, True):
-                    if (context.is_plugin_folder()
-                            and context.is_plugin_path(
+                    _post_run_action = None
+                    uri = context.get_uri()
+                    if context.is_plugin_folder():
+                        if context.is_plugin_path(
+                                uri, PATHS.PLAY
+                        ):
+                            context.send_notification(
+                                PLAYBACK_FAILED,
+                                {'video_id': context.get_param('video_id')},
+                            )
+                            # None of the following will actually prevent the
+                            # playback attempt from occurring
+                            item = xbmcgui.ListItem(path=uri, offscreen=True)
+                            item.setContentLookup(False)
+                            props = {
+                                'isPlayable': 'false',
+                                'ForceResolvePlugin': 'true',
+                            }
+                            item.setProperties(props)
+                            xbmcplugin.setResolvedUrl(
+                                handle,
+                                succeeded=False,
+                                listitem=item,
+                            )
+                        elif context.is_plugin_path(
                                 context.get_infolabel('Container.FolderPath')
-                            )):
-                        _, _post_run_action = self.uri_action(
-                            context,
-                            context.get_parent_uri(params={
-                                WINDOW_FALLBACK: True,
-                                WINDOW_REPLACE: True,
-                                WINDOW_RETURN: False,
-                            }),
-                        )
-                    else:
-                        _, _post_run_action = self.uri_action(
-                            context,
-                            'command://Action(Back)',
-                        )
+                        ):
+                            _, _post_run_action = self.uri_action(
+                                context,
+                                context.get_parent_uri(params={
+                                    WINDOW_FALLBACK: True,
+                                    WINDOW_REPLACE: True,
+                                    WINDOW_RETURN: False,
+                                }),
+                            )
+                        else:
+                            _, _post_run_action = self.uri_action(
+                                context,
+                                'command://Action(Back)',
+                            )
                     if post_run_action and _post_run_action:
                         post_run_action = (post_run_action, _post_run_action)
                     else:
