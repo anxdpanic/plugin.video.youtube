@@ -374,7 +374,7 @@ def _process_list_response(provider,
             fifo_queue.appendleft(item)
 
         if '_callback' in yt_item:
-            item.callback = yt_item['_callback']
+            item.callback = yt_item.pop('_callback')
             do_callbacks = True
 
         items.append(item)
