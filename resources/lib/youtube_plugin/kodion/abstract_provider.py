@@ -454,11 +454,10 @@ class AbstractProvider(object):
                     query = input_query
 
             if query:
-                context.execute('Action(Back)', wait=True)
                 return UriItem(context.create_uri(
-                    (PATHS.ROUTE, PATHS.SEARCH, 'query'),
+                    (PATHS.SEARCH, 'query'),
                     dict(params, q=query),
-                    run=True,
+                    window={'replace': False, 'return': True},
                 ))
             else:
                 command = 'list'

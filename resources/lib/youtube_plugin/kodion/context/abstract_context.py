@@ -283,7 +283,7 @@ class AbstractContext(Logger):
                    parse_params=False,
                    run=False,
                    play=None,
-                   replace=False,
+                   window=None,
                    command=False):
         if isinstance(path, (list, tuple)):
             uri = self.create_path(*path, is_uri=True)
@@ -304,7 +304,9 @@ class AbstractContext(Logger):
                 if isinstance(params, dict):
                     params = params.items()
                 params = urlencode([
-                    ('%' + param, ','.join([quote(item) for item in value]))
+                    (('%' + param, ','.join([quote(item) for item in value]))
+                     if len(value) > 1 else
+                     (param, value[0]))
                     if isinstance(value, (list, tuple)) else
                     (param, value)
                     for param, value in params
@@ -321,8 +323,19 @@ class AbstractContext(Logger):
                 uri,
                 ',playlist_type_hint=', str(play), ')',
             ))
-        if replace:
-            return ''.join((command, 'ReplaceWindow(Videos, ', uri, ')'))
+        if window:
+            if not isinstance(window, dict):
+                window = {}
+            window_replace = window.setdefault('replace', False)
+            window_return = window.setdefault('return', True)
+            return ''.join((
+                command,
+                'ReplaceWindow(Videos,'
+                if window_replace else
+                'ActivateWindow(Videos,',
+                uri,
+                ',return)' if window_return else ')',
+            ))
         return uri
 
     def get_parent_uri(self, **kwargs):

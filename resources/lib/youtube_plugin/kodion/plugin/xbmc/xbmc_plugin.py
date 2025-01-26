@@ -46,6 +46,7 @@ from ...items import (
     playback_item,
     uri_listitem,
 )
+from ...utils import parse_and_redact_uri
 
 
 class XbmcPlugin(AbstractPlugin):
@@ -354,42 +355,69 @@ class XbmcPlugin(AbstractPlugin):
     @staticmethod
     def uri_action(context, uri):
         if uri.startswith('script://'):
-            uri = uri[len('script://'):]
-            context.log_debug('Running script: |{0}|'.format(uri))
-            action = 'RunScript({0})'.format(uri)
+            _uri = uri[len('script://'):]
+            log_action = 'Running script'
+            log_uri = _uri
+            action = 'RunScript({0})'.format(_uri)
             result = True
 
         elif uri.startswith('command://'):
-            uri = uri[len('command://'):]
-            context.log_debug('Running command: |{0}|'.format(uri))
-            action = uri
+            _uri = uri[len('command://'):]
+            log_action = 'Running command'
+            log_uri = _uri
+            action = _uri
             result = True
 
         elif uri.startswith('PlayMedia('):
-            context.log_debug('Redirecting for playback: |{0}|'.format(uri))
+            log_action = 'Redirecting for playback'
+            log_uri = parse_and_redact_uri(
+                uri[len('PlayMedia('):-1],
+                redact_only=True,
+            )
             action = uri
             result = True
 
         elif uri.startswith('RunPlugin('):
-            context.log_debug('Running plugin: |{0}|'.format(uri))
+            log_action = 'Running plugin'
+            log_uri = parse_and_redact_uri(
+                uri[len('RunPlugin('):-1],
+                redact_only=True,
+            )
             action = uri
             result = True
 
+        elif uri.startswith('ActivateWindow('):
+            log_action = 'Activating window'
+            log_uri = parse_and_redact_uri(
+                uri[len('ActivateWindow('):-1],
+                redact_only=True,
+            )
+            action = uri
+            result = False
+
+        elif uri.startswith('ReplaceWindow('):
+            log_action = 'Replacing window'
+            log_uri = parse_and_redact_uri(
+                uri[len('ReplaceWindow('):-1],
+                redact_only=True,
+            )
+            action = uri
+            result = False
+
         elif context.is_plugin_path(uri, PATHS.PLAY):
-            _uri = urlsplit(uri)
-            params = dict(parse_qsl(_uri.query, keep_blank_values=True))
+            parts, params, log_uri, _ = parse_and_redact_uri(uri)
             if params.get('action') == 'list':
-                context.log_debug('Redirecting to: |{0}|'.format(uri))
+                log_action = 'Redirecting to'
                 action = context.create_uri(
-                    (PATHS.ROUTE, _uri.path.rstrip('/')),
+                    (PATHS.ROUTE, parts.path.rstrip('/')),
                     params,
                     run=True,
                 )
                 result = False
             else:
-                context.log_debug('Redirecting for playback: |{0}|'.format(uri))
+                log_action = 'Redirecting for playback'
                 action = context.create_uri(
-                    (_uri.path.rstrip('/'),),
+                    (parts.path.rstrip('/'),),
                     params,
                     play=(xbmc.PLAYLIST_MUSIC
                           if (context.get_ui().get_property(PLAY_FORCE_AUDIO)
@@ -399,12 +427,11 @@ class XbmcPlugin(AbstractPlugin):
                 result = True
 
         elif context.is_plugin_path(uri):
-            context.log_debug('Redirecting to: |{0}|'.format(uri))
-            _uri = urlsplit(uri)
+            log_action = 'Redirecting to'
+            parts, params, log_uri, _ = parse_and_redact_uri(uri)
             action = context.create_uri(
-                (PATHS.ROUTE, _uri.path.rstrip('/') or PATHS.HOME),
-                _uri.query,
-                parse_params=True,
+                (PATHS.ROUTE, parts.path.rstrip('/') or PATHS.HOME),
+                params,
                 run=True,
             )
             result = False
@@ -412,7 +439,14 @@ class XbmcPlugin(AbstractPlugin):
         else:
             action = None
             result = False
+            return result, action
 
+        context.log_debug(''.join((
+            log_action,
+            ': |',
+            log_uri,
+            '|',
+        )))
         return result, action
 
     def classify_list_item(self, item, options, force_resolve):
