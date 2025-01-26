@@ -55,7 +55,6 @@ class MediaItem(BaseItem):
         self._mediatype = None
         self._plot = plot
         self._rating = None
-        self._title = self.get_name()
 
         self._headers = None
         self._license_key = None
@@ -203,16 +202,6 @@ class MediaItem(BaseItem):
 
     def get_rating(self):
         return self._rating
-
-    def set_title(self, title):
-        try:
-            title = unescape(title)
-        except Exception:
-            pass
-        self._name = self._title = title
-
-    def get_title(self):
-        return self._title
 
     def set_headers(self, value):
         self._headers = value

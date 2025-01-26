@@ -1695,8 +1695,8 @@ class Provider(AbstractProvider):
                         new_item.set_bookmark_timestamp(bookmark_timestamp)
                         new_item.available = False
                         new_item.playable = False
-                        new_item.set_title(context.get_ui().color(
-                            'AA808080', new_item.get_title()
+                        new_item.set_name(context.get_ui().color(
+                            'AA808080', new_item.get_name()
                         ))
                     return True
 
