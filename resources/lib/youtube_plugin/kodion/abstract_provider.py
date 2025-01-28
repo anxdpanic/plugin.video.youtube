@@ -458,7 +458,7 @@ class AbstractProvider(object):
                     (PATHS.SEARCH, 'query'),
                     dict(params, q=query),
                     window={'replace': False, 'return': True},
-                ))
+                )), {provider.RESULT_FALLBACK: False}
             else:
                 command = 'list'
                 context.set_path(PATHS.SEARCH, command)
