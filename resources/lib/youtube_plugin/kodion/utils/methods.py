@@ -358,12 +358,12 @@ def parse_and_redact_uri(uri, redact_only=False):
     if parts.query:
         params = parse_qs(parts.query, keep_blank_values=True)
         log_params = redact_params(params)
-        log_path = urlunsplit((
-            '', '', parts.path, urlencode(log_params), '',
+        log_uri = urlunsplit((
+            parts.scheme, parts.netloc, parts.path, urlencode(log_params), '',
         ))
     else:
         params = log_params = None
-        log_path = parts.path
+        log_uri = uri
     if redact_only:
-        return log_path
-    return parts, params, log_path, log_params
+        return log_uri
+    return parts, params, log_uri, log_params
