@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from traceback import format_stack
 
 from ..abstract_plugin import AbstractPlugin
-from ...compatibility import xbmc, xbmcgui, xbmcplugin
+from ...compatibility import string_type, xbmc, xbmcgui, xbmcplugin
 from ...constants import (
     BUSY_FLAG,
     CONTAINER_FOCUS,
@@ -268,9 +268,14 @@ class XbmcPlugin(AbstractPlugin):
                 for param in FORCE_PLAY_PARAMS:
                     ui.clear_property(param)
 
-                if not options or options.get(provider.RESULT_FALLBACK, True):
+                uri = context.get_uri()
+                fallback = options.get(provider.RESULT_FALLBACK, True)
+                if isinstance(fallback, string_type) and fallback != uri:
+                    context.parse_uri(fallback, update=True)
+                    return self.run(provider, context, forced=forced)
+                if fallback:
                     _post_run_action = None
-                    uri = context.get_uri()
+
                     if context.is_plugin_folder():
                         if context.is_plugin_path(
                                 uri, PATHS.PLAY
