@@ -155,14 +155,13 @@ class AbstractContext(Logger):
         self._plugin_icon = None
         self._version = 'UNKNOWN'
 
-        self._path = path
-        self._path_parts = []
-        self.set_path(path, force=True)
-
         self._params = params or {}
         self.parse_params(self._params)
 
-        self._uri = self.create_uri(self._path, self._params)
+        self._uri = None
+        self._path = path
+        self._path_parts = []
+        self.set_path(path, force=True)
 
     @staticmethod
     def format_date_short(date_obj, str_format=None):
@@ -292,7 +291,8 @@ class AbstractContext(Logger):
         else:
             uri = '/'
 
-        uri = self._plugin_id.join(('plugin://', uri))
+        if not uri.startswith('plugin://'):
+            uri = self._plugin_id.join(('plugin://', uri))
 
         if params:
             if isinstance(params, string_type):
@@ -382,6 +382,8 @@ class AbstractContext(Logger):
 
         self._path = path
         self._path_parts = parts
+        if kwargs.get('update_uri', True):
+            self.update_uri()
 
     def get_params(self):
         return self._params
@@ -389,13 +391,17 @@ class AbstractContext(Logger):
     def get_param(self, name, default=None):
         return self._params.get(name, default)
 
-    def parse_uri(self, uri):
+    def parse_uri(self, uri, update=False):
         uri = urlsplit(uri)
+        path = uri.path
         params = self.parse_params(
             dict(parse_qsl(uri.query, keep_blank_values=True)),
             update=False,
         )
-        return uri.path, params
+        if update:
+            self._params = params
+            self.set_path(path)
+        return path, params
 
     def parse_params(self, params, update=True):
         to_delete = []
@@ -432,7 +438,7 @@ class AbstractContext(Logger):
                     elif param == 'action':
                         if parsed_value in {'play_all', 'play_video'}:
                             to_delete.append(param)
-                            self.set_path(PATHS.PLAY)
+                            self.set_path(PATHS.PLAY, update_uri=False)
                             continue
                     elif param == 'videoid':
                         to_delete.append(param)
@@ -495,6 +501,9 @@ class AbstractContext(Logger):
 
     def get_uri(self):
         return self._uri
+
+    def update_uri(self):
+        self._uri = self.create_uri(self._path, self._params)
 
     def get_name(self):
         return self._plugin_name
