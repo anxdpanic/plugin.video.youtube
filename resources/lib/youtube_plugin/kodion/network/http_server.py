@@ -12,7 +12,9 @@ from __future__ import absolute_import, division, unicode_literals
 import os
 import re
 import socket
+from collections import deque
 from errno import ECONNABORTED, ECONNREFUSED, ECONNRESET
+from functools import partial
 from io import open
 from json import dumps as json_dumps, loads as json_loads
 from select import select
@@ -109,8 +111,8 @@ class RequestHandler(BaseHTTPRequestHandler, object):
     chunk_size = 1024 * 64
 
     server_priority_list = {
-        'id': None,
-        'list': [],
+        'stream_ids': deque(),
+        'server_lists': {},
     }
 
     def __init__(self, request, client_address, server):
@@ -359,16 +361,29 @@ class RequestHandler(BaseHTTPRequestHandler, object):
 
             original_path = params.pop('__path', empty)[0] or '/videoplayback'
 
-            servers = params.pop('__netloc', empty)
+            request_servers = params.pop('__netloc', empty)
             stream_id = (params.pop('__id', empty)[0],
                          params.get('itag', empty)[0])
-            if stream_id != self.server_priority_list['id']:
-                self.server_priority_list['id'] = stream_id
-                _server_list = []
-                self.server_priority_list['list'] = _server_list
+            ids = self.server_priority_list['stream_ids']
+            server_lists = self.server_priority_list['server_lists']
+            if stream_id in ids:
+                priority = server_lists[stream_id]
+                request_servers.sort(
+                    key=partial(self._sort_servers,
+                                _len=len(priority['list']),
+                                _index=priority['list'].index),
+                    reverse=True,
+                )
             else:
-                _server_list = self.server_priority_list['list']
-                servers.sort(key=self._sort_servers, reverse=True)
+                ids.append(stream_id)
+                if len(ids) > 5:
+                    old_id = ids.popleft()
+                    del server_lists[old_id]
+                priority = {
+                    'started': False,
+                    'list': [],
+                }
+                server_lists[stream_id] = priority
 
             headers = params.pop('__headers', empty)[0]
             if headers:
@@ -383,7 +398,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             stream_redirect = settings.httpd_stream_redirect()
 
             response = None
-            for server in servers:
+            for server in request_servers:
                 if not server:
                     continue
 
@@ -395,7 +410,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                     '',
                 ))
 
-                if stream_redirect and server in _server_list:
+                if stream_redirect and server in priority['list']:
                     self.send_response(301)
                     self.send_header('Location', stream_url)
                     self.send_header('Connection', 'close')
@@ -409,11 +424,11 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                                            stream=True,
                                            allow_redirects=False) as response:
                     if not response or not response.ok or response.is_redirect:
-                        if server in _server_list:
-                            _server_list.remove(server)
+                        if server in priority['list']:
+                            priority['list'].remove(server)
                         continue
-                    if server not in _server_list:
-                        _server_list.append(server)
+                    if server not in priority['list']:
+                        priority['list'].append(server)
 
                     self.send_response(response.status_code)
                     for header, value in response.headers.items():
@@ -570,13 +585,12 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         for i in range(0, len(data), self.chunk_size):
             yield data[i:i + self.chunk_size]
 
-    def _sort_servers(self, server):
-        _server_list = self.server_priority_list['list']
+    def _sort_servers(self, server, _len, _index):
         try:
-            index = _server_list.index(server)
+            index = _index(server)
         except ValueError:
             return -1
-        return len(_server_list) - index
+        return _len - index
 
     @classmethod
     def api_config_page(cls):
