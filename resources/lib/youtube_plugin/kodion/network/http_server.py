@@ -191,14 +191,14 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         client_ip = self.client_address[0]
         ip_allowed, is_local, is_whitelisted = self.ip_address_status(client_ip)
 
-        parts, params, log_path, log_params = parse_and_redact_uri(self.path)
+        parts, params, log_uri, log_params = parse_and_redact_uri(self.path)
         path = {
             'full': self.path,
             'path': parts.path,
             'query': parts.query,
             'params': params,
             'log_params': log_params,
-            'log_path': log_path,
+            'log_uri': log_uri,
         }
 
         if not path['path'].startswith(PATHS.PING):
@@ -266,8 +266,8 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                             break
                         self.wfile.write(file_chunk)
             except IOError:
-                response = ('File Not Found: |{path}| -> |{file_path}|'
-                            .format(path=path['log_path'], file_path=file_path))
+                response = ('File Not Found: |{uri}| -> |{file_path}|'
+                            .format(uri=path['log_uri'], file_path=file_path))
                 self.send_error(404, response)
 
         elif api_config_enabled and path['path'] == PATHS.API:
@@ -461,8 +461,8 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                 self.send_header('Content-Length', str(file_size))
                 self.end_headers()
             except IOError:
-                response = ('File Not Found: |{path}| -> |{file_path}|'
-                            .format(path=path['log_path'], file_path=file_path))
+                response = ('File Not Found: |{uri}| -> |{file_path}|'
+                            .format(uri=path['log_uri'], file_path=file_path))
                 self.send_error(404, response)
 
         elif path['path'].startswith(PATHS.REDIRECT):

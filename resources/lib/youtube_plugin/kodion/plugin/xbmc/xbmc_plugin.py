@@ -371,10 +371,12 @@ class XbmcPlugin(AbstractPlugin):
 
         elif uri.startswith('PlayMedia('):
             log_action = 'Redirecting for playback'
-            log_uri = parse_and_redact_uri(
-                uri[len('PlayMedia('):-1],
+            log_uri = uri[len('PlayMedia('):-1].split(',')
+            log_uri[0] = parse_and_redact_uri(
+                log_uri[0],
                 redact_only=True,
             )
+            log_uri = ','.join(log_uri)
             action = uri
             result = True
 
@@ -389,19 +391,25 @@ class XbmcPlugin(AbstractPlugin):
 
         elif uri.startswith('ActivateWindow('):
             log_action = 'Activating window'
-            log_uri = parse_and_redact_uri(
-                uri[len('ActivateWindow('):-1],
-                redact_only=True,
-            )
+            log_uri = uri[len('ActivateWindow('):-1].split(',')
+            if len(log_uri) >= 2:
+                log_uri[1] = parse_and_redact_uri(
+                    log_uri[1],
+                    redact_only=True,
+                )
+            log_uri = ','.join(log_uri)
             action = uri
             result = False
 
         elif uri.startswith('ReplaceWindow('):
             log_action = 'Replacing window'
-            log_uri = parse_and_redact_uri(
-                uri[len('ReplaceWindow('):-1],
-                redact_only=True,
-            )
+            log_uri = uri[len('ReplaceWindow('):-1].split(',')
+            if len(log_uri) >= 2:
+                log_uri[1] = parse_and_redact_uri(
+                    log_uri[1],
+                    redact_only=True,
+                )
+            log_uri = ','.join(log_uri)
             action = uri
             result = False
 
