@@ -1919,7 +1919,6 @@ class StreamInfo(YouTubeRequestClient):
                 meta_info=meta_info,
                 playback_stats=playback_stats,
             )
-
             video_data, audio_data = self._process_adaptive_streams(
                 responses=responses,
                 default_lang_code=(default_lang['default']

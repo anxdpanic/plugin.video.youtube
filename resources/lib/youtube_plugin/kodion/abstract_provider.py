@@ -39,11 +39,11 @@ from .utils import to_unicode
 
 
 class AbstractProvider(object):
-    RESULT_CACHE_TO_DISC = 'cache_to_disc'  # (bool)
-    RESULT_FALLBACK = 'fallback'  # (bool)
-    RESULT_FORCE_PLAY = 'force_play'  # (bool)
-    RESULT_FORCE_RESOLVE = 'force_resolve'  # (bool)
-    RESULT_UPDATE_LISTING = 'update_listing'  # (bool)
+    RESULT_CACHE_TO_DISC = 'result_cache_to_disc'  # (bool)
+    RESULT_FALLBACK = 'result_fallback'  # (bool)
+    RESULT_FORCE_PLAY = 'result_force_play'  # (bool)
+    RESULT_FORCE_RESOLVE = 'result_force_resolve'  # (bool)
+    RESULT_UPDATE_LISTING = 'result_update_listing'  # (bool)
 
     # map for regular expression (path) to method (names)
     _dict_path = {}
@@ -278,6 +278,8 @@ class AbstractProvider(object):
                 context.log_debug('Rerouting - Fallback route not required')
                 return False, {self.RESULT_FALLBACK: False}
 
+        container = None
+        position = None
         refresh = params.get('refresh', 0)
         if refresh:
             if refresh < 0:
@@ -290,9 +292,6 @@ class AbstractProvider(object):
               and path.rstrip('/') == current_path.rstrip('/')):
             context.log_error('Rerouting - Unable to reroute to current path')
             return False
-        else:
-            container = None
-            position = None
 
         result = None
         try:
