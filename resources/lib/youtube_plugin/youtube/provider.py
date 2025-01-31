@@ -557,11 +557,9 @@ class Provider(AbstractProvider):
         listitem_channel_id = context.get_listitem_property(CHANNEL_ID)
 
         client = provider.get_client(context)
-        localize = context.localize
         create_uri = context.create_uri
         function_cache = context.get_function_cache()
         params = context.get_params()
-        ui = context.get_ui()
 
         command = re_match.group('command')
         identifier = re_match.group('identifier')

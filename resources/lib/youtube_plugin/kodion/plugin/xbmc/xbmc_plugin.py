@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from traceback import format_stack
 
 from ..abstract_plugin import AbstractPlugin
-from ...compatibility import parse_qsl, urlsplit, xbmc, xbmcgui, xbmcplugin
+from ...compatibility import xbmc, xbmcgui, xbmcplugin
 from ...constants import (
     BUSY_FLAG,
     CONTAINER_FOCUS,
@@ -22,11 +22,11 @@ from ...constants import (
     CONTENT_TYPE,
     FORCE_PLAY_PARAMS,
     PATHS,
-    PLAY_FORCED,
-    PLAY_FORCE_AUDIO,
     PLAYBACK_FAILED,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
+    PLAY_FORCED,
+    PLAY_FORCE_AUDIO,
     PLUGIN_SLEEPING,
     PLUGIN_WAKEUP,
     REFRESH_CONTAINER,
@@ -168,10 +168,10 @@ class XbmcPlugin(AbstractPlugin):
         if ui.get_property(PLUGIN_SLEEPING):
             context.wakeup(PLUGIN_WAKEUP)
 
-        if ui.pop_property(REFRESH_CONTAINER) or not forced:
-            focused = False
-        elif forced:
+        if not ui.pop_property(REFRESH_CONTAINER) and forced:
             focused = ui.get_property(VIDEO_ID)
+        else:
+            focused = False
 
         if ui.pop_property(RELOAD_ACCESS_MANAGER):
             context.reload_access_manager()
@@ -193,7 +193,8 @@ class XbmcPlugin(AbstractPlugin):
             else:
                 result, options = provider.navigate(context)
         except KodionException as exc:
-            result = options = None
+            result = None
+            options = {}
             if not provider.handle_exception(context, exc):
                 msg = ('XbmcRunner.run - Error'
                        '\n\tException: {exc!r}'
@@ -313,8 +314,8 @@ class XbmcPlugin(AbstractPlugin):
                     else:
                         post_run_action = _post_run_action
 
-            cache_to_disc = False
-            update_listing = True
+            cache_to_disc = options.get(provider.RESULT_CACHE_TO_DISC, False)
+            update_listing = options.get(provider.RESULT_UPDATE_LISTING, True)
 
         if ui.pop_property(PLAY_FORCED):
             context.set_path(PATHS.PLAY)
