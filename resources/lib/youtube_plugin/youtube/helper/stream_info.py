@@ -36,7 +36,7 @@ from ...kodion.compatibility import (
 )
 from ...kodion.constants import PATHS, TEMP_PATH
 from ...kodion.network import get_connect_address
-from ...kodion.utils import make_dirs, merge_dicts, redact_ip
+from ...kodion.utils import make_dirs, merge_dicts, redact_ip_in_uri
 from ...kodion.utils.datetime_parser import fromtimestamp
 
 
@@ -811,8 +811,8 @@ class StreamInfo(YouTubeRequestClient):
             # Some restricted videos require additional requests for subtitles
             # Limited audio stream availability with some clients
             'mpd': (
-                'android_youtube_tv',
                 'android_vr',
+                'android_youtube_tv',
             ),
             # Progressive streams
             # Limited video and audio stream availability
@@ -1223,7 +1223,7 @@ class StreamInfo(YouTubeRequestClient):
                     playback_stats=playback_stats,
                 )
                 if yt_format is None:
-                    stream_info = redact_ip(match.group(1))
+                    stream_info = redact_ip_in_uri(match.group(1))
                     log_debug('Unknown itag - {itag}'
                               '\n\t{stream}'
                               .format(itag=itag, stream=stream_info))
@@ -1312,11 +1312,11 @@ class StreamInfo(YouTubeRequestClient):
                 )
                 if yt_format is None:
                     if url:
-                        stream_map['url'] = redact_ip(url)
+                        stream_map['url'] = redact_ip_in_uri(url)
                     if conn:
-                        stream_map['conn'] = redact_ip(conn)
+                        stream_map['conn'] = redact_ip_in_uri(conn)
                     if stream:
-                        stream_map['stream'] = redact_ip(stream)
+                        stream_map['stream'] = redact_ip_in_uri(stream)
                     log_debug('Unknown itag - {itag}'
                               '\n\t{stream}'
                               .format(itag=itag, stream=stream_map))
@@ -1566,9 +1566,11 @@ class StreamInfo(YouTubeRequestClient):
         use_mpd = self._use_mpd
         use_remote_history = settings.use_remote_history()
 
-        client_name = None
+        _client_name = None
         _client = None
+        _has_auth = None
         _result = None
+        _visitor_data = None
         _video_details = None
         _microformat = None
         _streaming_data = None
@@ -1614,6 +1616,7 @@ class StreamInfo(YouTubeRequestClient):
             '_auth_requested': 'personal' if use_remote_history else False,
             '_access_token': self._access_token,
             '_access_token_tv': self._access_token_tv,
+            '_visitor_data': None,
         }
 
         for name, clients in self._client_groups.items():
@@ -1626,9 +1629,14 @@ class StreamInfo(YouTubeRequestClient):
 
             restart = None
             while 1:
-                for client_name in clients:
-                    _client = self.build_client(client_name, client_data)
-                    if not _client:
+                for _client_name in clients:
+                    _client = self.build_client(_client_name, client_data)
+                    if _client:
+                        _has_auth = _client.get('_has_auth', False)
+                        if _has_auth:
+                            restart = False
+                    else:
+                        _has_auth = None
                         _result = None
                         _video_details = None
                         _microformat = None
@@ -1646,12 +1654,18 @@ class StreamInfo(YouTubeRequestClient):
                         error_hook=self._error_hook,
                         error_hook_kwargs={
                             'video_id': video_id,
-                            'client': client_name,
-                            'auth': _client.get('_has_auth', False),
+                            'client': _client_name,
+                            'auth': _has_auth,
                         },
                         **_client
                     ) or {}
 
+                    if not _visitor_data:
+                        _visitor_data = (_result
+                                         .get('responseContext', {})
+                                         .get('visitorData'))
+                        if _visitor_data:
+                            client_data['_visitor_data'] = _visitor_data
                     _video_details = _result.get('videoDetails', {})
                     _microformat = (_result
                                     .get('microformat', {})
@@ -1695,8 +1709,8 @@ class StreamInfo(YouTubeRequestClient):
                                 status=_status,
                                 reason=_reason or 'UNKNOWN',
                                 video_id=video_id,
-                                client=_client['_name'],
-                                auth=_client.get('_has_auth', False),
+                                client=_client_name,
+                                auth=_has_auth,
                             )
                         )
                         compare_reason = _reason.lower()
@@ -1738,8 +1752,8 @@ class StreamInfo(YouTubeRequestClient):
                     '\n\tAuth:     |{auth}|'
                     .format(
                         video_id=video_id,
-                        client=client_name,
-                        auth=_client.get('_has_auth', False),
+                        client=_client_name,
+                        auth=_has_auth,
                     )
                 )
 
@@ -1755,13 +1769,13 @@ class StreamInfo(YouTubeRequestClient):
                     compare_str=True,
                 )
 
-                if not self._auth_client and _client.get('_has_auth'):
+                if not self._auth_client and _has_auth:
                     self._auth_client = {
                         'client': _client.copy(),
                         'result': _result,
                     }
 
-                responses[client_name] = {
+                responses[_client_name] = {
                     'client': _client,
                     'progressive_fmts': _streaming_data.get('formats'),
                     'adaptive_fmts': _streaming_data.get('adaptiveFormats'),

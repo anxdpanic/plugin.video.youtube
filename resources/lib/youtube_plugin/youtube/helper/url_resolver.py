@@ -194,7 +194,8 @@ class YouTubeResolver(AbstractResolver):
                     return url_components._replace(
                         query=urlencode(params)
                     ).geturl()
-                return url
+                if url != 'undefined':
+                    return url
 
         return response.url
 
@@ -254,7 +255,7 @@ class UrlResolver(object):
         resolved_url = function_cache.run(
             self._resolve,
             function_cache.ONE_DAY,
-            _refresh=self._context.get_param('refresh'),
+            _refresh=self._context.get_param('refresh', 0) > 0,
             url=url
         )
         if not resolved_url or resolved_url == '/':

@@ -58,19 +58,37 @@ class ServiceMonitor(xbmc.Monitor):
         super(ServiceMonitor, self).__init__()
 
     @staticmethod
+    def busy_dialog_active(dialog_ids=frozenset((
+            10100,  # WINDOW_DIALOG_YES_NO
+            10101,  # WINDOW_DIALOG_PROGRESS
+            10103,  # WINDOW_DIALOG_KEYBOARD
+            10109,  # WINDOW_DIALOG_NUMERIC
+            10138,  # WINDOW_DIALOG_BUSY
+            10151,  # WINDOW_DIALOG_EXT_PROGRESS
+            10160,  # WINDOW_DIALOG_BUSY_NOCANCEL
+            12000,  # WINDOW_DIALOG_SELECT
+            12002,  # WINDOW_DIALOG_OK
+    ))):
+        dialog_id = xbmcgui.getCurrentWindowDialogId()
+        if dialog_id in dialog_ids:
+            return dialog_id
+        return False
+
+    @staticmethod
     def is_plugin_container(url='plugin://{0}/'.format(ADDON_ID),
                             check_all=False,
                             _bool=xbmc.getCondVisibility,
+                            _busy=busy_dialog_active.__func__,
                             _label=xbmc.getInfoLabel):
         if check_all:
             return (not _bool('Container.IsUpdating')
-                    and not _bool('System.HasActiveModalDialog')
+                    and not _busy()
                     and _label('Container.FolderPath').startswith(url))
         is_plugin = _label('Container.FolderPath').startswith(url)
         return {
             'is_plugin': is_plugin,
             'is_loaded': is_plugin and not _bool('Container.IsUpdating'),
-            'is_active': is_plugin and not _bool('System.HasActiveModalDialog'),
+            'is_active': is_plugin and not _busy(),
         }
 
     @staticmethod

@@ -1,3 +1,27 @@
+## v7.2.0+beta.5
+### Fixed
+- Improve url resolver error handling
+- Fix showing Uploads playlist if all videos are private #988 #1060
+- Fix updating progress of background progress dialogs #1032
+- Fix showing duplicate channel progress dialogs in My Subscriptions #1032
+- Ensure correct playlist_type_hint is used with audio only playback
+- Workaround Kodi window history issues when accepting search inputs #1070
+- Fix various Python2 unicode encoding errors
+- Disable refresh parameter on Kodi forced refresh #1072
+- Improve handling of playlists feeds in My Subscriptions
+- Reprioritise clients and avoid re-authenticating requests if authentication already provided #1076
+- Prevent trying to open a fallback window when opening new search window #1070
+- Workarounds for race condition preventing window opening on search input #1070
+
+### Changed
+- Various improvements to thread handling and cache usage in My Subscriptions #1072
+- Delay progress dialog creation if other dialogs are open #1072
+- Minor optimisation and improve reliability of stream proxy
+- Update client details and include player response visitorData
+
+### New
+- Send JSON-RPC event notification when video playback fails
+
 ## v7.2.0+beta.4
 ### Fixed
 - Fix repeated subtitle queries/prompts #1056

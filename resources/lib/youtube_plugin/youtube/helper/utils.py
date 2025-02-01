@@ -797,12 +797,12 @@ def update_video_items(provider, context, video_id_dict,
 
         # update and set the title
         localised_info = snippet.get('localized') or {}
-        title = media_item.get_title()
+        title = media_item.get_name()
         if not title or title == untitled:
             title = (localised_info.get('title')
                      or snippet.get('title')
                      or untitled)
-        media_item.set_title(ui.italic(title) if media_item.upcoming else title)
+        media_item.set_name(ui.italic(title) if media_item.upcoming else title)
 
         """
         This is experimental. We try to get the most information out of the title of a video.
@@ -1285,7 +1285,7 @@ def add_related_video_to_playlist(provider, context, client, v3, video_id):
                 add_item = next((
                     item for item in result_items
                     if not any((item.get_uri() == pitem.get('file') or
-                                item.get_title() == pitem.get('title'))
+                                item.get_name() == pitem.get('title'))
                                for pitem in playlist_items)),
                     None)
 
@@ -1416,15 +1416,15 @@ def filter_split(item,
 
 def update_duplicate_items(item,
                            duplicates,
-                           skip_keys={
+                           skip_keys=frozenset((
                                '_bookmark_id',
                                '_bookmark_timestamp',
                                '_callback',
                                '_track_number',
-                           },
+                           )),
                            skip_vals=(None, '', -1)):
     item = item.__dict__
-    keys = set(item.keys()).difference(skip_keys)
+    keys = frozenset(item.keys()).difference(skip_keys)
     for duplicate in duplicates:
         duplicate = duplicate.__dict__
         for key in keys:
