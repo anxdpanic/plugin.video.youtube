@@ -2307,6 +2307,9 @@ class YouTube(LoginClient):
             kwargs.setdefault('raise_exc', True)
             raise InvalidJSON(exc, **kwargs)
         response.raise_for_status()
+        if kwargs.get('extended_debug'):
+            self._context.log_debug('API response:'
+                                    '\n\tcontent: |{0}|'.format(json_data))
         return json_data
 
     def _error_hook(self, **kwargs):
@@ -2458,6 +2461,8 @@ class YouTube(LoginClient):
                 )
             context.log_warning('API request: aborted')
             return {}
+        if context.get_settings().logging_enabled() & 2:
+            kwargs.setdefault('extended_debug', True)
         return self.request(response_hook=self._response_hook,
                             response_hook_kwargs=kwargs,
                             error_hook=self._error_hook,
