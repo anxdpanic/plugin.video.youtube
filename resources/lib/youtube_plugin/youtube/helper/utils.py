@@ -1344,7 +1344,8 @@ def filter_parse(item,
                      'endswith': str.endswith,
                      'startswith': str.startswith,
                      'search': re_search,
-                 }):
+                 },
+                 _none=lambda: None):
     replacement_criteria = []
     criteria_met = False
     for idx, criteria in enumerate(all_criteria):
@@ -1354,9 +1355,9 @@ def filter_parse(item,
         for input_1, op_str, input_2 in criteria:
             try:
                 if input_1.startswith('.'):
-                    input_1 = getattr(item, input_1[1:])
+                    input_1 = getattr(item, input_1[1:], None)
                 else:
-                    input_1 = getattr(item, 'get_{0}'.format(input_1))()
+                    input_1 = getattr(item, 'get_{0}'.format(input_1), _none)()
 
                 if input_2.startswith('"'):
                     input_2 = unquote(input_2[1:-1])
