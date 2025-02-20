@@ -426,6 +426,15 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                     if not response or not response.ok or response.is_redirect:
                         if server in priority['list']:
                             priority['list'].remove(server)
+                        context.log_warning(
+                            'HTTPServer - Stream proxy request failed'
+                            '\n\tServer: |{server}|'
+                            '\n\tStatus: |{status}|'
+                            '\n\tReason: |{reason}|'
+                            .format(server=server,
+                                    status=response and response.status_code,
+                                    reason=response and response.reason)
+                        )
                         continue
                     if server not in priority['list']:
                         priority['list'].append(server)
