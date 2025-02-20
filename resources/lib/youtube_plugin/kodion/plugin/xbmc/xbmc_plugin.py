@@ -260,6 +260,10 @@ class XbmcPlugin(AbstractPlugin):
             )
             cache_to_disc = options.get(provider.CACHE_TO_DISC, True)
             update_listing = options.get(provider.UPDATE_LISTING, False)
+
+            fallback = options.get(provider.FALLBACK)
+            if not fallback or fallback != ui.get_property(provider.FALLBACK):
+                ui.clear_property(provider.FALLBACK)
         else:
             succeeded = bool(result)
             if not succeeded:

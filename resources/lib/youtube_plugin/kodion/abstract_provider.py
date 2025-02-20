@@ -368,7 +368,15 @@ class AbstractProvider(object):
         if not command or command == 'query':
             query = to_unicode(params.get('q', ''))
             if query:
-                return provider.on_search_run(context=context, query=query)
+                result, options = provider.on_search_run(context, query=query)
+                if not options:
+                    options = {provider.CACHE_TO_DISC: False}
+                if result:
+                    fallback = options.setdefault(
+                        provider.FALLBACK, context.get_uri()
+                    )
+                    ui.set_property(provider.FALLBACK, fallback)
+                return result, options
             command = 'list'
             context.set_path(PATHS.SEARCH, command)
 
@@ -493,7 +501,6 @@ class AbstractProvider(object):
                 if fallback:
                     ui.set_property(provider.FALLBACK, fallback)
             else:
-                fallback = ui.pop_property(provider.RESULT_FALLBACK) or fallback
                 result = False
                 options = {
                     provider.CACHE_TO_DISC: False,
