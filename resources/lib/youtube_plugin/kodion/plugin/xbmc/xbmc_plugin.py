@@ -218,7 +218,7 @@ class XbmcPlugin(AbstractPlugin):
                     )
                 ]
 
-            force_resolve = provider.RESULT_FORCE_RESOLVE
+            force_resolve = provider.FORCE_RESOLVE
             if not options.pop(force_resolve, False):
                 force_resolve = False
 
@@ -238,7 +238,7 @@ class XbmcPlugin(AbstractPlugin):
                 result = options.get(force_resolve)
 
         if result and result.__class__.__name__ in self._PLAY_ITEM_MAP:
-            if options.get(provider.RESULT_FORCE_PLAY) or not result.playable:
+            if options.get(provider.FORCE_PLAY) or not result.playable:
                 result, post_run_action = self.uri_action(
                     context,
                     result.get_uri()
@@ -258,8 +258,8 @@ class XbmcPlugin(AbstractPlugin):
             succeeded = xbmcplugin.addDirectoryItems(
                 handle, items, item_count
             )
-            cache_to_disc = options.get(provider.RESULT_CACHE_TO_DISC, True)
-            update_listing = options.get(provider.RESULT_UPDATE_LISTING, False)
+            cache_to_disc = options.get(provider.CACHE_TO_DISC, True)
+            update_listing = options.get(provider.UPDATE_LISTING, False)
         else:
             succeeded = bool(result)
             if not succeeded:
@@ -269,7 +269,7 @@ class XbmcPlugin(AbstractPlugin):
                     ui.clear_property(param)
 
                 uri = context.get_uri()
-                fallback = options.get(provider.RESULT_FALLBACK, True)
+                fallback = options.get(provider.FALLBACK, True)
                 if isinstance(fallback, string_type) and fallback != uri:
                     context.parse_uri(fallback, update=True)
                     return self.run(provider, context, forced=forced)
@@ -319,8 +319,8 @@ class XbmcPlugin(AbstractPlugin):
                     else:
                         post_run_action = _post_run_action
 
-            cache_to_disc = options.get(provider.RESULT_CACHE_TO_DISC, False)
-            update_listing = options.get(provider.RESULT_UPDATE_LISTING, True)
+            cache_to_disc = options.get(provider.CACHE_TO_DISC, False)
+            update_listing = options.get(provider.UPDATE_LISTING, True)
 
         if ui.pop_property(PLAY_FORCED):
             context.set_path(PATHS.PLAY)

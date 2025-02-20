@@ -832,15 +832,15 @@ class Provider(AbstractProvider):
             return self.on_uri2addon(provider=self, context=context, uri=query)
         if context.is_plugin_path(query):
             return UriItem(query), {
-                self.RESULT_CACHE_TO_DISC: False,
-                self.RESULT_FALLBACK: False,
+                self.CACHE_TO_DISC: False,
+                self.FALLBACK: False,
             }
 
         result = self._search_channel_or_playlist(context, query)
         if result:  # found a channel or playlist matching search query
             return result, {
-                self.RESULT_CACHE_TO_DISC: False,
-                self.RESULT_FALLBACK: False,
+                self.CACHE_TO_DISC: False,
+                self.FALLBACK: False,
             }
         result = []
 
@@ -973,7 +973,7 @@ class Provider(AbstractProvider):
                 'live': False,
             },
         ))
-        return result, {self.RESULT_CACHE_TO_DISC: False}
+        return result, {self.CACHE_TO_DISC: False}
 
     @AbstractProvider.register_path('^/config/(?P<action>[^/]+)/?$')
     @staticmethod
@@ -981,7 +981,7 @@ class Provider(AbstractProvider):
         action = re_match.group('action')
         if action == 'setup_wizard':
             provider.run_wizard(context)
-            return False, {provider.RESULT_FALLBACK: False}
+            return False, {provider.FALLBACK: False}
         return UriItem('script://{addon},config/{action}'.format(
             addon=ADDON_ID, action=action
         ))
@@ -1199,7 +1199,7 @@ class Provider(AbstractProvider):
                     localize('history.clear'),
                     localize('history.clear.check')
             ):
-                return False, {provider.RESULT_FALLBACK: False}
+                return False, {provider.FALLBACK: False}
 
             playback_history.clear()
             ui.refresh_container()
@@ -1222,7 +1222,7 @@ class Provider(AbstractProvider):
                     localize('content.remove'),
                     localize('content.remove.check') % video_name,
             ):
-                return False, {provider.RESULT_FALLBACK: False}
+                return False, {provider.FALLBACK: False}
 
             playback_history.del_item(video_id)
             ui.refresh_container()
@@ -1792,7 +1792,7 @@ class Provider(AbstractProvider):
                     context.localize('bookmarks.clear'),
                     localize('bookmarks.clear.check')
             ):
-                return False, {provider.RESULT_FALLBACK: False}
+                return False, {provider.FALLBACK: False}
 
             context.get_bookmarks_list().clear()
             ui.refresh_container()
@@ -1826,7 +1826,7 @@ class Provider(AbstractProvider):
                     localize('content.remove'),
                     localize('content.remove.check') % bookmark_name,
             ):
-                return False, {provider.RESULT_FALLBACK: False}
+                return False, {provider.FALLBACK: False}
 
             context.get_bookmarks_list().del_item(item_id)
             context.get_ui().refresh_container()
@@ -1893,7 +1893,7 @@ class Provider(AbstractProvider):
                     localize('watch_later.clear'),
                     localize('watch_later.clear.check')
             ):
-                return False, {provider.RESULT_FALLBACK: False}
+                return False, {provider.FALLBACK: False}
 
             context.get_watch_later_list().clear()
             ui.refresh_container()
@@ -1922,7 +1922,7 @@ class Provider(AbstractProvider):
                     localize('content.remove'),
                     localize('content.remove.check') % video_name,
             ):
-                return False, {provider.RESULT_FALLBACK: False}
+                return False, {provider.FALLBACK: False}
 
             context.get_watch_later_list().del_item(video_id)
             ui.refresh_container()

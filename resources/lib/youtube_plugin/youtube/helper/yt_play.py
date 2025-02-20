@@ -237,9 +237,9 @@ def _play_playlist(provider, context):
         return (
             process_items_for_playlist(context, video_items, action=action),
             {
-                provider.RESULT_CACHE_TO_DISC: action == 'list',
-                provider.RESULT_FORCE_RESOLVE: action != 'list',
-                provider.RESULT_UPDATE_LISTING: action != 'list',
+                provider.CACHE_TO_DISC: action == 'list',
+                provider.FORCE_RESOLVE: action != 'list',
+                provider.UPDATE_LISTING: action != 'list',
             },
         )
 
@@ -270,9 +270,9 @@ def _play_channel_live(provider, context):
             play_from=context.get_param('live', 1),
         ),
         {
-            provider.RESULT_CACHE_TO_DISC: False,
-            provider.RESULT_FORCE_RESOLVE: True,
-            provider.RESULT_UPDATE_LISTING: True,
+            provider.CACHE_TO_DISC: False,
+            provider.FORCE_RESOLVE: True,
+            provider.UPDATE_LISTING: True,
         },
     )
 

@@ -39,11 +39,11 @@ from .utils import to_unicode
 
 
 class AbstractProvider(object):
-    RESULT_CACHE_TO_DISC = 'result_cache_to_disc'  # (bool)
-    RESULT_FALLBACK = 'result_fallback'  # (bool)
-    RESULT_FORCE_PLAY = 'result_force_play'  # (bool)
-    RESULT_FORCE_RESOLVE = 'result_force_resolve'  # (bool)
-    RESULT_UPDATE_LISTING = 'result_update_listing'  # (bool)
+    CACHE_TO_DISC = 'provider_cache_to_disc'  # (bool)
+    FALLBACK = 'provider_fallback'  # (bool, str)
+    FORCE_PLAY = 'provider_force_play'  # (bool)
+    FORCE_RESOLVE = 'provider_force_resolve'  # (bool)
+    UPDATE_LISTING = 'provider_update_listing'  # (bool)
 
     # map for regular expression (path) to method (names)
     _dict_path = {}
@@ -171,8 +171,8 @@ class AbstractProvider(object):
                 continue
 
             options = {
-                self.RESULT_CACHE_TO_DISC: True,
-                self.RESULT_UPDATE_LISTING: False,
+                self.CACHE_TO_DISC: True,
+                self.UPDATE_LISTING: False,
             }
             result = handler(provider=self, context=context, re_match=re_match)
             if isinstance(result, tuple):
@@ -181,8 +181,8 @@ class AbstractProvider(object):
                     options.update(new_options)
 
             if context.get_param('refresh', 0) > 0:
-                options[self.RESULT_CACHE_TO_DISC] = True
-                options[self.RESULT_UPDATE_LISTING] = True
+                options[self.CACHE_TO_DISC] = True
+                options[self.UPDATE_LISTING] = True
 
             return result, options
 
@@ -276,7 +276,7 @@ class AbstractProvider(object):
             container_uri = context.get_infolabel('Container.FolderPath')
             if context.is_plugin_path(container_uri):
                 context.log_debug('Rerouting - Fallback route not required')
-                return False, {self.RESULT_FALLBACK: False}
+                return False, {self.FALLBACK: False}
 
         container = None
         position = None
@@ -442,7 +442,7 @@ class AbstractProvider(object):
 
                 query = old_params.get('q')
                 if not query:
-                    fallback = ui.pop_property(provider.RESULT_FALLBACK)
+                    fallback = ui.pop_property(provider.FALLBACK)
                     if fallback:
                         history_blacklist = (
                             context.create_path(PATHS.SEARCH, 'input'),
@@ -485,19 +485,19 @@ class AbstractProvider(object):
                 context.set_path(PATHS.SEARCH, 'query')
                 result, options = provider.on_search_run(context, query=query)
                 if not options:
-                    options = {provider.RESULT_CACHE_TO_DISC: False}
+                    options = {provider.CACHE_TO_DISC: False}
                 fallback = options.setdefault(
-                    provider.RESULT_FALLBACK,
+                    provider.FALLBACK,
                     context.get_uri() if result else old_uri,
                 )
                 if fallback:
-                    ui.set_property(provider.RESULT_FALLBACK, fallback)
+                    ui.set_property(provider.FALLBACK, fallback)
             else:
                 fallback = ui.pop_property(provider.RESULT_FALLBACK) or fallback
                 result = False
                 options = {
-                    provider.RESULT_CACHE_TO_DISC: False,
-                    provider.RESULT_FALLBACK: fallback,
+                    provider.CACHE_TO_DISC: False,
+                    provider.FALLBACK: fallback,
                 }
             return result, options
 
@@ -524,7 +524,7 @@ class AbstractProvider(object):
             )
             result.append(search_history_item)
 
-        return result, {provider.RESULT_CACHE_TO_DISC: False}
+        return result, {provider.CACHE_TO_DISC: False}
 
     @staticmethod
     def on_command(re_match, **_kwargs):
