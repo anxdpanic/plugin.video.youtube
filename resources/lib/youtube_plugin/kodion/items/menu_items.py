@@ -735,7 +735,7 @@ def goto_quick_search(context, params=None, incognito=None):
                          if incognito else
                          'search.quick'),
         context.create_uri(
-            (PATHS.SEARCH, 'input',),
+            (PATHS.ROUTE, PATHS.SEARCH, 'input',),
             params,
             run=True,
         ),
