@@ -63,7 +63,7 @@ class HTTPServer(ThreadingMixIn, TCPServer):
             output = handler.wfile
             while (not handler._close_all
                    and not output.closed
-                   and not select((), (output,), (), 0)[1]):
+                   and not select((), (output,), (), 0.1)[1]):
                 pass
             if handler._close_all or output.closed:
                 return
@@ -146,7 +146,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         input = self.rfile
         while (not self._close_all
                and not input.closed
-               and not select((input,), (), (), 0)[0]):
+               and not select((input,), (), (), 0.1)[0]):
             pass
         if self._close_all or input.closed:
             self.close_connection = True
@@ -448,7 +448,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                     output = self.wfile
                     while (not self._close_all
                            and not output.closed
-                           and not select((), (output,), (), 0)[1]):
+                           and not select((), (output,), (), 0.1)[1]):
                         pass
                     if self._close_all or output.closed:
                         break
