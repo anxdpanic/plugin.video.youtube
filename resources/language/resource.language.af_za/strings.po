@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2025-01-17 11:43+0000\n"
 "Last-Translator: Graeme van Malsen <graemehvm@gmail.com>\n"
@@ -373,7 +373,7 @@ msgid "Subscribe to %s"
 msgstr ""
 
 msgctxt "#30518"
-msgid ""
+msgid "Feeds"
 msgstr ""
 
 msgctxt "#30519"
