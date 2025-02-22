@@ -58,11 +58,15 @@ class YouTubeRequestClient(BaseRequestsClass):
         'android_vr': {
             '_id': 28,
             '_query_subtitles': False,
+            '_os': {
+                'deviceCodename': 'eureka',
+                'build': 'SQ3A.220605.009.A1',
+            },
             'json': {
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_VR',
-                        'clientVersion': '1.60.19',
+                        'clientVersion': '1.61.48',
                         'deviceMake': 'Oculus',
                         'deviceModel': 'Quest 3',
                         'osName': 'Android',
@@ -76,7 +80,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                                '{json[context][client][clientVersion]}'
                                ' (Linux; U; {json[context][client][osName]}'
                                ' {json[context][client][osVersion]};'
-                               ' eureka-user Build/SQ3A.220605.009.A1) gzip'),
+                               ' {_os[deviceCodename]}-user Build/{_os[build]}) gzip'),
                 'X-YouTube-Client-Name': '{_id}',
                 'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
             },
@@ -94,7 +98,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_UNPLUGGED',
-                        'clientVersion': '8.49.0',
+                        'clientVersion': '9.03.2',
                         'androidSdkVersion': '32',
                         'osName': 'Android',
                         'osVersion': '12',
@@ -179,15 +183,15 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_auth_type': False,
             '_os': {
                 'major': '18',
-                'minor': '1',
-                'patch': '0',
-                'build': '22B83',
+                'minor': '2',
+                'patch': '1',
+                'build': '22C161',
             },
             'json': {
                 'context': {
                     'client': {
                         'clientName': 'IOS',
-                        'clientVersion': '19.45.4',
+                        'clientVersion': '20.03.02',
                         'deviceMake': 'Apple',
                         'deviceModel': 'iPhone16,2',
                         'osName': 'iOS',
@@ -213,20 +217,20 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_auth_type': 'personal',
             '_os': {
                 'major': '18',
-                'minor': '1',
-                'patch': '0',
-                'build': '22B83',
+                'minor': '2',
+                'patch': '1',
+                'build': '22C161',
             },
             'json': {
                 'context': {
                     'client': {
                         'clientName': 'IOS_UNPLUGGED',
-                        'clientVersion': '8.49',
+                        'clientVersion': '9.04',
                         'deviceMake': 'Apple',
                         'deviceModel': 'iPhone16,2',
                         'osName': 'iOS',
                         'osVersion': '{_os[major]}.{_os[minor]}.{_os[patch]}.{_os[build]}',
-                        'platform': 'TV',
+                        'platform': 'MOBILE',
                     },
                 },
             },
@@ -431,6 +435,10 @@ class YouTubeRequestClient(BaseRequestsClass):
             client['_auth_required'] = auth_required
         if auth_requested:
             client['_auth_requested'] = auth_requested
+
+        visitor_data = client.get('_visitor_data')
+        if visitor_data:
+            client['json']['context']['client']['visitorData'] = visitor_data
 
         for values, template_id, template in templates.values():
             if template_id in values:

@@ -56,7 +56,7 @@ class ResourceManager(object):
         client = self._provider.get_client(context)
         data_cache = context.get_data_cache()
         function_cache = context.get_function_cache()
-        refresh = context.get_param('refresh')
+        refresh = context.get_param('refresh', 0) > 0
         updated = []
         handles = {}
         for identifier in ids:
@@ -152,7 +152,7 @@ class ResourceManager(object):
                          suppress_errors=False,
                          defer_cache=False):
         context = self._context
-        refresh = context.get_param('refresh')
+        refresh = context.get_param('refresh', 0) > 0
         if not refresh and channel_data:
             result = channel_data
         else:
@@ -250,7 +250,7 @@ class ResourceManager(object):
     def get_playlists(self, ids, suppress_errors=False, defer_cache=False):
         context = self._context
         ids = tuple(ids)
-        refresh = context.get_param('refresh')
+        refresh = context.get_param('refresh', 0) > 0
         if refresh or not ids:
             result = {}
         else:
@@ -316,7 +316,7 @@ class ResourceManager(object):
             return None
 
         context = self._context
-        refresh = context.get_param('refresh')
+        refresh = context.get_param('refresh', 0) > 0
 
         if batch_id:
             ids = [batch_id[0]]
@@ -370,14 +370,18 @@ class ResourceManager(object):
             insert_point = batch_ids.index(batch_id, insert_point)
             while 1:
                 batch_id = (playlist_id, page_token)
-                new_batch_ids.append(batch_id)
                 batch = client.get_playlist_items(*batch_id)
+                if not batch:
+                    break
+                new_batch_ids.append(batch_id)
                 new_data[batch_id] = batch
                 page_token = batch.get('nextPageToken') if fetch_next else None
                 if page_token is None:
-                    batch_ids[insert_point:insert_point] = new_batch_ids
-                    insert_point += len(new_batch_ids)
                     break
+
+            if new_batch_ids:
+                batch_ids[insert_point:insert_point] = new_batch_ids
+                insert_point += len(new_batch_ids)
 
         if new_data:
             context.debug_log and context.log_debug(
@@ -451,7 +455,7 @@ class ResourceManager(object):
                    yt_items=None):
         context = self._context
         ids = tuple(ids)
-        refresh = context.get_param('refresh')
+        refresh = context.get_param('refresh', 0) > 0
         if refresh or not ids:
             result = {}
         else:

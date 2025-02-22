@@ -270,7 +270,7 @@ def _process_list_response(provider,
                                  channel_id=channel_id,
                                  playlist_id=item_id)
             playlist_id_dict[item_id] = item
-            item.available = False
+            item.available = yt_item.get('_available', False)
 
         elif kind_type == 'playlistitem':
             playlist_item_id = item_id
@@ -287,7 +287,8 @@ def _process_list_response(provider,
                              fanart=fanart,
                              plot=description,
                              video_id=item_id,
-                             channel_id=snippet.get('videoOwnerChannelId'),
+                             channel_id=(snippet.get('videoOwnerChannelId')
+                                         or snippet.get('channelId')),
                              playlist_id=snippet.get('playlistId'),
                              playlist_item_id=playlist_item_id)
 
@@ -373,7 +374,7 @@ def _process_list_response(provider,
             fifo_queue.appendleft(item)
 
         if '_callback' in yt_item:
-            item.callback = yt_item['_callback']
+            item.callback = yt_item.pop('_callback')
             do_callbacks = True
 
         items.append(item)

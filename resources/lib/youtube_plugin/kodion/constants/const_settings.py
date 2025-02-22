@@ -94,4 +94,4 @@ HTTPD_WHITELIST = 'kodion.http.ip.whitelist'  # (str)
 HTTPD_IDLE_SLEEP = 'youtube.http.idle_sleep'  # (bool)
 HTTPD_STREAM_REDIRECT = 'youtube.http.stream_redirect'  # (bool)
 
-LOGGING_ENABLED = 'kodion.logging.enabled'  # (bool)
+LOGGING_ENABLED = 'kodion.logging.enabled'  # (int)

@@ -17,6 +17,7 @@ import time
 from threading import Lock
 from traceback import format_stack
 
+from ..compatibility import to_str
 from ..logger import Logger
 from ..utils.datetime_parser import fromtimestamp, since_epoch
 from ..utils.methods import make_dirs
@@ -260,7 +261,7 @@ class Storage(object):
             'PRAGMA mmap_size = 4096000;',
             'PRAGMA page_size = 4096;',
             'PRAGMA cache_size = 1000;',
-            'PRAGMA journal_mode = WAL;',
+            'PRAGMA journal_mode = PERSIST;',
         ]
 
         if not self._table_updated:
@@ -441,13 +442,13 @@ class Storage(object):
             size = int(memoryview(blob).itemsize) * len(blob)
         if key:
             if for_update:
-                return timestamp, blob, size, str(key)
-            return str(key), timestamp, blob, size
+                return timestamp, blob, size, to_str(key)
+            return to_str(key), timestamp, blob, size
         return timestamp, blob, size
 
     def _get(self, item_id, process=None, seconds=None, as_dict=False):
         with self as (db, cursor), db:
-            result = self._execute(cursor, self._sql['get'], [str(item_id)])
+            result = self._execute(cursor, self._sql['get'], [to_str(item_id)])
             item = result.fetchone() if result else None
             if not item:
                 return None

@@ -678,5 +678,5 @@ class AbstractSettings(object):
         return frozenset(self.get_string_list(SETTINGS.CHANNEL_NAME_ALIASES))
 
     def logging_enabled(self):
-        return (self.get_bool(SETTINGS.LOGGING_ENABLED, False)
+        return (self.get_int(SETTINGS.LOGGING_ENABLED, 0)
                 or get_kodi_setting_bool('debug.showloginfo'))
