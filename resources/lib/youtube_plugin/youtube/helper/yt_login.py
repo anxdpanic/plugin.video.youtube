@@ -23,7 +23,7 @@ def process(mode, provider, context, sign_out_refresh=True):
         refresh_tokens = access_manager.get_refresh_token()
         client = provider.get_client(context)
         if any(refresh_tokens):
-            for _refresh_token in set(refresh_tokens):
+            for _refresh_token in frozenset(refresh_tokens):
                 try:
                     if _refresh_token:
                         client.revoke(_refresh_token)

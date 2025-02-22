@@ -13,23 +13,29 @@ from __future__ import absolute_import, division, unicode_literals
 from traceback import format_stack
 
 from ..abstract_plugin import AbstractPlugin
-from ...compatibility import parse_qsl, urlsplit, xbmcplugin
+from ...compatibility import string_type, xbmc, xbmcgui, xbmcplugin
 from ...constants import (
     BUSY_FLAG,
     CONTAINER_FOCUS,
     CONTAINER_ID,
     CONTAINER_POSITION,
     CONTENT_TYPE,
+    FORCE_PLAY_PARAMS,
     PATHS,
-    PLAY_FORCED,
+    PLAYBACK_FAILED,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
+    PLAY_FORCED,
+    PLAY_FORCE_AUDIO,
     PLUGIN_SLEEPING,
     PLUGIN_WAKEUP,
     REFRESH_CONTAINER,
     RELOAD_ACCESS_MANAGER,
     REROUTE_PATH,
     VIDEO_ID,
+    WINDOW_FALLBACK,
+    WINDOW_REPLACE,
+    WINDOW_RETURN,
 )
 from ...exceptions import KodionException
 from ...items import (
@@ -40,6 +46,7 @@ from ...items import (
     playback_item,
     uri_listitem,
 )
+from ...utils import parse_and_redact_uri
 
 
 class XbmcPlugin(AbstractPlugin):
@@ -65,7 +72,7 @@ class XbmcPlugin(AbstractPlugin):
     def __init__(self):
         super(XbmcPlugin, self).__init__()
 
-    def run(self, provider, context, focused=None):
+    def run(self, provider, context, forced=None):
         handle = context.get_handle()
         ui = context.get_ui()
 
@@ -161,10 +168,10 @@ class XbmcPlugin(AbstractPlugin):
         if ui.get_property(PLUGIN_SLEEPING):
             context.wakeup(PLUGIN_WAKEUP)
 
-        if ui.pop_property(REFRESH_CONTAINER):
-            focused = False
-        elif focused:
+        if not ui.pop_property(REFRESH_CONTAINER) and forced:
             focused = ui.get_property(VIDEO_ID)
+        else:
+            focused = False
 
         if ui.pop_property(RELOAD_ACCESS_MANAGER):
             context.reload_access_manager()
@@ -186,7 +193,8 @@ class XbmcPlugin(AbstractPlugin):
             else:
                 result, options = provider.navigate(context)
         except KodionException as exc:
-            result = options = None
+            result = None
+            options = {}
             if not provider.handle_exception(context, exc):
                 msg = ('XbmcRunner.run - Error'
                        '\n\tException: {exc!r}'
@@ -210,7 +218,7 @@ class XbmcPlugin(AbstractPlugin):
                     )
                 ]
 
-            force_resolve = provider.RESULT_FORCE_RESOLVE
+            force_resolve = provider.FORCE_RESOLVE
             if not options.pop(force_resolve, False):
                 force_resolve = False
 
@@ -230,7 +238,7 @@ class XbmcPlugin(AbstractPlugin):
                 result = options.get(force_resolve)
 
         if result and result.__class__.__name__ in self._PLAY_ITEM_MAP:
-            if options.get(provider.RESULT_FORCE_PLAY) or not result.playable:
+            if options.get(provider.FORCE_PLAY) or not result.playable:
                 result, post_run_action = self.uri_action(
                     context,
                     result.get_uri()
@@ -250,8 +258,12 @@ class XbmcPlugin(AbstractPlugin):
             succeeded = xbmcplugin.addDirectoryItems(
                 handle, items, item_count
             )
-            cache_to_disc = options.get(provider.RESULT_CACHE_TO_DISC, True)
-            update_listing = options.get(provider.RESULT_UPDATE_LISTING, False)
+            cache_to_disc = options.get(provider.CACHE_TO_DISC, True)
+            update_listing = options.get(provider.UPDATE_LISTING, False)
+
+            fallback = options.get(provider.FALLBACK)
+            if not fallback or fallback != ui.get_property(provider.FALLBACK):
+                ui.clear_property(provider.FALLBACK)
 
             # set alternative view mode
             view_manager = ui.get_view_manager()
@@ -264,36 +276,67 @@ class XbmcPlugin(AbstractPlugin):
             succeeded = bool(result)
             if not succeeded:
                 ui.clear_property(CONTENT_TYPE)
+                ui.clear_property(BUSY_FLAG)
+                for param in FORCE_PLAY_PARAMS:
+                    ui.clear_property(param)
 
-                if not options or options.get(provider.RESULT_FALLBACK, True):
-                    if (context.is_plugin_folder()
-                            and context.is_plugin_path(
+                uri = context.get_uri()
+                fallback = options.get(provider.FALLBACK, True)
+                if isinstance(fallback, string_type) and fallback != uri:
+                    context.parse_uri(fallback, update=True)
+                    return self.run(provider, context, forced=forced)
+                if fallback:
+                    _post_run_action = None
+
+                    if context.is_plugin_folder():
+                        if context.is_plugin_path(
+                                uri, PATHS.PLAY
+                        ):
+                            context.send_notification(
+                                PLAYBACK_FAILED,
+                                {'video_id': context.get_param('video_id')},
+                            )
+                            # None of the following will actually prevent the
+                            # playback attempt from occurring
+                            item = xbmcgui.ListItem(path=uri, offscreen=True)
+                            item.setContentLookup(False)
+                            props = {
+                                'isPlayable': 'false',
+                                'ForceResolvePlugin': 'true',
+                            }
+                            item.setProperties(props)
+                            xbmcplugin.setResolvedUrl(
+                                handle,
+                                succeeded=False,
+                                listitem=item,
+                            )
+                        elif context.is_plugin_path(
                                 context.get_infolabel('Container.FolderPath')
-                            )):
-                        _, _post_run_action = self.uri_action(
-                            context,
-                            context.get_parent_uri(params={
-                                'window_fallback': True,
-                                'window_replace': True,
-                                'window_return': False,
-                            }),
-                        )
-                    else:
-                        _, _post_run_action = self.uri_action(
-                            context,
-                            'command://Action(Back)',
-                        )
+                        ):
+                            _, _post_run_action = self.uri_action(
+                                context,
+                                context.get_parent_uri(params={
+                                    WINDOW_FALLBACK: True,
+                                    WINDOW_REPLACE: True,
+                                    WINDOW_RETURN: False,
+                                }),
+                            )
+                        else:
+                            _, _post_run_action = self.uri_action(
+                                context,
+                                'command://Action(Back)',
+                            )
                     if post_run_action and _post_run_action:
                         post_run_action = (post_run_action, _post_run_action)
                     else:
                         post_run_action = _post_run_action
 
-            cache_to_disc = False
-            update_listing = True
+            cache_to_disc = options.get(provider.CACHE_TO_DISC, False)
+            update_listing = options.get(provider.UPDATE_LISTING, True)
 
         if ui.pop_property(PLAY_FORCED):
             context.set_path(PATHS.PLAY)
-            return self.run(provider, context, focused=focused)
+            return self.run(provider, context, forced=forced)
 
         xbmcplugin.endOfDirectory(
             handle,
@@ -301,6 +344,7 @@ class XbmcPlugin(AbstractPlugin):
             updateListing=update_listing,
             cacheToDisc=cache_to_disc,
         )
+
         container = ui.pop_property(CONTAINER_ID)
         position = ui.pop_property(CONTAINER_POSITION)
         if container and position:
@@ -329,54 +373,91 @@ class XbmcPlugin(AbstractPlugin):
     @staticmethod
     def uri_action(context, uri):
         if uri.startswith('script://'):
-            uri = uri[len('script://'):]
-            context.log_debug('Running script: |{0}|'.format(uri))
-            action = 'RunScript({0})'.format(uri)
+            _uri = uri[len('script://'):]
+            log_action = 'Running script'
+            log_uri = _uri
+            action = 'RunScript({0})'.format(_uri)
             result = True
 
         elif uri.startswith('command://'):
-            uri = uri[len('command://'):]
-            context.log_debug('Running command: |{0}|'.format(uri))
-            action = uri
+            _uri = uri[len('command://'):]
+            log_action = 'Running command'
+            log_uri = _uri
+            action = _uri
             result = True
 
         elif uri.startswith('PlayMedia('):
-            context.log_debug('Redirecting for playback: |{0}|'.format(uri))
+            log_action = 'Redirecting for playback'
+            log_uri = uri[len('PlayMedia('):-1].split(',')
+            log_uri[0] = parse_and_redact_uri(
+                log_uri[0],
+                redact_only=True,
+            )
+            log_uri = ','.join(log_uri)
             action = uri
             result = True
 
         elif uri.startswith('RunPlugin('):
-            context.log_debug('Running plugin: |{0}|'.format(uri))
+            log_action = 'Running plugin'
+            log_uri = parse_and_redact_uri(
+                uri[len('RunPlugin('):-1],
+                redact_only=True,
+            )
             action = uri
             result = True
 
+        elif uri.startswith('ActivateWindow('):
+            log_action = 'Activating window'
+            log_uri = uri[len('ActivateWindow('):-1].split(',')
+            if len(log_uri) >= 2:
+                log_uri[1] = parse_and_redact_uri(
+                    log_uri[1],
+                    redact_only=True,
+                )
+            log_uri = ','.join(log_uri)
+            action = uri
+            result = False
+
+        elif uri.startswith('ReplaceWindow('):
+            log_action = 'Replacing window'
+            log_uri = uri[len('ReplaceWindow('):-1].split(',')
+            if len(log_uri) >= 2:
+                log_uri[1] = parse_and_redact_uri(
+                    log_uri[1],
+                    redact_only=True,
+                )
+            log_uri = ','.join(log_uri)
+            action = uri
+            result = False
+
         elif context.is_plugin_path(uri, PATHS.PLAY):
-            _uri = urlsplit(uri)
-            params = dict(parse_qsl(_uri.query, keep_blank_values=True))
+            parts, params, log_uri, _ = parse_and_redact_uri(uri)
             if params.get('action') == 'list':
-                context.log_debug('Redirecting to: |{0}|'.format(uri))
+                log_action = 'Redirecting to'
                 action = context.create_uri(
-                    (PATHS.ROUTE, _uri.path.rstrip('/')),
+                    (PATHS.ROUTE, parts.path.rstrip('/')),
                     params,
                     run=True,
                 )
                 result = False
             else:
-                context.log_debug('Redirecting for playback: |{0}|'.format(uri))
+                log_action = 'Redirecting for playback'
                 action = context.create_uri(
-                    (_uri.path.rstrip('/'),),
+                    (parts.path.rstrip('/'),),
                     params,
-                    play=True,
+                    play=(xbmc.PLAYLIST_MUSIC
+                          if (context.get_ui().get_property(PLAY_FORCE_AUDIO)
+                              or context.get_settings().audio_only()) else
+                          xbmc.PLAYLIST_VIDEO),
                 )
                 result = True
 
         elif context.is_plugin_path(uri):
-            context.log_debug('Redirecting to: |{0}|'.format(uri))
-            _uri = urlsplit(uri)
+            log_action = 'Redirecting to'
+            parts, params, log_uri, _ = parse_and_redact_uri(uri)
             action = context.create_uri(
-                (PATHS.ROUTE, _uri.path.rstrip('/') or PATHS.HOME),
-                _uri.query,
-                parse_params=True,
+                (PATHS.ROUTE, parts.path.rstrip('/') or PATHS.HOME),
+                params,
                 run=True,
             )
             result = False
@@ -384,7 +465,14 @@ class XbmcPlugin(AbstractPlugin):
         else:
             action = None
             result = False
+            return result, action
 
+        context.log_debug(''.join((
+            log_action,
+            ': |',
+            log_uri,
+            '|',
+        )))
         return result, action
 
     def classify_list_item(self, item, options, force_resolve):

@@ -1169,10 +1169,17 @@
                 </setting>
             </group>
             <group id="logging" label="14092">
-                <setting id="kodion.logging.enabled" type="boolean" label="20191" help="36392">
+                <setting id="kodion.logging.enabled" type="integer" label="20191" help="36392">
                     <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
+                    <default>0</default>
+                    <constraints>
+                        <options>
+                            <option label="13106">0</option> <!-- Disabled -->
+                            <option label="305">1</option>   <!-- Enabled -->
+                            <option label="666">2</option>   <!-- Component specific -->
+                        </options>
+                    </constraints>
+                    <control format="string" type="spinner"/>
                 </setting>
             </group>
         </category>

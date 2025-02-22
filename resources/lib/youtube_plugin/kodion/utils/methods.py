@@ -19,7 +19,16 @@ from re import (
     compile as re_compile,
 )
 
-from ..compatibility import byte_string_type, string_type, xbmc, xbmcvfs
+from ..compatibility import (
+    byte_string_type,
+    parse_qs,
+    string_type,
+    urlencode,
+    urlsplit,
+    urlunsplit,
+    xbmc,
+    xbmcvfs,
+)
 from ..logger import Logger
 
 
@@ -33,9 +42,10 @@ __all__ = (
     'loose_version',
     'make_dirs',
     'merge_dicts',
-    'print_items',
-    'redact_auth',
-    'redact_ip',
+    'parse_and_redact_uri',
+    'redact_auth_header',
+    'redact_ip_in_uri',
+    'redact_params',
     'rm_dir',
     'seconds_to_duration',
     'select_stream',
@@ -115,7 +125,7 @@ def select_stream(context,
 
         original_value = log_data.get('url')
         if original_value:
-            log_data['url'] = redact_ip(original_value)
+            log_data['url'] = redact_ip_in_uri(original_value)
 
         context.log_debug('Stream {idx}:'
                           '\n\t{stream_details}'
@@ -144,19 +154,6 @@ def strip_html_from_text(text, tag_re=re_compile('<[^<]+?>')):
     :return:
     """
     return tag_re.sub('', text)
-
-
-def print_items(items):
-    """
-    Prints the given test_items. Basically for tests
-    :param items: list of instances of base_item
-    :return:
-    """
-    if not items:
-        items = []
-
-    for item in items:
-        print(item)
 
 
 def make_dirs(path):
@@ -319,11 +316,54 @@ def wait(timeout=None):
     return xbmc.Monitor().waitForAbort(timeout)
 
 
-def redact_ip(url,
-              ip_re=re_compile(r'([?&/]|%3F|%26|%2F)ip([=/]|%3D|%2F)[^?&/%]+')):
-    return ip_re.sub(r'\g<1>ip\g<2><redacted>', url)
+def redact_ip_in_uri(
+    url,
+    _re=re_compile(r'([?&/]|%3F|%26|%2F)ip([=/]|%3D|%2F)[^?&/%]+'),
+):
+    return _re.sub(r'\g<1>ip\g<2><redacted>', url)
 
 
-def redact_auth(header_string,
-                ip_re=re_compile(r'"Authorization": "[^"]+"')):
-    return ip_re.sub(r'"Authorization": "<redacted>"', header_string)
+def redact_auth_header(header_string,
+                       _re=re_compile(r'"Authorization": "[^"]+"')):
+    return _re.sub(r'"Authorization": "<redacted>"', header_string)
+
+
+def redact_params(params, values_as_list=True):
+    log_params = params.copy()
+    for param, value in params.items():
+        if values_as_list:
+            value = value[0]
+        if param in {'key', 'api_key', 'api_secret', 'client_secret'}:
+            log_param = '...'.join((value[:3], value[-3:]))
+        elif param in {'api_id', 'client_id'}:
+            log_param = '...'.join((value[:3], value[-5:]))
+        elif param in {'access_token', 'refresh_token', 'token'}:
+            log_param = '<redacted>'
+        elif param == 'url':
+            log_param = redact_ip_in_uri(value)
+        elif param == 'ip':
+            log_param = '<redacted>'
+        elif param == 'location':
+            log_param = '|xx.xxxx,xx.xxxx|'
+        elif param == '__headers':
+            log_param = redact_auth_header(value)
+        else:
+            continue
+        log_params[param] = log_param
+    return log_params
+
+
+def parse_and_redact_uri(uri, redact_only=False):
+    parts = urlsplit(uri)
+    if parts.query:
+        params = parse_qs(parts.query, keep_blank_values=True)
+        log_params = redact_params(params)
+        log_uri = urlunsplit((
+            parts.scheme, parts.netloc, parts.path, urlencode(log_params), '',
+        ))
+    else:
+        params = log_params = None
+        log_uri = uri
+    if redact_only:
+        return log_uri
+    return parts, params, log_uri, log_params

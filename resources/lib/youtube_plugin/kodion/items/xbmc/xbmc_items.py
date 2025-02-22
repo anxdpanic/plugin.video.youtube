@@ -31,7 +31,7 @@ from ...constants import (
     SUBSCRIPTION_ID,
     VIDEO_ID,
 )
-from ...utils import current_system_version, datetime_parser, redact_ip
+from ...utils import current_system_version, datetime_parser, redact_ip_in_uri
 
 
 def set_info(list_item, item, properties, set_play_count=True, resume=True):
@@ -91,7 +91,7 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
             if value is not None:
                 info_labels['rating'] = value
 
-            value = item.get_title()
+            value = item.get_name()
             if value is not None:
                 info_labels['title'] = value
 
@@ -133,7 +133,7 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
         elif isinstance(item, ImageItem):
             info_type = 'picture'
 
-            value = item.get_title()
+            value = item.get_name()
             if value is not None:
                 info_labels['title'] = value
 
@@ -285,7 +285,7 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
 
         # title: str
         # eg. "Blow Your Head Off"
-        value = item.get_title()
+        value = item.get_name()
         if value is not None:
             info_tag.setTitle(value)
 
@@ -348,7 +348,7 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
         info_tag = list_item.getPictureInfoTag()
         info_type = 'picture'
 
-        value = item.get_title()
+        value = item.get_name()
         if value is not None:
             info_tag.setTitle(value)
 
@@ -407,7 +407,7 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
 def playback_item(context, media_item, show_fanart=None, **_kwargs):
     uri = media_item.get_uri()
     context.log_debug('Converting %s |%s|' % (media_item.__class__.__name__,
-                                              redact_ip(uri)))
+                                              redact_ip_in_uri(uri)))
 
     params = context.get_params()
     settings = context.get_settings()
@@ -425,7 +425,7 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
         props = {}
     else:
         kwargs = {
-            'label': media_item.get_title() or media_item.get_name(),
+            'label': media_item.get_name(),
             'label2': media_item.get_short_details(),
             'path': uri,
             'offscreen': True,
@@ -665,7 +665,7 @@ def media_listitem(context,
                                               uri))
 
     kwargs = {
-        'label': media_item.get_title() or media_item.get_name(),
+        'label': media_item.get_name(),
         'label2': media_item.get_short_details(),
         'path': uri,
         'offscreen': True,

@@ -10,6 +10,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from weakref import proxy
+
 from .view_manager import ViewManager
 from ..abstract_context_ui import AbstractContextUI, AbstractProgressDialog
 from ...compatibility import xbmc, xbmcgui
@@ -31,16 +33,16 @@ class XbmcContextUI(AbstractContextUI):
                                message_template=None,
                                template_params=None):
         if not message_template:
-            message_template = ('{wait} {{_current}}/{{_total}}'.format(
-                wait=(message or self._context.localize('please_wait'))
-            ))
+            message_template = '{_message} {_current}/{_total}'
 
         return AbstractProgressDialog(
+            ui=proxy(self),
             dialog=(xbmcgui.DialogProgressBG
                     if background else
                     xbmcgui.DialogProgress),
+            background=background,
             heading=heading,
-            message=message,
+            message=message or self._context.localize('please_wait'),
             total=int(total) if total is not None else 0,
             message_template=message_template,
             template_params=template_params,
@@ -267,8 +269,18 @@ class XbmcContextUI(AbstractContextUI):
         )
 
     @staticmethod
-    def busy_dialog_active():
+    def busy_dialog_active(dialog_ids=frozenset((
+            10100,  # WINDOW_DIALOG_YES_NO
+            10101,  # WINDOW_DIALOG_PROGRESS
+            10103,  # WINDOW_DIALOG_KEYBOARD
+            10109,  # WINDOW_DIALOG_NUMERIC
+            10138,  # WINDOW_DIALOG_BUSY
+            10151,  # WINDOW_DIALOG_EXT_PROGRESS
+            10160,  # WINDOW_DIALOG_BUSY_NOCANCEL
+            12000,  # WINDOW_DIALOG_SELECT
+            12002,  # WINDOW_DIALOG_OK
+    ))):
         dialog_id = xbmcgui.getCurrentWindowDialogId()
-        if dialog_id == 10160 or dialog_id == 10138:
+        if dialog_id in dialog_ids:
             return dialog_id
         return False

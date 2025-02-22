@@ -44,13 +44,30 @@ def run(context=_context,
         context.debug_log(off=True)
 
     current_uri = context.get_uri()
+    current_path = context.get_path()
+    current_params = context.get_params()
     context.init()
     new_uri = context.get_uri()
+    new_params = context.get_params()
+    new_handle = context.get_handle()
 
-    params = context.get_params().copy()
+    forced = (new_handle != -1
+              and ((current_uri == new_uri
+                    and current_path != '/'
+                    and current_params == new_params)
+                   or (current_uri != new_uri
+                       and current_path == '/'
+                       and not current_params)
+                   or (current_path == '/play/')))
+    if forced and 'refresh' in new_params:
+        refresh = new_params['refresh']
+        if refresh > 0:
+            new_params['refresh'] = -refresh
+
+    log_params = new_params.copy()
     for key in ('api_key', 'client_id', 'client_secret'):
-        if key in params:
-            params[key] = '<redacted>'
+        if key in log_params:
+            log_params[key] = '<redacted>'
 
     system_version = context.get_system_version()
     context.log_notice('Plugin: Running v{version}'
@@ -62,11 +79,11 @@ def run(context=_context,
                        .format(version=context.get_version(),
                                kodi=str(system_version),
                                python=system_version.get_python_version(),
-                               handle=context.get_handle(),
+                               handle=new_handle,
                                path=context.get_path(),
-                               params=params))
+                               params=log_params))
 
-    plugin.run(provider, context, focused=(current_uri == new_uri))
+    plugin.run(provider, context, forced=forced)
 
     if debug:
         profiler.print_stats()
