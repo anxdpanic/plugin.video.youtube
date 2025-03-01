@@ -15,12 +15,11 @@ import pickle
 import sqlite3
 import time
 from threading import Lock
-from traceback import format_stack
 
 from ..compatibility import to_str
 from ..logger import Logger
 from ..utils.datetime_parser import fromtimestamp, since_epoch
-from ..utils.methods import make_dirs
+from ..utils.methods import format_stack, make_dirs
 
 
 class Storage(object):
@@ -237,7 +236,7 @@ class Storage(object):
                        '\n\tException: {exc!r}'
                        '\n\tStack trace (most recent call last):\n{stack}'
                        .format(exc=exc,
-                               stack=''.join(format_stack())))
+                               stack=format_stack()))
                 if isinstance(exc, sqlite3.OperationalError):
                     Logger.log_warning(msg)
                     time.sleep(0.1)
@@ -316,7 +315,7 @@ class Storage(object):
                        '\n\tException: {exc!r}'
                        '\n\tStack trace (most recent call last):\n{stack}'
                        .format(exc=exc,
-                               stack=''.join(format_stack())))
+                               stack=format_stack()))
                 if isinstance(exc, sqlite3.OperationalError):
                     Logger.log_warning(msg)
                     time.sleep(0.1)

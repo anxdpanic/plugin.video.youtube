@@ -18,6 +18,8 @@ from math import floor, log
 from re import (
     compile as re_compile,
 )
+from sys import exc_info
+from traceback import format_stack as _format_stack
 
 from ..compatibility import (
     byte_string_type,
@@ -35,6 +37,7 @@ from ..logger import Logger
 __all__ = (
     'duration_to_seconds',
     'find_video_id',
+    'format_stack',
     'friendly_number',
     'get_kodi_setting_bool',
     'get_kodi_setting_value',
@@ -367,3 +370,15 @@ def parse_and_redact_uri(uri, redact_only=False):
     if redact_only:
         return log_uri
     return parts, params, log_uri, log_params
+
+
+def format_stack():
+    tb_obj = exc_info()[2]
+    while tb_obj:
+        next_tb_obj = tb_obj.tb_next
+        if next_tb_obj:
+            tb_obj = next_tb_obj
+        else:
+            return ''.join(_format_stack(f=tb_obj.tb_frame))
+    else:
+        return None

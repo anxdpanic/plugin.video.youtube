@@ -12,8 +12,6 @@ from __future__ import absolute_import, division, unicode_literals
 
 import threading
 from collections import deque
-from sys import exc_info
-from traceback import format_stack
 
 from .utils import (
     THUMB_TYPES,
@@ -42,7 +40,7 @@ from ...kodion.items import (
     VideoItem,
     menu_items,
 )
-from ...kodion.utils import datetime_parser, strip_html_from_text
+from ...kodion.utils import datetime_parser, format_stack, strip_html_from_text
 
 
 def _process_list_response(provider,
@@ -489,21 +487,10 @@ def _process_list_response(provider,
 
             updater(*resource['upd_args'], **kwargs)
         except Exception as exc:
-            tb_obj = exc_info()[2]
-            while tb_obj:
-                next_tb_obj = tb_obj.tb_next
-                if next_tb_obj:
-                    tb_obj = next_tb_obj
-                else:
-                    stack = ''.join(format_stack(f=tb_obj.tb_frame))
-                    break
-            else:
-                stack = None
-
             msg = ('v3._process_list_response._fetch - Error'
                    '\n\tException: {exc!r}'
                    '\n\tStack trace (most recent call last):\n{stack}'
-                   .format(exc=exc, stack=stack))
+                   .format(exc=exc, stack=format_stack()))
             context.log_error(msg)
         finally:
             resource['complete'] = True

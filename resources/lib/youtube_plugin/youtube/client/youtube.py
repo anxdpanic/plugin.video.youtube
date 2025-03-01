@@ -16,7 +16,6 @@ import xml.etree.ElementTree as ET
 from functools import partial
 from itertools import chain, islice
 from random import randint
-from traceback import format_stack
 
 from .login_client import LoginClient
 from ..helper.stream_info import StreamInfo
@@ -26,6 +25,7 @@ from ...kodion.compatibility import available_cpu_count, string_type, to_str
 from ...kodion.items import DirectoryItem
 from ...kodion.utils import (
     datetime_parser as dt,
+    format_stack,
     strip_html_from_text,
     to_unicode,
 )
@@ -1888,7 +1888,7 @@ class YouTube(LoginClient):
                            '\n\tException: {exc!r}'
                            '\n\tStack trace (most recent call last):\n{stack}'
                            .format(exc=exc,
-                                   stack=''.join(format_stack())))
+                                   stack=format_stack()))
                     context.log_error(msg)
                     continue
 

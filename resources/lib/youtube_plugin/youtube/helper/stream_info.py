@@ -14,7 +14,6 @@ from json import dumps as json_dumps, loads as json_loads
 from os import path as os_path
 from random import choice as random_choice
 from re import compile as re_compile
-from traceback import format_stack
 
 from .ratebypass import ratebypass
 from .signature.cipher import Cipher
@@ -36,7 +35,12 @@ from ...kodion.compatibility import (
 )
 from ...kodion.constants import PATHS, TEMP_PATH
 from ...kodion.network import get_connect_address
-from ...kodion.utils import make_dirs, merge_dicts, redact_ip_in_uri
+from ...kodion.utils import (
+    format_stack,
+    make_dirs,
+    merge_dicts,
+    redact_ip_in_uri,
+)
 from ...kodion.utils.datetime_parser import fromtimestamp
 
 
@@ -1382,7 +1386,7 @@ class StreamInfo(YouTubeRequestClient):
                        '\n\tStack trace (most recent call last):\n{stack}'
                        .format(exc=exc,
                                sig=encrypted_signature,
-                               stack=''.join(format_stack())))
+                               stack=format_stack()))
                 self._context.log_error(msg)
                 self._cipher = False
                 return None

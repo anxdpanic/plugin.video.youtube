@@ -11,7 +11,6 @@ from __future__ import absolute_import, division, unicode_literals
 
 import atexit
 import socket
-from traceback import format_stack
 
 from requests import Session
 from requests.adapters import HTTPAdapter, Retry
@@ -20,6 +19,7 @@ from requests.utils import DEFAULT_CA_BUNDLE_PATH, extract_zipped_paths
 from urllib3.util.ssl_ import create_urllib3_context
 
 from ..logger import Logger
+from ..utils.methods import format_stack
 
 
 __all__ = (
