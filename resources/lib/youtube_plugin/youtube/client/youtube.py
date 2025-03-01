@@ -1666,23 +1666,18 @@ class YouTube(LoginClient):
                     cached = cached_items[item_id]
                 else:
                     cached = _cache.get_item(item_id, seconds=_ttl)
+
                 if cached:
                     feed_details = cached['value']
-                    do_refresh = _refresh
-                else:
-                    feed_details = {
-                        'channel_name': None,
-                        'cached_items': None,
-                    }
-                    do_refresh = True
-
-                feed_details['refresh'] = do_refresh
-                if item_id in feeds:
-                    feeds[item_id].update(feed_details)
-                else:
-                    feeds[item_id] = feed_details
-                    if do_refresh:
+                    feed_details['refresh'] = _refresh
+                    if _refresh:
                         to_refresh.append({item_type: item_id})
+                    if item_id in feeds:
+                        feeds[item_id].update(feed_details)
+                    else:
+                        feeds[item_id] = feed_details
+                else:
+                    to_refresh.append({item_type: item_id})
             del inputs[:]
             return True, False
 
@@ -1933,6 +1928,54 @@ class YouTube(LoginClient):
                 'mine': True,
             }
 
+            def _get_updated_subscriptions(new_data, old_data):
+                items = new_data and new_data.get('items')
+                if not items:
+                    new_data['_abort'] = True
+                    return new_data
+
+                _items = old_data and old_data.get('items')
+                if _items:
+                    _items = {
+                        item['snippet']['resourceId']['channelId']:
+                            item['contentDetails']
+                        for item in _items
+                    }
+
+                    updated_subscriptions = []
+                    old_subscriptions = []
+
+                    for item in items:
+                        channel_id = item['snippet']['resourceId']['channelId']
+                        counts = item['contentDetails']
+
+                        if (counts['newItemCount']
+                                or counts['totalItemCount']
+                                > _items.get(channel_id, {})['totalItemCount']):
+                            updated_subscriptions.append(
+                                {
+                                    'channel_id': channel_id,
+                                }
+                            )
+                        else:
+                            old_subscriptions.append(channel_id)
+
+                    if old_subscriptions:
+                        new_data['nextPageToken'] = None
+                else:
+                    updated_subscriptions = [
+                        {
+                            'channel_id':
+                                item['snippet']['resourceId']['channelId'],
+                        }
+                        for item in items
+                    ]
+                    old_subscriptions = []
+
+                new_data['_updated_subscriptions'] = updated_subscriptions
+                new_data['_old_subscriptions'] = old_subscriptions
+                return new_data
+
             def _get_channels(output,
                               _params=channel_params,
                               _refresh=(refresh or not use_cache),
@@ -1943,31 +1986,29 @@ class YouTube(LoginClient):
                     if 'pageToken' in _params else
                     5 * function_cache.ONE_MINUTE,
                     _refresh=_refresh,
+                    _process=_get_updated_subscriptions,
                     method='GET',
                     path='subscriptions',
                     params=_params,
                     **kwargs
                 )
-                if not json_data:
+                if not json_data or json_data.get('_abort'):
                     return False, True
 
-                items = json_data.get('items', [])
-                if not items:
-                    return False, True
+                updated_subscriptions = json_data.get('_updated_subscriptions')
+                if updated_subscriptions:
+                    output['to_refresh'].extend(updated_subscriptions)
 
-                updated_items = [
-                    item['snippet']['resourceId']['channelId']
-                    for item in items
-                    if item['contentDetails']['newItemCount']
-                ]
-                output['channel_ids'].extend(updated_items)
-                if len(items) != len(updated_items):
-                    return True, True
+                old_subscriptions = json_data.get('_old_subscriptions')
+                if old_subscriptions:
+                    output['channel_ids'].extend(old_subscriptions)
 
-                subs_page_token = json_data.get('nextPageToken')
-                if subs_page_token:
-                    _params['pageToken'] = subs_page_token
+                page_token = json_data.get('nextPageToken')
+                if page_token:
+                    _params['pageToken'] = page_token
                     return True, False
+                if 'pageToken' in _params:
+                    del _params['pageToken']
                 return True, True
 
             # playlist_params = {
