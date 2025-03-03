@@ -1164,7 +1164,7 @@ class YouTube(LoginClient):
                     # 'token',
                 ),
             ),
-        ), default=[])
+        ), default=())
         if not related_videos or not any(related_videos):
             return {} if retry > 1 else self.get_related_videos(
                 video_id,
@@ -1359,10 +1359,17 @@ class YouTube(LoginClient):
     def search(self,
                q,
                search_type=None,
+               _search_type={'video', 'channel', 'playlist'},
                event_type=None,
+               _event_type={'live', 'upcoming', 'completed'},
                channel_id=None,
+               channel_type=None,
+               _channel_type={'any', 'show'},
                order='relevance',
                safe_search='moderate',
+               _safe_search={'moderate', 'none', 'strict'},
+               video_type=None,
+               _video_type={'any', 'episode', 'movie'},
                page_token='',
                location=False,
                **kwargs):
@@ -1416,25 +1423,32 @@ class YouTube(LoginClient):
                   'relevanceLanguage': self._language,
                   'maxResults': str(self.max_results())}
 
-        if search_type is None:
-            search_type = ('video', 'channel', 'playlist')
-        if isinstance(search_type, (list, tuple)):
+        if search_type and isinstance(search_type, (list, tuple)):
             search_type = ','.join(search_type)
+        elif not search_type or search_type not in _search_type:
+            search_type = ','.join(_search_type)
         if search_type:
             params['type'] = search_type
 
-        if event_type and event_type in {'live', 'upcoming', 'completed'}:
+        if event_type and event_type in _event_type:
             params['eventType'] = event_type
             params['type'] = 'video'
 
         if channel_id:
             params['channelId'] = channel_id
 
+        if channel_type and channel_type in _channel_type:
+            params['channelType'] = channel_type
+
         if order:
             params['order'] = order
 
-        if safe_search:
+        if safe_search and safe_search in _safe_search:
             params['safeSearch'] = safe_search
+
+        if video_type and video_type in _video_type:
+            params['videoType'] = video_type
+            params['type'] = 'video'
 
         if page_token:
             params['pageToken'] = page_token
@@ -1452,7 +1466,24 @@ class YouTube(LoginClient):
                                 params=params,
                                 **kwargs)
 
-    def search_with_params(self, params, **kwargs):
+    def search_with_params(self,
+                           params,
+                           _video_only_params={
+                               'eventType',
+                               'forMine'
+                               'location',
+                               'relatedToVideoId',
+                               'videoCaption',
+                               'videoCategoryId',
+                               'videoDefinition',
+                               'videoDimension',
+                               'videoDuration',
+                               'videoEmbeddable',
+                               'videoLicense',
+                               'videoSyndicated',
+                               'videoType',
+                           },
+                           **kwargs):
         settings = self._context.get_settings()
 
         # prepare default params
@@ -1522,22 +1553,7 @@ class YouTube(LoginClient):
         for param in params_to_delete:
             del params[param]
 
-        video_only_params = {
-            'eventType',
-            'forMine'
-            'location',
-            'relatedToVideoId',
-            'videoCaption',
-            'videoCategoryId',
-            'videoDefinition',
-            'videoDimension',
-            'videoDuration',
-            'videoEmbeddable',
-            'videoLicense',
-            'videoSyndicated',
-            'videoType',
-        }
-        if not video_only_params.isdisjoint(search_params.keys()):
+        if not _video_only_params.isdisjoint(search_params.keys()):
             search_params['type'] = 'video'
 
         return (params,
@@ -1569,7 +1585,7 @@ class YouTube(LoginClient):
         }
 
         context = self._context
-        cache = context.get_feed_history()
+        feed_history = context.get_feed_history()
         settings = context.get_settings()
 
         if do_filter:
@@ -1642,7 +1658,8 @@ class YouTube(LoginClient):
             'Connection': 'keep-alive',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
                           ' AppleWebKit/537.36 (KHTML, like Gecko)'
-                          ' Chrome/87.0.4280.66 Safari/537.36',
+                          ' Chrome/87.0.4280.66'
+                          ' Safari/537.36',
             'Accept': 'text/html,'
                       'application/xhtml+xml,'
                       'application/xml;q=0.9,'
@@ -1652,20 +1669,20 @@ class YouTube(LoginClient):
             'Accept-Language': 'en-US,en;q=0.7,de;q=0.3'
         }
 
-        def _get_feed_cache(output,
-                            inputs,
-                            item_type,
-                            _cache=cache,
-                            _refresh=refresh,
-                            _ttl=cache.ONE_HOUR):
+        def _get_cached_feed(output,
+                             inputs,
+                             item_type,
+                             _feed_history=feed_history,
+                             _refresh=refresh,
+                             _ttl=feed_history.ONE_HOUR):
             feeds = output['feeds']
             to_refresh = output['to_refresh']
-            cached_items = _cache.get_items(inputs, seconds=_ttl)
+            cached_items = _feed_history.get_items(inputs, seconds=_ttl)
             for item_id in inputs:
                 if item_id in cached_items:
                     cached = cached_items[item_id]
                 else:
-                    cached = _cache.get_item(item_id, seconds=_ttl)
+                    cached = _feed_history.get_item(item_id, seconds=_ttl)
 
                 if cached:
                     feed_details = cached['value']
@@ -1730,7 +1747,7 @@ class YouTube(LoginClient):
                          utf8=context.get_system_version().compatible(19),
                          filters=channel_filters,
                          _ns=namespaces,
-                         _cache=cache):
+                         _feed_history=feed_history):
             if progress_dialog:
                 total = len(feeds)
                 progress_dialog.reset_total(
@@ -1840,7 +1857,7 @@ class YouTube(LoginClient):
                     progress_dialog.update(position=len(all_items))
 
             if new_cache:
-                _cache.set_items(new_cache)
+                _feed_history.set_items(new_cache)
 
             # filter, sorting by publish date and trim
             if all_items:
@@ -2061,7 +2078,7 @@ class YouTube(LoginClient):
             #     'inputs_to_check': None,
             # }
         payloads[3] = {
-            'worker': partial(_get_feed_cache, item_type='channel_id'),
+            'worker': partial(_get_cached_feed, item_type='channel_id'),
             'kwargs': threaded_output['channel_ids'],
             'do_batch': True,
             'output': threaded_output,
@@ -2071,7 +2088,7 @@ class YouTube(LoginClient):
             'inputs_to_check': {1},
         }
         payloads[4] = {
-            'worker': partial(_get_feed_cache, item_type='playlist_id'),
+            'worker': partial(_get_cached_feed, item_type='playlist_id'),
             'kwargs': threaded_output['playlist_ids'],
             'do_batch': True,
             'output': threaded_output,
@@ -2333,24 +2350,32 @@ class YouTube(LoginClient):
 
     def _response_hook(self, **kwargs):
         response = kwargs['response']
-        self._context.log_debug('API response: |{0.status_code}|'
-                                '\n\theaders: |{0.headers}|'.format(response))
+        if kwargs.get('extended_debug'):
+            self._context.log_debug('API response: |{0.status_code}|'
+                                    '\n\tHeaders: |{0.headers}|'
+                                    '\n\tContent: |{0.text}|'
+                                    .format(response))
+        else:
+            self._context.log_debug('API response: |{0.status_code}|'
+                                    '\n\tHeaders: |{0.headers}|'
+                                    .format(response))
+
         if response.status_code == 204 and 'no_content' in kwargs:
             return True
+
         try:
             json_data = response.json()
-            if 'error' in json_data:
-                kwargs.setdefault('pass_data', True)
-                raise YouTubeException('"error" in response JSON data',
-                                       json_data=json_data,
-                                       **kwargs)
         except ValueError as exc:
             kwargs.setdefault('raise_exc', True)
             raise InvalidJSON(exc, **kwargs)
+
+        if 'error' in json_data:
+            kwargs.setdefault('pass_data', True)
+            raise YouTubeException('"error" in response JSON data',
+                                   json_data=json_data,
+                                   **kwargs)
+
         response.raise_for_status()
-        if kwargs.get('extended_debug'):
-            self._context.log_debug('API response:'
-                                    '\n\tcontent: |{0}|'.format(json_data))
         return json_data
 
     def _error_hook(self, **kwargs):

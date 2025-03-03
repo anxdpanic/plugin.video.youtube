@@ -600,14 +600,14 @@ class AbstractSettings(object):
         if update:
             if 'live_folder' in update:
                 if 'live_folder' not in types:
-                    update.update({
-                        'vod': False,
-                        'upcoming': True,
-                        'upcoming_live': True,
-                        'live': True,
-                        'premieres': True,
-                        'completed': True,
-                    })
+                    update.update((
+                        ('vod', False),
+                        ('upcoming', True),
+                        ('upcoming_live', True),
+                        ('live', True),
+                        ('premieres', True),
+                        ('completed', True),
+                    ))
             types.update(update)
 
         return types

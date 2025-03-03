@@ -1493,16 +1493,19 @@ class StreamInfo(YouTubeRequestClient):
                 return default_lang, subs_data
 
         video_id = self.video_id
-        client_data = {'json': {'videoId': video_id}}
-        video_info_url = 'https://www.youtube.com/youtubei/v1/player'
+        client_data = {
+            'json': {
+                'videoId': video_id,
+            },
+            'url': 'https://www.youtube.com/youtubei/v1/player',
+            'method': 'POST',
+        }
 
         for client_name in ('smart_tv_embedded', 'web'):
             client = self.build_client(client_name, client_data)
             if not client:
                 continue
             result = self.request(
-                video_info_url,
-                'POST',
                 response_hook=self._response_hook_json,
                 error_title='Caption player request failed',
                 error_hook=self._error_hook,
@@ -1587,8 +1590,6 @@ class StreamInfo(YouTubeRequestClient):
         responses = {}
         stream_list = {}
 
-        video_info_url = 'https://www.youtube.com/youtubei/v1/player'
-
         log_debug = context.log_debug
         log_warning = context.log_warning
 
@@ -1616,6 +1617,8 @@ class StreamInfo(YouTubeRequestClient):
             'json': {
                 'videoId': video_id,
             },
+            'url': 'https://www.youtube.com/youtubei/v1/player',
+            'method': 'POST',
             '_auth_required': False,
             '_auth_requested': 'personal' if use_remote_history else False,
             '_access_token': self._access_token,
@@ -1651,8 +1654,6 @@ class StreamInfo(YouTubeRequestClient):
                         continue
 
                     _result = self.request(
-                        video_info_url,
-                        'POST',
                         response_hook=self._response_hook_json,
                         error_title='Player request failed',
                         error_hook=self._error_hook,

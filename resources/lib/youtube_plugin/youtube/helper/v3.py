@@ -206,7 +206,7 @@ def _process_list_response(provider,
                                  image=image,
                                  fanart=fanart,
                                  plot=description,
-                                 category_label = title,
+                                 category_label=title,
                                  channel_id=item_id,
                                  subscription_id=subscription_id)
             channel_id_dict[item_id] = item

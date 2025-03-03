@@ -179,11 +179,11 @@ class Storage(object):
             self._base = self.__class__
 
         if migrate or not self._sql:
-            statements = {
-                name: sql.format(table=self._table_name,
-                                 order_col='time' if migrate else 'timestamp')
+            statements = [
+                (name, sql.format(table=self._table_name,
+                                  order_col='time' if migrate else 'timestamp'))
                 for name, sql in Storage._sql.items()
-            }
+            ]
             self._base._sql.update(statements)
         elif self._sql and '_partial' in self._sql:
             statements = {
@@ -191,12 +191,12 @@ class Storage(object):
                                  order_col='timestamp')
                 for name, sql in Storage._sql.items()
             }
-            partial_statements = {
-                name: sql.format(table=self._table_name,
-                                 order_col='timestamp')
+            partial_statements = [
+                (name, sql.format(table=self._table_name,
+                                  order_col='timestamp'))
                 for name, sql in self._base._sql.items()
                 if not name.startswith('_')
-            }
+            ]
             statements.update(partial_statements)
             self._base._sql = statements
 

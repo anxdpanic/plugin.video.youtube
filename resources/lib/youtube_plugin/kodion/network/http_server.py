@@ -60,12 +60,12 @@ class HTTPServer(ThreadingMixIn, TCPServer):
         try:
             handler.handle()
         finally:
-            output = handler.wfile
+            wfile = handler.wfile
             while (not handler._close_all
-                   and not output.closed
-                   and not select((), (output,), (), 0.1)[1]):
+                   and not wfile.closed
+                   and not select((), (wfile,), (), 0.1)[1]):
                 pass
-            if handler._close_all or output.closed:
+            if handler._close_all or wfile.closed:
                 return
             handler.finish()
 
@@ -143,12 +143,12 @@ class RequestHandler(BaseHTTPRequestHandler, object):
     def handle_one_request(self):
         # Allow self.rfile.readline call to be interrupted by
         # HTTPServer.server_close when connection is kept open by keep-alive
-        input = self.rfile
+        rfile = self.rfile
         while (not self._close_all
-               and not input.closed
-               and not select((input,), (), (), 0.1)[0]):
+               and not rfile.closed
+               and not select((rfile,), (), (), 0.1)[0]):
             pass
-        if self._close_all or input.closed:
+        if self._close_all or rfile.closed:
             self.close_connection = True
             return
 
@@ -358,9 +358,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
 
         elif path['path'].startswith(PATHS.STREAM_PROXY):
             params = path['params']
-
             original_path = params.pop('__path', empty)[0] or '/videoplayback'
-
             request_servers = params.pop('__netloc', empty)
             stream_id = (params.pop('__id', empty)[0],
                          params.get('itag', empty)[0])
@@ -444,16 +442,16 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                         self.send_header(header, value)
                     self.end_headers()
 
-                    input = response.raw
-                    output = self.wfile
+                    raw_data = response.raw
+                    wfile = self.wfile
                     while (not self._close_all
-                           and not output.closed
-                           and not select((), (output,), (), 0.1)[1]):
+                           and not wfile.closed
+                           and not select((), (wfile,), (), 0.1)[1]):
                         pass
-                    if self._close_all or output.closed:
+                    if self._close_all or wfile.closed:
                         break
-                    for chunk in input.stream(None, decode_content=False):
-                        output.write(chunk)
+                    for chunk in raw_data.stream(None, decode_content=False):
+                        wfile.write(chunk)
                 break
             else:
                 self.send_error(response and response.status_code or 500)
@@ -594,7 +592,8 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         for i in range(0, len(data), self.chunk_size):
             yield data[i:i + self.chunk_size]
 
-    def _sort_servers(self, server, _len, _index):
+    @staticmethod
+    def _sort_servers(server, _len, _index):
         try:
             index = _index(server)
         except ValueError:
