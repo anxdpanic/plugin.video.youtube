@@ -1436,16 +1436,16 @@ class StreamInfo(YouTubeRequestClient):
 
         if mpd:
             new_params['__id'] = self.video_id
-            new_params['__netloc'] = [parts.netloc]
+            new_params['__host'] = [parts.hostname]
             new_params['__path'] = parts.path
             new_params['__headers'] = json_dumps(headers or {})
 
             if 'mn' in params and 'fvip' in params:
                 fvip = params['fvip'][0]
                 primary, _, secondary = params['mn'][0].partition(',')
-                prefix, separator, server = parts.netloc.partition('---')
+                prefix, separator, server = parts.hostname.partition('---')
                 if primary and secondary:
-                    new_params['__netloc'].append(separator.join((
+                    new_params['__host'].append(separator.join((
                         digits_re.sub(fvip, prefix),
                         server.replace(primary, secondary),
                     )))
