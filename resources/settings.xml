@@ -1140,7 +1140,7 @@
                 </setting>
             </group>
             <group id="logging" label="14092">
-                <setting id="kodion.logging.enabled" type="integer" label="20191" help="36392">
+                <setting id="kodion.logging.level" type="integer" label="20191" help="36392">
                     <level>0</level>
                     <default>0</default>
                     <constraints>
