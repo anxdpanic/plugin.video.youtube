@@ -694,21 +694,55 @@ class Provider(AbstractProvider):
         if uploads:
             # The "UULF" videos playlist can only be used if videos in a channel
             # are made public. Use "UU" all uploads playlist and filter instead
-            # uploads = uploads.replace('UU', 'UULF', 1)
-            batch_id = (uploads, page_token or 0)
+            # if viewing personal channel.
+            if command != 'mine':
+                filtered_uploads = uploads.replace('UU', 'UULF', 1)
+            else:
+                filtered_uploads = None
+            while 1:
+                if filtered_uploads:
+                    batch_id = (filtered_uploads, page_token or 0)
+                else:
+                    batch_id = (uploads, page_token or 0)
 
-            json_data = resource_manager.get_playlist_items(batch_id=batch_id)
-            if not json_data:
+                json_data = resource_manager.get_playlist_items(
+                    batch_id=batch_id,
+                    defer_cache=False,
+                )
+                if json_data:
+                    break
+                if filtered_uploads:
+                    filtered_uploads = None
+                    continue
                 return result
 
             context.parse_params({
-                'playlist_id': uploads,
+                'playlist_id': filtered_uploads or uploads,
             })
 
+            json_data = json_data[batch_id]
+            if not filtered_uploads:
+                def filler(json_data, remaining):
+                    next_page_token = json_data.get('nextPageToken')
+                    if not next_page_token or remaining <= 0:
+                        return None
+
+                    next_batch_id = (uploads, next_page_token)
+                    new_json_data = resource_manager.get_playlist_items(
+                        batch_id=next_batch_id,
+                        defer_cache=False,
+                    )
+                    if not new_json_data:
+                        return None
+                    new_json_data = new_json_data[next_batch_id]
+                    new_json_data['_filler'] = filler
+                    return new_json_data
+
+                json_data['_filler'] = filler
             result.extend(v3.response_to_items(
-                provider, context, json_data[batch_id],
+                provider, context, json_data,
                 item_filter={
-                    # 'shorts': False,
+                    'shorts': True,
                     'live': False,
                     'upcoming_live': False,
                 },
