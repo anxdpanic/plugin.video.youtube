@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from base64 import urlsafe_b64encode
 from json import dumps as json_dumps, loads as json_loads
 from os import path as os_path
 from random import choice as random_choice
@@ -1438,7 +1439,9 @@ class StreamInfo(YouTubeRequestClient):
             new_params['__id'] = self.video_id
             new_params['__host'] = [parts.hostname]
             new_params['__path'] = parts.path
-            new_params['__headers'] = json_dumps(headers or {})
+            new_params['__headers'] = urlsafe_b64encode(
+                json_dumps(headers or {}).encode('utf-8')
+            )
 
             if 'mn' in params and 'fvip' in params:
                 fvip = params['fvip'][0]
