@@ -1719,7 +1719,7 @@ class YouTube(LoginClient):
                 )),
                 headers=_headers,
             )
-            if not response or response.status_code == 429:
+            if response is None or response.status_code == 429:
                 return False, True
 
             _output = {

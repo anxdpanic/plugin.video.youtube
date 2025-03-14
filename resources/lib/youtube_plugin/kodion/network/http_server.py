@@ -597,8 +597,12 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                                              headers=li_headers,
                                              data=post_data,
                                              stream=True)
-            if not response or not response.ok:
-                self.send_error(response and response.status_code or 500)
+            if response is None:
+                self.send_error(500)
+                return
+            status = response.status_code
+            if status >= 400:
+                self.send_error(status)
                 return
 
             response_length = int(response.headers.get('content-length'))
@@ -925,9 +929,12 @@ def httpd_status(context, address=None):
     if not RequestHandler.requests:
         RequestHandler.requests = BaseRequestsClass(context=context)
     response = RequestHandler.requests.request(url)
-    result = response and response.status_code
-    if result == 204:
-        return True
+    if response is None:
+        result = None
+    else:
+        result = response.status_code
+        if result == 204:
+            return True
 
     context.log_debug('HTTPServer - Ping'
                       '\n\tAddress:  |{netloc}|'
@@ -949,7 +956,7 @@ def get_client_ip_address(context):
     if not RequestHandler.requests:
         RequestHandler.requests = BaseRequestsClass(context=context)
     response = RequestHandler.requests.request(url)
-    if response and response.status_code == 200:
+    if response is not None and response.status_code == 200:
         response_json = response.json()
         if response_json:
             ip_address = response_json.get('ip')

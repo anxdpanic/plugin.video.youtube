@@ -1520,10 +1520,11 @@ class StreamInfo(YouTubeRequestClient):
                 **client
             )
 
-            captions = result and result.get('captions')
-            caption_headers = client['headers']
+            if result is None:
+                continue
+            captions = result.get('captions')
             if captions:
-                subtitles.load(captions, caption_headers)
+                subtitles.load(captions, client['headers'])
                 default_lang = subtitles.get_lang_details()
                 subs_data = subtitles.get_subtitles()
                 if subs_data or subs_data is False:

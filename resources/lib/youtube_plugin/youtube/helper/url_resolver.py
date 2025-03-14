@@ -130,7 +130,7 @@ class YouTubeResolver(AbstractResolver):
                                 # consent redirect
                                 cookies={'SOCS': 'CAISAiAD'},
                                 allow_redirects=True)
-        if not response or not response.ok:
+        if response is None or response.status_code >= 400:
             return url
 
         if path.startswith('/clip'):
@@ -218,7 +218,7 @@ class CommonResolver(AbstractResolver):
                                 method=method,
                                 headers=self._HEADERS,
                                 allow_redirects=True)
-        if not response or not response.ok:
+        if response is None or response.status_code >= 400:
             return url
         return response.url
 
