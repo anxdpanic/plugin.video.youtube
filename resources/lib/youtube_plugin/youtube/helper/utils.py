@@ -875,7 +875,7 @@ def update_video_items(provider, context, video_id_dict,
         image = media_item.get_image()
         if not image or image.startswith('Default'):
             image = get_thumbnail(thumb_size, snippet.get('thumbnails'))
-        if image.endswith('_live.jpg'):
+        if image and image.endswith('_live.jpg'):
             image = ''.join((image, '?ct=', thumb_stamp))
         media_item.set_image(image)
 
