@@ -330,7 +330,7 @@ class YouTube(LoginClient):
 
     def unsubscribe_channel(self, channel_id, **kwargs):
         post_data = {'channelIds': [channel_id]}
-        return self.api_request(client='v1',
+        return self.api_request(client='tv',
                                 method='POST',
                                 path='subscription/unsubscribe',
                                 post_data=post_data,
