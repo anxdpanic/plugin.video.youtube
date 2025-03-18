@@ -581,21 +581,51 @@ class YouTubeRequestClient(BaseRequestsClass):
 
         result = json_data
         for idx, keys in enumerate(path):
-            if not isinstance(result, (dict, list, tuple)):
+            if not isinstance(result, (dict, list)):
                 return default
 
             if isinstance(keys, slice):
-                return [
-                    cls.json_traverse(part, path[idx + 1:], default=default)
-                    for part in result[keys]
-                    if part
-                ]
+                next_key = path[idx + 1]
+                if next_key is None:
+                    for part in result[keys]:
+                        new_result = cls.json_traverse(
+                            part,
+                            path[idx + 2:],
+                            default=default,
+                        )
+                        if not new_result or new_result == default:
+                            continue
+                        return new_result
 
-            if not isinstance(keys, (list, tuple)):
-                keys = [keys]
+                if isinstance(next_key, (range, list)):
+                    results_limit = len(next_key)
+                    new_results = []
+                    for part in result[keys]:
+                        new_result = cls.json_traverse(
+                            part,
+                            path[idx + 2:],
+                            default=default,
+                        )
+                        if not new_result or new_result == default:
+                            continue
+                        new_results.append(new_result)
+                        if results_limit:
+                            if results_limit == 1:
+                                break
+                            results_limit -= 1
+                else:
+                    new_results = [
+                        cls.json_traverse(part, path[idx + 1:], default=default)
+                        for part in result[keys]
+                        if part
+                    ]
+                return new_results
+
+            if not isinstance(keys, tuple):
+                keys = (keys,)
 
             for key in keys:
-                if isinstance(key, (list, tuple)):
+                if isinstance(key, tuple):
                     new_result = cls.json_traverse(result, key, default=default)
                     if new_result:
                         result = new_result
@@ -603,8 +633,11 @@ class YouTubeRequestClient(BaseRequestsClass):
                     continue
 
                 try:
-                    result = result[key]
-                except (KeyError, IndexError):
+                    if callable(key):
+                        result = key(result)
+                    else:
+                        result = result[key]
+                except (KeyError, IndexError, TypeError):
                     continue
                 break
             else:
