@@ -353,40 +353,6 @@ class Provider(AbstractProvider):
         return False, None
 
     @AbstractProvider.register_path(
-        r'^(?:/channel/(?P<channel_id>[^/]+))?'
-        r'/playlist/(?P<playlist_id>[^/]+)/?$'
-    )
-    @staticmethod
-    def on_playlist(provider, context, re_match):
-        """
-        Lists the videos of a playlist.
-
-        plugin://plugin.video.youtube/channel/<CHANNEL_ID>/playlist/<PLAYLIST_ID>
-
-        or
-
-        plugin://plugin.video.youtube/playlist/<PLAYLIST_ID>
-
-        * CHANNEL_ID: ['mine'|YouTube Channel ID]
-        * PLAYLIST_ID: YouTube Playlist ID
-        """
-        context.parse_params({
-            'playlist_id': re_match.group('playlist_id'),
-        })
-
-        context.set_content(CONTENT.VIDEO_CONTENT)
-        resource_manager = provider.get_resource_manager(context)
-
-        batch_id = (re_match.group('playlist_id'),
-                    context.get_param('page_token') or 0)
-
-        json_data = resource_manager.get_playlist_items(batch_id=batch_id)
-        if not json_data:
-            return False
-        result = v3.response_to_items(provider, context, json_data[batch_id])
-        return result
-
-    @AbstractProvider.register_path(
         r'^/channel/(?P<channel_id>[^/]+)'
         r'/playlists/?$')
     @staticmethod
@@ -471,29 +437,48 @@ class Provider(AbstractProvider):
 
     @AbstractProvider.register_path(
         r'^/channel/(?P<channel_id>[^/]+)'
-        r'/live/?$')
+        r'/(?:live|playlist/(?P<playlist_id>UULV[^/]+))/?$'
+    )
     @staticmethod
-    def on_channel_live(provider, context, re_match):
+    def on_channel_live(provider,
+                        context,
+                        re_match=None,
+                        channel_id=None,
+                        playlist_id=None):
         """
-        List live streams for channel.
+        List live streams for a given channel.
 
         plugin://plugin.video.youtube/channel/<CHANNEL_ID>/live
 
-        * CHANNEL_ID: YouTube Channel ID
+        or
+
+        plugin://plugin.video.youtube/channel/<CHANNEL_ID>/playlist/<PLAYLIST_ID>
+
+        * CHANNEL_ID: YouTube channel ID
+        * PLAYLIST_ID: YouTube live stream playlist ID beginning with UULV
         """
         context.set_content(CONTENT.VIDEO_CONTENT)
 
-        channel_id = re_match.group('channel_id')
-
         resource_manager = provider.get_resource_manager(context)
-        playlists = resource_manager.get_related_playlists(channel_id)
-        uploads = playlists.get('uploads') if playlists else None
-        if uploads and uploads.startswith('UU'):
-            uploads = uploads.replace('UU', 'UULV', 1)
-            batch_id = (uploads, context.get_param('page_token') or 0)
-        else:
-            return False
 
+        if re_match:
+            channel_id = re_match.group('channel_id')
+            playlist_id = re_match.group('playlist_id')
+            if not playlist_id:
+                playlists = resource_manager.get_related_playlists(channel_id)
+                playlist_id = playlists.get('uploads') if playlists else None
+                if playlist_id and playlist_id.startswith('UU'):
+                    playlist_id = playlist_id.replace('UU', 'UULV', 1)
+
+        if not channel_id or not playlist_id:
+            return False
+        new_params = {
+            'channel_id': channel_id,
+            'playlist_id': playlist_id,
+        }
+        context.parse_params(new_params)
+
+        batch_id = (playlist_id, context.get_param('page_token') or 0)
         json_data = resource_manager.get_playlist_items(batch_id=batch_id)
         if not json_data:
             return False
@@ -507,29 +492,49 @@ class Provider(AbstractProvider):
 
     @AbstractProvider.register_path(
         r'^/channel/(?P<channel_id>[^/]+)'
-        r'/shorts/?$')
+        r'/(?:shorts|playlist/(?P<playlist_id>UUSH[^/]+))/?$'
+    )
     @staticmethod
-    def on_channel_shorts(provider, context, re_match):
+    def on_channel_shorts(provider,
+                          context,
+                          re_match=None,
+                          channel_id=None,
+                          playlist_id=None):
         """
         List shorts for channel.
 
         plugin://plugin.video.youtube/channel/<CHANNEL_ID>/shorts
 
-        * CHANNEL_ID: YouTube Channel ID
+        or
+
+        plugin://plugin.video.youtube/channel/<CHANNEL_ID>/playlist/<PLAYLIST_ID>
+
+        * CHANNEL_ID: YouTube channel ID
+        * PLAYLIST_ID: YouTube live stream playlist ID beginning with UUSH
         """
         context.set_content(CONTENT.VIDEO_CONTENT)
 
-        channel_id = re_match.group('channel_id')
-
         resource_manager = provider.get_resource_manager(context)
-        playlists = resource_manager.get_related_playlists(channel_id)
-        uploads = playlists.get('uploads') if playlists else None
-        if uploads and uploads.startswith('UU'):
-            uploads = uploads.replace('UU', 'UUSH', 1)
-            batch_id = (uploads, context.get_param('page_token') or 0)
-        else:
-            return False
 
+        if re_match:
+            channel_id = re_match.group('channel_id')
+            playlist_id = re_match.group('playlist_id')
+            if not playlist_id:
+                playlists = resource_manager.get_related_playlists(channel_id)
+                playlist_id = playlists.get('uploads') if playlists else None
+                if playlist_id and playlist_id.startswith('UU'):
+                    playlist_id = playlist_id.replace('UU', 'UUSH', 1)
+
+        if not playlist_id:
+            return False
+        new_params = {
+            'playlist_id': playlist_id,
+        }
+        if channel_id:
+            new_params['channel_id'] = channel_id
+        context.parse_params(new_params)
+
+        batch_id = (playlist_id, context.get_param('page_token') or 0)
         json_data = resource_manager.get_playlist_items(batch_id=batch_id)
         if not json_data:
             return False
@@ -539,6 +544,43 @@ class Provider(AbstractProvider):
                 'shorts': True,
             },
         )
+        return result
+
+    @AbstractProvider.register_path(
+        r'^(?:/channel/(?P<channel_id>[^/]+))?'
+        r'/playlist/(?P<playlist_id>[^/]+)/?$'
+    )
+    @staticmethod
+    def on_playlist(provider, context, re_match):
+        """
+        Lists the videos of a playlist.
+
+        plugin://plugin.video.youtube/channel/<CHANNEL_ID>/playlist/<PLAYLIST_ID>
+
+        or
+
+        plugin://plugin.video.youtube/playlist/<PLAYLIST_ID>
+
+        * CHANNEL_ID: ['mine'|YouTube Channel ID]
+        * PLAYLIST_ID: YouTube Playlist ID
+        """
+        playlist_id = re_match.group('playlist_id')
+        new_params = {
+            'playlist_id': playlist_id,
+        }
+        channel_id = re_match.group('channel_id')
+        if channel_id:
+            new_params['channel_id'] = channel_id
+        context.parse_params(new_params)
+
+        context.set_content(CONTENT.VIDEO_CONTENT)
+        resource_manager = provider.get_resource_manager(context)
+
+        batch_id = (playlist_id, context.get_param('page_token') or 0)
+        json_data = resource_manager.get_playlist_items(batch_id=batch_id)
+        if not json_data:
+            return False
+        result = v3.response_to_items(provider, context, json_data[batch_id])
         return result
 
     @AbstractProvider.register_path(
