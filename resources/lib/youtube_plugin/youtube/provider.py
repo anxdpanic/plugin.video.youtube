@@ -482,8 +482,53 @@ class Provider(AbstractProvider):
         json_data = resource_manager.get_playlist_items(batch_id=batch_id)
         if not json_data:
             return False
+        json_data = json_data[batch_id]
+
+        live_streams = provider.get_client(context).get_browse_videos(
+            channel_id=channel_id,
+            route='streams',
+            json_path={
+                'items': (
+                    'contents',
+                    'twoColumnBrowseResultsRenderer',
+                    'tabs',
+                    slice(None),
+                    'tabRenderer',
+                    lambda x: (
+                        x['content']
+                        if x['title'] == 'Live' else
+                        None
+                    ),
+                    'richGridRenderer',
+                    'contents',
+                    slice(None),
+                    'richItemRenderer',
+                    'content',
+                    'videoRenderer',
+                    lambda x: (
+                        x
+                        if (x[
+                            'thumbnailOverlays'
+                        ][
+                            0
+                        ][
+                            'thumbnailOverlayTimeStatusRenderer'
+                        ][
+                            'style'
+                        ]) == 'LIVE' else
+                        None
+                    ),
+                ),
+                'continuation': None,
+            },
+        )
+        if live_streams and 'items' in live_streams and 'items' in json_data:
+            live_streams['items'].extend(json_data['items'])
+            json_data['items'] = live_streams['items']
+
         result = v3.response_to_items(
-            provider, context, json_data[batch_id],
+            provider, context, json_data,
+            allow_duplicates=False,
             item_filter={
                 'live_folder': True,
             },
