@@ -46,17 +46,26 @@ from ...kodion.utils import datetime_parser, format_stack, strip_html_from_text
 def _process_list_response(provider,
                            context,
                            json_data,
+                           allow_duplicates=True,
                            item_filter=None,
-                           progress_dialog=None):
+                           progress_dialog=None,
+                           video_id_dict=None,
+                           channel_id_dict=None,
+                           playlist_id_dict=None,
+                           subscription_id_dict=None):
     yt_items = json_data.get('items', [])
     if not yt_items:
         context.log_warning('v3 response: Items list is empty')
         return None
 
-    video_id_dict = {}
-    channel_id_dict = {}
-    playlist_id_dict = {}
-    subscription_id_dict = {}
+    if video_id_dict is None:
+        video_id_dict = {}
+    if channel_id_dict is None:
+        channel_id_dict = {}
+    if playlist_id_dict is None:
+        playlist_id_dict = {}
+    if subscription_id_dict is None:
+        subscription_id_dict = {}
 
     items = []
     do_callbacks = False
@@ -365,7 +374,10 @@ def _process_list_response(provider,
             item.set_track_number(position + 1)
             item_id = item.video_id
             if item_id in video_id_dict:
-                fifo_queue = video_id_dict[item_id]
+                if allow_duplicates:
+                    fifo_queue = video_id_dict[item_id]
+                else:
+                    continue
             else:
                 fifo_queue = deque()
                 video_id_dict[item_id] = fifo_queue
@@ -580,6 +592,7 @@ def response_to_items(provider,
                       json_data,
                       sort=None,
                       reverse=False,
+                      allow_duplicates=True,
                       process_next_page=True,
                       item_filter=None):
     params = context.get_params()
@@ -590,13 +603,18 @@ def response_to_items(provider,
     current_page = params.get('page')
     next_page = None
 
+    filtered_items = []
+    video_id_dict = {}
+    channel_id_dict = {}
+    playlist_id_dict = {}
+    subscription_id_dict = {}
+
     with context.get_ui().create_progress_dialog(
             heading=context.localize('loading.directory'),
             message_template=context.localize('loading.directory.progress'),
             background=True,
     ) as progress_dialog:
         remaining = None
-        filtered_items = []
         num_original_items = 0
         while 1:
             kind, is_youtube, is_plugin, kind_type = _parse_kind(json_data)
@@ -620,8 +638,13 @@ def response_to_items(provider,
                 provider,
                 context,
                 json_data,
+                allow_duplicates=allow_duplicates,
                 item_filter=_item_filter,
                 progress_dialog=progress_dialog,
+                video_id_dict=video_id_dict,
+                channel_id_dict=channel_id_dict,
+                playlist_id_dict=playlist_id_dict,
+                subscription_id_dict=subscription_id_dict
             )
             if not result:
                 break
