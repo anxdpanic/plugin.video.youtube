@@ -677,33 +677,15 @@ class Provider(AbstractProvider):
             channel_id = identifier
         else:
             channel_id = None
-            identifier = {command: True, 'identifier': identifier}
 
         if not channel_id:
-            context.log_debug('Trying to get channel ID for |{0}|'.format(
-                identifier['identifier']
-            ))
-            json_data = function_cache.run(
-                client.get_channel_by_identifier,
-                function_cache.ONE_DAY,
-                _refresh=params.get('refresh', 0) > 0,
-                **identifier
+            _params = {command: True, 'identifier': identifier}
+            channel_id = client.get_channel_by_identifier(
+                refresh=params.get('refresh', 0) > 0,
+                **_params
             )
-            if not json_data:
+            if not channel_id:
                 return False
-
-            identifier = identifier['identifier']
-            # we correct the channel id based on the username
-            items = json_data.get('items', [])
-            if items:
-                channel_id = items[0]['id']
-            else:
-                context.log_debug('Channel ID not found for |{0}|'.format(
-                    identifier
-                ))
-
-        if not channel_id:
-            return False
 
         context.parse_params({
             'channel_id': channel_id,

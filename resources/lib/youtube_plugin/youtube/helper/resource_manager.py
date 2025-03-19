@@ -67,25 +67,14 @@ class ResourceManager(object):
                 updated.append(identifier)
                 continue
 
-            data = function_cache.run(
-                client.get_channel_by_identifier,
-                function_cache.ONE_DAY,
-                _refresh=refresh,
-                identifier=identifier,
-            ) or {}
-            items = data.get('items')
-
-            try:
-                channel_id = items[0]['id']
+            channel_id = client.get_channel_by_identifier(
+                identifier,
+                refresh=refresh,
+            )
+            if channel_id:
                 updated.append(channel_id)
                 if channel_id != identifier:
                     handles[channel_id] = identifier
-            except (IndexError, KeyError, TypeError) as exc:
-                context.log_error('ResourceManager.get_channels'
-                                  ' - Own channel_id not found'
-                                  '\n\tException: {exc!r}'
-                                  '\n\tChannels:  {data}'
-                                  .format(exc=exc, data=data))
 
         ids = updated
         if refresh or not ids:

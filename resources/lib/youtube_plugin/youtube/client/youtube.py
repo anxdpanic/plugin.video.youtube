@@ -749,7 +749,7 @@ class YouTube(LoginClient):
         elif channel_id == 'mine':
             params['mine'] = True
         else:
-            params['channelId'] = channel_id
+            params['channelId'] = self.get_channel_by_identifier(channel_id)
         if page_token:
             params['pageToken'] = page_token
 
@@ -765,7 +765,7 @@ class YouTube(LoginClient):
         if channel_id == 'mine':
             params['mine'] = True
         else:
-            params['channelId'] = channel_id
+            params['channelId'] = self.get_channel_by_identifier(channel_id)
         return self.api_request(method='GET',
                                 path='channelSections',
                                 params=params,
@@ -777,7 +777,7 @@ class YouTube(LoginClient):
         if channel_id == 'mine':
             params['mine'] = True
         else:
-            params['channelId'] = channel_id
+            params['channelId'] = self.get_channel_by_identifier(channel_id)
         if page_token:
             params['pageToken'] = page_token
 
@@ -835,6 +835,8 @@ class YouTube(LoginClient):
                                   identifier,
                                   mine=False,
                                   handle=False,
+                                  as_json=False,
+                                  refresh=False,
                                   **kwargs):
         """
         Returns a collection of zero or more channel resources that match the request criteria.
@@ -843,6 +845,9 @@ class YouTube(LoginClient):
         :param bool handle: treat identifier as request for handle
         :return:
         """
+        if identifier.startswith('UC'):
+            return identifier
+
         params = {'part': 'id'}
         if mine or identifier == 'mine':
             params['mine'] = True
@@ -851,10 +856,36 @@ class YouTube(LoginClient):
         else:
             params['forUsername'] = identifier
 
-        return self.api_request(method='GET',
-                                path='channels',
-                                params=params,
-                                **kwargs)
+        function_cache = self._context.get_function_cache()
+        json_data = function_cache.run(
+            self.api_request,
+            function_cache.ONE_DAY,
+            _refresh=refresh,
+            method='GET',
+            path='channels',
+            params=params,
+            **kwargs
+        )
+
+        if as_json:
+            return json_data
+
+        try:
+            return json_data['items'][0]['id']
+        except (IndexError, KeyError, TypeError) as exc:
+            self._context.log_warning('YouTube.get_channel_by_identifier'
+                                      ' - Channel ID not found'
+                                      '\n\tException:  {exc!r}'
+                                      '\n\tData:       {data}'
+                                      '\n\tIdentifier: {identifier}'
+                                      '\n\tMine:       {mine}'
+                                      '\n\tHandle:     {handle}'
+                                      .format(exc=exc,
+                                              data=json_data,
+                                              identifier=identifier,
+                                              mine=mine,
+                                              handle=handle))
+        return None
 
     def get_channels(self, channel_id, **kwargs):
         """
@@ -949,6 +980,8 @@ class YouTube(LoginClient):
                           json_path=None,
                           remaining=None,
                           offset=None):
+        if channel_id:
+            channel_id = self.get_channel_by_identifier(channel_id)
         browse_id = browse_id or channel_id
         if not browse_id:
             return None
@@ -1440,7 +1473,7 @@ class YouTube(LoginClient):
         if channel_id == 'mine':
             params['forMine'] = True
         else:
-            params['channelId'] = channel_id
+            params['channelId'] = self.get_channel_by_identifier(channel_id)
 
         if page_token:
             params['pageToken'] = page_token
@@ -1529,7 +1562,7 @@ class YouTube(LoginClient):
             params['type'] = 'video'
 
         if channel_id:
-            params['channelId'] = channel_id
+            params['channelId'] = self.get_channel_by_identifier(channel_id)
 
         if channel_type and channel_type in _channel_type:
             params['channelType'] = channel_type
@@ -1604,6 +1637,8 @@ class YouTube(LoginClient):
         if channel_id == 'mine':
             del params['channelId']
             params['forMine'] = True
+        elif channel_id:
+            params['channelId'] = self.get_channel_by_identifier(channel_id)
 
         location = params.get('location')
         if location is True:
