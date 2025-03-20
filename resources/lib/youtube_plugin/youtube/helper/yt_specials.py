@@ -80,9 +80,11 @@ def _process_recommendations(provider, context, client):
     context.set_content(CONTENT.VIDEO_CONTENT)
     params = context.get_params()
     function_cache = context.get_function_cache()
+    # source = client.get_recommended_for_home_tv
+    source = client.get_recommended_for_home_vr
 
     json_data = function_cache.run(
-        client.get_recommended_for_home,
+        source,
         function_cache.ONE_HOUR,
         _refresh=params.get('refresh', 0) > 0,
         visitor=params.get('visitor'),
@@ -98,7 +100,7 @@ def _process_recommendations(provider, context, client):
                 return None
 
             json_data = function_cache.run(
-                client.get_recommended_for_home,
+                source,
                 function_cache.ONE_HOUR,
                 _refresh=params.get('refresh', 0) > 0,
                 visitor=json_data.get('visitorData'),
@@ -110,7 +112,10 @@ def _process_recommendations(provider, context, client):
             return json_data
 
         json_data['_filler'] = filler
-        return v3.response_to_items(provider, context, json_data)
+        return v3.response_to_items(provider,
+                                    context,
+                                    json_data,
+                                    allow_duplicates=False)
     return False
 
 
