@@ -451,9 +451,10 @@ class ResourceManager(object):
             data_cache = context.get_data_cache()
             result = data_cache.get_items(ids, data_cache.ONE_MONTH)
         to_update = [id_ for id_ in ids
-                     if id_ not in result
-                     or not result[id_]
-                     or result[id_].get('_partial')]
+                     if id_
+                     and (id_ not in result
+                          or not result[id_]
+                          or result[id_].get('_partial'))]
 
         if result:
             context.debug_log and context.log_debug(
