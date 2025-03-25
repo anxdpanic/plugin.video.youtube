@@ -275,6 +275,20 @@ class PlayerMonitorThread(threading.Thread):
                             current_rating=rating,
                         )
 
+            # auto like video
+            if settings.get_bool('youtube.post.play.auto.like'):
+                json_data = client.get_video_rating(self.video_id)
+                if json_data:
+                    items = json_data.get('items', [{'rating': 'none'}])
+                    rating = items[0].get('rating', 'none')
+                    if rating == 'none':
+                        client.rate_video(self.video_id, 'like')
+                        self._context.get_ui().show_notification(
+                            self._context.localize('30901'),  # "Auto liked watched video"
+                            time_ms=2500,
+                            audible=False,
+                        )
+
         if settings.get_bool('youtube.post.play.refresh', False):
             self._context.send_notification(REFRESH_CONTAINER)
 
