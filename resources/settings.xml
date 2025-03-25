@@ -999,6 +999,11 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="youtube.post.play.auto.like" type="boolean" label="30900" help="30900">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="youtube.post.play.rate" type="boolean" label="30627" help="">
                     <level>0</level>
                     <default>false</default>
