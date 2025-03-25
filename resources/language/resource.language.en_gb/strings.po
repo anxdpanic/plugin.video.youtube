@@ -1588,3 +1588,11 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+msgctxt "#30900"
+msgid "Auto Like Watched Videos"
+msgstr "Auto Like Watched Videos"
+
+msgctxt "#30901"
+msgid "Auto liked watched video"
+msgstr "Auto liked watched video"
