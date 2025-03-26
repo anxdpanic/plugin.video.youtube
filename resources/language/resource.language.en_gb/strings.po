@@ -1594,5 +1594,29 @@ msgid "Auto Like Watched Videos"
 msgstr "Auto Like Watched Videos"
 
 msgctxt "#30901"
-msgid "Auto liked watched video"
-msgstr "Auto liked watched video"
+msgid "Auto-liked video"
+msgstr "Auto-liked video"
+
+msgctxt "#30902"
+msgid "Enable Channel Filtering"
+msgstr "Enable Channel Filtering"
+
+msgctxt "#30903"
+msgid "Enable filtering to auto-like videos only from specific channels"
+msgstr "Enable filtering to auto-like videos only from specific channels"
+
+msgctxt "#30904"
+msgid "Use as Blacklist"
+msgstr "Use as Blacklist"
+
+msgctxt "#30905"
+msgid "When enabled, auto-like will be disabled for channels in the list instead of enabled"
+msgstr "When enabled, auto-like will be disabled for channels in the list instead of enabled"
+
+msgctxt "#30906"
+msgid "Channel List"
+msgstr "Channel List"
+
+msgctxt "#30907"
+msgid "Enter channel names separated by commas (e.g., 'Channel1, Channel2')"
+msgstr "Enter channel names separated by commas (e.g., 'Channel1, Channel2')"
