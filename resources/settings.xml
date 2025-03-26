@@ -273,6 +273,50 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="youtube.post.play.auto.like.filter.enabled" type="boolean" parent="youtube.post.play.auto.like" label="30902" help="30903">
+                    <level>0</level>
+                    <default>false</default>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition setting="youtube.post.play.auto.like" operator="is">true</condition>
+                        </dependency>
+                        <dependency type="visible">
+                            <condition setting="youtube.post.play.auto.like" operator="is">true</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="youtube.post.play.auto.like.filter.blacklist" type="boolean" parent="youtube.post.play.auto.like.filter.enabled" label="30904" help="30905">
+                    <level>0</level>
+                    <default>false</default>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition setting="youtube.post.play.auto.like.filter.enabled" operator="is">true</condition>
+                        </dependency>
+                        <dependency type="visible">
+                            <condition setting="youtube.post.play.auto.like.filter.enabled" operator="is">true</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="youtube.post.play.auto.like.filter.list" type="string" parent="youtube.post.play.auto.like.filter.enabled" label="30906" help="30907">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition setting="youtube.post.play.auto.like.filter.enabled" operator="is">true</condition>
+                        </dependency>
+                        <dependency type="visible">
+                            <condition setting="youtube.post.play.auto.like.filter.enabled" operator="is">true</condition>
+                        </dependency>
+                    </dependencies>
+                    <control format="string" type="edit">
+                        <heading>30906</heading>
+                    </control>
+                </setting>
                 <setting id="youtube.post.play.rate.playlists" type="boolean" parent="youtube.post.play.rate" label="30712" help="">
                     <level>0</level>
                     <default>false</default>

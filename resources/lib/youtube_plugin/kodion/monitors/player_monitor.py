@@ -198,6 +198,69 @@ class PlayerMonitorThread(threading.Thread):
             logged_in = self._provider.is_logged_in()
 
         if self.progress >= settings.get_play_count_min_percent():
+            if use_local_history:
+                play_count += 1
+                self._context.get_playback_history().update_item(
+                    self.video_id,
+                    {'play_count': play_count},
+                )
+
+            if logged_in and use_remote_history:
+                client.update_watch_history(
+                    self._context,
+                    self.video_id,
+                    report_url,
+                    status=(self.current_time,
+                            segment_start,
+                            self.current_time,
+                            'complete'),
+                )
+
+            # Check auto-like settings and channel filtering
+            if settings.get_bool('youtube.post.play.auto.like', False):
+                filter_enabled = settings.get_bool('youtube.post.play.auto.like.filter.enabled', False)
+                if filter_enabled:
+                    filter_list = settings.get_string('youtube.post.play.auto.like.filter.list', '').replace(', ', ',').split(',')
+                    filter_list = [item.lower() for item in filter_list if item]
+                    is_blacklist = settings.get_bool('youtube.post.play.auto.like.filter.blacklist', False)
+                    
+                    # Get channel name from channel ID
+                    channel_info = None
+                    if logged_in and self.channel_id:
+                        self._context.log_debug('Getting channel info for ID: %s' % self.channel_id)
+                        channel_info = client.get_channels([self.channel_id])
+                        if channel_info:
+                            self._context.log_debug('Channel info response: %s' % channel_info)
+                            # Get first item from items array
+                            items = channel_info.get('items', [])
+                            if items:
+                                channel_info = items[0]
+                    
+                    channel_name = channel_info.get('snippet', {}).get('title', '').lower() if channel_info else ''
+                    self._context.log_debug('Channel name: %s' % channel_name)
+                    
+                    # Check if channel name matches any filter (case-insensitive)
+                    filter_list = [filter_name.lower() for filter_name in filter_list]
+                    self._context.log_debug('Filter list: %s' % filter_list)
+                    channel_in_list = channel_name in filter_list
+                    self._context.log_debug('Channel in list: %s' % channel_in_list)
+                    should_like = (not channel_in_list if is_blacklist else channel_in_list)
+                    self._context.log_debug('Should like: %s' % should_like)
+                    
+                    if should_like and logged_in:
+                        client.rate_video(self.video_id, 'like')
+                        self._context.get_ui().show_notification(
+                            self._context.localize('30901')  # Auto-liked video
+                        )
+                else:
+                    # No filtering, just like the video
+                    if logged_in:
+                        client.rate_video(self.video_id, 'like')
+                        self._context.get_ui().show_notification(
+                            self._context.localize('30901')  # Auto-liked video
+                        )
+
+        if self.progress >= settings.get_play_count_min_percent():
             play_count += 1
             self.current_time = 0
             segment_end = self.total_time
@@ -273,20 +336,6 @@ class PlayerMonitorThread(threading.Thread):
                             command='rate',
                             video_id=self.video_id,
                             current_rating=rating,
-                        )
-
-            # auto like video
-            if settings.get_bool('youtube.post.play.auto.like'):
-                json_data = client.get_video_rating(self.video_id)
-                if json_data:
-                    items = json_data.get('items', [{'rating': 'none'}])
-                    rating = items[0].get('rating', 'none')
-                    if rating == 'none':
-                        client.rate_video(self.video_id, 'like')
-                        self._context.get_ui().show_notification(
-                            self._context.localize('30901'),  # "Auto liked watched video"
-                            time_ms=2500,
-                            audible=False,
                         )
 
         if settings.get_bool('youtube.post.play.refresh', False):
