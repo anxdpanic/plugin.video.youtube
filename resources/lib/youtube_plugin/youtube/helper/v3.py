@@ -597,11 +597,15 @@ def response_to_items(provider,
                       item_filter=None):
     params = context.get_params()
     settings = context.get_settings()
+    cache = context.get_feed_history()
 
     items_per_page = settings.items_per_page()
     item_filter_param = params.get('item_filter')
     current_page = params.get('page')
     next_page = None
+
+    first_page_offset_cache_key = 'first_page_offset' + context.get_path().replace('/', '_')
+    first_page_offset = cache.get_item(first_page_offset_cache_key + str(current_page), cache.ONE_HOUR, as_dict=False)
 
     with context.get_ui().create_progress_dialog(
             heading=context.localize('loading.directory'),
@@ -649,12 +653,16 @@ def response_to_items(provider,
             if _item_filter or do_callbacks or callback:
                 items = filter_videos(items, callback=callback, **_item_filter)
             if items:
+                if first_page_offset:
+                    items = items[first_page_offset:]
+                    first_page_offset = None
                 if remaining and remaining < len(items):
+                    first_page_offset = remaining
                     items = items[:remaining]
                 filtered_items.extend(items)
 
             remaining = num_original_items - len(filtered_items)
-            if remaining >= 0:
+            if remaining > 0 or (remaining == 0 and (first_page_offset or 0) == 0):
                 if next_page:
                     next_page += 1
                 elif current_page:
@@ -662,6 +670,7 @@ def response_to_items(provider,
                 else:
                     next_page = 2
             if remaining <= 0:
+                cache.set_item(first_page_offset_cache_key + str(next_page), first_page_offset or 0)
                 break
 
             filler = json_data.get('_filler')

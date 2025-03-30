@@ -27,9 +27,12 @@ class FeedHistory(Storage):
                                   values_only=False)
         return result
 
-    def get_item(self, content_id, seconds=None):
-        result = self._get(content_id, seconds=seconds, as_dict=True)
+    def get_item(self, content_id, seconds=None, as_dict=True):
+        result = self._get(content_id, seconds=seconds, as_dict=as_dict)
         return result
+
+    def set_item(self, content_id, item):
+        self._set(content_id, item)
 
     def set_items(self, items):
         self._set_many(items)
