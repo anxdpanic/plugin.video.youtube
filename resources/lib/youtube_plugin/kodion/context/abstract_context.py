@@ -61,6 +61,7 @@ class AbstractContext(Logger):
         PLAY_STRM,
         PLAY_TIMESHIFT,
         PLAY_WITH,
+        'back_fill',
         'confirmed',
         'clip',
         'enable',
@@ -85,7 +86,6 @@ class AbstractContext(Logger):
         'items_per_page',
         'live',
         'next_page_token',
-        'offset',
         'page',
         'refresh',
     }
@@ -100,6 +100,7 @@ class AbstractContext(Logger):
     }
     _LIST_PARAMS = {
         'channel_ids',
+        'exclude',
         'item_filter',
         'playlist_ids',
         'video_ids',

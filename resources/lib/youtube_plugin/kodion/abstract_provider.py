@@ -234,6 +234,8 @@ class AbstractProvider(object):
             )
         else:
             page_token = ''
+        if 'exclude' in params:
+            del params['exclude']
         params = dict(params, page=page, page_token=page_token)
 
         if (not ui.busy_dialog_active()

@@ -1301,6 +1301,7 @@ def add_related_video_to_playlist(provider, context, client, v3, video_id):
 
 
 def filter_videos(items,
+                  exclude=None,
                   shorts=True,
                   live=True,
                   upcoming_live=True,
@@ -1318,7 +1319,8 @@ def filter_videos(items,
             and (not callback or callback(item))
             and (not custom or filter_parse(item, custom))
             and (not item.playable
-                 or not ((not completed and item.completed)
+                 or not ((exclude and item.video_id in exclude)
+                         or (not completed and item.completed)
                          or (not live and item.live and not item.upcoming)
                          or (not upcoming and item.upcoming)
                          or (not premieres and item.upcoming and not item.live)

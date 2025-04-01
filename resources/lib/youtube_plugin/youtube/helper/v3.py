@@ -600,8 +600,13 @@ def response_to_items(provider,
 
     items_per_page = settings.items_per_page()
     item_filter_param = params.get('item_filter')
-    current_page = params.get('page')
-    next_page = None
+
+    yt_page_token = None
+    current_page = params.get('page') or 1
+    remaining = items_per_page
+    exclude = params.get('exclude') or []
+    back_fill_attempts = 5
+    back_fill = False
 
     filtered_items = []
     video_id_dict = {}
@@ -614,8 +619,6 @@ def response_to_items(provider,
             message_template=context.localize('loading.directory.progress'),
             background=True,
     ) as progress_dialog:
-        remaining = None
-        num_original_items = 0
         while 1:
             kind, is_youtube, is_plugin, kind_type = _parse_kind(json_data)
             if not is_youtube and not is_plugin:
@@ -633,6 +636,7 @@ def response_to_items(provider,
             _item_filter = settings.item_filter(
                 update=(item_filter or json_data.get('_item_filter')),
                 override=item_filter_param,
+                exclude=json_data.get('_exclude', exclude),
             )
             result = _process_list_response(
                 provider,
@@ -653,36 +657,44 @@ def response_to_items(provider,
             callback = json_data.get('_callback')
             if not items:
                 break
-            elif not num_original_items:
-                num_original_items = max(items_per_page, len(items))
 
+            filler = json_data.get('_filler')
             if _item_filter or do_callbacks or callback:
                 items = filter_videos(items, callback=callback, **_item_filter)
             if items:
-                if remaining and remaining < len(items):
+                num_items = len(items)
+                if not filler:
+                    remaining = num_items
+                if 0 < remaining < num_items:
                     items = items[:remaining]
-                filtered_items.extend(items)
-
-            remaining = num_original_items - len(filtered_items)
-            if remaining >= 0:
-                if next_page:
-                    next_page += 1
-                elif current_page:
-                    next_page = current_page + 1
+                    if not yt_page_token:
+                        yt_page_token = params.get('page_token')
+                    remaining = 0
+                    back_fill = True
                 else:
-                    next_page = 2
+                    yt_page_token = json_data.get('nextPageToken')
+                    remaining -= num_items
+                    back_fill = False
+                exclude = [
+                    item.video_id
+                    for item in items
+                    if isinstance(item, MediaItem)
+                ]
+                filtered_items.extend(items)
+            elif filler and back_fill_attempts > 0:
+                back_fill_attempts -= 1
+            else:
+                break
+
             if remaining <= 0:
                 break
 
-            filler = json_data.get('_filler')
-            if not filler:
-                break
-
             _json_data = filler(json_data, remaining)
-            if _json_data:
-                json_data = _json_data
-            else:
+            if not _json_data:
                 break
+            json_data = _json_data
+            current_page += 1
+        next_page = current_page if back_fill else current_page + 1
 
         items = filtered_items
         if not items:
@@ -703,19 +715,15 @@ def response_to_items(provider,
     We implemented our own calculation for the token into the YouTube client
     This should work for up to ~2000 entries.
     """
-    new_params = dict(params, page=next_page)
-    offset = json_data.get('offset')
-    yt_next_page_token = json_data.get('nextPageToken')
-    if yt_next_page_token == next_page:
+    new_params = dict(params, page=next_page, back_fill=back_fill)
+    if yt_page_token == next_page:
         new_params['page_token'] = ''
-    elif yt_next_page_token:
-        new_params['page_token'] = yt_next_page_token
-    elif offset:
-        new_params['page_token'] = ''
+    elif yt_page_token:
+        new_params['page_token'] = yt_page_token
     else:
         if 'page_token' in new_params:
             del new_params['page_token']
-        elif current_page:
+        elif 'page' in params:
             new_params['page_token'] = ''
         else:
             return items
@@ -740,13 +748,15 @@ def response_to_items(provider,
     if yt_visitor_data:
         new_params['visitor'] = yt_visitor_data
 
-    if next_page > 1:
+    if next_page and next_page > 1:
         yt_click_tracking = json_data.get('clickTracking')
         if yt_click_tracking:
             new_params['click_tracking'] = yt_click_tracking
 
-        if offset:
-            new_params['offset'] = offset
+        if exclude:
+            new_params['exclude'] = exclude
+    elif 'exclude' in new_params:
+        del new_params['exclude']
 
     next_page_item = NextPageItem(context, new_params)
     items.append(next_page_item)
