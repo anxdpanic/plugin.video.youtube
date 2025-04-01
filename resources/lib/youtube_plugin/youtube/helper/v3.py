@@ -370,7 +370,10 @@ def _process_list_response(provider,
         if isinstance(item, MediaItem):
             # Set track number from playlist, or set to current list length to
             # match "Default" (unsorted) sort order
-            position = snippet.get('position') or len(items)
+            if kind_type == 'playlistitem':
+                position = snippet.get('position') or len(items)
+            else:
+                position = len(items)
             item.set_track_number(position + 1)
             item_id = item.video_id
             if item_id in video_id_dict:
