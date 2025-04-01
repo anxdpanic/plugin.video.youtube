@@ -90,11 +90,10 @@ def _process_recommendations(provider, context, client):
         visitor=params.get('visitor'),
         page_token=params.get('page_token'),
         click_tracking=params.get('click_tracking'),
-        offset=params.get('offset'),
     )
 
     if json_data:
-        def filler(json_data, remaining):
+        def filler(json_data, _remaining):
             page_token = json_data.get('nextPageToken')
             if not page_token:
                 return None
@@ -106,7 +105,6 @@ def _process_recommendations(provider, context, client):
                 visitor=json_data.get('visitorData'),
                 page_token=page_token,
                 click_tracking=json_data.get('clickTracking'),
-                remaining=remaining,
             )
             json_data['_filler'] = filler
             return json_data

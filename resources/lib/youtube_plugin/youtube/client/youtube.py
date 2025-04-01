@@ -333,9 +333,7 @@ class YouTube(LoginClient):
     def get_recommended_for_home_tv(self,
                                     visitor='',
                                     page_token='',
-                                    click_tracking='',
-                                    offset=None,
-                                    remaining=None):
+                                    click_tracking=''):
         return self.get_browse_videos(
             browse_id='FEwhat_to_watch',
             client='tv',
@@ -421,16 +419,12 @@ class YouTube(LoginClient):
             visitor=visitor,
             page_token=page_token,
             click_tracking=click_tracking,
-            offset=offset,
-            remaining=remaining,
         )
 
     def get_recommended_for_home_vr(self,
                                     visitor='',
                                     page_token='',
-                                    click_tracking='',
-                                    offset=None,
-                                    remaining=None):
+                                    click_tracking=''):
         return self.get_browse_videos(
             browse_id='FEwhat_to_watch',
             client='android_vr',
@@ -490,8 +484,6 @@ class YouTube(LoginClient):
             visitor=visitor,
             page_token=page_token,
             click_tracking=click_tracking,
-            offset=offset,
-            remaining=remaining,
         )
 
     def get_related_for_home(self, page_token='', refresh=False):
@@ -986,9 +978,7 @@ class YouTube(LoginClient):
                           visitor='',
                           page_token='',
                           click_tracking='',
-                          json_path=None,
-                          remaining=None,
-                          offset=None):
+                          json_path=None):
         if channel_id:
             channel_id = self.get_channel_by_identifier(channel_id)
         browse_id = browse_id or channel_id
@@ -1100,35 +1090,13 @@ class YouTube(LoginClient):
             v3_response['items'] = items
             return v3_response
 
-        if remaining is None:
-            remaining = self.max_results()
-        if remaining and offset:
-            remaining = offset + remaining
-            if remaining < len(items):
-                last_item = None
-            else:
-                last_item = nodes[-1]
-            items = items[offset:remaining]
-        elif remaining and remaining < len(items):
-            last_item = None
-            items = items[:remaining]
-        elif offset:
-            last_item = nodes[-1]
-            items = items[offset:]
-        else:
-            last_item = nodes[-1]
-
-        if last_item and 'continuationCommand' in last_item:
-            continuation = last_item
-        else:
-            continuation = self.json_traverse(
-                result,
-                (json_path.get('continuation_continuation')
-                 or json_path.get('continuation'))
-                if page_token else
-                json_path.get('continuation'),
-            )
-
+        continuation = self.json_traverse(
+            result,
+            (json_path.get('continuation_continuation')
+             or json_path.get('continuation'))
+            if page_token else
+            json_path.get('continuation'),
+        )
         if continuation:
             click_tracking = continuation.get('clickTrackingParams')
             if click_tracking:
@@ -1164,7 +1132,6 @@ class YouTube(LoginClient):
             v3_response['visitorData'] = visitor
             v3_response['nextPageToken'] = page_token
             v3_response['clickTracking'] = click_tracking
-            v3_response['offset'] = remaining
 
         v3_response['items'] = items
         return v3_response
