@@ -120,6 +120,7 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='i18nLanguages',
                                 params=params,
+                                no_login=True,
                                 **kwargs)
 
     def get_supported_regions(self, language=None, **kwargs):
@@ -132,6 +133,7 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='i18nRegions',
                                 params=params,
+                                no_login=True,
                                 **kwargs)
 
     def rename_playlist(self,
@@ -301,6 +303,7 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='videos',
                                 params=params,
+                                no_login=True,
                                 **kwargs)
 
     def get_video_category(self, video_category_id, page_token='', **kwargs):
@@ -315,6 +318,7 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='videos',
                                 params=params,
+                                no_login=True,
                                 **kwargs)
 
     def get_video_categories(self, page_token='', **kwargs):
@@ -328,6 +332,7 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='videoCategories',
                                 params=params,
+                                no_login=True,
                                 **kwargs)
 
     def get_recommended_for_home_tv(self,
@@ -782,6 +787,7 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='channelSections',
                                 params=params,
+                                no_login=True,
                                 **kwargs)
 
     def get_playlists_of_channel(self, channel_id, page_token='', **kwargs):
@@ -803,6 +809,7 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='playlists',
                                 params=params,
+                                no_login=True,
                                 **kwargs)
 
     def get_playlist_item_id_of_video_id(self,
@@ -848,6 +855,7 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='playlistItems',
                                 params=params,
+                                no_login=True,
                                 **kwargs)
 
     def get_channel_by_identifier(self,
@@ -977,6 +985,7 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='channels',
                                 params=params,
+                                no_login=True,
                                 **kwargs)
 
     def get_disliked_videos(self, page_token='', **kwargs):
@@ -1015,6 +1024,7 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='videos',
                                 params=params,
+                                no_login=True,
                                 **kwargs)
 
     def get_playlists(self, playlist_id, **kwargs):
@@ -1026,6 +1036,7 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='playlists',
                                 params=params,
+                                no_login=True,
                                 **kwargs)
 
     def get_browse_videos(self,
@@ -1264,6 +1275,7 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='search',
                                 params=params,
+                                no_login=True,
                                 **kwargs)
 
     def get_related_videos(self,
@@ -1540,6 +1552,7 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='search',
                                 params=params,
+                                no_login=True,
                                 **kwargs)
 
     def search(self,
@@ -1657,6 +1670,7 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='search',
                                 params=params,
+                                no_login=True,
                                 **kwargs)
 
     def search_with_params(self,
@@ -1762,6 +1776,7 @@ class YouTube(LoginClient):
                 self.api_request(method='GET',
                                  path='search',
                                  params=search_params,
+                                 no_login=True,
                                  **kwargs))
 
     def get_my_subscriptions(self,
@@ -2658,6 +2673,8 @@ class YouTube(LoginClient):
         else:
             clear_data = True
         if params:
+            if params.get('mine') or params.get('forMine'):
+                no_login = False
             client_data['params'] = params
 
         abort = False
