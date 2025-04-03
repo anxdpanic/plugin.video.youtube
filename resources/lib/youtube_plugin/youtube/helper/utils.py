@@ -185,6 +185,7 @@ def update_channel_items(provider, context, channel_id_dict,
     if subscription_id_dict is None:
         subscription_id_dict = {}
 
+    client = provider.get_client(context)
     logged_in = provider.is_logged_in()
 
     settings = context.get_settings()
@@ -206,19 +207,12 @@ def update_channel_items(provider, context, channel_id_dict,
         in_bookmarks_list = False
         in_subscription_list = False
 
-    filter_list = None
+    filters_set = None
     if in_bookmarks_list or in_subscription_list:
-        if settings.get_bool('youtube.folder.my_subscriptions_filtered.show',
-                             False):
-            filter_string = settings.get_string(
-                'youtube.filter.my_subscriptions_filtered.list', ''
-            ).replace(', ', ',')
-            custom_filters = []
-            filter_list = {
-                item.lower()
-                for item in filter_string.split(',')
-                if item and filter_split(item, custom_filters)
-            }
+        if settings.subscriptions_filter_enabled():
+            filter_string, filters_set, custom_filters = channel_filter_split(
+                settings.subscriptions_filter()
+            )
 
     thumb_size = settings.get_thumbnail_size()
 
@@ -321,12 +315,11 @@ def update_channel_items(provider, context, channel_id_dict,
             )
 
         # add/remove from filter list
-        if filter_list is not None:
-            channel = channel_name.lower().replace(',', '')
+        if filters_set is not None:
             context_menu.append(
                 menu_items.remove_my_subscriptions_filter(
                     context, channel_name
-                ) if channel in filter_list else
+                ) if client.channel_match(channel_name, filters_set) else
                 menu_items.add_my_subscriptions_filter(
                     context, channel_name
                 )
@@ -1405,15 +1398,25 @@ def filter_parse(item,
     return criteria_met
 
 
-def filter_split(item,
-                 _all_criteria,
-                 criteria_re=re_compile(
-                     r'{?{([^}]+)}{([^}]+)}{([^}]+)}}?'
-                 )):
-    criteria = criteria_re.findall(item)
+def channel_filter_split(filters_string):
+    custom_filters = []
+    channel_filters = {
+        filter_string
+        for filter_string in filters_string.split(',')
+        if filter_string and custom_filter_split(filter_string, custom_filters)
+    }
+    return filters_string, channel_filters, custom_filters
+
+
+def custom_filter_split(filter,
+                        custom_filters,
+                        criteria_re=re_compile(
+                            r'{?{([^}]+)}{([^}]+)}{([^}]+)}}?'
+                        )):
+    criteria = criteria_re.findall(filter)
     if not criteria:
         return True
-    _all_criteria.append(criteria)
+    custom_filters.append(criteria)
     return False
 
 

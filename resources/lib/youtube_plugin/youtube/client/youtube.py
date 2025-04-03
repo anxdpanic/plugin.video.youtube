@@ -19,7 +19,7 @@ from random import randint
 
 from .login_client import LoginClient
 from ..helper.stream_info import StreamInfo
-from ..helper.utils import filter_split
+from ..helper.utils import channel_filter_split
 from ..youtube_exceptions import InvalidJSON, YouTubeException
 from ...kodion.compatibility import available_cpu_count, string_type, to_str
 from ...kodion.items import DirectoryItem
@@ -1806,20 +1806,15 @@ class YouTube(LoginClient):
         settings = context.get_settings()
 
         if do_filter:
+            _, filters_set, custom_filters = channel_filter_split(
+                settings.subscriptions_filter()
+            )
             item_filter = {
-                'custom': [],
+                'custom': custom_filters,
             }
             channel_filters = {
-                'blacklist': settings.get_bool(
-                    'youtube.filter.my_subscriptions_filtered.blacklist', False
-                ),
-                'names': {
-                    item.lower()
-                    for item in settings.get_string(
-                        'youtube.filter.my_subscriptions_filtered.list', ''
-                    ).replace(', ', ',').split(',')
-                    if item and filter_split(item, item_filter['custom'])
-                },
+                'blacklist': settings.subscriptions_filter_blacklist(),
+                'names': filters_set,
             }
         else:
             item_filter = None
@@ -1989,12 +1984,11 @@ class YouTube(LoginClient):
                     content = to_unicode(content.content).replace('\n', '')
 
                     root = ET.fromstring(content if utf8 else to_str(content))
-                    channel_title = findtext(root, 'atom:title', '', _ns)
+                    channel_name = findtext(root, 'atom:title', '', _ns)
                     channel_id = findtext(root, 'yt:channelId', '', _ns)
                     if not channel_id.startswith('UC'):
                         channel_id = 'UC' + channel_id
                     playlist_id = findtext(root, 'yt:playlistId', '', _ns)
-                    channel_name = channel_title.lower().replace(',', '')
 
                     feed_items = [{
                         'kind': ('youtube#video'
@@ -2006,7 +2000,7 @@ class YouTube(LoginClient):
                         'snippet': {
                             'videoOwnerChannelId': channel_id,
                             'playlistId': playlist_id,
-                            'channelTitle': channel_title,
+                            'channelTitle': channel_name,
                             'resourceId': {
                                 'videoId': findtext(item, 'yt:videoId', '', _ns)
                             } if playlist_id else None,
@@ -2061,11 +2055,11 @@ class YouTube(LoginClient):
                     continue
 
                 if filters and filters['names']:
-                    filtered = channel_name and channel_name in filters['names']
-                    if filters['blacklist']:
-                        if not filtered:
-                            all_items[item_id] = feed_items
-                    elif filtered:
+                    if self.channel_match(
+                            channel_name,
+                            filters['names'],
+                            filters['blacklist']
+                    ):
                         all_items[item_id] = feed_items
                 else:
                     all_items[item_id] = feed_items

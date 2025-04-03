@@ -30,7 +30,7 @@ from .helper import (
     yt_subscriptions,
     yt_video,
 )
-from .helper.utils import filter_split, update_duplicate_items
+from .helper.utils import channel_filter_split, update_duplicate_items
 from .youtube_exceptions import InvalidGrant, LoginException
 from ..kodion import AbstractProvider
 from ..kodion.constants import (
@@ -1102,40 +1102,32 @@ class Provider(AbstractProvider):
         settings = context.get_settings()
         ui = context.get_ui()
 
-        channel = context.get_param('item_name')
+        channel_name = context.get_param('item_name')
         command = re_match.group('command')
-        if not channel or not command:
+        if not channel_name or not command:
             return
 
-        filter_enabled = settings.get_bool(
-            'youtube.folder.my_subscriptions_filtered.show', False
+        if not settings.subscriptions_filter_enabled():
+            return
+
+        filter_string, filters_set, custom_filters = channel_filter_split(
+            settings.subscriptions_filter()
         )
-        if not filter_enabled:
-            return
 
-        channel_name = channel.lower()
-        channel_name = channel_name.replace(',', '')
-
-        filter_string = settings.get_string(
-            'youtube.filter.my_subscriptions_filtered.list', ''
-        ).replace(', ', ',')
-        custom_filters = []
-        filter_list = [
-            item.lower()
-            for item in filter_string.split(',')
-            if item and filter_split(item, custom_filters)
-        ]
-
-        if channel_name not in filter_list:
-            if command == 'add':
-                filter_list.append(channel_name)
-            else:
+        if command == 'add':
+            num_filters = len(filters_set)
+            filters_set.add(channel_name)
+            if len(filters_set) == num_filters:
                 return False
         elif command == 'remove':
-            filter_list = [item for item in filter_list if item != channel_name]
+            try:
+                filters_set.remove(channel_name)
+            except KeyError:
+                return False
         else:
             return False
 
+        filter_list = list(filters_set)
         if custom_filters:
             filter_list.extend([
                 ''.join([
@@ -1145,16 +1137,13 @@ class Provider(AbstractProvider):
                 for custom_filter in custom_filters
                 for condition in custom_filter
             ])
-        modified_string = ','.join(filter_list).lstrip(',')
-        if filter_string != modified_string:
-            settings.set_string('youtube.filter.my_subscriptions_filtered.list',
-                                modified_string)
+        settings.subscriptions_filter(filter_list)
 
-            ui.show_notification(context.localize(
-                'my_subscriptions.filter.added'
-                if command == 'add' else
-                'my_subscriptions.filter.removed'
-            ))
+        ui.show_notification(context.localize(
+            'my_subscriptions.filter.added'
+            if command == 'add' else
+            'my_subscriptions.filter.removed'
+        ))
 
     @AbstractProvider.register_path(
         r'^/maintenance'
