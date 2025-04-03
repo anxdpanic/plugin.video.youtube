@@ -888,6 +888,41 @@ class YouTube(LoginClient):
                                               handle=handle))
         return None
 
+    def channel_match(self, identifier, identifiers, exclude=False):
+        if not identifier or not identifiers:
+            return False
+
+        function_cache = self._context.get_function_cache()
+        result = False
+
+        channel_id = function_cache.run(
+            self.get_channel_by_identifier,
+            function_cache.ONE_MONTH,
+            identifier=identifier,
+        )
+        if channel_id:
+            channel_ids = {
+                function_cache.run(
+                    self.get_channel_by_identifier,
+                    function_cache.ONE_MONTH,
+                    identifier=channel,
+                )
+                for channel in identifiers
+            }
+            if channel_id in channel_ids:
+                result = True
+
+        if not result and channel_id != identifier:
+            identifiers = {
+                channel.lower().replace(',', '')
+                for channel in identifiers
+            }
+            result = identifier.lower().replace(',', '') in identifiers
+
+        if exclude:
+            return not result
+        return result
+
     def get_channels(self, channel_id, **kwargs):
         """
         Returns a collection of zero or more channel resources that match the request criteria.

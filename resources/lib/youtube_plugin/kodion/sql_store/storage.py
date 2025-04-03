@@ -27,7 +27,7 @@ class Storage(object):
     ONE_HOUR = 60 * ONE_MINUTE
     ONE_DAY = 24 * ONE_HOUR
     ONE_WEEK = 7 * ONE_DAY
-    ONE_MONTH = 4 * ONE_WEEK
+    ONE_MONTH = 30 * ONE_DAY
 
     _base = None
     _table_name = 'storage_v2'
