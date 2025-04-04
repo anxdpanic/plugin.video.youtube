@@ -1884,17 +1884,17 @@ class YouTube(LoginClient):
         def _get_cached_feed(output,
                              inputs,
                              item_type,
-                             _feed_history=feed_history,
                              _refresh=refresh,
-                             _ttl=feed_history.ONE_HOUR):
+                             feed_history=feed_history,
+                             ttl=feed_history.ONE_HOUR):
             feeds = output['feeds']
             to_refresh = output['to_refresh']
-            cached_items = _feed_history.get_items(inputs, seconds=_ttl)
+            cached_items = feed_history.get_items(inputs, seconds=ttl)
             for item_id in inputs:
                 if item_id in cached_items:
                     cached = cached_items[item_id]
                 else:
-                    cached = _feed_history.get_item(item_id, seconds=_ttl)
+                    cached = feed_history.get_item(item_id, seconds=ttl)
 
                 if cached:
                     feed_details = cached['value']
@@ -1913,7 +1913,7 @@ class YouTube(LoginClient):
         def _get_feed(output,
                       channel_id=None,
                       playlist_id=None,
-                      _headers=headers):
+                      headers=headers):
             if channel_id:
                 item_id = channel_id
                 is_channel = True
@@ -1929,7 +1929,7 @@ class YouTube(LoginClient):
                     'channel_id=' if is_channel else 'playlist_id=',
                     item_id,
                 )),
-                headers=_headers,
+                headers=headers,
             )
             if response is None or response.status_code == 429:
                 return False, True
@@ -1958,8 +1958,8 @@ class YouTube(LoginClient):
                          progress_dialog=None,
                          utf8=context.get_system_version().compatible(19),
                          filters=channel_filters,
-                         _ns=namespaces,
-                         _feed_history=feed_history):
+                         ns=namespaces,
+                         feed_history=feed_history):
             if progress_dialog:
                 total = len(feeds)
                 progress_dialog.reset_total(
@@ -1984,17 +1984,22 @@ class YouTube(LoginClient):
                     content = to_unicode(content.content).replace('\n', '')
 
                     root = ET.fromstring(content if utf8 else to_str(content))
-                    channel_name = findtext(root, 'atom:title', '', _ns)
-                    channel_id = findtext(root, 'yt:channelId', '', _ns)
+                    channel_name = findtext(
+                        root,
+                        'atom:author/atom:name',
+                        '',
+                        ns,
+                    )
+                    channel_id = findtext(root, 'yt:channelId', '', ns)
                     if not channel_id.startswith('UC'):
                         channel_id = 'UC' + channel_id
-                    playlist_id = findtext(root, 'yt:playlistId', '', _ns)
+                    playlist_id = findtext(root, 'yt:playlistId', '', ns)
 
                     feed_items = [{
                         'kind': ('youtube#video'
                                  if channel_id else
                                  'youtube#playlistitem'),
-                        'id': (findtext(item, 'yt:videoId', '', _ns)
+                        'id': (findtext(item, 'yt:videoId', '', ns)
                                if channel_id else
                                None),
                         'snippet': {
@@ -2002,33 +2007,33 @@ class YouTube(LoginClient):
                             'playlistId': playlist_id,
                             'channelTitle': channel_name,
                             'resourceId': {
-                                'videoId': findtext(item, 'yt:videoId', '', _ns)
+                                'videoId': findtext(item, 'yt:videoId', '', ns)
                             } if playlist_id else None,
-                            'title': findtext(item, 'atom:title', '', _ns),
+                            'title': findtext(item, 'atom:title', '', ns),
                             'description': findtext(
                                 item,
                                 'media:group/media:description',
                                 '',
-                                _ns,
+                                ns,
                             ),
                             'publishedAt': dt.strptime(
-                                findtext(item, 'atom:published', '', _ns)
+                                findtext(item, 'atom:published', '', ns)
                             ),
                         },
                         'statistics': {
                             'likeCount': getattr(find(
                                 item,
                                 'media:group/media:community/media:starRating',
-                                _ns,
+                                ns,
                             ), 'get', dict_get)('count', 0),
                             'viewCount': getattr(find(
                                 item,
                                 'media:group/media:community/media:statistics',
-                                _ns,
+                                ns,
                             ), 'get', dict_get)('views', 0),
                         },
                         '_partial': True,
-                    } for item in root.findall('atom:entry', _ns)]
+                    } for item in root.findall('atom:entry', ns)]
                 else:
                     feed_items = []
 
@@ -2068,7 +2073,7 @@ class YouTube(LoginClient):
                     progress_dialog.update(position=len(all_items))
 
             if new_cache:
-                _feed_history.set_items(new_cache)
+                feed_history.set_items(new_cache)
 
             # filter, sorting by publish date and trim
             if all_items:

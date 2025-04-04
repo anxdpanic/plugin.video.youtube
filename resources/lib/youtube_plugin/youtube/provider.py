@@ -645,7 +645,6 @@ class Provider(AbstractProvider):
 
         client = provider.get_client(context)
         create_uri = context.create_uri
-        function_cache = context.get_function_cache()
         params = context.get_params()
 
         command = re_match.group('command')

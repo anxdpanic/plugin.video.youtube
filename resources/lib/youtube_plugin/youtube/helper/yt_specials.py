@@ -91,30 +91,30 @@ def _process_recommendations(provider, context, client):
         page_token=params.get('page_token'),
         click_tracking=params.get('click_tracking'),
     )
+    if not json_data:
+        return False
 
-    if json_data:
-        def filler(json_data, _remaining):
-            page_token = json_data.get('nextPageToken')
-            if not page_token:
-                return None
+    def filler(json_data, _remaining):
+        page_token = json_data.get('nextPageToken')
+        if not page_token:
+            return None
 
-            json_data = function_cache.run(
-                source,
-                function_cache.ONE_HOUR,
-                _refresh=params.get('refresh', 0) > 0,
-                visitor=json_data.get('visitorData'),
-                page_token=page_token,
-                click_tracking=json_data.get('clickTracking'),
-            )
-            json_data['_filler'] = filler
-            return json_data
-
+        json_data = function_cache.run(
+            source,
+            function_cache.ONE_HOUR,
+            _refresh=params.get('refresh', 0) > 0,
+            visitor=json_data.get('visitorData'),
+            page_token=page_token,
+            click_tracking=json_data.get('clickTracking'),
+        )
         json_data['_filler'] = filler
-        return v3.response_to_items(provider,
-                                    context,
-                                    json_data,
-                                    allow_duplicates=False)
-    return False
+        return json_data
+
+    json_data['_filler'] = filler
+    return v3.response_to_items(provider,
+                                context,
+                                json_data,
+                                allow_duplicates=False)
 
 
 def _process_trending(provider, context, client):
@@ -123,22 +123,22 @@ def _process_trending(provider, context, client):
     json_data = client.get_trending_videos(
         page_token=context.get_param('page_token')
     )
+    if not json_data:
+        return False
 
-    if json_data:
-        def filler(json_data, _remaining):
-            page_token = json_data.get('nextPageToken')
-            if not page_token:
-                return None
+    def filler(json_data, _remaining):
+        page_token = json_data.get('nextPageToken')
+        if not page_token:
+            return None
 
-            json_data = client.get_trending_videos(
-                page_token=page_token,
-            )
-            json_data['_filler'] = filler
-            return json_data
-
+        json_data = client.get_trending_videos(
+            page_token=page_token,
+        )
         json_data['_filler'] = filler
-        return v3.response_to_items(provider, context, json_data)
-    return False
+        return json_data
+
+    json_data['_filler'] = filler
+    return v3.response_to_items(provider, context, json_data)
 
 
 def _process_browse_channels(provider, context, client):
@@ -352,27 +352,27 @@ def _process_my_subscriptions(provider, context, client, filtered=False):
             refresh=refresh,
             progress_dialog=progress_dialog,
         )
+        if not json_data:
+            return False
 
-        if json_data:
-            def filler(json_data, _remaining):
-                page_token = json_data.get('nextPageToken')
-                if not page_token:
-                    return None
+        def filler(json_data, _remaining):
+            page_token = json_data.get('nextPageToken')
+            if not page_token:
+                return None
 
-                json_data = client.get_my_subscriptions(
-                    page_token=json_data.get('nextPageToken'),
-                    logged_in=logged_in,
-                    do_filter=filtered,
-                    refresh=refresh,
-                    use_cache=True,
-                    progress_dialog=progress_dialog,
-                )
-                json_data['_filler'] = filler
-                return json_data
-
+            json_data = client.get_my_subscriptions(
+                page_token=json_data.get('nextPageToken'),
+                logged_in=logged_in,
+                do_filter=filtered,
+                refresh=refresh,
+                use_cache=True,
+                progress_dialog=progress_dialog,
+            )
             json_data['_filler'] = filler
-            return v3.response_to_items(provider, context, json_data)
-    return False
+            return json_data
+
+        json_data['_filler'] = filler
+        return v3.response_to_items(provider, context, json_data)
 
 
 def process(provider, context, re_match=None, category=None):
