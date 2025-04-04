@@ -195,8 +195,12 @@ class BaseRequestsClass(Logger):
 
             if error_info is None:
                 try:
-                    error_info = ('Status:    {0.status_code} - {0.reason}'
-                                  .format(exc.response))
+                    error_info = '\n\t'.join((
+                        'URL:       {method} {url}',
+                        'Status:    {response.status_code} - {response.reason}',
+                    )).format(method=method,
+                              url=url,
+                              response=exc.response)
                 except AttributeError:
                     error_info = ('Exception: {exc!r}'
                                   .format(exc=exc))
