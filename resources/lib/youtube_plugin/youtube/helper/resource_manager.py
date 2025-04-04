@@ -67,9 +67,11 @@ class ResourceManager(object):
                 updated.append(identifier)
                 continue
 
-            channel_id = client.get_channel_by_identifier(
-                identifier,
-                refresh=refresh,
+            channel_id = function_cache.run(
+                client.get_channel_by_identifier,
+                function_cache.ONE_MONTH,
+                _refresh=refresh,
+                identifier=identifier,
             )
             if channel_id:
                 updated.append(channel_id)

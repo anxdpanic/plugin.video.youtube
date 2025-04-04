@@ -679,10 +679,14 @@ class Provider(AbstractProvider):
             channel_id = None
 
         if not channel_id:
-            _params = {command: True, 'identifier': identifier}
-            channel_id = client.get_channel_by_identifier(
-                refresh=params.get('refresh', 0) > 0,
-                **_params
+            function_cache = context.get_function_cache()
+            channel_id = function_cache.run(
+                client.get_channel_by_identifier,
+                function_cache.ONE_MONTH,
+                **{
+                    command: True,
+                    'identifier': identifier,
+                }
             )
             if not channel_id:
                 return False
