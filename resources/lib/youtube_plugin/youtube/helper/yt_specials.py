@@ -333,12 +333,20 @@ def _process_saved_playlists_tv(provider, context, client):
     return tv.saved_playlists_to_items(provider, context, json_data)
 
 
-def _process_my_subscriptions(provider, context, client, filtered=False):
+def _process_my_subscriptions(provider,
+                              context,
+                              client,
+                              filtered=False,
+                              feed_type=None,
+                              _feed_types={'videos', 'shorts', 'live'}):
     context.set_content(CONTENT.VIDEO_CONTENT)
 
     logged_in = provider.is_logged_in()
     params = context.get_params()
     refresh = params.get('refresh', 0) > 0
+
+    if feed_type not in _feed_types:
+        feed_type = 'videos'
 
     with context.get_ui().create_progress_dialog(
             heading=context.localize('my_subscriptions.loading'),
@@ -349,6 +357,7 @@ def _process_my_subscriptions(provider, context, client, filtered=False):
             page_token=params.get('page', 1),
             logged_in=logged_in,
             do_filter=filtered,
+            feed_type=feed_type,
             refresh=refresh,
             progress_dialog=progress_dialog,
         )
@@ -364,6 +373,7 @@ def _process_my_subscriptions(provider, context, client, filtered=False):
                 page_token=json_data.get('nextPageToken'),
                 logged_in=logged_in,
                 do_filter=filtered,
+                feed_type=feed_type,
                 refresh=refresh,
                 use_cache=True,
                 progress_dialog=progress_dialog,
@@ -372,12 +382,52 @@ def _process_my_subscriptions(provider, context, client, filtered=False):
             return json_data
 
         json_data['_filler'] = filler
-        return v3.response_to_items(provider, context, json_data)
+
+        if filtered:
+            my_subscriptions_path = PATHS.MY_SUBSCRIPTIONS_FILTERED
+        else:
+            my_subscriptions_path = PATHS.MY_SUBSCRIPTIONS
+        result = [
+            DirectoryItem(
+                context.localize('my_subscriptions'),
+                context.create_uri(my_subscriptions_path),
+                image='{media}/new_uploads.png',
+            ) if feed_type != 'videos' else None,
+            DirectoryItem(
+                context.localize('shorts'),
+                context.create_uri((my_subscriptions_path, 'shorts')),
+                image='{media}/shorts.png',
+            ) if feed_type != 'shorts' else None,
+            DirectoryItem(
+                context.localize('live'),
+                context.create_uri((my_subscriptions_path, 'live')),
+                image='{media}/live.png',
+            ) if feed_type != 'live' else None,
+        ]
+        result.extend(v3.response_to_items(
+            provider, context, json_data,
+            item_filter={
+                'live_folder': True,
+                'shorts': False,
+            } if feed_type == 'live' else {
+                'live': False,
+                'shorts': True,
+                'upcoming_live': False,
+            } if feed_type == 'shorts' else {
+                'live': False,
+                'shorts': False,
+                'upcoming_live': False,
+            }
+        ))
+        return result
 
 
-def process(provider, context, re_match=None, category=None):
-    if re_match and category is None:
-        category = re_match.group('category')
+def process(provider, context, re_match=None, category=None, sub_category=None):
+    if re_match:
+        if category is None:
+            category = re_match.group('category')
+        if sub_category is None:
+            sub_category = re_match.group('sub_category')
 
     # required for provider.is_logged_in()
     client = provider.get_client(context)
@@ -396,7 +446,11 @@ def process(provider, context, re_match=None, category=None):
 
     if category.startswith(('my_subscriptions', 'new_uploaded_videos_tv')):
         return _process_my_subscriptions(
-            provider, context, client, filtered=category.endswith('_filtered'),
+            provider,
+            context,
+            client,
+            filtered=category.endswith('_filtered'),
+            feed_type=sub_category,
         )
 
     if category == 'disliked_videos':

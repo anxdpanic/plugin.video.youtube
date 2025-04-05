@@ -76,7 +76,7 @@ class Provider(AbstractProvider):
         )
 
         self.on_specials_x = self.register_path(
-            '^/special/(?P<category>[^/]+)/?$',
+            '^/special/(?P<category>[^/]+)(?:/(?P<sub_category>[^/]+))?/?$',
             yt_specials.process,
         )
 

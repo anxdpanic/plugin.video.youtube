@@ -1783,6 +1783,7 @@ class YouTube(LoginClient):
                              page_token=1,
                              logged_in=False,
                              do_filter=False,
+                             feed_type='videos',
                              refresh=False,
                              use_cache=True,
                              progress_dialog=None,
@@ -1884,21 +1885,33 @@ class YouTube(LoginClient):
         def _get_cached_feed(output,
                              inputs,
                              item_type,
+                             feed_type=feed_type,
                              _refresh=refresh,
                              feed_history=feed_history,
                              ttl=feed_history.ONE_HOUR):
             feeds = output['feeds']
             to_refresh = output['to_refresh']
-            cached_items = feed_history.get_items(inputs, seconds=ttl)
+            if item_type == 'channel_id':
+                channel_prefix = (
+                    'UUSH' if feed_type == 'shorts' else
+                    'UULV' if feed_type == 'live' else
+                    'UULF'
+                )
+            else:
+                channel_prefix = False
             for item_id in inputs:
-                if item_id in cached_items:
-                    cached = cached_items[item_id]
+                if channel_prefix:
+                    channel_id = item_id
+                    item_id = item_id.replace('UC', channel_prefix, 1)
                 else:
-                    cached = feed_history.get_item(item_id, seconds=ttl)
+                    channel_id = None
+                cached = feed_history.get_item(item_id, seconds=ttl)
 
                 if cached:
                     feed_details = cached['value']
                     feed_details['refresh'] = _refresh
+                    if channel_id:
+                        feed_details.setdefault('channel_id', channel_id)
                     if _refresh:
                         to_refresh.append({item_type: item_id})
                     if item_id in feeds:
@@ -1913,20 +1926,24 @@ class YouTube(LoginClient):
         def _get_feed(output,
                       channel_id=None,
                       playlist_id=None,
+                      feed_type=feed_type,
                       headers=headers):
             if channel_id:
-                item_id = channel_id
-                is_channel = True
+                item_id = channel_id.replace(
+                    'UC',
+                    'UUSH' if feed_type == 'shorts' else
+                    'UULV' if feed_type == 'live' else
+                    'UULF',
+                    1,
+                )
             elif playlist_id:
                 item_id = playlist_id
-                is_channel = False
             else:
                 return True, False
 
             response = self.request(
                 ''.join((
-                    'https://www.youtube.com/feeds/videos.xml?',
-                    'channel_id=' if is_channel else 'playlist_id=',
+                    'https://www.youtube.com/feeds/videos.xml?playlist_id=',
                     item_id,
                 )),
                 headers=headers,
@@ -1935,6 +1952,7 @@ class YouTube(LoginClient):
                 return False, True
 
             _output = {
+                'channel_id': channel_id,
                 'content': response,
                 'refresh': True,
             }
@@ -1974,6 +1992,7 @@ class YouTube(LoginClient):
             all_items = {}
             new_cache = {}
             for item_id, feed in feeds.items():
+                channel_id = feed.get('channel_id')
                 channel_name = feed.get('channel_name')
                 cached_items = feed.get('cached_items')
                 refresh_feed = feed.get('refresh')
@@ -2053,6 +2072,7 @@ class YouTube(LoginClient):
 
                 if refresh_feed:
                     new_cache[item_id] = {
+                        'channel_id': channel_id,
                         'channel_name': channel_name,
                         'cached_items': feed_items,
                     }
@@ -2060,10 +2080,10 @@ class YouTube(LoginClient):
                     continue
 
                 if filters and filters['names']:
-                    if self.channel_match(
-                            channel_name,
+                    if channel_id and self.channel_match(
+                            channel_id,
                             filters['names'],
-                            filters['blacklist']
+                            filters['blacklist'],
                     ):
                         all_items[item_id] = feed_items
                 else:
