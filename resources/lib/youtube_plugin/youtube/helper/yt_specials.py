@@ -23,7 +23,7 @@ def _process_related_videos(provider, context, client):
 
     params = context.get_params()
     video_id = params.get('video_id')
-    refresh = params.get('refresh', 0) > 0
+    refresh = context.refresh_requested()
     if video_id:
         json_data = function_cache.run(
             client.get_related_videos,
@@ -80,38 +80,41 @@ def _process_recommendations(provider, context, client):
     context.set_content(CONTENT.VIDEO_CONTENT)
     params = context.get_params()
     function_cache = context.get_function_cache()
+    # source = client.get_recommended_for_home_tv
+    source = client.get_recommended_for_home_vr
 
     json_data = function_cache.run(
-        client.get_recommended_for_home,
+        source,
         function_cache.ONE_HOUR,
-        _refresh=params.get('refresh', 0) > 0,
+        _refresh=context.refresh_requested(),
         visitor=params.get('visitor'),
         page_token=params.get('page_token'),
         click_tracking=params.get('click_tracking'),
-        offset=params.get('offset'),
     )
+    if not json_data:
+        return False
 
-    if json_data:
-        def filler(json_data, remaining):
-            page_token = json_data.get('nextPageToken')
-            if not page_token:
-                return None
+    def filler(json_data, _remaining):
+        page_token = json_data.get('nextPageToken')
+        if not page_token:
+            return None
 
-            json_data = function_cache.run(
-                client.get_recommended_for_home,
-                function_cache.ONE_HOUR,
-                _refresh=params.get('refresh', 0) > 0,
-                visitor=json_data.get('visitorData'),
-                page_token=page_token,
-                click_tracking=json_data.get('clickTracking'),
-                remaining=remaining,
-            )
-            json_data['_filler'] = filler
-            return json_data
-
+        json_data = function_cache.run(
+            source,
+            function_cache.ONE_HOUR,
+            _refresh=context.refresh_requested(),
+            visitor=json_data.get('visitorData'),
+            page_token=page_token,
+            click_tracking=json_data.get('clickTracking'),
+        )
         json_data['_filler'] = filler
-        return v3.response_to_items(provider, context, json_data)
-    return False
+        return json_data
+
+    json_data['_filler'] = filler
+    return v3.response_to_items(provider,
+                                context,
+                                json_data,
+                                allow_duplicates=False)
 
 
 def _process_trending(provider, context, client):
@@ -120,29 +123,28 @@ def _process_trending(provider, context, client):
     json_data = client.get_trending_videos(
         page_token=context.get_param('page_token')
     )
+    if not json_data:
+        return False
 
-    if json_data:
-        def filler(json_data, _remaining):
-            page_token = json_data.get('nextPageToken')
-            if not page_token:
-                return None
+    def filler(json_data, _remaining):
+        page_token = json_data.get('nextPageToken')
+        if not page_token:
+            return None
 
-            json_data = client.get_trending_videos(
-                page_token=page_token,
-            )
-            json_data['_filler'] = filler
-            return json_data
-
+        json_data = client.get_trending_videos(
+            page_token=page_token,
+        )
         json_data['_filler'] = filler
-        return v3.response_to_items(provider, context, json_data)
-    return False
+        return json_data
+
+    json_data['_filler'] = filler
+    return v3.response_to_items(provider, context, json_data)
 
 
 def _process_browse_channels(provider, context, client):
     context.set_content(CONTENT.LIST_CONTENT)
 
-    params = context.get_params()
-    guide_id = params.get('guide_id')
+    guide_id = context.get_param('guide_id')
     if guide_id:
         json_data = client.get_guide_category(guide_id)
     else:
@@ -150,7 +152,7 @@ def _process_browse_channels(provider, context, client):
         json_data = function_cache.run(
             client.get_guide_categories,
             function_cache.ONE_MONTH,
-            _refresh=params.get('refresh', 0) > 0,
+            _refresh=context.refresh_requested(),
         )
 
     if not json_data:
@@ -216,7 +218,7 @@ def _process_description_links(provider, context):
             urls = function_cache.run(
                 utils.extract_urls,
                 function_cache.ONE_DAY,
-                _refresh=params.get('refresh', 0) > 0,
+                _refresh=context.refresh_requested(),
                 text=description,
             )
 
@@ -330,12 +332,19 @@ def _process_saved_playlists_tv(provider, context, client):
     return tv.saved_playlists_to_items(provider, context, json_data)
 
 
-def _process_my_subscriptions(provider, context, client, filtered=False):
+def _process_my_subscriptions(provider,
+                              context,
+                              client,
+                              filtered=False,
+                              feed_type=None,
+                              _feed_types={'videos', 'shorts', 'live'}):
     context.set_content(CONTENT.VIDEO_CONTENT)
 
     logged_in = provider.is_logged_in()
-    params = context.get_params()
-    refresh = params.get('refresh', 0) > 0
+    refresh = context.refresh_requested()
+
+    if feed_type not in _feed_types:
+        feed_type = 'videos'
 
     with context.get_ui().create_progress_dialog(
             heading=context.localize('my_subscriptions.loading'),
@@ -343,38 +352,80 @@ def _process_my_subscriptions(provider, context, client, filtered=False):
             background=True,
     ) as progress_dialog:
         json_data = client.get_my_subscriptions(
-            page_token=params.get('page', 1),
+            page_token=context.get_param('page', 1),
             logged_in=logged_in,
             do_filter=filtered,
+            feed_type=feed_type,
             refresh=refresh,
             progress_dialog=progress_dialog,
         )
+        if not json_data:
+            return False
 
-        if json_data:
-            def filler(json_data, _remaining):
-                page_token = json_data.get('nextPageToken')
-                if not page_token:
-                    return None
+        def filler(json_data, _remaining):
+            page_token = json_data.get('nextPageToken')
+            if not page_token:
+                return None
 
-                json_data = client.get_my_subscriptions(
-                    page_token=json_data.get('nextPageToken'),
-                    logged_in=logged_in,
-                    do_filter=filtered,
-                    refresh=refresh,
-                    use_cache=True,
-                    progress_dialog=progress_dialog,
-                )
-                json_data['_filler'] = filler
-                return json_data
-
+            json_data = client.get_my_subscriptions(
+                page_token=json_data.get('nextPageToken'),
+                logged_in=logged_in,
+                do_filter=filtered,
+                feed_type=feed_type,
+                refresh=refresh,
+                use_cache=True,
+                progress_dialog=progress_dialog,
+            )
             json_data['_filler'] = filler
-            return v3.response_to_items(provider, context, json_data)
-    return False
+            return json_data
+
+        json_data['_filler'] = filler
+
+        if filtered:
+            my_subscriptions_path = PATHS.MY_SUBSCRIPTIONS_FILTERED
+        else:
+            my_subscriptions_path = PATHS.MY_SUBSCRIPTIONS
+        result = [
+            DirectoryItem(
+                context.localize('my_subscriptions'),
+                context.create_uri(my_subscriptions_path),
+                image='{media}/new_uploads.png',
+            ) if feed_type != 'videos' else None,
+            DirectoryItem(
+                context.localize('shorts'),
+                context.create_uri((my_subscriptions_path, 'shorts')),
+                image='{media}/shorts.png',
+            ) if feed_type != 'shorts' else None,
+            DirectoryItem(
+                context.localize('live'),
+                context.create_uri((my_subscriptions_path, 'live')),
+                image='{media}/live.png',
+            ) if feed_type != 'live' else None,
+        ]
+        result.extend(v3.response_to_items(
+            provider, context, json_data,
+            item_filter={
+                'live_folder': True,
+                'shorts': False,
+            } if feed_type == 'live' else {
+                'live': False,
+                'shorts': True,
+                'upcoming_live': False,
+            } if feed_type == 'shorts' else {
+                'live': False,
+                'shorts': False,
+                'upcoming_live': False,
+            }
+        ))
+        return result
 
 
-def process(provider, context, re_match=None, category=None):
-    if re_match and category is None:
-        category = re_match.group('category')
+def process(provider, context, re_match=None, category=None, sub_category=None):
+    if re_match:
+        if category is None:
+            category = re_match.group('category')
+        if sub_category is None:
+            sub_category = re_match.group('sub_category')
 
     # required for provider.is_logged_in()
     client = provider.get_client(context)
@@ -393,7 +444,11 @@ def process(provider, context, re_match=None, category=None):
 
     if category.startswith(('my_subscriptions', 'new_uploaded_videos_tv')):
         return _process_my_subscriptions(
-            provider, context, client, filtered=category.endswith('_filtered'),
+            provider,
+            context,
+            client,
+            filtered=category.endswith('_filtered'),
+            feed_type=sub_category,
         )
 
     if category == 'disliked_videos':

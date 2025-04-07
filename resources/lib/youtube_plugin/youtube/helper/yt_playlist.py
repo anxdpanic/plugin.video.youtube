@@ -145,10 +145,7 @@ def _process_remove_video(provider,
         if playlist_id in container_uri:
             uri = container_uri
             path = None
-            refresh = params.get('refresh', 0)
-            if refresh < 0:
-                refresh = -refresh
-            params = {'refresh': refresh + 1}
+            params = {'refresh': context.refresh_requested(force=True, on=True)}
         else:
             path = params.pop('reload_path', False if confirmed else None)
             uri = None
@@ -228,7 +225,7 @@ def _process_select_playlist(provider, context):
         current_page += 1
         json_data = function_cache.run(client.get_playlists_of_channel,
                                        function_cache.ONE_MINUTE // 3,
-                                       _refresh=params.get('refresh', 0) > 0,
+                                       _refresh=context.refresh_requested(),
                                        channel_id='mine',
                                        page_token=page_token)
         if not json_data:

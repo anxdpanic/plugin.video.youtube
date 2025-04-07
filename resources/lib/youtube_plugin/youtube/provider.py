@@ -30,7 +30,7 @@ from .helper import (
     yt_subscriptions,
     yt_video,
 )
-from .helper.utils import filter_split, update_duplicate_items
+from .helper.utils import channel_filter_split, update_duplicate_items
 from .youtube_exceptions import InvalidGrant, LoginException
 from ..kodion import AbstractProvider
 from ..kodion.constants import (
@@ -76,7 +76,7 @@ class Provider(AbstractProvider):
         )
 
         self.on_specials_x = self.register_path(
-            '^/special/(?P<category>[^/]+)/?$',
+            '^/special/(?P<category>[^/]+)(?:/(?P<sub_category>[^/]+))?/?$',
             yt_specials.process,
         )
 
@@ -353,40 +353,6 @@ class Provider(AbstractProvider):
         return False, None
 
     @AbstractProvider.register_path(
-        r'^(?:/channel/(?P<channel_id>[^/]+))?'
-        r'/playlist/(?P<playlist_id>[^/]+)/?$'
-    )
-    @staticmethod
-    def on_playlist(provider, context, re_match):
-        """
-        Lists the videos of a playlist.
-
-        plugin://plugin.video.youtube/channel/<CHANNEL_ID>/playlist/<PLAYLIST_ID>
-
-        or
-
-        plugin://plugin.video.youtube/playlist/<PLAYLIST_ID>
-
-        * CHANNEL_ID: ['mine'|YouTube Channel ID]
-        * PLAYLIST_ID: YouTube Playlist ID
-        """
-        context.parse_params({
-            'playlist_id': re_match.group('playlist_id'),
-        })
-
-        context.set_content(CONTENT.VIDEO_CONTENT)
-        resource_manager = provider.get_resource_manager(context)
-
-        batch_id = (re_match.group('playlist_id'),
-                    context.get_param('page_token') or 0)
-
-        json_data = resource_manager.get_playlist_items(batch_id=batch_id)
-        if not json_data:
-            return False
-        result = v3.response_to_items(provider, context, json_data[batch_id])
-        return result
-
-    @AbstractProvider.register_path(
         r'^/channel/(?P<channel_id>[^/]+)'
         r'/playlists/?$')
     @staticmethod
@@ -471,34 +437,98 @@ class Provider(AbstractProvider):
 
     @AbstractProvider.register_path(
         r'^/channel/(?P<channel_id>[^/]+)'
-        r'/live/?$')
+        r'/(?:live|playlist/(?P<playlist_id>UULV[^/]+))/?$'
+    )
     @staticmethod
-    def on_channel_live(provider, context, re_match):
+    def on_channel_live(provider,
+                        context,
+                        re_match=None,
+                        channel_id=None,
+                        playlist_id=None):
         """
-        List live streams for channel.
+        List live streams for a given channel.
 
         plugin://plugin.video.youtube/channel/<CHANNEL_ID>/live
 
-        * CHANNEL_ID: YouTube Channel ID
+        or
+
+        plugin://plugin.video.youtube/channel/<CHANNEL_ID>/playlist/<PLAYLIST_ID>
+
+        * CHANNEL_ID: YouTube channel ID
+        * PLAYLIST_ID: YouTube live stream playlist ID beginning with UULV
         """
         context.set_content(CONTENT.VIDEO_CONTENT)
 
-        channel_id = re_match.group('channel_id')
-
         resource_manager = provider.get_resource_manager(context)
-        playlists = resource_manager.get_related_playlists(channel_id)
-        uploads = playlists.get('uploads') if playlists else None
-        if uploads and uploads.startswith('UU'):
-            uploads = uploads.replace('UU', 'UULV', 1)
-            batch_id = (uploads, context.get_param('page_token') or 0)
-        else:
-            return False
 
+        if re_match:
+            channel_id = re_match.group('channel_id')
+            playlist_id = re_match.group('playlist_id')
+            if not playlist_id:
+                playlists = resource_manager.get_related_playlists(channel_id)
+                playlist_id = playlists.get('uploads') if playlists else None
+                if playlist_id and playlist_id.startswith('UU'):
+                    playlist_id = playlist_id.replace('UU', 'UULV', 1)
+
+        if not channel_id or not playlist_id:
+            return False
+        new_params = {
+            'channel_id': channel_id,
+            'playlist_id': playlist_id,
+        }
+        context.parse_params(new_params)
+
+        batch_id = (playlist_id, context.get_param('page_token') or 0)
         json_data = resource_manager.get_playlist_items(batch_id=batch_id)
         if not json_data:
             return False
+        json_data = json_data[batch_id]
+
+        live_streams = provider.get_client(context).get_browse_videos(
+            channel_id=channel_id,
+            route='streams',
+            json_path={
+                'items': (
+                    'contents',
+                    'twoColumnBrowseResultsRenderer',
+                    'tabs',
+                    slice(None),
+                    'tabRenderer',
+                    lambda x: (
+                        x['content']
+                        if x['title'] == 'Live' else
+                        None
+                    ),
+                    'richGridRenderer',
+                    'contents',
+                    slice(None),
+                    'richItemRenderer',
+                    'content',
+                    'videoRenderer',
+                    lambda x: (
+                        x
+                        if (x[
+                            'thumbnailOverlays'
+                        ][
+                            0
+                        ][
+                            'thumbnailOverlayTimeStatusRenderer'
+                        ][
+                            'style'
+                        ]) == 'LIVE' else
+                        None
+                    ),
+                ),
+                'continuation': None,
+            },
+        )
+        if live_streams and 'items' in live_streams and 'items' in json_data:
+            live_streams['items'].extend(json_data['items'])
+            json_data['items'] = live_streams['items']
+
         result = v3.response_to_items(
-            provider, context, json_data[batch_id],
+            provider, context, json_data,
+            allow_duplicates=False,
             item_filter={
                 'live_folder': True,
             },
@@ -507,29 +537,49 @@ class Provider(AbstractProvider):
 
     @AbstractProvider.register_path(
         r'^/channel/(?P<channel_id>[^/]+)'
-        r'/shorts/?$')
+        r'/(?:shorts|playlist/(?P<playlist_id>UUSH[^/]+))/?$'
+    )
     @staticmethod
-    def on_channel_shorts(provider, context, re_match):
+    def on_channel_shorts(provider,
+                          context,
+                          re_match=None,
+                          channel_id=None,
+                          playlist_id=None):
         """
         List shorts for channel.
 
         plugin://plugin.video.youtube/channel/<CHANNEL_ID>/shorts
 
-        * CHANNEL_ID: YouTube Channel ID
+        or
+
+        plugin://plugin.video.youtube/channel/<CHANNEL_ID>/playlist/<PLAYLIST_ID>
+
+        * CHANNEL_ID: YouTube channel ID
+        * PLAYLIST_ID: YouTube live stream playlist ID beginning with UUSH
         """
         context.set_content(CONTENT.VIDEO_CONTENT)
 
-        channel_id = re_match.group('channel_id')
-
         resource_manager = provider.get_resource_manager(context)
-        playlists = resource_manager.get_related_playlists(channel_id)
-        uploads = playlists.get('uploads') if playlists else None
-        if uploads and uploads.startswith('UU'):
-            uploads = uploads.replace('UU', 'UUSH', 1)
-            batch_id = (uploads, context.get_param('page_token') or 0)
-        else:
-            return False
 
+        if re_match:
+            channel_id = re_match.group('channel_id')
+            playlist_id = re_match.group('playlist_id')
+            if not playlist_id:
+                playlists = resource_manager.get_related_playlists(channel_id)
+                playlist_id = playlists.get('uploads') if playlists else None
+                if playlist_id and playlist_id.startswith('UU'):
+                    playlist_id = playlist_id.replace('UU', 'UUSH', 1)
+
+        if not playlist_id:
+            return False
+        new_params = {
+            'playlist_id': playlist_id,
+        }
+        if channel_id:
+            new_params['channel_id'] = channel_id
+        context.parse_params(new_params)
+
+        batch_id = (playlist_id, context.get_param('page_token') or 0)
         json_data = resource_manager.get_playlist_items(batch_id=batch_id)
         if not json_data:
             return False
@@ -539,6 +589,43 @@ class Provider(AbstractProvider):
                 'shorts': True,
             },
         )
+        return result
+
+    @AbstractProvider.register_path(
+        r'^(?:/channel/(?P<channel_id>[^/]+))?'
+        r'/playlist/(?P<playlist_id>[^/]+)/?$'
+    )
+    @staticmethod
+    def on_playlist(provider, context, re_match):
+        """
+        Lists the videos of a playlist.
+
+        plugin://plugin.video.youtube/channel/<CHANNEL_ID>/playlist/<PLAYLIST_ID>
+
+        or
+
+        plugin://plugin.video.youtube/playlist/<PLAYLIST_ID>
+
+        * CHANNEL_ID: ['mine'|YouTube Channel ID]
+        * PLAYLIST_ID: YouTube Playlist ID
+        """
+        playlist_id = re_match.group('playlist_id')
+        new_params = {
+            'playlist_id': playlist_id,
+        }
+        channel_id = re_match.group('channel_id')
+        if channel_id:
+            new_params['channel_id'] = channel_id
+        context.parse_params(new_params)
+
+        context.set_content(CONTENT.VIDEO_CONTENT)
+        resource_manager = provider.get_resource_manager(context)
+
+        batch_id = (playlist_id, context.get_param('page_token') or 0)
+        json_data = resource_manager.get_playlist_items(batch_id=batch_id)
+        if not json_data:
+            return False
+        result = v3.response_to_items(provider, context, json_data[batch_id])
         return result
 
     @AbstractProvider.register_path(
@@ -558,7 +645,6 @@ class Provider(AbstractProvider):
 
         client = provider.get_client(context)
         create_uri = context.create_uri
-        function_cache = context.get_function_cache()
         params = context.get_params()
 
         command = re_match.group('command')
@@ -590,33 +676,20 @@ class Provider(AbstractProvider):
             channel_id = identifier
         else:
             channel_id = None
-            identifier = {command: True, 'identifier': identifier}
 
         if not channel_id:
-            context.log_debug('Trying to get channel ID for |{0}|'.format(
-                identifier['identifier']
-            ))
-            json_data = function_cache.run(
+            function_cache = context.get_function_cache()
+            channel_id = function_cache.run(
                 client.get_channel_by_identifier,
-                function_cache.ONE_DAY,
-                _refresh=params.get('refresh', 0) > 0,
-                **identifier
+                function_cache.ONE_MONTH,
+                _refresh=context.refresh_requested(),
+                **{
+                    command: True,
+                    'identifier': identifier,
+                }
             )
-            if not json_data:
+            if not channel_id:
                 return False
-
-            identifier = identifier['identifier']
-            # we correct the channel id based on the username
-            items = json_data.get('items', [])
-            if items:
-                channel_id = items[0]['id']
-            else:
-                context.log_debug('Channel ID not found for |{0}|'.format(
-                    identifier
-                ))
-
-        if not channel_id:
-            return False
 
         context.parse_params({
             'channel_id': channel_id,
@@ -694,21 +767,55 @@ class Provider(AbstractProvider):
         if uploads:
             # The "UULF" videos playlist can only be used if videos in a channel
             # are made public. Use "UU" all uploads playlist and filter instead
-            # uploads = uploads.replace('UU', 'UULF', 1)
-            batch_id = (uploads, page_token or 0)
+            # if viewing personal channel.
+            if command != 'mine':
+                filtered_uploads = uploads.replace('UU', 'UULF', 1)
+            else:
+                filtered_uploads = None
+            while 1:
+                if filtered_uploads:
+                    batch_id = (filtered_uploads, page_token or 0)
+                else:
+                    batch_id = (uploads, page_token or 0)
 
-            json_data = resource_manager.get_playlist_items(batch_id=batch_id)
-            if not json_data:
+                json_data = resource_manager.get_playlist_items(
+                    batch_id=batch_id,
+                    defer_cache=False,
+                )
+                if json_data:
+                    break
+                if filtered_uploads:
+                    filtered_uploads = None
+                    continue
                 return result
 
             context.parse_params({
-                'playlist_id': uploads,
+                'playlist_id': filtered_uploads or uploads,
             })
 
+            json_data = json_data[batch_id]
+            if not filtered_uploads:
+                def filler(json_data, remaining):
+                    next_page_token = json_data.get('nextPageToken')
+                    if not next_page_token or remaining <= 0:
+                        return None
+
+                    next_batch_id = (uploads, next_page_token)
+                    new_json_data = resource_manager.get_playlist_items(
+                        batch_id=next_batch_id,
+                        defer_cache=False,
+                    )
+                    if not new_json_data:
+                        return None
+                    new_json_data = new_json_data[next_batch_id]
+                    new_json_data['_filler'] = filler
+                    return new_json_data
+
+                json_data['_filler'] = filler
             result.extend(v3.response_to_items(
-                provider, context, json_data[batch_id],
+                provider, context, json_data,
                 item_filter={
-                    # 'shorts': False,
+                    'shorts': True,
                     'live': False,
                     'upcoming_live': False,
                 },
@@ -955,7 +1062,7 @@ class Provider(AbstractProvider):
         search_params, json_data = function_cache.run(
             self.get_client(context).search_with_params,
             function_cache.ONE_MINUTE * 10,
-            _refresh=params.get('refresh', 0) > 0,
+            _refresh=context.refresh_requested(),
             params=search_params,
         )
         if not json_data:
@@ -995,40 +1102,32 @@ class Provider(AbstractProvider):
         settings = context.get_settings()
         ui = context.get_ui()
 
-        channel = context.get_param('item_name')
+        channel_name = context.get_param('item_name')
         command = re_match.group('command')
-        if not channel or not command:
+        if not channel_name or not command:
             return
 
-        filter_enabled = settings.get_bool(
-            'youtube.folder.my_subscriptions_filtered.show', False
+        if not settings.subscriptions_filter_enabled():
+            return
+
+        filter_string, filters_set, custom_filters = channel_filter_split(
+            settings.subscriptions_filter()
         )
-        if not filter_enabled:
-            return
 
-        channel_name = channel.lower()
-        channel_name = channel_name.replace(',', '')
-
-        filter_string = settings.get_string(
-            'youtube.filter.my_subscriptions_filtered.list', ''
-        ).replace(', ', ',')
-        custom_filters = []
-        filter_list = [
-            item.lower()
-            for item in filter_string.split(',')
-            if item and filter_split(item, custom_filters)
-        ]
-
-        if channel_name not in filter_list:
-            if command == 'add':
-                filter_list.append(channel_name)
-            else:
+        if command == 'add':
+            num_filters = len(filters_set)
+            filters_set.add(channel_name)
+            if len(filters_set) == num_filters:
                 return False
         elif command == 'remove':
-            filter_list = [item for item in filter_list if item != channel_name]
+            try:
+                filters_set.remove(channel_name)
+            except KeyError:
+                return False
         else:
             return False
 
+        filter_list = list(filters_set)
         if custom_filters:
             filter_list.extend([
                 ''.join([
@@ -1038,16 +1137,13 @@ class Provider(AbstractProvider):
                 for custom_filter in custom_filters
                 for condition in custom_filter
             ])
-        modified_string = ','.join(filter_list).lstrip(',')
-        if filter_string != modified_string:
-            settings.set_string('youtube.filter.my_subscriptions_filtered.list',
-                                modified_string)
+        settings.subscriptions_filter(filter_list)
 
-            ui.show_notification(context.localize(
-                'my_subscriptions.filter.added'
-                if command == 'add' else
-                'my_subscriptions.filter.removed'
-            ))
+        ui.show_notification(context.localize(
+            'my_subscriptions.filter.added'
+            if command == 'add' else
+            'my_subscriptions.filter.removed'
+        ))
 
     @AbstractProvider.register_path(
         r'^/maintenance'

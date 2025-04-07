@@ -46,6 +46,7 @@ class Profiler(object):
         '_print_callees',
         '_profiler',
         '_reuse',
+        '_sort_by',
         '_timer',
         'name',
     )
@@ -120,12 +121,14 @@ class Profiler(object):
                  num_lines=20,
                  print_callees=False,
                  reuse=False,
+                 sort_by=('cumulative', 'time'),
                  timer=None):
         self._enabled = enabled
         self._num_lines = num_lines
         self._print_callees = print_callees
         self._profiler = None
         self._reuse = reuse
+        self._sort_by = sort_by
         self._timer = timer
         self.name = name
 
@@ -145,11 +148,7 @@ class Profiler(object):
         if not self._enabled:
             return
 
-        Logger.log_debug('Profiling stats: {0}'.format(self.get_stats(
-            num_lines=self._num_lines,
-            print_callees=self._print_callees,
-            reuse=self._reuse,
-        )))
+        self.print_stats()
         if not self._reuse:
             self.tear_down()
 
@@ -239,7 +238,8 @@ class Profiler(object):
                   flush=True,
                   num_lines=20,
                   print_callees=False,
-                  reuse=False):
+                  reuse=False,
+                  sort_by=('cumulative', 'time')):
         if not (self._enabled and self._profiler):
             return None
 
@@ -251,7 +251,7 @@ class Profiler(object):
                 self._profiler,
                 stream=output_stream
             )
-            stats.strip_dirs().sort_stats('cumulative', 'time')
+            stats.strip_dirs().sort_stats(*sort_by)
             if print_callees:
                 stats.print_callees(num_lines)
             else:
@@ -274,6 +274,7 @@ class Profiler(object):
             num_lines=self._num_lines,
             print_callees=self._print_callees,
             reuse=self._reuse,
+            sort_by=self._sort_by,
         )))
 
     def tear_down(self):

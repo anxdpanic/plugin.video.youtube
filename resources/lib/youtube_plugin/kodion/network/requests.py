@@ -11,15 +11,15 @@ from __future__ import absolute_import, division, unicode_literals
 
 import atexit
 import socket
-from traceback import format_stack
 
 from requests import Session
 from requests.adapters import HTTPAdapter, Retry
-from requests.exceptions import InvalidJSONError, RequestException
+from requests.exceptions import InvalidJSONError, RequestException, URLRequired
 from requests.utils import DEFAULT_CA_BUNDLE_PATH, extract_zipped_paths
 from urllib3.util.ssl_ import create_urllib3_context
 
 from ..logger import Logger
+from ..utils.methods import format_stack
 
 
 __all__ = (
@@ -96,10 +96,11 @@ class BaseRequestsClass(Logger):
     def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
         self._session.close()
 
-    def request(self, url, method='GET',
+    def request(self, url=None, method='GET',
                 params=None, data=None, headers=None, cookies=None, files=None,
                 auth=None, timeout=None, allow_redirects=None, proxies=None,
                 hooks=None, stream=None, verify=None, cert=None, json=None,
+                prepared_request=None,
                 # Custom event hook implementation
                 # See _response_hook and _error_hook in login_client.py
                 # for example usage
@@ -119,21 +120,38 @@ class BaseRequestsClass(Logger):
 
         response = None
         try:
-            response = self._session.request(method, url,
-                                             params=params,
-                                             data=data,
-                                             headers=headers,
-                                             cookies=cookies,
-                                             files=files,
-                                             auth=auth,
-                                             timeout=timeout,
-                                             allow_redirects=allow_redirects,
-                                             proxies=proxies,
-                                             hooks=hooks,
-                                             stream=stream,
-                                             verify=verify,
-                                             cert=cert,
-                                             json=json)
+            if prepared_request:
+                response = self._session.send(
+                    request=prepared_request,
+                    stream=stream,
+                    verify=verify,
+                    proxies=proxies,
+                    cert=cert,
+                    timeout=timeout,
+                    allow_redirects=allow_redirects,
+                )
+            elif url:
+                response = self._session.request(
+                    method=method,
+                    url=url,
+                    params=params,
+                    data=data,
+                    headers=headers,
+                    cookies=cookies,
+                    files=files,
+                    auth=auth,
+                    timeout=timeout,
+                    allow_redirects=allow_redirects,
+                    proxies=proxies,
+                    hooks=hooks,
+                    stream=stream,
+                    verify=verify,
+                    cert=cert,
+                    json=json,
+                )
+            else:
+                raise URLRequired()
+
             if not getattr(response, 'status_code', None):
                 raise self._default_exc[0](response=response)
 
@@ -177,8 +195,12 @@ class BaseRequestsClass(Logger):
 
             if error_info is None:
                 try:
-                    error_info = ('Status:    {0.status_code} - {0.reason}'
-                                  .format(exc.response))
+                    error_info = '\n\t'.join((
+                        'URL:       {method} {url}',
+                        'Status:    {response.status_code} - {response.reason}',
+                    )).format(method=method,
+                              url=url,
+                              response=exc.response)
                 except AttributeError:
                     error_info = ('Exception: {exc!r}'
                                   .format(exc=exc))

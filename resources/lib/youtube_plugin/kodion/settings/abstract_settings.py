@@ -581,7 +581,7 @@ class AbstractSettings(object):
         'custom': None,
     }
 
-    def item_filter(self, update=None, override=None):
+    def item_filter(self, update=None, override=None, exclude=None):
         if override is None:
             override = self.get_string_list(SETTINGS.HIDE_VIDEOS)
             override = dict.fromkeys(override, False)
@@ -600,17 +600,39 @@ class AbstractSettings(object):
         if update:
             if 'live_folder' in update:
                 if 'live_folder' not in types:
-                    update.update({
-                        'vod': False,
-                        'upcoming': True,
-                        'upcoming_live': True,
-                        'live': True,
-                        'premieres': True,
-                        'completed': True,
-                    })
+                    update.update((
+                        ('vod', False),
+                        ('upcoming', True),
+                        ('upcoming_live', True),
+                        ('live', True),
+                        ('premieres', True),
+                        ('completed', True),
+                    ))
             types.update(update)
 
+        if exclude:
+            types['exclude'] = exclude
+
         return types
+
+    def subscriptions_filter_enabled(self, value=None):
+        if value is not None:
+            return self.set_bool(SETTINGS.SUBSCRIPTIONS_FILTER_ENABLED, value)
+        return self.get_bool(SETTINGS.SUBSCRIPTIONS_FILTER_ENABLED, True)
+
+    def subscriptions_filter_blacklist(self, value=None):
+        if value is not None:
+            return self.set_bool(SETTINGS.SUBSCRIPTIONS_FILTER_BLACKLIST, value)
+        return self.get_bool(SETTINGS.SUBSCRIPTIONS_FILTER_BLACKLIST, True)
+
+    def subscriptions_filter(self, value=None):
+        if value is not None:
+            if isinstance(value, (list, tuple, set)):
+                value = ','.join(value).lstrip(',')
+            return self.set_string(SETTINGS.SUBSCRIPTIONS_FILTER_LIST, value)
+        return self.get_string(
+            SETTINGS.SUBSCRIPTIONS_FILTER_LIST, ''
+        ).replace(', ', ',')
 
     def shorts_duration(self, value=None):
         if value is not None:

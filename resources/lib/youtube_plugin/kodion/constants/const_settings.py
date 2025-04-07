@@ -32,6 +32,10 @@ HIDE_VIDEOS = 'youtube.view.hide_videos'  # (list[str])
 SHORTS_DURATION = 'youtube.view.shorts.duration'  # (int)
 FILTER_LIST = 'youtube.view.filter.list'  # (str)
 
+SUBSCRIPTIONS_FILTER_ENABLED = 'youtube.folder.my_subscriptions_filtered.show'  # (bool)
+SUBSCRIPTIONS_FILTER_BLACKLIST = 'youtube.filter.my_subscriptions_filtered.blacklist'  # (bool)
+SUBSCRIPTIONS_FILTER_LIST = 'youtube.filter.my_subscriptions_filtered.list'  # (str)
+
 SAFE_SEARCH = 'kodion.safe.search'  # (int)
 AGE_GATE = 'kodion.age.gate'  # (bool)
 
@@ -94,4 +98,4 @@ HTTPD_WHITELIST = 'kodion.http.ip.whitelist'  # (str)
 HTTPD_IDLE_SLEEP = 'youtube.http.idle_sleep'  # (bool)
 HTTPD_STREAM_REDIRECT = 'youtube.http.stream_redirect'  # (bool)
 
-LOGGING_ENABLED = 'kodion.logging.enabled'  # (int)
+LOGGING_ENABLED = 'kodion.logging.level'  # (int)

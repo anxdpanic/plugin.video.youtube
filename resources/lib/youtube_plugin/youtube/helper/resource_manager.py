@@ -56,7 +56,7 @@ class ResourceManager(object):
         client = self._provider.get_client(context)
         data_cache = context.get_data_cache()
         function_cache = context.get_function_cache()
-        refresh = context.get_param('refresh', 0) > 0
+        refresh = context.refresh_requested()
         updated = []
         handles = {}
         for identifier in ids:
@@ -67,25 +67,16 @@ class ResourceManager(object):
                 updated.append(identifier)
                 continue
 
-            data = function_cache.run(
+            channel_id = function_cache.run(
                 client.get_channel_by_identifier,
-                function_cache.ONE_DAY,
+                function_cache.ONE_MONTH,
                 _refresh=refresh,
                 identifier=identifier,
-            ) or {}
-            items = data.get('items')
-
-            try:
-                channel_id = items[0]['id']
+            )
+            if channel_id:
                 updated.append(channel_id)
                 if channel_id != identifier:
                     handles[channel_id] = identifier
-            except (IndexError, KeyError, TypeError) as exc:
-                context.log_error('ResourceManager.get_channels'
-                                  ' - Own channel_id not found'
-                                  '\n\tException: {exc!r}'
-                                  '\n\tChannels:  {data}'
-                                  .format(exc=exc, data=data))
 
         ids = updated
         if refresh or not ids:
@@ -152,7 +143,7 @@ class ResourceManager(object):
                          suppress_errors=False,
                          defer_cache=False):
         context = self._context
-        refresh = context.get_param('refresh', 0) > 0
+        refresh = context.refresh_requested()
         if not refresh and channel_data:
             result = channel_data
         else:
@@ -250,7 +241,7 @@ class ResourceManager(object):
     def get_playlists(self, ids, suppress_errors=False, defer_cache=False):
         context = self._context
         ids = tuple(ids)
-        refresh = context.get_param('refresh', 0) > 0
+        refresh = context.refresh_requested()
         if refresh or not ids:
             result = {}
         else:
@@ -316,7 +307,7 @@ class ResourceManager(object):
             return None
 
         context = self._context
-        refresh = context.get_param('refresh', 0) > 0
+        refresh = context.refresh_requested()
 
         if batch_id:
             ids = [batch_id[0]]
@@ -455,16 +446,17 @@ class ResourceManager(object):
                    yt_items=None):
         context = self._context
         ids = tuple(ids)
-        refresh = context.get_param('refresh', 0) > 0
+        refresh = context.refresh_requested()
         if refresh or not ids:
             result = {}
         else:
             data_cache = context.get_data_cache()
             result = data_cache.get_items(ids, data_cache.ONE_MONTH)
         to_update = [id_ for id_ in ids
-                     if id_ not in result
-                     or not result[id_]
-                     or result[id_].get('_partial')]
+                     if id_
+                     and (id_ not in result
+                          or not result[id_]
+                          or result[id_].get('_partial'))]
 
         if result:
             context.debug_log and context.log_debug(

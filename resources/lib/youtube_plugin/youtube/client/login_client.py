@@ -135,12 +135,13 @@ class LoginClient(YouTubeRequestClient):
                      'grant_type': 'refresh_token'}
 
         config_type = self._get_config_type(client_id, client_secret)
+        client_id.replace('.apps.googleusercontent.com', '')
         client = (('\n\tconfig_type:   |{config_type}|'
                    '\n\tclient_id:     |{id_start}...{id_end}|'
                    '\n\tclient_secret: |{secret_start}...{secret_end}|')
                   .format(config_type=config_type,
                           id_start=client_id[:3],
-                          id_end=client_id[-5:],
+                          id_end=client_id[-3:],
                           secret_start=client_secret[:3],
                           secret_end=client_secret[-3:]))
         self.log_debug('Refresh token:{0}'.format(client))
@@ -185,12 +186,13 @@ class LoginClient(YouTubeRequestClient):
                      'grant_type': 'http://oauth.net/grant_type/device/1.0'}
 
         config_type = self._get_config_type(client_id, client_secret)
+        client_id.replace('.apps.googleusercontent.com', '')
         client = (('\n\tconfig_type:   |{config_type}|'
                    '\n\tclient_id:     |{id_start}...{id_end}|'
                    '\n\tclient_secret: |{secret_start}...{secret_end}|')
                   .format(config_type=config_type,
                           id_start=client_id[:3],
-                          id_end=client_id[-5:],
+                          id_end=client_id[-3:],
                           secret_start=client_secret[:3],
                           secret_end=client_secret[-3:]))
         self.log_debug('Requesting access token:{0}'.format(client))
@@ -231,11 +233,12 @@ class LoginClient(YouTubeRequestClient):
                      'scope': 'https://www.googleapis.com/auth/youtube'}
 
         config_type = self._get_config_type(client_id)
+        client_id.replace('.apps.googleusercontent.com', '')
         client = (('\n\tconfig_type: |{config_type}|'
                    '\n\tclient_id:   |{id_start}...{id_end}|')
                   .format(config_type=config_type,
                           id_start=client_id[:3],
-                          id_end=client_id[-5:]))
+                          id_end=client_id[-3:]))
         self.log_debug('Requesting device and user code:{0}'.format(client))
 
         json_data = self.request(self.DEVICE_CODE_URL,

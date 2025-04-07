@@ -197,6 +197,7 @@ def get_channel_id(identifier,
     json_data = client.get_channel_by_identifier(identifier=identifier,
                                                  mine=mine,
                                                  handle=handle,
+                                                 as_json=True,
                                                  notify=False,
                                                  pass_data=True,
                                                  raise_exc=False)

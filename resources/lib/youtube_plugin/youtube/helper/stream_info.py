@@ -10,11 +10,11 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from base64 import urlsafe_b64encode
 from json import dumps as json_dumps, loads as json_loads
 from os import path as os_path
 from random import choice as random_choice
 from re import compile as re_compile
-from traceback import format_stack
 
 from .ratebypass import ratebypass
 from .signature.cipher import Cipher
@@ -36,7 +36,12 @@ from ...kodion.compatibility import (
 )
 from ...kodion.constants import PATHS, TEMP_PATH
 from ...kodion.network import get_connect_address
-from ...kodion.utils import make_dirs, merge_dicts, redact_ip_in_uri
+from ...kodion.utils import (
+    format_stack,
+    make_dirs,
+    merge_dicts,
+    redact_ip_in_uri,
+)
 from ...kodion.utils.datetime_parser import fromtimestamp
 
 
@@ -1382,7 +1387,7 @@ class StreamInfo(YouTubeRequestClient):
                        '\n\tStack trace (most recent call last):\n{stack}'
                        .format(exc=exc,
                                sig=encrypted_signature,
-                               stack=''.join(format_stack())))
+                               stack=format_stack()))
                 self._context.log_error(msg)
                 self._cipher = False
                 return None
@@ -1432,16 +1437,18 @@ class StreamInfo(YouTubeRequestClient):
 
         if mpd:
             new_params['__id'] = self.video_id
-            new_params['__netloc'] = [parts.netloc]
+            new_params['__host'] = [parts.hostname]
             new_params['__path'] = parts.path
-            new_params['__headers'] = json_dumps(headers or {})
+            new_params['__headers'] = urlsafe_b64encode(
+                json_dumps(headers or {}).encode('utf-8')
+            )
 
             if 'mn' in params and 'fvip' in params:
                 fvip = params['fvip'][0]
                 primary, _, secondary = params['mn'][0].partition(',')
-                prefix, separator, server = parts.netloc.partition('---')
+                prefix, separator, server = parts.hostname.partition('---')
                 if primary and secondary:
-                    new_params['__netloc'].append(separator.join((
+                    new_params['__host'].append(separator.join((
                         digits_re.sub(fvip, prefix),
                         server.replace(primary, secondary),
                     )))
@@ -1489,16 +1496,19 @@ class StreamInfo(YouTubeRequestClient):
                 return default_lang, subs_data
 
         video_id = self.video_id
-        client_data = {'json': {'videoId': video_id}}
-        video_info_url = 'https://www.youtube.com/youtubei/v1/player'
+        client_data = {
+            'json': {
+                'videoId': video_id,
+            },
+            'url': 'https://www.youtube.com/youtubei/v1/player',
+            'method': 'POST',
+        }
 
         for client_name in ('smart_tv_embedded', 'web'):
             client = self.build_client(client_name, client_data)
             if not client:
                 continue
             result = self.request(
-                video_info_url,
-                'POST',
                 response_hook=self._response_hook_json,
                 error_title='Caption player request failed',
                 error_hook=self._error_hook,
@@ -1510,10 +1520,11 @@ class StreamInfo(YouTubeRequestClient):
                 **client
             )
 
-            captions = result and result.get('captions')
-            caption_headers = client['headers']
+            if result is None:
+                continue
+            captions = result.get('captions')
             if captions:
-                subtitles.load(captions, caption_headers)
+                subtitles.load(captions, client['headers'])
                 default_lang = subtitles.get_lang_details()
                 subs_data = subtitles.get_subtitles()
                 if subs_data or subs_data is False:
@@ -1583,8 +1594,6 @@ class StreamInfo(YouTubeRequestClient):
         responses = {}
         stream_list = {}
 
-        video_info_url = 'https://www.youtube.com/youtubei/v1/player'
-
         log_debug = context.log_debug
         log_warning = context.log_warning
 
@@ -1612,6 +1621,8 @@ class StreamInfo(YouTubeRequestClient):
             'json': {
                 'videoId': video_id,
             },
+            'url': 'https://www.youtube.com/youtubei/v1/player',
+            'method': 'POST',
             '_auth_required': False,
             '_auth_requested': 'personal' if use_remote_history else False,
             '_access_token': self._access_token,
@@ -1647,8 +1658,6 @@ class StreamInfo(YouTubeRequestClient):
                         continue
 
                     _result = self.request(
-                        video_info_url,
-                        'POST',
                         response_hook=self._response_hook_json,
                         error_title='Player request failed',
                         error_hook=self._error_hook,

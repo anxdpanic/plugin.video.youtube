@@ -73,7 +73,7 @@ def _process_rate_video(provider,
 
         if response:
             # this will be set if we are in the 'Liked Video' playlist
-            if context.get_param('refresh', 0) > 0:
+            if context.refresh_requested():
                 context.get_ui().refresh_container()
 
             if result == 'none':

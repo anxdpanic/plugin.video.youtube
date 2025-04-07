@@ -13,11 +13,14 @@ from __future__ import absolute_import, division, unicode_literals
 import json
 import os
 import shutil
+from base64 import urlsafe_b64decode
 from datetime import timedelta
 from math import floor, log
 from re import (
     compile as re_compile,
 )
+from sys import exc_info
+from traceback import format_stack as _format_stack
 
 from ..compatibility import (
     byte_string_type,
@@ -35,6 +38,7 @@ from ..logger import Logger
 __all__ = (
     'duration_to_seconds',
     'find_video_id',
+    'format_stack',
     'friendly_number',
     'get_kodi_setting_bool',
     'get_kodi_setting_value',
@@ -328,28 +332,54 @@ def redact_auth_header(header_string,
     return _re.sub(r'"Authorization": "<redacted>"', header_string)
 
 
-def redact_params(params, values_as_list=True):
+def redact_params(params):
     log_params = params.copy()
     for param, value in params.items():
-        if values_as_list:
-            value = value[0]
         if param in {'key', 'api_key', 'api_secret', 'client_secret'}:
-            log_param = '...'.join((value[:3], value[-3:]))
+            log_value = (
+                ['...'.join((val[:3], val[-3:])) for val in value]
+                if isinstance(value, (list, tuple)) else
+                '...'.join((value[:3], value[-3:]))
+            )
         elif param in {'api_id', 'client_id'}:
-            log_param = '...'.join((value[:3], value[-5:]))
+            log_value = (
+                ['...'.join((val[:3], val[-5:])) for val in value]
+                if isinstance(value, (list, tuple)) else
+                '...'.join((value[:3], value[-5:]))
+            )
         elif param in {'access_token', 'refresh_token', 'token'}:
-            log_param = '<redacted>'
+            log_value = (
+                ['<redacted>' for _ in value]
+                if isinstance(value, (list, tuple)) else
+                '<redacted>'
+            )
         elif param == 'url':
-            log_param = redact_ip_in_uri(value)
+            log_value = (
+                [redact_ip_in_uri(val) for val in value]
+                if isinstance(value, (list, tuple)) else
+                redact_ip_in_uri(value)
+            )
         elif param == 'ip':
-            log_param = '<redacted>'
+            log_value = (
+                ['<redacted>' for _ in value]
+                if isinstance(value, (list, tuple)) else
+                '<redacted>'
+            )
         elif param == 'location':
-            log_param = '|xx.xxxx,xx.xxxx|'
+            log_value = (
+                ['|xx.xxxx,xx.xxxx|' for _ in value]
+                if isinstance(value, (list, tuple)) else
+                '|xx.xxxx,xx.xxxx|'
+            )
         elif param == '__headers':
-            log_param = redact_auth_header(value)
+            log_value = (
+                [redact_auth_header(val) for val in value]
+                if isinstance(value, (list, tuple)) else
+                redact_auth_header(value)
+            )
         else:
             continue
-        log_params[param] = log_param
+        log_params[param] = log_value
     return log_params
 
 
@@ -357,6 +387,9 @@ def parse_and_redact_uri(uri, redact_only=False):
     parts = urlsplit(uri)
     if parts.query:
         params = parse_qs(parts.query, keep_blank_values=True)
+        headers = params.get('__headers', [None])[0]
+        if headers:
+            params['__headers'] = [urlsafe_b64decode(headers).decode('utf-8')]
         log_params = redact_params(params)
         log_uri = urlunsplit((
             parts.scheme, parts.netloc, parts.path, urlencode(log_params), '',
@@ -367,3 +400,15 @@ def parse_and_redact_uri(uri, redact_only=False):
     if redact_only:
         return log_uri
     return parts, params, log_uri, log_params
+
+
+def format_stack():
+    tb_obj = exc_info()[2]
+    while tb_obj:
+        next_tb_obj = tb_obj.tb_next
+        if next_tb_obj:
+            tb_obj = next_tb_obj
+        else:
+            return ''.join(_format_stack(f=tb_obj.tb_frame))
+    else:
+        return None

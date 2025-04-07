@@ -14,6 +14,7 @@ from . import datetime_parser
 from .methods import (
     duration_to_seconds,
     find_video_id,
+    format_stack,
     friendly_number,
     get_kodi_setting_bool,
     get_kodi_setting_value,
@@ -40,6 +41,7 @@ __all__ = (
     'datetime_parser',
     'duration_to_seconds',
     'find_video_id',
+    'format_stack',
     'friendly_number',
     'get_kodi_setting_bool',
     'get_kodi_setting_value',

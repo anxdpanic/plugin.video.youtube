@@ -19,7 +19,8 @@ class YouTubeRequestClient(BaseRequestsClass):
         'android': 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
         'android_embedded': 'AIzaSyCjc_pVEDi4qsv5MtC2dMXzpIaDoRFLsxw',
         'ios': 'AIzaSyB-63vPrdThhKuerbB2N_l7Kwwcxj6yUAc',
-        'smart_tv': 'AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8',
+        'ios_youtube_tv': 'AIzaSyAA2X8Iz20HQACliPKA2J9URIdPmS3xFUA',
+        'android_youtube_tv': 'AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8',
         'web': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
     }
     _PLAYER_PARAMS = {
@@ -31,58 +32,81 @@ class YouTubeRequestClient(BaseRequestsClass):
         # Disabled - requires PO token
         # Requests for stream urls result in HTTP 403 errors
         'android': {
-            '_id': 3,
             '_disabled': True,
+            '_id': {
+                'client_id': 3,
+                'client_name': 'ANDROID',
+                'client_version': '20.10.38',
+                'android_sdk_version': '32',
+                'os_name': 'Android',
+                'os_version': '15',
+                'package_id': 'com.google.android.youtube',
+                'platform': 'MOBILE',
+            },
+            '_auth_type': False,
             '_query_subtitles': 'optional',
             'json': {
                 'context': {
                     'client': {
-                        'clientName': 'ANDROID',
-                        'clientVersion': '19.44.38',
-                        'androidSdkVersion': '30',
-                        'osName': 'Android',
-                        'osVersion': '11',
-                        'platform': 'MOBILE',
+                        'clientName': '{_id[client_name]}',
+                        'clientVersion': '{_id[client_version]}',
+                        'androidSdkVersion': '{_id[android_sdk_version]}',
+                        'osName': '{_id[os_name]}',
+                        'osVersion': '{_id[os_version]}',
+                        'platform': '{_id[platform]}',
                     },
                 },
             },
             'headers': {
-                'User-Agent': ('com.google.android.youtube/'
-                               '{json[context][client][clientVersion]}'
-                               ' (Linux; U; {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]}) gzip'),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
+                'User-Agent': (
+                    '{_id[package_id]}/{_id[client_version]}'
+                    ' (Linux; U;'
+                    ' {_id[os_name]} {_id[os_version]}'
+                    ') gzip'
+                ),
+                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Version': '{_id[client_version]}',
             },
         },
         'android_vr': {
-            '_id': 28,
-            '_query_subtitles': False,
-            '_os': {
-                'deviceCodename': 'eureka',
-                'build': 'SQ3A.220605.009.A1',
+            '_id': {
+                'client_id': 28,
+                'client_name': 'ANDROID_VR',
+                'client_version': '1.62.27',
+                'android_sdk_version': '32',
+                'device_codename': 'eureka',
+                'device_make': 'Oculus',
+                'device_model': 'Quest 3',
+                'os_name': 'Android',
+                'os_version': '12L',
+                'os_build': 'SQ3A.220605.009.A1',
+                'package_id': 'com.google.android.apps.youtube.vr.oculus',
             },
+            '_query_subtitles': False,
             'json': {
                 'context': {
                     'client': {
-                        'clientName': 'ANDROID_VR',
-                        'clientVersion': '1.61.48',
-                        'deviceMake': 'Oculus',
-                        'deviceModel': 'Quest 3',
-                        'osName': 'Android',
-                        'osVersion': '12L',
-                        'androidSdkVersion': '32',
-                    }
-                }
+                        'androidSdkVersion': '{_id[android_sdk_version]}',
+                        'clientName': '{_id[client_name]}',
+                        'clientVersion': '{_id[client_version]}',
+                        'deviceMake': '{_id[device_make]}',
+                        'deviceModel': '{_id[device_model]}',
+                        'osName': '{_id[os_name]}',
+                        'osVersion': '{_id[os_version]}',
+                    },
+                },
             },
             'headers': {
-                'User-Agent': ('com.google.android.apps.youtube.vr.oculus/'
-                               '{json[context][client][clientVersion]}'
-                               ' (Linux; U; {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]};'
-                               ' {_os[deviceCodename]}-user Build/{_os[build]}) gzip'),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
+                'User-Agent': (
+                    '{_id[package_id]}/{_id[client_version]}'
+                    ' (Linux; U;'
+                    ' {_id[os_name]} {_id[os_version]};'
+                    ' {_id[device_codename]}-user'
+                    ' Build/{_id[os_build]}'
+                    ') gzip'
+                ),
+                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Version': '{_id[client_version]}',
             },
         },
         # 4k with HDR
@@ -90,29 +114,40 @@ class YouTubeRequestClient(BaseRequestsClass):
         # Limited subtitle availability
         # Limited audio streams
         'android_youtube_tv': {
-            '_id': 29,
+            '_id': {
+                'client_id': 29,
+                'client_name': 'ANDROID_UNPLUGGED',
+                'client_version': '9.03.2',
+                'android_sdk_version': '32',
+                'os_name': 'Android',
+                'os_version': '12',
+                'package_id': 'com.google.android.apps.youtube.unplugged',
+                'platform': 'TV',
+            },
             '_auth_required': True,
             '_auth_type': 'personal',
             '_query_subtitles': True,
             'json': {
                 'context': {
                     'client': {
-                        'clientName': 'ANDROID_UNPLUGGED',
-                        'clientVersion': '9.03.2',
-                        'androidSdkVersion': '32',
-                        'osName': 'Android',
-                        'osVersion': '12',
-                        'platform': 'TV',
+                        'clientName': '{_id[client_name]}',
+                        'clientVersion': '{_id[client_version]}',
+                        'androidSdkVersion': '{_id[android_sdk_version]}',
+                        'osName': '{_id[os_name]}',
+                        'osVersion': '{_id[os_version]}',
+                        'platform': '{_id[platform]}',
                     },
                 },
             },
             'headers': {
-                'User-Agent': ('com.google.android.apps.youtube.unplugged/'
-                               '{json[context][client][clientVersion]}'
-                               ' (Linux; U; {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]}) gzip'),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
+                'User-Agent': (
+                    '{_id[package_id]}/{_id[client_version]}'
+                    ' (Linux; U;'
+                    ' {_id[os_name]} {_id[os_version]}'
+                    ') gzip'
+                ),
+                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Version': '{_id[client_version]}',
             },
         },
         # Disabled - all player requests result in following response
@@ -137,10 +172,12 @@ class YouTubeRequestClient(BaseRequestsClass):
                 },
             },
             'headers': {
-                'User-Agent': ('com.google.android.youtube/'
-                               '{json[context][client][clientVersion]}'
-                               ' (Linux; U; {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]}) gzip'),
+                'User-Agent': (
+                    'com.google.android.youtube/'
+                    '{json[context][client][clientVersion]}'
+                    ' (Linux; U; {json[context][client][osName]}'
+                    ' {json[context][client][osVersion]}) gzip'
+                ),
                 'X-YouTube-Client-Name': '{_id}',
                 'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
             },
@@ -170,79 +207,107 @@ class YouTubeRequestClient(BaseRequestsClass):
                 },
             },
             'headers': {
-                'User-Agent': ('com.google.android.youtube/'
-                               '{json[context][client][clientVersion]}'
-                               ' (Linux; U; {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]}) gzip'),
+                'User-Agent': (
+                    'com.google.android.youtube/'
+                    '{json[context][client][clientVersion]}'
+                    ' (Linux; U; {json[context][client][osName]}'
+                    ' {json[context][client][osVersion]}) gzip'
+                ),
                 'X-YouTube-Client-Name': '{_id}',
                 'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
             },
         },
         'ios': {
-            '_id': 5,
-            '_auth_type': False,
-            '_os': {
-                'major': '18',
-                'minor': '2',
-                'patch': '1',
-                'build': '22C161',
+            '_id': {
+                'client_id': 5,
+                'client_name': 'IOS',
+                'client_version': '20.11.6',
+                'device_make': 'Apple',
+                'device_model': 'iPhone16,2',
+                'os_name': 'iOS',
+                'os_major': '18',
+                'os_minor': '3',
+                'os_patch': '2',
+                'os_build': '22D82',
+                'package_id': 'com.google.ios.youtube',
+                'platform': 'MOBILE',
             },
+            '_auth_type': False,
             'json': {
                 'context': {
                     'client': {
-                        'clientName': 'IOS',
-                        'clientVersion': '20.03.02',
-                        'deviceMake': 'Apple',
-                        'deviceModel': 'iPhone16,2',
-                        'osName': 'iOS',
-                        'osVersion': '{_os[major]}.{_os[minor]}.{_os[patch]}.{_os[build]}',
-                        'platform': 'MOBILE',
+                        'clientName': '{_id[client_name]}',
+                        'clientVersion': '{_id[client_version]}',
+                        'deviceMake': '{_id[device_make]}',
+                        'deviceModel': '{_id[device_model]}',
+                        'osName': '{_id[os_name]}',
+                        'osVersion': (
+                            '{_id[os_major]}'
+                            '.{_id[os_minor]}'
+                            '.{_id[os_patch]}'
+                            '.{_id[os_build]}'
+                        ),
+                        'platform': '{_id[platform]}',
                     },
                 },
             },
             'headers': {
-                'User-Agent': ('com.google.ios.youtube/'
-                               '{json[context][client][clientVersion]}'
-                               ' ({json[context][client][deviceModel]};'
-                               ' U; CPU {json[context][client][osName]}'
-                               ' {_os[major]}_{_os[minor]}_{_os[patch]}'
-                               ' like Mac OS X)'),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
+                'User-Agent': (
+                    '{_id[package_id]}/{_id[client_version]}'
+                    ' ({_id[device_model]}; U; CPU'
+                    ' {_id[os_name]}'
+                    ' {_id[os_major]}_{_id[os_minor]}_{_id[os_patch]}'
+                    ' like Mac OS X)'
+                ),
+                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Version': '{_id[client_version]}',
             },
         },
         'ios_youtube_tv': {
-            '_id': 33,
+            '_id': {
+                'client_id': 33,
+                'client_name': 'IOS_UNPLUGGED',
+                'client_version': '9.04',
+                'device_make': 'Apple',
+                'device_model': 'iPhone16,2',
+                'os_name': 'iOS',
+                'os_major': '18',
+                'os_minor': '3',
+                'os_patch': '2',
+                'os_build': '22D82',
+                'package_id': 'com.google.ios.youtubeunplugged',
+                'platform': 'MOBILE',
+            },
             '_auth_required': True,
             '_auth_type': 'personal',
-            '_os': {
-                'major': '18',
-                'minor': '2',
-                'patch': '1',
-                'build': '22C161',
-            },
             'json': {
                 'context': {
                     'client': {
-                        'clientName': 'IOS_UNPLUGGED',
-                        'clientVersion': '9.04',
-                        'deviceMake': 'Apple',
-                        'deviceModel': 'iPhone16,2',
-                        'osName': 'iOS',
-                        'osVersion': '{_os[major]}.{_os[minor]}.{_os[patch]}.{_os[build]}',
-                        'platform': 'MOBILE',
+                        'clientName': '{_id[client_name]}',
+                        'clientVersion': '{_id[client_version]}',
+                        'deviceMake': '{_id[device_make]}',
+                        'deviceModel': '{_id[device_model]}',
+                        'osName': '{_id[os_name]}',
+                        'osVersion': (
+                            '{_id[os_major]}'
+                            '.{_id[os_minor]}'
+                            '.{_id[os_patch]}'
+                            '.{_id[os_build]}'
+                        ),
+                        'platform': '{_id[platform]}',
                     },
                 },
             },
             'headers': {
-                'User-Agent': ('com.google.ios.youtubeunplugged/'
-                               '{json[context][client][clientVersion]}'
-                               ' ({json[context][client][deviceModel]};'
-                               ' U; CPU {json[context][client][osName]}'
-                               ' {_os[major]}_{_os[minor]}_{_os[patch]}'
-                               ' like Mac OS X)'),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
+                'User-Agent': (
+                    '{_id[package_id]}/{_id[client_version]}'
+                    ' ({_id[device_model]}; U; CPU'
+                    ' {_id[os_name]}'
+                    ' {_id[os_major]}_{_id[os_minor]}_{_id[os_patch]}'
+                    ' like Mac OS X)'
+                ),
+                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Version': '{_id[client_version]}',
             },
         },
         # Disabled - request are now blocked with following response
@@ -285,6 +350,126 @@ class YouTubeRequestClient(BaseRequestsClass):
                                ' 85.0.4183.93/6.5 TV Safari/537.36'),
             },
         },
+        'v1': {
+            '_id': {
+                'client_id': 1,
+                'client_name': 'WEB',
+                'client_version': '2.20250312.04.00',
+            },
+            'url': 'https://www.youtube.com/youtubei/v1/{_endpoint}',
+            'method': None,
+            'json': {
+                'context': {
+                    'client': {
+                        'clientName': '{_id[client_name]}',
+                        'clientVersion': '{_id[client_version]}',
+                    },
+                },
+            },
+            'headers': {
+                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Version': '{_id[client_version]}',
+            },
+        },
+        'v3': {
+            '_auth_requested': 'personal',
+            'url': 'https://www.googleapis.com/youtube/v3/{_endpoint}',
+            'method': None,
+            'headers': {
+                'Host': 'www.googleapis.com',
+            },
+            'params': {
+                'key': None,
+            },
+        },
+        'tv': {
+            '_id': {
+                'client_id': 7,
+                'client_name': 'TVHTML5',
+                'client_version': '7.20250312.16.00',
+            },
+            'url': 'https://www.youtube.com/youtubei/v1/{_endpoint}',
+            'method': None,
+            'json': {
+                'context': {
+                    'client': {
+                        'clientName': '{_id[client_name]}',
+                        'clientVersion': '{_id[client_version]}',
+                    },
+                },
+            },
+            'headers': {
+                'User-Agent': (
+                    'Mozilla/5.0'
+                    ' (ChromiumStylePlatform)'
+                    ' Cobalt/Version'
+                ),
+                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Version': '{_id[client_version]}',
+            },
+        },
+        'tv_embed': {
+            '_id': {
+                'client_id': 85,
+                'client_name': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
+                'client_version': '2.0',
+            },
+            'url': 'https://www.youtube.com/youtubei/v1/{_endpoint}',
+            'method': None,
+            'json': {
+                'context': {
+                    'client': {
+                        'clientName': '{_id[client_name]}',
+                        'clientVersion': '{_id[client_version]}',
+                    },
+                },
+            },
+            'headers': {
+                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Version': '{_id[client_version]}',
+            },
+        },
+        'mweb': {
+            '_id': {
+                'client_id': 2,
+                'client_name': 'MWEB',
+                'client_version': '2.20250311.03.00',
+                'device_make': 'Apple',
+                'device_model': 'iPad',
+                'os_name': 'OS',
+                'os_major': '16',
+                'os_minor': '7',
+                'os_patch': '10',
+                'os_build': '15E148',
+                'platform': 'MOBILE',
+            },
+            'url': 'https://www.youtube.com/youtubei/v1/{_endpoint}',
+            'method': None,
+            'json': {
+                'context': {
+                    'client': {
+                        'clientName': '{_id[client_name]}',
+                        'clientVersion': '{_id[client_version]}',
+                    },
+                },
+            },
+            'headers': {
+                'User-Agent': (
+                    'Mozilla/5.0'
+                    ' ({_id[device_model]};'
+                    ' CPU'
+                    ' {_id[os_name]}'
+                    ' {_id[os_major]}_{_id[os_minor]}_{_id[os_patch]}'
+                    ' like Mac OS X)'
+                    ' AppleWebKit/605.1.15 (KHTML, like Gecko)'
+                    ' Version/{_id[os_major]}.{_id[os_minor]}'
+                    ' {_id[platform]}/{_id[os_build]}'
+                    ' Safari/604.1,gzip(gfe)'
+                ),
+                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Version': '{_id[client_version]}',
+            },
+        },
         # Used for misc api requests by default
         # Requires handling of nsig to overcome throttling (TODO)
         'web': {
@@ -293,7 +478,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'WEB',
-                        'clientVersion': '2.20240726.00.00',
+                        'clientVersion': '2.20250312.04.00',
                     },
                 },
             },
@@ -303,7 +488,24 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'User-Agent': ('Mozilla/5.0 (Linux; Android 10; SM-G981B)'
                                ' AppleWebKit/537.36 (KHTML, like Gecko)'
                                ' Chrome/80.0.3987.162 Mobile Safari/537.36'),
-                'Referer': 'https://www.youtube.com/watch?v={json[videoId]}'
+            },
+        },
+        'watch_history': {
+            '_auth_required': True,
+            '_auth_type': 'personal',
+            '_video_id': None,
+            'headers': {
+                'Host': 's.youtube.com',
+                'Referer': 'https://www.youtube.com/watch?v={_video_id}',
+            },
+            'params': {
+                'referrer': 'https://accounts.google.com/',
+                'ns': 'yt',
+                'el': 'detailpage',
+                'ver': '2',
+                'fs': '0',
+                'volume': '100',
+                'muted': '0',
             },
         },
         '_common': {
@@ -315,15 +517,11 @@ class YouTubeRequestClient(BaseRequestsClass):
                     'client': {
                         'gl': None,
                         'hl': None,
+                        'utcOffsetMinutes': 0,
                     },
                     'request': {
                         'internalExperimentFlags': [],
                         'useSsl': True,
-                    },
-                },
-                'playbackContext': {
-                    'contentPlaybackContext': {
-                        'html5Preference': 'HTML5_PREF_WANTS',
                     },
                 },
                 'racyCheckOk': True,
@@ -331,7 +529,6 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'user': {
                     'lockedSafetyMode': False
                 },
-                'videoId': None,
             },
             'headers': {
                 'Accept-Encoding': 'gzip, deflate',
@@ -339,6 +536,12 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'Accept': '*/*',
                 'Accept-Language': 'en-US,en;q=0.5',
                 'Authorization': 'Bearer {{0}}',
+                'User-Agent': (
+                    'Mozilla/5.0 (Linux; Android 10; SM-G981B)'
+                    ' AppleWebKit/537.36 (KHTML, like Gecko)'
+                    ' Chrome/80.0.3987.162'
+                    ' Mobile Safari/537.36'
+                ),
             },
             'params': {
                 'key': ValueError,
@@ -378,21 +581,51 @@ class YouTubeRequestClient(BaseRequestsClass):
 
         result = json_data
         for idx, keys in enumerate(path):
-            if not isinstance(result, (dict, list, tuple)):
+            if not isinstance(result, (dict, list)):
                 return default
 
             if isinstance(keys, slice):
-                return [
-                    cls.json_traverse(part, path[idx + 1:], default=default)
-                    for part in result[keys]
-                    if part
-                ]
+                next_key = path[idx + 1]
+                if next_key is None:
+                    for part in result[keys]:
+                        new_result = cls.json_traverse(
+                            part,
+                            path[idx + 2:],
+                            default=default,
+                        )
+                        if not new_result or new_result == default:
+                            continue
+                        return new_result
 
-            if not isinstance(keys, (list, tuple)):
-                keys = [keys]
+                if isinstance(next_key, (range, list)):
+                    results_limit = len(next_key)
+                    new_results = []
+                    for part in result[keys]:
+                        new_result = cls.json_traverse(
+                            part,
+                            path[idx + 2:],
+                            default=default,
+                        )
+                        if not new_result or new_result == default:
+                            continue
+                        new_results.append(new_result)
+                        if results_limit:
+                            if results_limit == 1:
+                                break
+                            results_limit -= 1
+                else:
+                    new_results = [
+                        cls.json_traverse(part, path[idx + 1:], default=default)
+                        for part in result[keys]
+                        if part
+                    ]
+                return new_results
+
+            if not isinstance(keys, tuple):
+                keys = (keys,)
 
             for key in keys:
-                if isinstance(key, (list, tuple)):
+                if isinstance(key, tuple):
                     new_result = cls.json_traverse(result, key, default=default)
                     if new_result:
                         result = new_result
@@ -400,8 +633,11 @@ class YouTubeRequestClient(BaseRequestsClass):
                     continue
 
                 try:
-                    result = result[key]
-                except (KeyError, IndexError):
+                    if callable(key):
+                        result = key(result)
+                    else:
+                        result = result[key]
+                except (KeyError, IndexError, TypeError):
                     continue
                 break
             else:

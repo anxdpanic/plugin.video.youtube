@@ -1,3 +1,24 @@
+## v7.2.0+beta.6
+### Fixed
+- Fix My Subscriptions not loading old or previously accessed content #1123
+- Manually redirect video server requests if required #1127 #1135
+- Improve logging of client ID #1117
+- Fix possible exception that may occur if video thumbnails fail to update
+- Fix unsubscribing from My Subscriptions #1137
+- Fix folders for channel shorts and live streams not being routed correctly #988 #1060
+- Update YouTube.get_recommended_for_home #1107
+
+### Changed
+- Improve handling of using filtered playlists in channels #988 #1060
+- Base64 encode/decode header query param to obfuscate in debug logs
+- Update client details
+- Automatically handle different types of identifiers as channel_id parameter
+- Improve pagination of filtered listings #984 #1035
+- Split My Subscriptions into Long Form, Shorts and Live folders
+
+### New
+- Show broadcasting streams at the top of channel live streams folder listings #1092
+
 ## v7.2.0+beta.5
 ### Fixed
 - Improve url resolver error handling
