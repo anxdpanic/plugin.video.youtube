@@ -759,6 +759,7 @@ class YouTube(LoginClient):
             channel_id = function_cache.run(
                 self.get_channel_by_identifier,
                 function_cache.ONE_MONTH,
+                _refresh=self._context.refresh_requested(),
                 identifier=channel_id,
             )
             params['channelId'] = channel_id
@@ -781,6 +782,7 @@ class YouTube(LoginClient):
             channel_id = function_cache.run(
                 self.get_channel_by_identifier,
                 function_cache.ONE_MONTH,
+                _refresh=self._context.refresh_requested(),
                 identifier=channel_id,
             )
             params['channelId'] = channel_id
@@ -800,6 +802,7 @@ class YouTube(LoginClient):
             channel_id = function_cache.run(
                 self.get_channel_by_identifier,
                 function_cache.ONE_MONTH,
+                _refresh=self._context.refresh_requested(),
                 identifier=channel_id,
             )
             params['channelId'] = channel_id
@@ -938,11 +941,13 @@ class YouTube(LoginClient):
             return False
 
         function_cache = self._context.get_function_cache()
+        refresh = self._context.refresh_requested()
         result = False
 
         channel_id = function_cache.run(
             self.get_channel_by_identifier,
             function_cache.ONE_MONTH,
+            _refresh=refresh,
             identifier=identifier,
         )
         if channel_id:
@@ -950,6 +955,7 @@ class YouTube(LoginClient):
                 function_cache.run(
                     self.get_channel_by_identifier,
                     function_cache.ONE_MONTH,
+                    _refresh=refresh,
                     identifier=channel,
                 )
                 for channel in identifiers
@@ -1067,6 +1073,7 @@ class YouTube(LoginClient):
             channel_id = function_cache.run(
                 self.get_channel_by_identifier,
                 function_cache.ONE_MONTH,
+                _refresh=self._context.refresh_requested(),
                 identifier=channel_id,
             )
         browse_id = browse_id or channel_id
@@ -1542,6 +1549,7 @@ class YouTube(LoginClient):
             channel_id = function_cache.run(
                 self.get_channel_by_identifier,
                 function_cache.ONE_MONTH,
+                _refresh=self._context.refresh_requested(),
                 identifier=channel_id,
             )
             params['channelId'] = channel_id
@@ -1638,6 +1646,7 @@ class YouTube(LoginClient):
             channel_id = function_cache.run(
                 self.get_channel_by_identifier,
                 function_cache.ONE_MONTH,
+                _refresh=self._context.refresh_requested(),
                 identifier=channel_id,
                 do_search=False,
             )
@@ -1722,6 +1731,7 @@ class YouTube(LoginClient):
             channel_id = function_cache.run(
                 self.get_channel_by_identifier,
                 function_cache.ONE_MONTH,
+                _refresh=self._context.refresh_requested(),
                 identifier=channel_id,
                 do_search=False,
             )

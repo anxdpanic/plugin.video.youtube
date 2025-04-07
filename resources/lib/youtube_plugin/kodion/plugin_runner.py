@@ -59,10 +59,10 @@ def run(context=_context,
                        and current_path == '/'
                        and not current_params)
                    or (current_path == '/play/')))
-    if forced and 'refresh' in new_params:
-        refresh = new_params['refresh']
-        if refresh > 0:
-            new_params['refresh'] = -refresh
+    if forced:
+        refresh = context.refresh_requested(force=True, off=True)
+        if refresh:
+            new_params['refresh'] = refresh
 
     log_params = new_params.copy()
     for key in ('api_key', 'client_id', 'client_secret'):

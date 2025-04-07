@@ -682,6 +682,7 @@ class Provider(AbstractProvider):
             channel_id = function_cache.run(
                 client.get_channel_by_identifier,
                 function_cache.ONE_MONTH,
+                _refresh=context.refresh_requested(),
                 **{
                     command: True,
                     'identifier': identifier,
@@ -1061,7 +1062,7 @@ class Provider(AbstractProvider):
         search_params, json_data = function_cache.run(
             self.get_client(context).search_with_params,
             function_cache.ONE_MINUTE * 10,
-            _refresh=params.get('refresh', 0) > 0,
+            _refresh=context.refresh_requested(),
             params=search_params,
         )
         if not json_data:

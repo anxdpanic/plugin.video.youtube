@@ -180,7 +180,7 @@ class AbstractProvider(object):
                 if new_options:
                     options.update(new_options)
 
-            if context.get_param('refresh', 0) > 0:
+            if context.refresh_requested():
                 options[self.CACHE_TO_DISC] = True
                 options[self.UPDATE_LISTING] = True
 
@@ -444,7 +444,7 @@ class AbstractProvider(object):
                 context.get_infolabel('Container.FolderPath')
             )
             old_uri = context.create_uri(old_path, old_params)
-            if (not params.get('refresh', 0) > 0
+            if (not context.refresh_requested()
                     and context.is_plugin_folder()
                     and context.is_plugin_path(old_uri,
                                                PATHS.SEARCH,

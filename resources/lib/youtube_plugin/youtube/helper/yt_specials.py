@@ -23,7 +23,7 @@ def _process_related_videos(provider, context, client):
 
     params = context.get_params()
     video_id = params.get('video_id')
-    refresh = params.get('refresh', 0) > 0
+    refresh = context.refresh_requested()
     if video_id:
         json_data = function_cache.run(
             client.get_related_videos,
@@ -86,7 +86,7 @@ def _process_recommendations(provider, context, client):
     json_data = function_cache.run(
         source,
         function_cache.ONE_HOUR,
-        _refresh=params.get('refresh', 0) > 0,
+        _refresh=context.refresh_requested(),
         visitor=params.get('visitor'),
         page_token=params.get('page_token'),
         click_tracking=params.get('click_tracking'),
@@ -102,7 +102,7 @@ def _process_recommendations(provider, context, client):
         json_data = function_cache.run(
             source,
             function_cache.ONE_HOUR,
-            _refresh=params.get('refresh', 0) > 0,
+            _refresh=context.refresh_requested(),
             visitor=json_data.get('visitorData'),
             page_token=page_token,
             click_tracking=json_data.get('clickTracking'),
@@ -144,8 +144,7 @@ def _process_trending(provider, context, client):
 def _process_browse_channels(provider, context, client):
     context.set_content(CONTENT.LIST_CONTENT)
 
-    params = context.get_params()
-    guide_id = params.get('guide_id')
+    guide_id = context.get_param('guide_id')
     if guide_id:
         json_data = client.get_guide_category(guide_id)
     else:
@@ -153,7 +152,7 @@ def _process_browse_channels(provider, context, client):
         json_data = function_cache.run(
             client.get_guide_categories,
             function_cache.ONE_MONTH,
-            _refresh=params.get('refresh', 0) > 0,
+            _refresh=context.refresh_requested(),
         )
 
     if not json_data:
@@ -219,7 +218,7 @@ def _process_description_links(provider, context):
             urls = function_cache.run(
                 utils.extract_urls,
                 function_cache.ONE_DAY,
-                _refresh=params.get('refresh', 0) > 0,
+                _refresh=context.refresh_requested(),
                 text=description,
             )
 
@@ -342,8 +341,7 @@ def _process_my_subscriptions(provider,
     context.set_content(CONTENT.VIDEO_CONTENT)
 
     logged_in = provider.is_logged_in()
-    params = context.get_params()
-    refresh = params.get('refresh', 0) > 0
+    refresh = context.refresh_requested()
 
     if feed_type not in _feed_types:
         feed_type = 'videos'
@@ -354,7 +352,7 @@ def _process_my_subscriptions(provider,
             background=True,
     ) as progress_dialog:
         json_data = client.get_my_subscriptions(
-            page_token=params.get('page', 1),
+            page_token=context.get_param('page', 1),
             logged_in=logged_in,
             do_filter=filtered,
             feed_type=feed_type,

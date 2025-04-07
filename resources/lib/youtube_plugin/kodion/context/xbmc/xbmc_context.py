@@ -922,3 +922,18 @@ class XbmcContext(AbstractContext):
         if folder_name is None:
             folder_name = xbmc.getInfoLabel('Container.FolderName')
         return folder_name == self._plugin_name
+
+    def refresh_requested(self, force=False, on=False, off=False):
+        refresh = self.get_param('refresh', 0)
+        if not force:
+            return refresh > 0
+
+        if off:
+            if refresh > 0:
+                refresh = -refresh
+        elif on or refresh:
+            if refresh < 0:
+                refresh = -refresh
+            refresh += 1
+
+        return refresh
