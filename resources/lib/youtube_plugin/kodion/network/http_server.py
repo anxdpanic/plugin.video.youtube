@@ -26,6 +26,7 @@ from ..compatibility import (
     TCPServer,
     ThreadingMixIn,
     urlencode,
+    urlsplit,
     urlunsplit,
     xbmc,
     xbmcgui,
@@ -60,12 +61,12 @@ class HTTPServer(ThreadingMixIn, TCPServer):
         try:
             handler.handle()
         finally:
-            output = handler.wfile
+            wfile = handler.wfile
             while (not handler._close_all
-                   and not output.closed
-                   and not select((), (output,), (), 0.1)[1]):
+                   and not wfile.closed
+                   and not select((), (wfile,), (), 0.1)[1]):
                 pass
-            if handler._close_all or output.closed:
+            if handler._close_all or wfile.closed:
                 return
             handler.finish()
 
@@ -143,12 +144,12 @@ class RequestHandler(BaseHTTPRequestHandler, object):
     def handle_one_request(self):
         # Allow self.rfile.readline call to be interrupted by
         # HTTPServer.server_close when connection is kept open by keep-alive
-        input = self.rfile
+        rfile = self.rfile
         while (not self._close_all
-               and not input.closed
-               and not select((input,), (), (), 0.1)[0]):
+               and not rfile.closed
+               and not select((rfile,), (), (), 0.1)[0]):
             pass
-        if self._close_all or input.closed:
+        if self._close_all or rfile.closed:
             self.close_connection = True
             return
 
@@ -358,32 +359,31 @@ class RequestHandler(BaseHTTPRequestHandler, object):
 
         elif path['path'].startswith(PATHS.STREAM_PROXY):
             params = path['params']
-
             original_path = params.pop('__path', empty)[0] or '/videoplayback'
-
-            request_servers = params.pop('__netloc', empty)
+            request_servers = params.pop('__host', empty)
             stream_id = (params.pop('__id', empty)[0],
                          params.get('itag', empty)[0])
             ids = self.server_priority_list['stream_ids']
             server_lists = self.server_priority_list['server_lists']
             if stream_id in ids:
-                priority = server_lists[stream_id]
-                request_servers.sort(
-                    key=partial(self._sort_servers,
-                                _len=len(priority['list']),
-                                _index=priority['list'].index),
-                    reverse=True,
-                )
+                priority_list = server_lists[stream_id]['list']
+                if priority_list:
+                    request_servers.sort(
+                        key=partial(self._sort_servers,
+                                    _len=len(priority_list),
+                                    _index=priority_list.index),
+                        reverse=True,
+                    )
             else:
                 ids.append(stream_id)
                 if len(ids) > 5:
                     old_id = ids.popleft()
                     del server_lists[old_id]
-                priority = {
+                priority_list = []
+                server_lists[stream_id] = {
                     'started': False,
-                    'list': [],
+                    'list': priority_list,
                 }
-                server_lists[stream_id] = priority
 
             headers = params.pop('__headers', empty)[0]
             if headers:
@@ -397,10 +397,30 @@ class RequestHandler(BaseHTTPRequestHandler, object):
 
             stream_redirect = settings.httpd_stream_redirect()
 
+            log_msg = ('HTTPServer - Stream proxy response {success}'
+                       '\n\tServer: |{server}|'
+                       '\n\tTarget: |{target}|'
+                       '\n\tStatus: |{status}|'
+                       '\n\tReason: |{reason}|')
+
             response = None
-            for server in request_servers:
-                if not server:
+            server = None
+            target = None
+            iterator = iter(request_servers)
+            while 1:
+                if target:
+                    _server = target
+                    target = None
+                else:
+                    _server = next(iterator, Ellipsis)
+                if _server is Ellipsis:
+                    self.send_error(
+                        500 if response is None else response.status_code
+                    )
+                    break
+                if not _server or _server == server:
                     continue
+                server = _server
 
                 stream_url = urlunsplit((
                     'https',
@@ -410,7 +430,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                     '',
                 ))
 
-                if stream_redirect and server in priority['list']:
+                if stream_redirect and server in priority_list:
                     self.send_response(301)
                     self.send_header('Location', stream_url)
                     self.send_header('Connection', 'close')
@@ -418,45 +438,90 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                     break
 
                 headers['Host'] = server
-                with self.requests.request(stream_url,
-                                           method='GET',
-                                           headers=headers,
-                                           stream=True,
-                                           allow_redirects=False) as response:
-                    if not response or not response.ok or response.is_redirect:
-                        if server in priority['list']:
-                            priority['list'].remove(server)
-                        context.log_warning(
-                            'HTTPServer - Stream proxy request failed'
-                            '\n\tServer: |{server}|'
-                            '\n\tStatus: |{status}|'
-                            '\n\tReason: |{reason}|'
-                            .format(server=server,
-                                    status=response and response.status_code,
-                                    reason=response and response.reason)
-                        )
-                        continue
-                    if server not in priority['list']:
-                        priority['list'].append(server)
+                with self.requests.request(
+                        stream_url,
+                        method='GET',
+                        headers=headers,
+                        allow_redirects=False,
+                        stream=True
+                ) as response:
+                    if response is None:
+                        status = -1
+                        reason = 'Failed'
+                    else:
+                        while response.is_redirect:
+                            request = response.next
+                            if not request:
+                                break
 
-                    self.send_response(response.status_code)
+                            target = urlsplit(request.url).hostname
+                            if (target.endswith('googlevideo.com')
+                                    and 'Authorization' in headers):
+                                _headers = (
+                                    ('Authorization', headers['Authorization']),
+                                    ('Host', target),
+                                )
+                            else:
+                                _headers = (
+                                    ('Host', target),
+                                )
+                            request.headers.update(_headers)
+
+                            response = self.requests.request(
+                                prepared_request=request,
+                                allow_redirects=False,
+                                stream=True,
+                            )
+                            if response is None:
+                                break
+                        status = response.status_code
+                        reason = response.reason
+
+                    if 100 <= status < 400:
+                        success = True
+                        log_level = context.LOGDEBUG
+                        if server not in priority_list:
+                            priority_list.append(server)
+                    else:
+                        success = False
+                        log_level = context.LOGWARNING
+                        if server in priority_list:
+                            priority_list.remove(server)
+
+                    context.log(
+                        log_msg.format(
+                            success='OK' if success else 'not OK',
+                            server=server,
+                            target=target,
+                            status=status,
+                            reason=reason,
+                        ),
+                        log_level=log_level
+                    )
+
+                    if not success:
+                        continue
+
+                    self.send_response(status)
                     for header, value in response.headers.items():
                         self.send_header(header, value)
                     self.end_headers()
 
-                    input = response.raw
-                    output = self.wfile
+                    wfile = self.wfile
                     while (not self._close_all
-                           and not output.closed
-                           and not select((), (output,), (), 0.1)[1]):
+                           and not wfile.closed
+                           and not select((), (wfile,), (), 0.1)[1]):
                         pass
-                    if self._close_all or output.closed:
+                    if self._close_all or wfile.closed:
                         break
-                    for chunk in input.stream(None, decode_content=False):
-                        output.write(chunk)
+                    wfile.write(
+                        response.raw.read(
+                            amt=None,
+                            decode_content=False,
+                            cache_content=False,
+                        )
+                    )
                 break
-            else:
-                self.send_error(response and response.status_code or 500)
 
         else:
             self.send_error(501)
@@ -532,8 +597,12 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                                              headers=li_headers,
                                              data=post_data,
                                              stream=True)
-            if not response or not response.ok:
-                self.send_error(response and response.status_code or 500)
+            if response is None:
+                self.send_error(500)
+                return
+            status = response.status_code
+            if status >= 400:
+                self.send_error(status)
                 return
 
             response_length = int(response.headers.get('content-length'))
@@ -594,7 +663,8 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         for i in range(0, len(data), self.chunk_size):
             yield data[i:i + self.chunk_size]
 
-    def _sort_servers(self, server, _len, _index):
+    @staticmethod
+    def _sort_servers(server, _len, _index):
         try:
             index = _index(server)
         except ValueError:
@@ -859,9 +929,12 @@ def httpd_status(context, address=None):
     if not RequestHandler.requests:
         RequestHandler.requests = BaseRequestsClass(context=context)
     response = RequestHandler.requests.request(url)
-    result = response and response.status_code
-    if result == 204:
-        return True
+    if response is None:
+        result = None
+    else:
+        result = response.status_code
+        if result == 204:
+            return True
 
     context.log_debug('HTTPServer - Ping'
                       '\n\tAddress:  |{netloc}|'
@@ -883,7 +956,7 @@ def get_client_ip_address(context):
     if not RequestHandler.requests:
         RequestHandler.requests = BaseRequestsClass(context=context)
     response = RequestHandler.requests.request(url)
-    if response and response.status_code == 200:
+    if response is not None and response.status_code == 200:
         response_json = response.json()
         if response_json:
             ip_address = response_json.get('ip')

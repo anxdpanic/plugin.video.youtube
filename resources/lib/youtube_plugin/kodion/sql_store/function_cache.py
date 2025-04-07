@@ -102,10 +102,12 @@ class FunctionCache(Storage):
                          0: function only,
                          1: function + value of builtin type parameters
                          2: function + value of all parameters, default 2
-        :keyword _ignore_value: (Any) don't cache func return value if equal to
-                                _ignored_value, default None
+        :keyword _ignore_value: (Any) don't cache or process func return value
+                                if equal to _ignored_value, default None
         :keyword _oneshot: (bool) remove previously cached result, default False
         :keyword _refresh: (bool) updates cache with new result, default False
+        :keyword _process: (callable) function called to process new/cached
+                           result, default None
         :keyword _retry_value: (Any) re-evaluate func if cached value is equal
                                _retry_value, default None
         :return:
@@ -114,6 +116,7 @@ class FunctionCache(Storage):
         ignore_value = kwargs.pop('_ignore_value', None)
         oneshot = kwargs.pop('_oneshot', False)
         refresh = kwargs.pop('_refresh', False)
+        process = kwargs.pop('_process', None)
         retry_value = kwargs.pop('_retry_value', None)
         partial_func = partial(func, *args, **kwargs)
 
@@ -124,7 +127,12 @@ class FunctionCache(Storage):
         cache_id = self._create_id_from_func(partial_func, scope)
         data = retry_value if refresh else self._get(cache_id, seconds=seconds)
         if data == retry_value:
+            _data = data
             data = partial_func()
+        else:
+            _data = None
+        if callable(process):
+            data = process(data, _data)
         if data != ignore_value:
             self._set(cache_id, data)
         elif oneshot:

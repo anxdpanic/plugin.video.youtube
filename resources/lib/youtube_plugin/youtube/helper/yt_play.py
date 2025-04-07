@@ -12,7 +12,6 @@ from __future__ import absolute_import, division, unicode_literals
 
 import json
 import random
-from traceback import format_stack
 
 from ..helper import utils, v3
 from ..youtube_exceptions import YouTubeException
@@ -34,7 +33,12 @@ from ...kodion.constants import (
 )
 from ...kodion.items import AudioItem, UriItem, VideoItem
 from ...kodion.network import get_connect_address
-from ...kodion.utils import datetime_parser, find_video_id, select_stream
+from ...kodion.utils import (
+    datetime_parser,
+    find_video_id,
+    format_stack,
+    select_stream,
+)
 
 
 def _play_stream(provider, context):
@@ -85,7 +89,7 @@ def _play_stream(provider, context):
                    '\n\tException: {exc!r}'
                    '\n\tStack trace (most recent call last):\n{stack}'
                    .format(exc=exc,
-                           stack=''.join(format_stack())))
+                           stack=format_stack()))
             context.log_error(msg)
             ui.show_notification(message=exc.get_message())
             return False

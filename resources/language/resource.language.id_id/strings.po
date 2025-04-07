@@ -373,7 +373,7 @@ msgid "Subscribe to %s"
 msgstr "Berlangganan ke %s"
 
 msgctxt "#30518"
-msgid ""
+msgid "Feeds"
 msgstr ""
 
 msgctxt "#30519"
