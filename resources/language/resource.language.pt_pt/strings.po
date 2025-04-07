@@ -372,7 +372,7 @@ msgid "Subscribe to %s"
 msgstr "Subscreva %s"
 
 msgctxt "#30518"
-msgid ""
+msgid "Feeds"
 msgstr ""
 
 msgctxt "#30519"
