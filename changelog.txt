@@ -1,3 +1,7 @@
+## v7.2.0+beta.7
+### Fixed
+- Clear old function cache values on initial run after install #1150
+
 ## v7.2.0+beta.6
 ### Fixed
 - Fix My Subscriptions not loading old or previously accessed content #1123
@@ -14,7 +18,7 @@
 - Update client details
 - Automatically handle different types of identifiers as channel_id parameter
 - Improve pagination of filtered listings #984 #1035
-- Split My Subscriptions into Long Form, Shorts and Live folders
+- Split My Subscriptions into Long Form, Shorts and Live folders #988
 
 ### New
 - Show broadcasting streams at the top of channel live streams folder listings #1092
