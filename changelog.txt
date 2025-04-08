@@ -1,3 +1,8 @@
+## v7.2.0+beta.8
+### Fixed
+- Fix regression in opening playlists of logged in user #1154
+- Fix regressions in checking channel filters
+
 ## v7.2.0+beta.7
 ### Fixed
 - Clear old function cache values on initial run after install #1150
