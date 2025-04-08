@@ -319,7 +319,7 @@ def update_channel_items(provider, context, channel_id_dict,
             context_menu.append(
                 menu_items.remove_my_subscriptions_filter(
                     context, channel_name
-                ) if client.channel_match(channel_name, filters_set) else
+                ) if client.channel_match(channel_id, filters_set) else
                 menu_items.add_my_subscriptions_filter(
                     context, channel_name
                 )

@@ -855,10 +855,15 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
+        if self._context.get_param('channel_id', 'mine') == 'mine':
+            no_login = False
+        else:
+            no_login = True
+
         return self.api_request(method='GET',
                                 path='playlistItems',
                                 params=params,
-                                no_login=True,
+                                no_login=no_login,
                                 **kwargs)
 
     def get_channel_by_identifier(self,
@@ -867,7 +872,7 @@ class YouTube(LoginClient):
                                   handle=False,
                                   username=False,
                                   verify_id=False,
-                                  do_search=True,
+                                  do_search=False,
                                   as_json=False,
                                   **kwargs):
         """
@@ -957,6 +962,7 @@ class YouTube(LoginClient):
                     function_cache.ONE_MONTH,
                     _refresh=refresh,
                     identifier=channel,
+                    do_search=True,
                 )
                 for channel in identifiers
             }
