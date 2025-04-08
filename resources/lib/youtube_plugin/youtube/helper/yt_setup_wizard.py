@@ -20,7 +20,11 @@ from ...kodion.utils import to_unicode
 from ...kodion.utils.datetime_parser import strptime
 
 
-def process_language(provider, context, step, steps):
+def process_pre_run(context):
+    context.get_function_cache().clear()
+
+
+def process_language(context, step, steps):
     localize = context.localize
     ui = context.get_ui()
 

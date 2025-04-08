@@ -102,6 +102,10 @@ class Provider(AbstractProvider):
         ]
         return steps
 
+    @staticmethod
+    def pre_run_wizard_step(provider, context):
+        yt_setup_wizard.process_pre_run(context)
+
     def is_logged_in(self):
         return self._logged_in
 
