@@ -872,7 +872,7 @@ class YouTube(LoginClient):
                                   handle=False,
                                   username=False,
                                   verify_id=False,
-                                  do_search=True,
+                                  do_search=False,
                                   as_json=False,
                                   **kwargs):
         """
@@ -962,6 +962,7 @@ class YouTube(LoginClient):
                     function_cache.ONE_MONTH,
                     _refresh=refresh,
                     identifier=channel,
+                    do_search=True,
                 )
                 for channel in identifiers
             }
