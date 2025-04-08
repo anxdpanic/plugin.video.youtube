@@ -5,29 +5,29 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-04-12 15:00+0000\n"
-"Last-Translator: Sopor <sopor@hotmail.com>\n"
+"PO-Revision-Date: 2025-04-07 16:55+0000\n"
+"Last-Translator: Daniel Nylander <daniel@danielnylander.se>\n"
 "Language-Team: Swedish <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/sv_se/>\n"
 "Language: sv_se\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.4.3\n"
+"X-Generator: Weblate 5.10.4\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
-msgstr "Plugin för YouTube"
+msgstr "Insticksmodul för YouTube"
 
 msgctxt "Addon Description"
 msgid "YouTube is one of the biggest video-sharing websites of the world."
-msgstr "YouTube är en av de största videodelningssajterna i världen."
+msgstr "YouTube är en av världens största webbplatser för videodelning."
 
 msgctxt "Addon Disclaimer"
 msgid "This plugin is not endorsed by Google"
-msgstr "Detta plugin är inte godkänt av Google"
+msgstr "Denna insticksmodul är inte godkänd av Google"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
@@ -50,16 +50,16 @@ msgstr ""
 
 msgctxt "#30003"
 msgid "YouTube"
-msgstr ""
+msgstr "YouTube"
 
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
 msgid "Use InputStream.Adaptive"
-msgstr ""
+msgstr "Använd InputStream.Adaptive"
 
 msgctxt "#30008"
 msgid "Configure InputStream.Adaptive"
-msgstr ""
+msgstr "Konfigurera InputStream.Adaptive"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -112,7 +112,7 @@ msgstr "Tillåt 3D"
 
 msgctxt "#30021"
 msgid "Show fanart"
-msgstr "Show fanart"
+msgstr "Visa fanart"
 
 msgctxt "#30022"
 msgid "Items per page"
@@ -120,7 +120,7 @@ msgstr "Antal per sida"
 
 msgctxt "#30023"
 msgid "Search history size"
-msgstr "Sökhistoriestorlek"
+msgstr "Storlek för sökhistorik"
 
 msgctxt "#30024"
 msgid "Cache size (MB)"
@@ -128,27 +128,27 @@ msgstr "Cache-storlek (MB)"
 
 msgctxt "#30025"
 msgid "Enable Setup Wizard"
-msgstr ""
+msgstr "Aktivera installationsguiden"
 
 msgctxt "#30026"
 msgid "Override views"
-msgstr ""
+msgstr "Åsidosätt visningar"
 
 msgctxt "#30027"
 msgid "View: Default"
-msgstr ""
+msgstr "Visa: Standard"
 
 msgctxt "#30028"
 msgid "View: Episodes"
-msgstr ""
+msgstr "Visa: Avsnitt"
 
 msgctxt "#30029"
 msgid "View: Movies"
-msgstr ""
+msgstr "Visa: Filmer"
 
 msgctxt "#30030"
 msgid "Configure %s?"
-msgstr ""
+msgstr "Konfigurera %s?"
 
 msgctxt "#30031"
 msgid ""
@@ -156,41 +156,41 @@ msgstr ""
 
 msgctxt "#30032"
 msgid "View: TV Shows"
-msgstr ""
+msgstr "Visa: TV-serier"
 
 msgctxt "#30033"
 msgid "View: Songs"
-msgstr ""
+msgstr "Visa: Låtar"
 
 msgctxt "#30034"
 msgid "View: Artists"
-msgstr ""
+msgstr "Visa: Artister"
 
 msgctxt "#30035"
 msgid "View: Albums"
-msgstr ""
+msgstr "Visa: Album"
 
 msgctxt "#30036"
 msgid "Support alternative player"
-msgstr ""
+msgstr "Stöd för alternativ spelare"
 
 msgctxt "#30037"
 msgid "Custom Watch Later playlist id"
-msgstr ""
+msgstr "Anpassat id för spellistan Se senare"
 
 msgctxt "#30038"
 msgid "Custom History playlist id"
-msgstr ""
+msgstr "ID för spellista med anpassad historik"
 
 # Kodion Common
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
 msgid "Bookmarks"
-msgstr ""
+msgstr "Bokmärken"
 
 msgctxt "#30101"
 msgid "Bookmark"
-msgstr ""
+msgstr "Bokmärke"
 
 msgctxt "#30102"
 msgid "Search"
@@ -206,15 +206,15 @@ msgstr ""
 
 msgctxt "#30105"
 msgid "filtered"
-msgstr ""
+msgstr "filtrerad"
 
 msgctxt "#30106"
 msgid "Next page: %d"
-msgstr ""
+msgstr "Nästa sida: %d"
 
 msgctxt "#30107"
 msgid "Watch Later"
-msgstr ""
+msgstr "Se senare"
 
 msgctxt "#30108"
 msgid ""
@@ -226,15 +226,15 @@ msgstr ""
 
 msgctxt "#30110"
 msgid "New Search"
-msgstr ""
+msgstr "Ny sökning"
 
 msgctxt "#30111"
 msgid "Sign In"
-msgstr ""
+msgstr "Logga in"
 
 msgctxt "#30112"
 msgid "Sign Out"
-msgstr ""
+msgstr "Logga ut"
 
 msgctxt "#30113"
 msgid ""
@@ -242,19 +242,19 @@ msgstr ""
 
 msgctxt "#30114"
 msgid "Confirm delete"
-msgstr ""
+msgstr "Bekräfta radering"
 
 msgctxt "#30115"
 msgid "Confirm remove"
-msgstr ""
+msgstr "Bekräfta borttagning"
 
 msgctxt "#30116"
 msgid "Delete \"%s\"?"
-msgstr ""
+msgstr "Ta bort \"%s\"?"
 
 msgctxt "#30117"
 msgid "Remove \"%s\"?"
-msgstr ""
+msgstr "Ta bort \"%s\"?"
 
 msgctxt "#30118"
 msgid ""
@@ -262,33 +262,33 @@ msgstr ""
 
 msgctxt "#30119"
 msgid "Please wait..."
-msgstr ""
+msgstr "Vänta..."
 
 msgctxt "#30120"
 msgid "Confirm clear"
-msgstr ""
+msgstr "Bekräfta städning"
 
 msgctxt "#30121"
 msgid "Clear %s?"
-msgstr ""
+msgstr "Töm %s?"
 
 # YouTube
 # empty strings from id 30121 to 30199
 msgctxt "#30200"
 msgid "API"
-msgstr ""
+msgstr "API"
 
 msgctxt "#30201"
 msgid "API Key"
-msgstr ""
+msgstr "API-nyckel"
 
 msgctxt "#30202"
 msgid "API Id"
-msgstr ""
+msgstr "API-id"
 
 msgctxt "#30203"
 msgid "API Secret"
-msgstr ""
+msgstr "API-hemlighet"
 
 msgctxt "#30204"
 msgid ""
@@ -310,79 +310,79 @@ msgstr ""
 
 msgctxt "#30502"
 msgid "Go to %s"
-msgstr ""
+msgstr "Gå till %s"
 
 msgctxt "#30503"
 msgid "Channel fanart"
-msgstr ""
+msgstr "Fanart för kanalen"
 
 msgctxt "#30504"
 msgid "Subscriptions"
-msgstr ""
+msgstr "Prenumerationer"
 
 msgctxt "#30505"
 msgid "Unsubscribe"
-msgstr ""
+msgstr "Avsluta prenumeration"
 
 msgctxt "#30506"
 msgid "Subscribe"
-msgstr ""
+msgstr "Prenumerera"
 
 msgctxt "#30507"
 msgid "My Channel"
-msgstr ""
+msgstr "Min kanal"
 
 msgctxt "#30508"
 msgid "Liked Videos"
-msgstr ""
+msgstr "Gillade videor"
 
 msgctxt "#30509"
 msgid "History"
-msgstr ""
+msgstr "Historik"
 
 msgctxt "#30510"
 msgid "My Subscriptions"
-msgstr ""
+msgstr "Mina prenumerationer"
 
 msgctxt "#30511"
 msgid "Queue video"
-msgstr ""
+msgstr "Kölägg video"
 
 msgctxt "#30512"
 msgid "Browse Channels"
-msgstr ""
+msgstr "Bläddra bland kanalerna"
 
 msgctxt "#30513"
 msgid "Trending"
-msgstr ""
+msgstr "Populära just nu"
 
 msgctxt "#30514"
 msgid "Related Videos"
-msgstr ""
+msgstr "Relaterade videor"
 
 msgctxt "#30515"
 msgid "Auto-Remove from Watch Later"
-msgstr ""
+msgstr "Ta automatiskt bort från Se senare"
 
 msgctxt "#30516"
 msgid "Folders"
-msgstr ""
+msgstr "Mappar"
 
 msgctxt "#30517"
 msgid "Subscribe to %s"
-msgstr ""
+msgstr "Prenumerera på %s"
 
 msgctxt "#30518"
 msgid "Feeds"
-msgstr ""
+msgstr "Flöden"
 
 msgctxt "#30519"
 msgid "and enter the following code:"
-msgstr ""
+msgstr "och ange följande kod:"
 
 msgctxt "#30520"
 msgid "Add to..."
-msgstr ""
+msgstr "Lägg till..."
 
 msgctxt "#30521"
 msgid ""
@@ -398,31 +398,31 @@ msgstr ""
 
 msgctxt "#30524"
 msgid "Select language"
-msgstr ""
+msgstr "Välj språk"
 
 msgctxt "#30525"
 msgid "Select region"
-msgstr ""
+msgstr "Välj region"
 
 msgctxt "#30526"
 msgid "Setup Wizard"
-msgstr ""
+msgstr "Installationsguide"
 
 msgctxt "#30527"
 msgid "Language and Region"
-msgstr ""
+msgstr "Språk och region"
 
 msgctxt "#30528"
 msgid "Rate..."
-msgstr ""
+msgstr "Betygsätt..."
 
 msgctxt "#30529"
 msgid "I like this"
-msgstr ""
+msgstr "Jag gillar det här"
 
 msgctxt "#30530"
 msgid "I dislike this"
-msgstr ""
+msgstr "Jag tycker inte om detta"
 
 msgctxt "#30531"
 msgid ""
@@ -434,7 +434,7 @@ msgstr ""
 
 msgctxt "#30533"
 msgid "Reverse"
-msgstr ""
+msgstr "Omvänd"
 
 msgctxt "#30534"
 msgid ""
@@ -442,35 +442,35 @@ msgstr ""
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
-msgstr ""
+msgstr "Välj ordning på spellistan"
 
 msgctxt "#30536"
 msgid "Updating Playlist..."
-msgstr ""
+msgstr "Uppdaterar spellista..."
 
 msgctxt "#30537"
 msgid "Play from here"
-msgstr ""
+msgstr "Spela från här"
 
 msgctxt "#30538"
 msgid "Disliked Videos"
-msgstr ""
+msgstr "Ogillade videor"
 
 msgctxt "#30539"
 msgid "Play recently added"
-msgstr ""
+msgstr "Spela nyligen tillagda"
 
 msgctxt "#30540"
 msgid "Play with..."
-msgstr ""
+msgstr "Spela med..."
 
 msgctxt "#30541"
 msgid "Show channel name and video details in description"
-msgstr ""
+msgstr "Visa kanalnamn och videodetaljer i beskrivningen"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
-msgstr ""
+msgstr "rtmpe-strömmar stöds inte"
 
 msgctxt "#30543"
 msgid ""
@@ -478,19 +478,19 @@ msgstr ""
 
 msgctxt "#30544"
 msgid "More Links from the description"
-msgstr ""
+msgstr "Fler länkar från beskrivningen"
 
 msgctxt "#30545"
 msgid "No further links found."
-msgstr ""
+msgstr "Inga ytterligare länkar hittades."
 
 msgctxt "#30546"
 msgid "Please complete all login prompts"
-msgstr ""
+msgstr "Fyll i alla inloggningsförfrågningar"
 
 msgctxt "#30547"
 msgid "You may be prompted to enable two applications so that YouTube is functioning properly."
-msgstr ""
+msgstr "Du kan bli ombedd att aktivera två program så att YouTube fungerar korrekt."
 
 msgctxt "#30548"
 msgid ""
@@ -498,7 +498,7 @@ msgstr ""
 
 msgctxt "#30549"
 msgid "No videos streams found"
-msgstr ""
+msgstr "Inga videoströmmar hittades"
 
 msgctxt "#30550"
 msgid ""
@@ -506,39 +506,39 @@ msgstr ""
 
 msgctxt "#30551"
 msgid "Recommendations"
-msgstr ""
+msgstr "Rekommenderat"
 
 msgctxt "#30552"
 msgid "Maintenance"
-msgstr ""
+msgstr "Underhåll"
 
 msgctxt "#30553"
 msgid "Delete function cache database"
-msgstr ""
+msgstr "Ta bort databas för funktionscache"
 
 msgctxt "#30554"
 msgid "Delete search history database"
-msgstr ""
+msgstr "Ta bort sökhistorikdatabas"
 
 msgctxt "#30555"
 msgid "Clear function cache"
-msgstr ""
+msgstr "Töm funktionscache"
 
 msgctxt "#30556"
 msgid "Clear search history"
-msgstr ""
+msgstr "Töm sökhistorik"
 
 msgctxt "#30557"
 msgid "function cache"
-msgstr ""
+msgstr "funktionscache"
 
 msgctxt "#30558"
 msgid "search history"
-msgstr ""
+msgstr "sökhistorik"
 
 msgctxt "#30559"
 msgid "Delete settings.xml"
-msgstr ""
+msgstr "Ta bort settings.xml"
 
 msgctxt "#30560"
 msgid ""
@@ -550,7 +550,7 @@ msgstr ""
 
 msgctxt "#30562"
 msgid "View all"
-msgstr ""
+msgstr "Visa alla"
 
 msgctxt "#30563"
 msgid ""
@@ -570,43 +570,43 @@ msgstr ""
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
-msgstr ""
+msgstr "Ställ in som Se senare"
 
 msgctxt "#30568"
 msgid "Remove as Watch Later"
-msgstr ""
+msgstr "Ta bort som Se senare"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
-msgstr ""
+msgstr "Är du säker på att du vill ta bort \"%s\" från din \"Se senare\"-lista?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
-msgstr ""
+msgstr "Är du säker på att du vill ersätta din nuvarande \"Se senare\"-lista med \"%s\"?"
 
 msgctxt "#30571"
 msgid "Set as History"
-msgstr ""
+msgstr "Ställ in som historik"
 
 msgctxt "#30572"
 msgid "Remove as History"
-msgstr ""
+msgstr "Ta bort som historik"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove \"%s\" as your History list?"
-msgstr ""
+msgstr "Är du säker på att du vill ta bort \"%s\" från din historiklista?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with \"%s\"?"
-msgstr ""
+msgstr "Är du säker på att du vill ersätta din nuvarande historiklista med \"%s\"?"
 
 msgctxt "#30575"
 msgid "Succeeded"
-msgstr ""
+msgstr "Lyckades"
 
 msgctxt "#30576"
 msgid "Failed"
-msgstr ""
+msgstr "Misslyckades"
 
 msgctxt "#30577"
 msgid ""
@@ -614,83 +614,83 @@ msgstr ""
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
-msgstr ""
+msgstr "Tvinga fram verifiering av SSL-certifikat"
 
 msgctxt "#30579"
 msgid "InputStream.Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream.Adaptive now?"
-msgstr ""
+msgstr "InputStream.Adaptive är aktiverat i YouTube-inställningarna, men tillägget har inaktiverats. Vill du aktivera InputStream.Adaptive nu?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
-msgstr ""
+msgstr "Återställ åtkomsthanteraren"
 
 msgctxt "#30581"
 msgid "Are you sure you want to reset access manager?"
-msgstr ""
+msgstr "Är du säker på att du vill återställa åtkomsthanteraren?"
 
 msgctxt "#30582"
 msgid "Autoplay suggested videos"
-msgstr ""
+msgstr "Automatisk uppspelning av föreslagna videor"
 
 msgctxt "#30583"
 msgid "Filters can be channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel', and/or custom video filters in the form '{ATTR}{OP}{VALUE}' eg. '{duration}{>=}{180}{artists_string}{=}{\"The Best Channel\"},{duration}{<}{180}'"
-msgstr ""
+msgstr "Filter kan vara kanalnamn åtskilda med ett kommatecken, t.ex. \"The Best Channel, The 2nd Best Channel\", och/eller anpassade videofilter i formen \"{ATTR}{OP}{VALUE}\", t.ex. \"{duration}{>=}{180}{artists_string}{=}{\"The Best Channel\"},{duration}{<}{180}\""
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
-msgstr ""
+msgstr "Mina prenumerationer (filtrerad)"
 
 msgctxt "#30585"
 msgid "Enable Blacklist to exclude channel names in Filters from My Subscriptions, disable to include channel names"
-msgstr ""
+msgstr "Aktivera Blacklist för att utesluta kanalnamn i filter från mina prenumerationer, inaktivera för att inkludera kanalnamn"
 
 msgctxt "#30586"
 msgid "Blacklist"
-msgstr ""
+msgstr "Svartlista"
 
 msgctxt "#30587"
 msgid "Add to My Subscriptions filter"
-msgstr ""
+msgstr "Lägg till i filtret Mina prenumerationer"
 
 msgctxt "#30588"
 msgid "Remove from My Subscriptions filter"
-msgstr ""
+msgstr "Ta bort från filtret Mina prenumerationer"
 
 msgctxt "#30589"
 msgid "Added to My Subscriptions filter"
-msgstr ""
+msgstr "Lade till i filtret Mina prenumerationer"
 
 msgctxt "#30590"
 msgid "Removed from My Subscriptions filter"
-msgstr ""
+msgstr "Borttagen från filtret Mina prenumerationer"
 
 msgctxt "#30591"
 msgid "Thumbnail size"
-msgstr ""
+msgstr "Storlek på miniatyrbild"
 
 msgctxt "#30592"
 msgid "Medium (16:9)"
-msgstr ""
+msgstr "Medium (16:9)"
 
 msgctxt "#30593"
 msgid "High (4:3)"
-msgstr ""
+msgstr "Hög (4:3)"
 
 msgctxt "#30594"
 msgid "Safe search"
-msgstr ""
+msgstr "Säker sökning"
 
 msgctxt "#30595"
 msgid "Moderate"
-msgstr ""
+msgstr "Måttligt"
 
 msgctxt "#30596"
 msgid "Strict"
-msgstr ""
+msgstr "Strikt"
 
 msgctxt "#30597"
 msgid "Updated: %s"
-msgstr ""
+msgstr "Uppdaterad: %s"
 
 msgctxt "#30598"
 msgid ""
@@ -698,7 +698,7 @@ msgstr ""
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
-msgstr ""
+msgstr "Misslyckades med att aktivera personliga API-nycklar. Saknas: %s"
 
 msgctxt "#30600"
 msgid ""
@@ -706,51 +706,51 @@ msgstr ""
 
 msgctxt "#30601"
 msgid "%s with Original/%s fallback"
-msgstr ""
+msgstr "%s med original/%s reserv"
 
 msgctxt "#30602"
 msgid "No auto-generated"
-msgstr ""
+msgstr "Ingen autogenererad"
 
 msgctxt "#30603"
 msgid "Age gate"
-msgstr ""
+msgstr "Åldersgräns"
 
 msgctxt "#30604"
 msgid "Allow offensive content"
-msgstr ""
+msgstr "Tillåt stötande innehåll"
 
 msgctxt "#30605"
 msgid "Quick Search"
-msgstr ""
+msgstr "Snabbsökning"
 
 msgctxt "#30606"
 msgid "Quick Search (Incognito)"
-msgstr ""
+msgstr "Snabbsökning (inkognito)"
 
 msgctxt "#30607"
 msgid "Audio only"
-msgstr ""
+msgstr "Endast ljud"
 
 msgctxt "#30608"
 msgid "Allow developer keys"
-msgstr ""
+msgstr "Tillåt nycklar för utvecklare"
 
 msgctxt "#30609"
 msgid "Clear watch history"
-msgstr ""
+msgstr "Töm visningshistorik"
 
 msgctxt "#30610"
 msgid "This will clear your account's watch history from all devices. You can't undo this."
-msgstr ""
+msgstr "Detta kommer att rensa ditt kontos visningshistorik från alla enheter. Du kan inte ångra detta."
 
 msgctxt "#30611"
 msgid "Saved Playlists"
-msgstr ""
+msgstr "Sparade spellistor"
 
 msgctxt "#30612"
 msgid "Retry"
-msgstr ""
+msgstr "Försök igen"
 
 msgctxt "#30613"
 msgid ""
@@ -770,19 +770,19 @@ msgstr ""
 
 msgctxt "#30617"
 msgid "InputStream.Adaptive"
-msgstr ""
+msgstr "InputStream.Adaptive"
 
 msgctxt "#30618"
 msgid "Stream redirect"
-msgstr ""
+msgstr "Omdirigering av ström"
 
 msgctxt "#30619"
 msgid "Enable to reduce resource usage on less powerful devices, but could lead to IP bans. Use at own risk."
-msgstr ""
+msgstr "Gör det möjligt att minska resursanvändningen på mindre kraftfulla enheter, men kan leda till IP-bannlysning. Använd på egen risk."
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
-msgstr ""
+msgstr "Port %s används redan. Det går inte att starta http-servern."
 
 msgctxt "#30621"
 msgid ""
@@ -790,11 +790,11 @@ msgstr ""
 
 msgctxt "#30622"
 msgid "Purchases"
-msgstr ""
+msgstr "Köp"
 
 msgctxt "#30623"
 msgid "Install InputStream Helper"
-msgstr ""
+msgstr "Installera InputStream-hjälpprogram"
 
 msgctxt "#30624"
 msgid ""
@@ -802,23 +802,23 @@ msgstr ""
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
-msgstr ""
+msgstr "InputStream-hjälpprogram är redan installerad."
 
 msgctxt "#30626"
 msgid "Delete temporary files"
-msgstr ""
+msgstr "Ta bort temporära filer"
 
 msgctxt "#30627"
 msgid "Rate video after watching"
-msgstr ""
+msgstr "Betygsätt video efter att ha tittat"
 
 msgctxt "#30628"
 msgid "HTTP Server"
-msgstr ""
+msgstr "HTTP-server"
 
 msgctxt "#30629"
 msgid "IP whitelist (comma delimited)"
-msgstr ""
+msgstr "IP-vitlista (avgränsad med kommatecken)"
 
 msgctxt "#30630"
 msgid ""
@@ -826,291 +826,291 @@ msgstr ""
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
-msgstr ""
+msgstr "Uppdaterad: %s"
 
 msgctxt "#30632"
 msgid "Enable API configuration page"
-msgstr ""
+msgstr "Aktivera API-konfigureringssida"
 
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/youtube/api (see Advanced > HTTP Server)"
-msgstr ""
+msgstr "http://<ipadress>:<port>/youtube/api (se Avancerat &gt; HTTP Server)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
-msgstr ""
+msgstr "Konfiguration av API för YouTube-tillägg"
 
 msgctxt "#30635"
 msgid "No changes detected, API keys were not updated."
-msgstr ""
+msgstr "Inga ändringar har upptäckts, API-nycklarna har inte uppdaterats."
 
 msgctxt "#30636"
 msgid "Personal API keys are enabled."
-msgstr ""
+msgstr "Personliga API-nycklar är aktiverade."
 
 msgctxt "#30637"
 msgid "Personal API keys are disabled."
-msgstr ""
+msgstr "Personliga API-nycklar är inaktiverade."
 
 msgctxt "#30638"
 msgid "Bookmark this page to quickly add your keys in the future."
-msgstr ""
+msgstr "Bokmärk den här sidan så att du snabbt kan lägga till dina nycklar i framtiden."
 
 msgctxt "#30639"
 msgid "Found personal API keys in api_keys.json, would you like to restore them? Choosing no will overwrite them."
-msgstr ""
+msgstr "Hittade personliga API-nycklar i api_keys.json, vill du återställa dem? Om du väljer nej kommer de att skrivas över."
 
 msgctxt "#30640"
 msgid "Restore"
-msgstr ""
+msgstr "Återställ"
 
 msgctxt "#30641"
 msgid "Delete api_keys.json"
-msgstr ""
+msgstr "Ta bort api_keys.json"
 
 msgctxt "#30642"
 msgid "Delete access_manager.json"
-msgstr ""
+msgstr "Ta bort access_manager.json"
 
 msgctxt "#30643"
 msgid "Listen on IP"
-msgstr ""
+msgstr "Lyssna på IP"
 
 msgctxt "#30644"
 msgid "Select listen IP"
-msgstr ""
+msgstr "Välj IP för lyssning"
 
 msgctxt "#30645"
 msgid "Refresh after watching"
-msgstr ""
+msgstr "Uppdatera efter att ha tittat"
 
 msgctxt "#30646"
 msgid "Upcoming Live"
-msgstr ""
+msgstr "Kommande Live"
 
 msgctxt "#30647"
 msgid "Completed Live"
-msgstr ""
+msgstr "Avslutad Live"
 
 msgctxt "#30648"
 msgid "API Key is incorrect. Settings > API > API Key"
-msgstr ""
+msgstr "API-nyckeln är felaktig. Inställningar > API > API-nyckel"
 
 msgctxt "#30649"
 msgid "Client Id is incorrect. Settings > API > API Id"
-msgstr ""
+msgstr "Klient-ID är felaktigt. Inställningar > API > API-id"
 
 msgctxt "#30650"
 msgid "Client Secret is incorrect. Settings > API > API Secret"
-msgstr ""
+msgstr "Klienthemligheten är felaktig. Inställningar > API > API-hemlighet"
 
 msgctxt "#30651"
 msgid "Location"
-msgstr ""
+msgstr "Plats"
 
 msgctxt "#30652"
 msgid "Location radius (km)"
-msgstr ""
+msgstr "Platsens radie (km)"
 
 msgctxt "#30653"
 msgid "My Location using IP geolocation lookup"
-msgstr ""
+msgstr "Min plats använder IP-uppslag för geolokalisering"
 
 msgctxt "#30654"
 msgid "My Location"
-msgstr ""
+msgstr "Min plats"
 
 msgctxt "#30655"
 msgid "Switch User"
-msgstr ""
+msgstr "Byt användare"
 
 msgctxt "#30656"
 msgid "New user"
-msgstr ""
+msgstr "Ny användare"
 
 msgctxt "#30657"
 msgid "Unnamed"
-msgstr ""
+msgstr "Namnlös"
 
 msgctxt "#30658"
 msgid "Enter a name for this user"
-msgstr ""
+msgstr "Ange ett namn för den här användaren"
 
 msgctxt "#30659"
 msgid "User is now \"%s\""
-msgstr ""
+msgstr "Användaren är nu \"%s\""
 
 msgctxt "#30660"
 msgid "Users"
-msgstr ""
+msgstr "Användare"
 
 msgctxt "#30661"
 msgid "Add a user"
-msgstr ""
+msgstr "Lägg till en användare"
 
 msgctxt "#30662"
 msgid "Remove a user"
-msgstr ""
+msgstr "Ta bort en användare"
 
 msgctxt "#30663"
 msgid "Rename a user"
-msgstr ""
+msgstr "Byt namn på en användare"
 
 msgctxt "#30664"
 msgid "Switch user"
-msgstr ""
+msgstr "Byt användare"
 
 msgctxt "#30665"
 msgid "Switch to \"%s\" now?"
-msgstr ""
+msgstr "Byt till \"%s\" nu?"
 
 msgctxt "#30666"
 msgid "\"%s\" removed"
-msgstr ""
+msgstr "\"%s\" togs bort"
 
 msgctxt "#30667"
 msgid "Renamed \"%s\" to \"%s\""
-msgstr ""
+msgstr "Bytte namn på \"%s\" till \"%s\""
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
-msgstr ""
+msgstr "Spelantal minsta procent"
 
 msgctxt "#30669"
 msgid "Mark unwatched"
-msgstr ""
+msgstr "Markera osedda"
 
 msgctxt "#30670"
 msgid "Mark watched"
-msgstr ""
+msgstr "Markera sedda"
 
 msgctxt "#30671"
 msgid "Clear playback history"
-msgstr ""
+msgstr "Töm uppspelningshistorik"
 
 msgctxt "#30672"
 msgid "Delete playback history database"
-msgstr ""
+msgstr "Ta bort databas för uppspelningshistorik"
 
 msgctxt "#30673"
 msgid "playback history"
-msgstr ""
+msgstr "uppspelningshistorik"
 
 msgctxt "#30674"
 msgid "Reset resume point"
-msgstr ""
+msgstr "Återställ återupptagningspunkt"
 
 msgctxt "#30675"
 msgid "Use local playback history (watched, resume tracking)"
-msgstr ""
+msgstr "Använda lokal uppspelningshistorik (tittat på, återuppta spårning)"
 
 msgctxt "#30676"
 msgid "Just now"
-msgstr ""
+msgstr "Just nu"
 
 msgctxt "#30677"
 msgid "A minute ago"
-msgstr ""
+msgstr "För en minut sedan"
 
 msgctxt "#30678"
 msgid "Recently"
-msgstr ""
+msgstr "Tidigare"
 
 msgctxt "#30679"
 msgid "An hour ago"
-msgstr ""
+msgstr "För en timme sedan"
 
 msgctxt "#30680"
 msgid "Two hours ago"
-msgstr ""
+msgstr "För två timmar sedan"
 
 msgctxt "#30681"
 msgid "Three hours ago"
-msgstr ""
+msgstr "För tre timmar sedan"
 
 msgctxt "#30682"
 msgid "Yesterday at"
-msgstr ""
+msgstr "Igår vid"
 
 msgctxt "#30683"
 msgid "Two days ago"
-msgstr ""
+msgstr "För två dagar sedan"
 
 msgctxt "#30684"
 msgid "Today at"
-msgstr ""
+msgstr "Idag vid"
 
 msgctxt "#30685"
 msgid "Delete data cache database"
-msgstr ""
+msgstr "Ta bort databas för datacache"
 
 msgctxt "#30686"
 msgid "Clear data cache"
-msgstr ""
+msgstr "Töm datacache"
 
 msgctxt "#30687"
 msgid "data cache"
-msgstr ""
+msgstr "datacache"
 
 msgctxt "#30688"
 msgid "Use MPEG-DASH for videos"
-msgstr ""
+msgstr "Använd MPEG-DASH för videor"
 
 msgctxt "#30689"
 msgid "Use for live streams"
-msgstr ""
+msgstr "Använd för livestreaming"
 
 msgctxt "#30690"
 msgid "InputStream.Adaptive >= 2.0.12 is required for adaptive live streams"
-msgstr ""
+msgstr "InputStream.Adaptive >= 2.0.12 krävs för adaptiva liveströmmar"
 
 msgctxt "#30691"
 msgid "Airing now"
-msgstr ""
+msgstr "Sänds nu"
 
 msgctxt "#30692"
 msgid "In a minute"
-msgstr ""
+msgstr "Om en minut"
 
 msgctxt "#30693"
 msgid "Airing soon"
-msgstr ""
+msgstr "Sänds snart"
 
 msgctxt "#30694"
 msgid "In over an hour"
-msgstr ""
+msgstr "På över en timme"
 
 msgctxt "#30695"
 msgid "In over two hours"
-msgstr ""
+msgstr "På över två timmar"
 
 msgctxt "#30696"
 msgid "Airing today at"
-msgstr ""
+msgstr "Visas idag på"
 
 msgctxt "#30697"
 msgid "Tomorrow at"
-msgstr ""
+msgstr "I morgon kl"
 
 msgctxt "#30698"
 msgid "Check my IP"
-msgstr ""
+msgstr "Kontrollera min IP"
 
 msgctxt "#30699"
 msgid "HTTP server is not running"
-msgstr ""
+msgstr "HTTP-servern körs inte"
 
 msgctxt "#30700"
 msgid "Client IP is %s"
-msgstr ""
+msgstr "Klientens IP är %s"
 
 msgctxt "#30701"
 msgid "Failed to obtain client IP"
-msgstr ""
+msgstr "Misslyckades med att få klientens IP"
 
 msgctxt "#30702"
 msgid "Play with subtitles"
-msgstr ""
+msgstr "Spela med undertexter"
 
 msgctxt "#30703"
 msgid ""
@@ -1118,23 +1118,23 @@ msgstr ""
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
-msgstr ""
+msgstr "Använd YouTube-webbplatsens adresser med standardspelare"
 
 msgctxt "#30705"
 msgid "Download subtitles"
-msgstr ""
+msgstr "Hämta undertexter"
 
 msgctxt "#30706"
 msgid "Download subtitles before starting playback? (Default: No)"
-msgstr ""
+msgstr "Hämta undertexter innan uppspelning påbörjas? (Standard: Nej)"
 
 msgctxt "#30707"
 msgid "Untitled"
-msgstr ""
+msgstr "Namnlös"
 
 msgctxt "#30708"
 msgid "Play audio only"
-msgstr ""
+msgstr "Spela endast upp ljud"
 
 msgctxt "#30709"
 msgid ""
@@ -1150,39 +1150,39 @@ msgstr ""
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
-msgstr ""
+msgstr "Betygsätt videor i spellistor"
 
 msgctxt "#30713"
 msgid "Added to Watch Later"
-msgstr ""
+msgstr "Tillagd till Se senare"
 
 msgctxt "#30714"
 msgid "Added to playlist"
-msgstr ""
+msgstr "Tillagd till spellista"
 
 msgctxt "#30715"
 msgid "Removed from playlist"
-msgstr ""
+msgstr "Borttagen från spellistan"
 
 msgctxt "#30716"
 msgid "Liked video"
-msgstr ""
+msgstr "Gillade video"
 
 msgctxt "#30717"
 msgid "Disliked video"
-msgstr ""
+msgstr "Ogillade video"
 
 msgctxt "#30718"
 msgid "Rating removed"
-msgstr ""
+msgstr "Betyg borttaget"
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
-msgstr ""
+msgstr "Prenumererar på kanal"
 
 msgctxt "#30720"
 msgid "Unsubscribed from channel"
-msgstr ""
+msgstr "Avregistrerad från kanal"
 
 msgctxt "#30721"
 msgid ""
@@ -1190,67 +1190,67 @@ msgstr ""
 
 msgctxt "#30722"
 msgid "Enable HDR video"
-msgstr ""
+msgstr "Aktivera HDR-video"
 
 msgctxt "#30723"
 msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream.Adaptive >= 2.3.14"
-msgstr ""
+msgstr "Proxy krävs för MPEG-DASH VOD (se Avancerat > HTTP-server)[CR]HDR och >1080p video kräver InputStream.Adaptive >= 2.3.14"
 
 msgctxt "#30724"
 msgid "Enable high framerate video"
-msgstr ""
+msgstr "Aktivera video med hög bildfrekvens"
 
 msgctxt "#30725"
 msgid "1440p (QHD)"
-msgstr ""
+msgstr "1440p (QHD)"
 
 msgctxt "#30726"
 msgid "Uploads"
-msgstr ""
+msgstr "Uppladdningar"
 
 msgctxt "#30727"
 msgid "Enable H.264 video"
-msgstr ""
+msgstr "Aktivera H.264-video"
 
 msgctxt "#30728"
 msgid "Enable VP9 video"
-msgstr ""
+msgstr "Aktivera VP9-video"
 
 msgctxt "#30729"
 msgid "Prefer lower resolution streams for unselected codecs"
-msgstr ""
+msgstr "Föredrar strömmar med lägre upplösning för icke-valda kodekar"
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
-msgstr ""
+msgstr "Spela (Fråga efter kvalitet)"
 
 msgctxt "#30731"
 msgid "The YouTube add-on now requires that you use your own API keys.[CR]For more information see the wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Sorry for the inconvenience."
-msgstr ""
+msgstr "YouTube-tillägget kräver nu att du använder dina egna API-nycklar.[CR]För mer information se wikin: [B]https://ytaddon.page.link/keys[/B][CR][CR][CR]Ursäkta för besväret."
 
 msgctxt "#30732"
 msgid "Comments"
-msgstr ""
+msgstr "Kommentarer"
 
 msgctxt "#30733"
 msgid "Likes"
-msgstr ""
+msgstr "Gillar"
 
 msgctxt "#30734"
 msgid "Replies"
-msgstr ""
+msgstr "Svar"
 
 msgctxt "#30735"
 msgid "Edited"
-msgstr ""
+msgstr "Ändrad"
 
 msgctxt "#30736"
 msgid "Shorts"
-msgstr ""
+msgstr "Shorts"
 
 msgctxt "#30737"
 msgid "Shorts - Max duration"
-msgstr ""
+msgstr "Shorts - Max speltid"
 
 msgctxt "#30738"
 msgid ""
@@ -1258,331 +1258,331 @@ msgstr ""
 
 msgctxt "#30739"
 msgid "Subscribers"
-msgstr ""
+msgstr "Prenumeranter"
 
 msgctxt "#30740"
 msgid "HLS"
-msgstr ""
+msgstr "HLS"
 
 msgctxt "#30741"
 msgid "Multi-stream HLS"
-msgstr ""
+msgstr "HLS med flera strömmar"
 
 msgctxt "#30742"
 msgid "Adaptive HLS"
-msgstr ""
+msgstr "Adaptiv HLS"
 
 msgctxt "#30743"
 msgid "MPEG-DASH"
-msgstr ""
+msgstr "MPEG-DASH"
 
 msgctxt "#30744"
 msgid "Original"
-msgstr ""
+msgstr "Original"
 
 msgctxt "#30745"
 msgid "Dubbed"
-msgstr ""
+msgstr "Dubbade"
 
 msgctxt "#30746"
 msgid "Descriptive"
-msgstr ""
+msgstr "Beskrivande"
 
 msgctxt "#30747"
 msgid "Alternate"
-msgstr ""
+msgstr "Alternativ"
 
 msgctxt "#30748"
 msgid "Stream features"
-msgstr ""
+msgstr "Strömfunktioner"
 
 msgctxt "#30749"
 msgid "Enable AV1 video"
-msgstr ""
+msgstr "Aktivera AV1-video"
 
 msgctxt "#30750"
 msgid "Enable Vorbis audio"
-msgstr ""
+msgstr "Aktivera Vorbis-ljud"
 
 msgctxt "#30751"
 msgid "Enable Opus audio"
-msgstr ""
+msgstr "Aktivera Opus-ljud"
 
 msgctxt "#30752"
 msgid "Enable AAC audio"
-msgstr ""
+msgstr "Aktivera AAC-ljud"
 
 msgctxt "#30753"
 msgid "Enable surround sound audio"
-msgstr ""
+msgstr "Aktivera surroundljud"
 
 msgctxt "#30754"
 msgid "Enable AC-3 audio"
-msgstr ""
+msgstr "Aktivera AC-3-ljud"
 
 msgctxt "#30755"
 msgid "Enable EAC-3 audio"
-msgstr ""
+msgstr "Aktivera EAC-3-ljud"
 
 msgctxt "#30756"
 msgid "Enable DTS audio"
-msgstr ""
+msgstr "Aktivera DTS-ljud"
 
 msgctxt "#30757"
 msgid "Remove similar/duplicate streams"
-msgstr ""
+msgstr "Ta bort liknande/duplicerade strömmar"
 
 msgctxt "#30758"
 msgid "Stream selection"
-msgstr ""
+msgstr "Val av ström"
 
 msgctxt "#30759"
 msgid "Quality selection"
-msgstr ""
+msgstr "Val av kvalitet"
 
 msgctxt "#30760"
 msgid "Automatic + Quality selection"
-msgstr ""
+msgstr "Automatisk + Kvalitetsval"
 
 msgctxt "#30761"
 msgid "Update playback history on Youtube"
-msgstr ""
+msgstr "Uppdatera uppspelningshistorik på Youtube"
 
 msgctxt "#30762"
 msgid "Multi-language"
-msgstr ""
+msgstr "Flerspråkig"
 
 msgctxt "#30763"
 msgid "Multi-audio"
-msgstr ""
+msgstr "Multi-audio"
 
 msgctxt "#30764"
 msgid "Requests connect timeout"
-msgstr ""
+msgstr "Tidsgräns för begäran om anslutning"
 
 msgctxt "#30765"
 msgid "Requests read timeout"
-msgstr ""
+msgstr "Tidsgräns för begärd läsning"
 
 msgctxt "#30766"
 msgid "Premieres"
-msgstr ""
+msgstr "Premiärer"
 
 msgctxt "#30767"
 msgid "Views"
-msgstr ""
+msgstr "Visningar"
 
 msgctxt "#30768"
 msgid "Disable high framerate video at maximum video quality"
-msgstr ""
+msgstr "Inaktivera video med hög bildfrekvens vid maximal videokvalitet"
 
 msgctxt "#30769"
 msgid "Clear Watch Later list"
-msgstr ""
+msgstr "Töm Se senare-listan"
 
 msgctxt "#30770"
 msgid "Are you sure you want to clear your Watch Later list?"
-msgstr ""
+msgstr "Är du säker på att du vill tömma din Se senare-lista?"
 
 msgctxt "#30771"
 msgid "Disable fractional framerate hinting"
-msgstr ""
+msgstr "Inaktivera fraktionerad bildfrekvensindikering"
 
 msgctxt "#30772"
 msgid "Disable all framerate hinting"
-msgstr ""
+msgstr "Inaktivera alla bildfrekvensindikeringar"
 
 msgctxt "#30773"
 msgid "Show video details in video lists"
-msgstr ""
+msgstr "Visa videodetaljer i videolistor"
 
 msgctxt "#30774"
 msgid "All available"
-msgstr ""
+msgstr "Alla tillgängliga"
 
 msgctxt "#30775"
 msgid "%s (translation)"
-msgstr ""
+msgstr "%s (översättning)"
 
 msgctxt "#30776"
 msgid "Ask + Automatic + Quality selection"
-msgstr ""
+msgstr "Fråga + Automatisk + Kvalitetsval"
 
 msgctxt "#30777"
 msgid "Views for %s (%s)"
-msgstr ""
+msgstr "Visningar för %s (%s)"
 
 msgctxt "#30778"
 msgid "Import old playback history?"
-msgstr ""
+msgstr "Importera gammal uppspelningshistorik?"
 
 msgctxt "#30779"
 msgid "Import old search history?"
-msgstr ""
+msgstr "Importera gammal sökhistorik?"
 
 msgctxt "#30780"
 msgid "Clear local watch later list"
-msgstr ""
+msgstr "Töm lokal lista för senare visning"
 
 msgctxt "#30781"
 msgid "Delete watch later database"
-msgstr ""
+msgstr "Ta bort \"Se senare\"-databasen"
 
 msgctxt "#30782"
 msgid "local watch later list"
-msgstr ""
+msgstr "lokal lista för senare visning"
 
 msgctxt "#30783"
 msgid "settings to recommended values"
-msgstr ""
+msgstr "inställningar till rekommenderade värden"
 
 msgctxt "#30784"
 msgid "listings to show minimal details"
-msgstr ""
+msgstr "listningar för att visa minimala detaljer"
 
 msgctxt "#30785"
 msgid "performance settings"
-msgstr ""
+msgstr "prestandainställningar"
 
 msgctxt "#30786"
 msgid "Choose device capabilities"
-msgstr ""
+msgstr "Välj enhetens förmågor"
 
 msgctxt "#30787"
 msgid "720p, H.264 only | Limited or older devices"
-msgstr ""
+msgstr "720p, endast H.264 | Begränsade eller äldre enheter"
 
 msgctxt "#30788"
 msgid "1080p/30 fps | Raspberry Pi 3, or similar"
-msgstr ""
+msgstr "1080p/30 bilder/s| Raspberry Pi 3, eller liknande"
 
 msgctxt "#30789"
 msgid "4K/30 fps or 1080p/60 fps, HDR if compatible | Raspberry Pi 5, or similar"
-msgstr ""
+msgstr "4K/30 bilder/seller 1080p/60 bilder/s, HDR om kompatibel | Raspberry Pi 5, eller liknande"
 
 msgctxt "#30790"
 msgid "4K/60 fps, HDR if compatible | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1, or similar"
-msgstr ""
+msgstr "4K/60 bilder/s, HDR om kompatibel | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1 eller liknande"
 
 msgctxt "#30791"
 msgid "4K/60 fps, HDR, using AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V, or similar"
-msgstr ""
+msgstr "4K/60 bilder/s, HDR, med hjälp av AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V eller liknande"
 
 msgctxt "#30792"
 msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities"
-msgstr ""
+msgstr "8K/60 bilder/s, HDR, med AV1 | Modern enhet eller PC med full kapacitet"
 
 msgctxt "#30793"
 msgid "Views count display colour"
-msgstr ""
+msgstr "Visningsfärg för antal visningar"
 
 msgctxt "#30794"
 msgid "Subscriber/Likes count display colour"
-msgstr ""
+msgstr "Visningsfärg för prenumerant/gillar-antal"
 
 msgctxt "#30795"
 msgid "Videos/Comments count display colour"
-msgstr ""
+msgstr "Visningsfärg för Videor/Kommentarer-antal"
 
 msgctxt "#30796"
 msgid "1080p/60 fps | Raspberry Pi 4, or similar"
-msgstr ""
+msgstr "1080p/60 bilder/s | Raspberry Pi 4, eller liknande"
 
 msgctxt "#30797"
 msgid "1080p/30 fps or 720p/30 fps, H.264 only | Raspberry Pi 1/2, or similar"
-msgstr ""
+msgstr "1080p/30 bilder/s eller 720p/30 bilder/s, endast H.264 | Raspberry Pi 1/2, eller liknande"
 
 msgctxt "#30798"
 msgid "Clear bookmarks list"
-msgstr ""
+msgstr "Töm bokmärkeslistan"
 
 msgctxt "#30799"
 msgid "Delete bookmarks database"
-msgstr ""
+msgstr "Ta bort bokmärkesdatabasen"
 
 msgctxt "#30800"
 msgid "bookmarks list"
-msgstr ""
+msgstr "bokmärkeslista"
 
 msgctxt "#30801"
 msgid "Clear Bookmarks list"
-msgstr ""
+msgstr "Töm listan med bokmärken"
 
 msgctxt "#30802"
 msgid "Are you sure you want to clear your Bookmarks list?"
-msgstr ""
+msgstr "Är du säker på att du vill tömma din bokmärkeslista?"
 
 msgctxt "#30803"
 msgid "Bookmark %s"
-msgstr ""
+msgstr "Bokmärk %s"
 
 msgctxt "#30804"
 msgid "Use YouTube website urls with external player"
-msgstr ""
+msgstr "Använd YouTube-webbplatsens adresser med extern spelare"
 
 msgctxt "#30805"
 msgid "Use MPEG-DASH with external player"
-msgstr ""
+msgstr "Använd MPEG-DASH med extern spelare"
 
 msgctxt "#30806"
 msgid "Jump to page..."
-msgstr ""
+msgstr "Hoppa till sidan..."
 
 msgctxt "#30807"
 msgid "Use channel name as"
-msgstr ""
+msgstr "Använd kanalnamn som"
 
 msgctxt "#30808"
 msgid "Hide videos from listings"
-msgstr ""
+msgstr "Dölj videor från listor"
 
 msgctxt "#30809"
 msgid "All upcoming videos"
-msgstr ""
+msgstr "Alla kommande videor"
 
 msgctxt "#30810"
 msgid "All previously streamed (completed) videos"
-msgstr ""
+msgstr "Alla tidigare strömmade (slutförda) videor"
 
 msgctxt "#30811"
 msgid "Filter Live folders"
-msgstr ""
+msgstr "Filtrera Live-mappar"
 
 msgctxt "#30812"
 msgid "Clear subscription feed history"
-msgstr ""
+msgstr "Töm historik för prenumerationsflöde"
 
 msgctxt "#30813"
 msgid "Delete subscription feed history database"
-msgstr ""
+msgstr "Ta bort databasen för prenumerationsflödeshistorik"
 
 msgctxt "#30814"
 msgid "feed history"
-msgstr ""
+msgstr "flödeshistorik"
 
 msgctxt "#30815"
 msgid "Go back..."
-msgstr ""
+msgstr "Gå tillbaka..."
 
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
-msgstr ""
+msgstr "Listan är tom.[CR][CR]Uppdatera från snabbmenyn eller försök igen senare."
 
 msgctxt "#30817"
 msgid "Refresh settings.xml"
-msgstr ""
+msgstr "Uppdatera settings.xml"
 
 msgctxt "#30818"
 msgid "Are you sure you want to refresh settings.xml?"
-msgstr ""
+msgstr "Är du säker på att du vill uppdatera settings.xml?"
 
 msgctxt "#30819"
 msgid "Play from start"
-msgstr ""
+msgstr "Spela från början"
 
 msgctxt "#30820"
 msgid "Podcast"
-msgstr ""
+msgstr "Podradio"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
