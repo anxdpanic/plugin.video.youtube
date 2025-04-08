@@ -125,7 +125,7 @@ class AbstractProvider(object):
             return wrapper(command)
         return wrapper
 
-    def run_wizard(self, context):
+    def run_wizard(self, context, last_run=None):
         localize = context.localize
         # ui local variable used for ui.get_view_manager() in unofficial version
         ui = context.get_ui()
@@ -133,6 +133,8 @@ class AbstractProvider(object):
         settings_state = {'state': 'defer'}
         context.wakeup(CHECK_SETTINGS, timeout=5, payload=settings_state)
 
+        if last_run and last_run > 1:
+            self.pre_run_wizard_step(provider=self, context=context)
         wizard_steps = self.get_wizard_steps()
         wizard_steps.extend(ui.get_view_manager().get_wizard_steps())
 
@@ -163,6 +165,11 @@ class AbstractProvider(object):
     def get_wizard_steps():
         # can be overridden by the derived class
         return []
+
+    @staticmethod
+    def pre_run_wizard_step(provider, context):
+        # can be overridden by the derived class
+        pass
 
     def navigate(self, context):
         path = context.get_path()

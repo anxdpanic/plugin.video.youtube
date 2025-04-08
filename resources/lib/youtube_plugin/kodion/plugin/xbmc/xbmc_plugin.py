@@ -175,8 +175,9 @@ class XbmcPlugin(AbstractPlugin):
             context.reload_access_manager()
 
         settings = context.get_settings()
-        if settings.setup_wizard_enabled():
-            provider.run_wizard(context)
+        setup_wizard_required = settings.setup_wizard_enabled()
+        if setup_wizard_required:
+            provider.run_wizard(context, last_run=setup_wizard_required)
         show_fanart = settings.fanart_selection()
 
         try:

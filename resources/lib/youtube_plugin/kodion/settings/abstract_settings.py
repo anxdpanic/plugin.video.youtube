@@ -104,21 +104,23 @@ class AbstractSettings(object):
         return self.get_int(SETTINGS.SEARCH_SIZE, 10)
 
     def setup_wizard_enabled(self, value=None):
-        # Increment min_required on new release to enable oneshot on first run
-        min_required = 5
+        # Set run_required to release date (as Unix timestamp in seconds)
+        # to enable oneshot on first run
+        # Tuesday, 8 April 2025 12:00:00 AM = 1744070400
+        run_required = 1744070400
 
         if value is False:
-            self.set_int(SETTINGS.SETUP_WIZARD_RUNS, min_required)
+            self.set_int(SETTINGS.SETUP_WIZARD_RUNS, run_required)
             return self.set_bool(SETTINGS.SETUP_WIZARD, False)
         if value is True:
             self.set_int(SETTINGS.SETUP_WIZARD_RUNS, 0)
             return self.set_bool(SETTINGS.SETUP_WIZARD, True)
 
-        forced_runs = self.get_int(SETTINGS.SETUP_WIZARD_RUNS, 0)
-        if forced_runs < min_required:
-            self.set_int(SETTINGS.SETUP_WIZARD_RUNS, min_required)
+        last_run = self.get_int(SETTINGS.SETUP_WIZARD_RUNS, 0)
+        if last_run < run_required:
+            self.set_int(SETTINGS.SETUP_WIZARD_RUNS, run_required)
             self.set_bool(SETTINGS.SETTINGS_END, True)
-            return True
+            return run_required
         return self.get_bool(SETTINGS.SETUP_WIZARD, False)
 
     def support_alternative_player(self, value=None):
