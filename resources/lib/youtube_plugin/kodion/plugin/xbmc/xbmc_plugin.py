@@ -123,30 +123,30 @@ class XbmcPlugin(AbstractPlugin):
                     else:
                         continue
 
-            max_wait_time = 30
+            timeout = 30
             while ui.busy_dialog_active():
-                max_wait_time -= 1
-                if max_wait_time < 0:
+                timeout -= 1
+                if timeout < 0:
                     context.log_error('Multiple busy dialogs active'
                                       ' - Extended busy period')
                     continue
                 context.sleep(1)
 
             context.log_warning('Multiple busy dialogs active'
-                                ' - Reloading playlist')
+                                ' - Reloading playlist...')
 
             num_items = playlist_player.add_items(items)
             if position:
-                max_wait_time = min(position, num_items)
+                timeout = min(position, num_items)
             else:
                 position = 1
-                max_wait_time = num_items
+                timeout = num_items
 
             while ui.busy_dialog_active() or playlist_player.size() < position:
-                max_wait_time -= 1
-                if max_wait_time < 0:
+                timeout -= 1
+                if timeout < 0:
                     context.log_error('Multiple busy dialogs active'
-                                      ' - Unable to restart playback')
+                                      ' - Playback restart failed, retrying...')
                     command = playlist_player.play_playlist_item(position,
                                                                  defer=True)
                     result, post_run_action = self.uri_action(

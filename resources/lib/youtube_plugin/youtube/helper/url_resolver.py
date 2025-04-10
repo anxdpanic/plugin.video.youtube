@@ -162,11 +162,11 @@ class YouTubeResolver(AbstractResolver):
                 if num_matched != 7:
                     continue
 
-                params.update({
-                    'clip': True,
-                    'start': start_time,
-                    'end': end_time,
-                })
+                params.update((
+                    ('clip', True),
+                    ('start', start_time),
+                    ('end', end_time),
+                ))
                 return url_components._replace(query=urlencode(params)).geturl()
 
         elif path == '/watch_videos':

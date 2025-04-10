@@ -16,9 +16,7 @@ import shutil
 from base64 import urlsafe_b64decode
 from datetime import timedelta
 from math import floor, log
-from re import (
-    compile as re_compile,
-)
+from re import compile as re_compile
 from sys import exc_info
 from traceback import format_stack as _format_stack
 

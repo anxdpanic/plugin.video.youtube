@@ -684,10 +684,8 @@ def update_video_items(provider, context, video_id_dict,
             start_at = None
 
             if item_filter and (
-                    (not item_filter['shorts']
-                     and media_item.short)
-                    or (not item_filter['completed']
-                        and media_item.completed)
+                    (not item_filter['completed']
+                     and media_item.completed)
                     or (not item_filter['live']
                         and media_item.live and not media_item.upcoming)
                     or (not item_filter['upcoming']
@@ -698,6 +696,8 @@ def update_video_items(provider, context, video_id_dict,
                         and media_item.upcoming and media_item.live)
                     or (not item_filter['vod']
                         and media_item.vod)
+                    or (not item_filter['shorts']
+                        and media_item.short)
             ):
                 continue
 
@@ -1341,12 +1341,11 @@ def filter_parse(item,
                      'search': re_search,
                  },
                  _none=lambda: None):
-    replacement_criteria = []
     criteria_met = False
     for idx, criteria in enumerate(all_criteria):
         if isinstance(criteria, string_type):
             criteria = criteria_re.findall(criteria)
-            replacement_criteria.append((idx, criteria))
+            all_criteria[idx] = criteria
         for input_1, op_str, input_2 in criteria:
             try:
                 if input_1.startswith('.'):
@@ -1393,8 +1392,6 @@ def filter_parse(item,
         else:
             criteria_met = True
             break
-    for idx, criteria in replacement_criteria:
-        all_criteria[idx] = criteria
     return criteria_met
 
 

@@ -70,19 +70,20 @@ def _process_list_response(provider,
     items = []
     do_callbacks = False
 
-    new_params = {}
     params = context.get_params()
-    copy_params = {
-        'addon_id',
-        'incognito',
-        PLAY_FORCE_AUDIO,
-        PLAY_TIMESHIFT,
-        PLAY_PROMPT_QUALITY,
-        PLAY_PROMPT_SUBTITLES,
-        PLAY_WITH,
-    }.intersection(params.keys())
-    for param in copy_params:
-        new_params[param] = params[param]
+    new_params = {
+        param: params[param]
+        for param in (
+            'addon_id',
+            'incognito',
+            PLAY_FORCE_AUDIO,
+            PLAY_TIMESHIFT,
+            PLAY_PROMPT_QUALITY,
+            PLAY_PROMPT_SUBTITLES,
+            PLAY_WITH,
+        )
+        if param in params
+    }
 
     settings = context.get_settings()
     thumb_size = settings.get_thumbnail_size()

@@ -475,10 +475,10 @@ def process_items_for_playlist(context,
         return items
     if action == 'play':
         ui = context.get_ui()
-        max_wait_time = position
+        timeout = position
         while ui.busy_dialog_active() or playlist_player.size() < position:
-            max_wait_time -= 1
-            if max_wait_time < 0:
+            timeout -= 1
+            if timeout < 0:
                 command = playlist_player.play_playlist_item(position,
                                                              defer=True)
                 return UriItem(command)
