@@ -71,7 +71,13 @@ class AbstractProgressDialog(object):
                  message='',
                  total=0,
                  message_template=None,
-                 template_params=None):
+                 template_params=None,
+                 hide=False):
+        if hide:
+            self._dialog = None
+            self._created = False
+            return
+
         self._ui = ui
         if ui.busy_dialog_active():
             self._dialog = dialog()
@@ -112,9 +118,13 @@ class AbstractProgressDialog(object):
         self.close()
 
     def get_total(self):
+        if not self._dialog:
+            return None
         return self._total
 
     def get_position(self):
+        if not self._dialog:
+            return None
         return self._position
 
     def close(self):
@@ -129,17 +139,25 @@ class AbstractProgressDialog(object):
         return False
 
     def set_total(self, total):
+        if not self._dialog:
+            return
         self._total = int(total)
 
     def reset_total(self, new_total, **kwargs):
+        if not self._dialog:
+            return
         self._total = int(new_total)
         self.update(position=0, **kwargs)
 
     def update_total(self, new_total, **kwargs):
+        if not self._dialog:
+            return
         self._total = int(new_total)
         self.update(steps=0, **kwargs)
 
     def grow_total(self, new_total=None, delta=None):
+        if not self._dialog:
+            return None
         if delta:
             delta = int(delta)
             self._total += delta
