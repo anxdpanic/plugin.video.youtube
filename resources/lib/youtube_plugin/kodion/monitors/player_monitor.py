@@ -214,26 +214,7 @@ class PlayerMonitorThread(object):
             client = provider.get_client(context)
             logged_in = client.logged_in
 
-        if self.progress >= settings.get_play_count_min_percent():
-            if use_local_history:
-                play_count += 1
-                self._context.get_playback_history().update_item(
-                    self.video_id,
-                    {'play_count': play_count},
-                )
-
-            if logged_in and use_remote_history:
-                client.update_watch_history(
-                    self._context,
-                    self.video_id,
-                    report_url,
-                    status=(self.current_time,
-                            segment_start,
-                            self.current_time,
-                            'complete'),
-                )
-
-            # Check auto-like settings and channel filtering
+                   # Check auto-like settings and channel filtering
             if settings.get_bool('youtube.post.play.auto.like', False):
                 filter_enabled = settings.get_bool('youtube.post.play.auto.like.filter.enabled', False)
                 if filter_enabled:
