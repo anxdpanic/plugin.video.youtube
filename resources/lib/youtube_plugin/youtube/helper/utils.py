@@ -259,11 +259,12 @@ def update_channel_items(provider, context, channel_id_dict,
 
         # channel name and title
         localised_info = snippet.get('localized') or {}
+        channel_handle = snippet.get('customUrl')
         channel_name = (localised_info.get('title')
                         or snippet.get('title')
                         or untitled)
         channel_item.set_name(channel_name)
-        channel_item.add_artist(channel_name)
+        channel_item.add_artist(channel_handle or channel_name)
 
         # plot
         description = strip_html_from_text(localised_info.get('description')
@@ -275,9 +276,10 @@ def update_channel_items(provider, context, channel_id_dict,
                 ui.new_line(stats, cr_after=1) if stats else '',
                 ui.new_line(description, cr_after=1) if description else '',
                 ui.new_line('--------', cr_before=1, cr_after=1),
-                'https://www.youtube.com/' + channel_id
-                if channel_id.startswith('@') else
-                'https://www.youtube.com/channel/' + channel_id,
+                'https://www.youtube.com/',
+                channel_handle if channel_handle else
+                channel_id if channel_id.startswith('@') else
+                '/channel/' + channel_id,
             ))
         channel_item.set_plot(description)
 
@@ -318,10 +320,10 @@ def update_channel_items(provider, context, channel_id_dict,
         if filters_set is not None:
             context_menu.append(
                 menu_items.remove_my_subscriptions_filter(
-                    context, channel_name
+                    context, channel_handle or channel_name
                 ) if client.channel_match(channel_id, filters_set) else
                 menu_items.add_my_subscriptions_filter(
-                    context, channel_name
+                    context, channel_handle or channel_name
                 )
             )
 

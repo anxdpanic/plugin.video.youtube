@@ -16,6 +16,7 @@ import xml.etree.ElementTree as ET
 from functools import partial
 from itertools import chain, islice
 from random import randint
+from re import compile as re_compile
 
 from .login_client import LoginClient
 from ..helper.stream_info import StreamInfo
@@ -885,6 +886,7 @@ class YouTube(LoginClient):
                                   verify_id=False,
                                   do_search=False,
                                   as_json=False,
+                                  id_re=re_compile('UC[A-Za-z0-9_-]{21}[AQgw]'),
                                   **kwargs):
         """
         Returns a collection of zero or more channel resources that match the request criteria.
@@ -897,17 +899,17 @@ class YouTube(LoginClient):
         params = {'part': 'id'}
         if mine or identifier == 'mine':
             params['mine'] = True
+        elif id_re.match(identifier):
+            if not verify_id:
+                return identifier
+            params['id'] = identifier
         elif handle or identifier.startswith('@'):
             params['forHandle'] = identifier
         elif username:
             params['forUsername'] = identifier
-        elif identifier.startswith('UC'):
-            if not verify_id:
-                return identifier
-            params['id'] = identifier
         else:
-            username = True
-            params['forUsername'] = identifier
+            handle = True
+            params['forHandle'] = identifier
 
         json_data = self.api_request(
             method='GET',
