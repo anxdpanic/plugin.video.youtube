@@ -302,16 +302,18 @@ class AbstractProvider(object):
             context.log_error('Rerouting - Unable to reroute to current path')
             return False
 
+        ui = context.get_ui()
         result = None
         try:
             if window_cache:
                 function_cache = context.get_function_cache()
-                result, options = function_cache.run(
-                    self.navigate,
-                    _refresh=True,
-                    _scope=function_cache.SCOPE_NONE,
-                    context=context.clone(path, params),
-                )
+                with ui.on_busy():
+                    result, options = function_cache.run(
+                        self.navigate,
+                        _refresh=True,
+                        _scope=function_cache.SCOPE_NONE,
+                        context=context.clone(path, params),
+                    )
         except Exception as exc:
             context.log_error('Rerouting - Error'
                               '\n\tException: {exc!r}'.format(exc=exc))
@@ -335,7 +337,6 @@ class AbstractProvider(object):
                                   .format(uri=uri))
                 return False
 
-            ui = context.get_ui()
             reroute_path = ui.get_property(REROUTE_PATH)
             if reroute_path:
                 return True
@@ -346,12 +347,29 @@ class AbstractProvider(object):
                     ui.set_property(CONTAINER_ID, container)
                     ui.set_property(CONTAINER_POSITION, position)
 
-            context.execute(''.join((
+            action = ''.join((
                 'ReplaceWindow' if window_replace else 'ActivateWindow',
                 '(Videos,',
                 uri,
                 ',return)' if window_return else ')',
-            )))
+            ))
+
+            timeout = 30
+            while ui.busy_dialog_active():
+                timeout -= 1
+                if timeout < 0:
+                    context.log_warning('Multiple busy dialogs active'
+                                        ' - Rerouting workaround')
+                    return UriItem('command://{0}'.format(action))
+                context.sleep(1)
+            else:
+                context.execute(
+                    action,
+                    wait=True,
+                    # wait_for=(REROUTE_PATH if window_cache else None),
+                    # wait_for_set=False,
+                    # block_ui=True,
+                )
         return True
 
     @staticmethod

@@ -191,6 +191,8 @@ class XbmcPlugin(AbstractPlugin):
                 )
             else:
                 result, options = provider.navigate(context)
+                if ui.get_property(REROUTE_PATH):
+                    return
         except KodionException as exc:
             result = None
             options = {}
