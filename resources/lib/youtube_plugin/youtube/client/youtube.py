@@ -993,13 +993,22 @@ class YouTube(LoginClient):
             return not result
         return result
 
-    def get_channels(self, channel_id, **kwargs):
+    def get_channels(self, channel_id, max_results=None, **kwargs):
         """
-        Returns a collection of zero or more channel resources that match the request criteria.
-        :param channel_id: list or comma-separated list of the YouTube channel ID(s)
+        Returns a collection of zero or more channel resources that match the
+        request criteria.
+        :param channel_id: list or string of comma-separated YouTube channelIds
+        :param max_results: the maximum number of items that should be returned
+                            in the result set, from 0 to 50, inclusive
         :return:
         """
-        params = {'part': 'snippet,contentDetails,brandingSettings,statistics'}
+        if max_results is None:
+            max_results = self.max_results()
+        params = {
+            'part': 'snippet,contentDetails,brandingSettings,statistics',
+            'maxResults': str(max_results),
+        }
+
         if channel_id == 'mine':
             params['mine'] = True
         elif isinstance(channel_id, string_type):
@@ -1030,11 +1039,17 @@ class YouTube(LoginClient):
                                 params=params,
                                 **kwargs)
 
-    def get_videos(self, video_id, live_details=False, **kwargs):
+    def get_videos(self,
+                   video_id,
+                   live_details=False,
+                   max_results=None,
+                   **kwargs):
         """
         Returns a list of videos that match the API request parameters
         :param video_id: list of video ids
         :param live_details: also retrieve liveStreamingDetails
+        :param max_results: the maximum number of items that should be returned
+                            in the result set, from 0 to 50, inclusive
         :return:
         """
         params = {
@@ -1048,6 +1063,11 @@ class YouTube(LoginClient):
                 if isinstance(video_id, string_type) else
                 ','.join(video_id)
             ),
+            'maxResults': (
+                self.max_results()
+                if max_results is None else
+                max_results
+            ),
         }
         return self.api_request(method='GET',
                                 path='videos',
@@ -1055,14 +1075,19 @@ class YouTube(LoginClient):
                                 no_login=True,
                                 **kwargs)
 
-    def get_playlists(self, playlist_id, **kwargs):
+    def get_playlists(self, playlist_id, max_results=None, **kwargs):
         params = {
             'part': 'snippet,status,contentDetails',
             'id': (
                 playlist_id
                 if isinstance(playlist_id, string_type) else
                 ','.join(playlist_id)
-            )
+            ),
+            'maxResults': (
+                self.max_results()
+                if max_results is None else
+                max_results
+            ),
         }
         return self.api_request(method='GET',
                                 path='playlists',
@@ -2216,7 +2241,7 @@ class YouTube(LoginClient):
 
             channel_params = {
                 'part': 'snippet,contentDetails',
-                'maxResults': str(self.max_results()),
+                'maxResults': 50,
                 'order': 'unread',
                 'mine': True,
             }
@@ -2306,7 +2331,7 @@ class YouTube(LoginClient):
 
             # playlist_params = {
             #     'part': 'snippet',
-            #     'maxResults': str(self.max_results()),
+            #     'maxResults': 50,
             #     'order': 'alphabetical',
             #     'mine': True,
             # }

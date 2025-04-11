@@ -101,6 +101,7 @@ class ResourceManager(object):
         if to_update:
             notify_and_raise = not suppress_errors
             new_data = [client.get_channels(list_of_50,
+                                            max_results=50,
                                             notify=notify_and_raise,
                                             raise_exc=notify_and_raise)
                         for list_of_50 in self._list_batch(to_update, n=50)]
@@ -175,6 +176,7 @@ class ResourceManager(object):
             notify_and_raise = not suppress_errors
             client = self._provider.get_client(context)
             new_data = [client.get_channels(list_of_50,
+                                            max_results=50,
                                             notify=notify_and_raise,
                                             raise_exc=notify_and_raise)
                         for list_of_50 in self._list_batch(to_update, n=50)]
@@ -266,6 +268,7 @@ class ResourceManager(object):
             notify_and_raise = not suppress_errors
             client = self._provider.get_client(context)
             new_data = [client.get_playlists(list_of_50,
+                                             max_results=50,
                                              notify=notify_and_raise,
                                              raise_exc=notify_and_raise)
                         for list_of_50 in self._list_batch(to_update, n=50)]
@@ -473,6 +476,7 @@ class ResourceManager(object):
             client = self._provider.get_client(context)
             new_data = [client.get_videos(list_of_50,
                                           live_details,
+                                          max_results=50,
                                           notify=notify_and_raise,
                                           raise_exc=notify_and_raise)
                         for list_of_50 in self._list_batch(to_update, n=50)]
