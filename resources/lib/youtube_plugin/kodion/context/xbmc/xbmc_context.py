@@ -687,20 +687,36 @@ class XbmcContext(AbstractContext):
 
         return new_context
 
-    def execute(self, command, wait=False, wait_for=None):
+    def execute(self,
+                command,
+                wait=False,
+                wait_for=None,
+                wait_for_set=True,
+                block_ui=False):
         if not wait_for:
             xbmc.executebuiltin(command, wait)
             return
 
         ui = self.get_ui()
-        ui.clear_property(wait_for)
-        pop_property = ui.pop_property
         waitForAbort = xbmc.Monitor().waitForAbort
 
         xbmc.executebuiltin(command, wait)
 
-        while not pop_property(wait_for) and not waitForAbort(1):
-            pass
+        if block_ui:
+            xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+
+        if wait_for_set:
+            ui.clear_property(wait_for)
+            pop_property = ui.pop_property
+            while not pop_property(wait_for) and not waitForAbort(1):
+                pass
+        else:
+            get_property = ui.get_property
+            while get_property(wait_for) and not waitForAbort(1):
+                pass
+
+        if block_ui:
+            xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
 
     @staticmethod
     def sleep(timeout=None):

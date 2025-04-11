@@ -534,7 +534,12 @@ class AbstractContext(Logger):
     def clone(self, new_path=None, new_params=None):
         raise NotImplementedError()
 
-    def execute(self, command, wait=False, wait_for=None):
+    def execute(self,
+                command,
+                wait=False,
+                wait_for=None,
+                wait_for_set=True,
+                block_ui=False):
         raise NotImplementedError()
 
     @staticmethod
