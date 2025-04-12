@@ -155,6 +155,9 @@ class XbmcContextUI(AbstractContextUI):
                                       time_ms,
                                       audible)
 
+    def on_busy(self):
+        return XbmcBusyDialog()
+
     def refresh_container(self):
         self._context.send_notification(REFRESH_CONTAINER)
 
@@ -277,3 +280,16 @@ class XbmcContextUI(AbstractContextUI):
         if dialog_id in dialog_ids:
             return dialog_id
         return False
+
+
+class XbmcBusyDialog(object):
+    def __enter__(self):
+        xbmc.executebuiltin('ActivateWindow(BusyDialogNoCancel)')
+        return self
+
+    def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
+        self.close()
+
+    @staticmethod
+    def close():
+        xbmc.executebuiltin('Dialog.Close(BusyDialogNoCancel)')
