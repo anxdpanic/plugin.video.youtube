@@ -129,7 +129,7 @@ class XbmcPlugin(AbstractPlugin):
                 if timeout < 0:
                     context.log_error('Multiple busy dialogs active'
                                       ' - Extended busy period')
-                    continue
+                    break
                 context.sleep(1)
 
             context.log_warning('Multiple busy dialogs active'
@@ -154,7 +154,7 @@ class XbmcPlugin(AbstractPlugin):
                         command,
                     )
                     succeeded = False
-                    continue
+                    break
                 context.sleep(1)
             else:
                 playlist_player.play_playlist_item(position)
