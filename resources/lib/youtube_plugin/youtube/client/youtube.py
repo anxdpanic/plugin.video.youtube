@@ -1977,12 +1977,16 @@ class YouTube(LoginClient):
                     feed_details['refresh'] = _refresh
                     if channel_id:
                         feed_details.setdefault('channel_id', channel_id)
-                    if _refresh:
+                        if _refresh:
+                            to_refresh.append({item_type: channel_id})
+                    elif _refresh:
                         to_refresh.append({item_type: item_id})
                     if item_id in feeds:
                         feeds[item_id].update(feed_details)
                     else:
                         feeds[item_id] = feed_details
+                elif channel_id:
+                    to_refresh.append({item_type: channel_id})
                 else:
                     to_refresh.append({item_type: item_id})
             del inputs[:]
