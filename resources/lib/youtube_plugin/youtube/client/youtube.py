@@ -2017,7 +2017,11 @@ class YouTube(LoginClient):
                 )),
                 headers=headers,
             )
-            if response is None or response.status_code == 429:
+            if response is None:
+                return False, True
+            elif response.status_code == 404:
+                response = None
+            elif response.status_code == 429:
                 return False, True
 
             _output = {
