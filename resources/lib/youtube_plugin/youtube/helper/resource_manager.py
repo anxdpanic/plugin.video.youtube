@@ -305,7 +305,11 @@ class ResourceManager(object):
 
         return result
 
-    def get_playlist_items(self, ids=None, batch_id=None, defer_cache=False):
+    def get_playlist_items(self,
+                           ids=None,
+                           batch_id=None,
+                           page_token=None,
+                           defer_cache=False):
         if not ids and not batch_id:
             return None
 
@@ -315,6 +319,10 @@ class ResourceManager(object):
         if batch_id:
             ids = [batch_id[0]]
             page_token = batch_id[1]
+            fetch_next = False
+        elif page_token is None:
+            fetch_next = True
+        elif len(ids) == 1:
             fetch_next = False
         else:
             page_token = None
@@ -399,6 +407,8 @@ class ResourceManager(object):
                 if batch_id in result
             }
 
+        if not fetch_next:
+            return result[batch_ids[0]]
         return result
 
     def get_related_playlists(self, channel_id, defer_cache=False):

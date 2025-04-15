@@ -486,7 +486,6 @@ class Provider(AbstractProvider):
         json_data = resource_manager.get_playlist_items(batch_id=batch_id)
         if not json_data:
             return False
-        json_data = json_data[batch_id]
 
         live_streams = provider.get_client(context).get_browse_videos(
             channel_id=channel_id,
@@ -588,7 +587,7 @@ class Provider(AbstractProvider):
         if not json_data:
             return False
         result = v3.response_to_items(
-            provider, context, json_data[batch_id],
+            provider, context, json_data,
             item_filter={
                 'shorts': True,
             },
@@ -629,7 +628,7 @@ class Provider(AbstractProvider):
         json_data = resource_manager.get_playlist_items(batch_id=batch_id)
         if not json_data:
             return False
-        result = v3.response_to_items(provider, context, json_data[batch_id])
+        result = v3.response_to_items(provider, context, json_data)
         return result
 
     @AbstractProvider.register_path(
@@ -797,7 +796,6 @@ class Provider(AbstractProvider):
                 'playlist_id': filtered_uploads or uploads,
             })
 
-            json_data = json_data[batch_id]
             if not filtered_uploads:
                 def filler(json_data, remaining):
                     next_page_token = json_data.get('nextPageToken')
@@ -811,7 +809,6 @@ class Provider(AbstractProvider):
                     )
                     if not new_json_data:
                         return None
-                    new_json_data = new_json_data[next_batch_id]
                     new_json_data['_filler'] = filler
                     return new_json_data
 
