@@ -207,8 +207,8 @@ def _process_description_links(provider, context):
             yt_item = video_data[video_id] if video_data else None
             if not yt_item or 'snippet' not in yt_item:
                 context.get_ui().on_ok(
-                    title=context.localize('video.description.links'),
-                    text=context.localize('video.description.links.not_found')
+                    title=context.localize('video.description_links'),
+                    text=context.localize('video.description_links.not_found')
                 )
                 return False
             snippet = yt_item['snippet']
@@ -241,8 +241,8 @@ def _process_description_links(provider, context):
         if result:
             return result
         context.get_ui().on_ok(
-            title=context.localize('video.description.links'),
-            text=context.localize('video.description.links.not_found')
+            title=context.localize('video.description_links'),
+            text=context.localize('video.description_links.not_found')
         )
         return False
 

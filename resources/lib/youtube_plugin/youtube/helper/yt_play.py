@@ -46,7 +46,7 @@ def _play_stream(provider, context):
     params = context.get_params()
     video_id = params.get('video_id')
     if not video_id:
-        message = context.localize('error.no_video_streams_found')
+        message = context.localize('error.no_streams_found')
         ui.show_notification(message, time_ms=5000)
         return False
 
@@ -95,7 +95,7 @@ def _play_stream(provider, context):
             return False
 
         if not streams:
-            message = context.localize('error.no_video_streams_found')
+            message = context.localize('error.no_streams_found')
             ui.show_notification(message, time_ms=5000)
             return False
 
