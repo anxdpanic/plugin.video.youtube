@@ -66,6 +66,7 @@ class XbmcContext(AbstractContext):
     }
 
     LOCAL_MAP = {
+        'after_watch.play_suggested': 30582,
         'api.config': 30634,
         'api.config.bookmark': 30638,
         'api.config.not_updated': 30635,
@@ -121,6 +122,7 @@ class XbmcContext(AbstractContext):
         'delete': 117,
         'disliked.video': 30717,
         'error.no_streams_found': 30549,
+        'error.no_videos_found': 30545,
         'error.rtmpe_not_supported': 30542,
         'failed': 30576,
         'feeds': 30518,

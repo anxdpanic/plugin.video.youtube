@@ -1274,7 +1274,11 @@ def add_related_video_to_playlist(provider, context, client, v3, video_id):
                                                     process_next_page=False)
                 page_token = json_data.get('nextPageToken', '')
             except Exception:
-                context.get_ui().show_notification('Failed to add a suggested video.', time_ms=5000)
+                context.get_ui().show_notification(
+                    context.localize('error.no_videos_found'),
+                    header=context.localize('after_watch.play_suggested'),
+                    time_ms=5000,
+                )
 
             if result_items:
                 add_item = next((
