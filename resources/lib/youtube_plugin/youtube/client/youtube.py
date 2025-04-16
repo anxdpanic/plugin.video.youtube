@@ -21,6 +21,7 @@ from re import compile as re_compile
 from .login_client import LoginClient
 from ..helper.stream_info import StreamInfo
 from ..helper.utils import channel_filter_split
+from ..helper.v3 import pre_fill
 from ..youtube_exceptions import InvalidJSON, YouTubeException
 from ...kodion.compatibility import available_cpu_count, string_type, to_str
 from ...kodion.items import DirectoryItem
@@ -639,8 +640,14 @@ class YouTube(LoginClient):
 
         # Fetch related videos. Use threads for faster execution.
         def threaded_get_related(video_id, func, *args, **kwargs):
-            related = self.get_related_videos(video_id,
-                                              max_results=items_per_page)
+            filler = partial(
+                self.get_related_videos,
+                video_id,
+            )
+            related = pre_fill(filler,
+                               filler(),
+                               max_results=items_per_page,
+                               exclude=[])
             if related and 'items' in related:
                 func(related['items'][:items_per_page], *args, **kwargs)
 
@@ -1334,15 +1341,26 @@ class YouTube(LoginClient):
     def get_related_videos(self,
                            video_id,
                            page_token='',
-                           max_results=0,
-                           offset=0,
                            retry=0,
+                           visitor=None,
+                           click_tracking=None,
                            **kwargs):
-        max_results = self.max_results() if max_results <= 0 else max_results
-
         post_data = {'videoId': video_id}
+
         if page_token:
             post_data['continuation'] = page_token
+
+        if click_tracking or visitor:
+            context = {}
+            if click_tracking:
+                context['clickTracking'] = {
+                    'clickTrackingParams': click_tracking,
+                }
+            if visitor:
+                context['client'] = {
+                    'visitorData': visitor,
+                }
+            post_data['context'] = context
 
         result = self.api_request(client=('tv' if retry == 1 else
                                           'tv_embed' if retry == 2 else
@@ -1390,7 +1408,7 @@ class YouTube(LoginClient):
                 'results',
             )
         ) + (
-            slice(offset, None, None),
+            slice(None),
             (
                 'pivotVideoRenderer',
                 # 'videoId',
@@ -1399,13 +1417,17 @@ class YouTube(LoginClient):
                 # 'videoId',
             ) if retry == 2 else (
                 (
+                    'lockupViewModel',
+                    # 'contentId',
+                ),
+                (
                     'compactVideoRenderer',
                     # 'videoId',
                 ),
                 (
                     'continuationItemRenderer',
                     'continuationEndpoint',
-                    'continuationCommand',
+                    # 'continuationCommand',
                     # 'token',
                 ),
             ),
@@ -1414,7 +1436,6 @@ class YouTube(LoginClient):
             return {} if retry > 1 else self.get_related_videos(
                 video_id,
                 page_token=page_token,
-                max_results=max_results,
                 retry=(retry + 1),
                 **kwargs
             )
@@ -1454,83 +1475,103 @@ class YouTube(LoginClient):
         if retry == 1:
             related_videos = chain.from_iterable(related_videos)
 
-        items = [{
-            'kind': 'youtube#video',
-            'id': video['videoId'],
-            '_related_video_id': video_id,
-            '_related_channel_id': channel_id,
-            '_partial': True,
-            'snippet': {
-                'title': self.json_traverse(video, path=(
-                    'title',
-                    (
-                        (
-                            'simpleText',
-                        ),
-                        (
+        items = []
+        for video in related_videos:
+            if not video:
+                continue
+            new_video_id = video.get('videoId')
+            new_content_id = video.get('contentId')
+            if new_video_id:
+                items.append({
+                    'kind': 'youtube#video',
+                    'id': new_video_id,
+                    '_related_video_id': video_id,
+                    '_related_channel_id': channel_id,
+                    '_partial': True,
+                    'snippet': {
+                        'title': self.json_traverse(video, path=(
+                            'title',
+                            (
+                                (
+                                    'simpleText',
+                                ),
+                                (
+                                    'runs',
+                                    0,
+                                    'text'
+                                ),
+                            )
+                        )),
+                        'thumbnails': video['thumbnail']['thumbnails'],
+                        'channelId': self.json_traverse(video, path=(
+                            ('longBylineText', 'shortBylineText'),
                             'runs',
                             0,
-                            'text'
-                        ),
-                    )
-                )),
-                'thumbnails': video['thumbnail']['thumbnails'],
-                'channelId': self.json_traverse(video, path=(
-                    ('longBylineText', 'shortBylineText'),
-                    'runs',
-                    0,
-                    'navigationEndpoint',
-                    'browseEndpoint',
-                    'browseId',
-                )),
-            }
-        } for video in related_videos if video and 'videoId' in video]
+                            'navigationEndpoint',
+                            'browseEndpoint',
+                            'browseId',
+                        )),
+                    },
+                })
+            elif new_content_id:
+                items.append({
+                    'kind': 'youtube#video',
+                    'id': new_content_id,
+                    '_related_video_id': video_id,
+                    '_related_channel_id': channel_id,
+                    '_partial': True,
+                    'snippet': {
+                        'title': self.json_traverse(video, path=(
+                            'metadata',
+                            'lockupMetadataViewModel',
+                            'title',
+                            'content',
+                        )),
+                        'thumbnails': self.json_traverse(video, path=(
+                            'contentImage',
+                            'thumbnailViewModel',
+                            'image',
+                            'sources',
+                        )),
+                        'channelId': self.json_traverse(video, path=(
+                            'metadata',
+                            'lockupMetadataViewModel',
+                            'image',
+                            'decoratedAvatarViewModel',
+                            'rendererContext',
+                            'commandContext',
+                            'onTap',
+                            'innertubeCommand',
+                            'browseEndpoint',
+                            'browseId',
+                        )),
+                    },
+                })
+
+        if retry:
+            page_token = ''
+            click_tracking = ''
+        else:
+            continuation = related_videos[-1]
+            page_token = self.json_traverse(continuation, path=(
+                'continuationCommand',
+                'token',
+            ))
+            if page_token:
+                click_tracking = continuation.get('clickTrackingParams', '')
+            else:
+                click_tracking = ''
 
         v3_response = {
             'kind': 'youtube#videoListResponse',
-            'items': [],
+            'items': items or [],
+            'nextPageToken': page_token,
+            'visitorData': self.json_traverse(result, path=(
+                'responseContext',
+                'visitorData',
+            )),
+            'clickTracking': click_tracking,
         }
-
-        if not retry:
-            last_item = related_videos[-1]
-            if last_item and 'token' in last_item:
-                page_token = last_item['token']
-
-        while 1:
-            remaining = max_results - len(items)
-            if remaining < 0:
-                items = items[:max_results]
-                if page_token:
-                    v3_response['nextPageToken'] = page_token
-                v3_response['offset'] = remaining
-                break
-
-            if not page_token:
-                break
-
-            if not remaining:
-                v3_response['nextPageToken'] = page_token
-                break
-
-            continuation = self.get_related_videos(
-                video_id,
-                page_token=page_token,
-                max_results=remaining,
-                **kwargs
-            )
-            if not continuation:
-                break
-            if 'nextPageToken' in continuation:
-                page_token = continuation['nextPageToken']
-            else:
-                page_token = ''
-            if 'items' in continuation:
-                items.extend(continuation['items'])
-
-        if items:
-            v3_response['items'] = items
-        else:
-            v3_response = None
         return v3_response
 
     def get_parent_comments(self,

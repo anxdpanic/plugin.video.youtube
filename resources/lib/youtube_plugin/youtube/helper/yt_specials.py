@@ -22,10 +22,10 @@ from ...kodion.utils import strip_html_from_text
 def _process_related_videos(provider, context, client):
     context.set_content(CONTENT.VIDEO_CONTENT)
     function_cache = context.get_function_cache()
-
-    params = context.get_params()
-    video_id = params.get('video_id')
     refresh = context.refresh_requested()
+    params = context.get_params()
+
+    video_id = params.get('video_id')
     if video_id:
         json_data = function_cache.run(
             client.get_related_videos,
@@ -33,20 +33,32 @@ def _process_related_videos(provider, context, client):
             _refresh=refresh,
             video_id=video_id,
             page_token=params.get('page_token', ''),
-            offset=params.get('offset', 0),
         )
+        if not json_data:
+            return False
+
+        filler = partial(
+            function_cache.run,
+            client.get_related_videos,
+            function_cache.ONE_HOUR,
+            _refresh=refresh,
+            video_id=video_id,
+        )
+        json_data['_pre_filler'] = filler
+        json_data['_post_filler'] = filler
     else:
         json_data = function_cache.run(
             client.get_related_for_home,
             function_cache.ONE_HOUR,
             _refresh=refresh,
-            page_token=params.get('page_token', ''),
-            refresh=refresh,
         )
+        if not json_data:
+            return False
 
-    if not json_data:
-        return False
-    return v3.response_to_items(provider, context, json_data)
+    return v3.response_to_items(provider,
+                                context,
+                                json_data,
+                                allow_duplicates=False)
 
 
 def _process_comments(provider, context, client):
