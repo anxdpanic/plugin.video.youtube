@@ -1253,50 +1253,49 @@ def get_shelf_index_by_title(context, json_data, shelf_title):
 
 def add_related_video_to_playlist(provider, context, client, v3, video_id):
     playlist_player = context.get_playlist_player()
+    if playlist_player.size() > 999:
+        return
+    playlist_items = playlist_player.get_items()
 
-    if playlist_player.size() <= 999:
-        a = 0
-        add_item = None
-        page_token = ''
-        playlist_items = playlist_player.get_items()
+    next_item = None
+    page_token = ''
+    for _ in range(2):
+        json_data = client.get_related_videos(
+            video_id,
+            page_token=page_token,
+        )
+        if not json_data:
+            break
 
-        while not add_item and a <= 2:
-            a += 1
-            result_items = []
+        result_items = v3.response_to_items(
+            provider,
+            context,
+            json_data,
+            process_next_page=False,
+        )
 
-            try:
-                json_data = client.get_related_videos(video_id,
-                                                      page_token=page_token,
-                                                      max_results=5)
-                result_items = v3.response_to_items(provider,
-                                                    context,
-                                                    json_data,
-                                                    process_next_page=False)
-                page_token = json_data.get('nextPageToken', '')
-            except Exception:
-                context.get_ui().show_notification(
-                    context.localize('error.no_videos_found'),
-                    header=context.localize('after_watch.play_suggested'),
-                    time_ms=5000,
-                )
+        try:
+            next_item = next((
+                item for item in result_items
+                if item
+                   and not any((item.get_uri() == playlist_item.get('file')
+                                or item.get_name() == playlist_item.get('title')
+                                for playlist_item in playlist_items))
+            ))
+        except StopIteration:
+            page_token = json_data.get('nextPageToken')
 
-            if result_items:
-                add_item = next((
-                    item for item in result_items
-                    if not any((item.get_uri() == pitem.get('file') or
-                                item.get_name() == pitem.get('title'))
-                               for pitem in playlist_items)),
-                    None)
+        if not page_token:
+            break
 
-            if not add_item and page_token:
-                continue
-
-            if add_item:
-                playlist_player.add(add_item)
-                break
-
-            if not page_token:
-                break
+    if next_item:
+        playlist_player.add(next_item)
+    else:
+        context.get_ui().show_notification(
+            context.localize('error.no_videos_found'),
+            header=context.localize('after_watch.play_suggested'),
+            time_ms=5000,
+        )
 
 
 def filter_videos(items,
