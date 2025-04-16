@@ -61,7 +61,6 @@ class AbstractContext(Logger):
         PLAY_STRM,
         PLAY_TIMESHIFT,
         PLAY_WITH,
-        'back_fill',
         'confirmed',
         'clip',
         'enable',
@@ -84,6 +83,7 @@ class AbstractContext(Logger):
     }
     _INT_PARAMS = {
         'fanart_type',
+        'filtered',
         'items_per_page',
         'live',
         'next_page_token',
