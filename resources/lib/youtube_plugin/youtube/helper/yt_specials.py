@@ -10,6 +10,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from functools import partial
+
 from . import UrlResolver, UrlToItemConverter, tv, utils, v3
 from ...kodion import KodionException
 from ...kodion.constants import CONTENT, PATHS
@@ -78,15 +80,16 @@ def _process_comments(provider, context, client):
 
 def _process_recommendations(provider, context, client):
     context.set_content(CONTENT.VIDEO_CONTENT)
-    params = context.get_params()
     function_cache = context.get_function_cache()
+    refresh = context.refresh_requested()
+    params = context.get_params()
     # source = client.get_recommended_for_home_tv
     source = client.get_recommended_for_home_vr
 
     json_data = function_cache.run(
         source,
         function_cache.ONE_HOUR,
-        _refresh=context.refresh_requested(),
+        _refresh=refresh,
         visitor=params.get('visitor'),
         page_token=params.get('page_token'),
         click_tracking=params.get('click_tracking'),
@@ -94,23 +97,15 @@ def _process_recommendations(provider, context, client):
     if not json_data:
         return False
 
-    def filler(json_data, _remaining):
-        page_token = json_data.get('nextPageToken')
-        if not page_token:
-            return None
+    filler = partial(
+        function_cache.run,
+        source,
+        function_cache.ONE_HOUR,
+        _refresh=refresh,
+    )
+    json_data['_pre_filler'] = filler
+    json_data['_post_filler'] = filler
 
-        json_data = function_cache.run(
-            source,
-            function_cache.ONE_HOUR,
-            _refresh=context.refresh_requested(),
-            visitor=json_data.get('visitorData'),
-            page_token=page_token,
-            click_tracking=json_data.get('clickTracking'),
-        )
-        json_data['_filler'] = filler
-        return json_data
-
-    json_data['_filler'] = filler
     return v3.response_to_items(provider,
                                 context,
                                 json_data,
@@ -119,25 +114,26 @@ def _process_recommendations(provider, context, client):
 
 def _process_trending(provider, context, client):
     context.set_content(CONTENT.VIDEO_CONTENT)
+    function_cache = context.get_function_cache()
+    refresh = context.refresh_requested()
 
-    json_data = client.get_trending_videos(
-        page_token=context.get_param('page_token')
+    json_data = function_cache.run(
+        client.get_trending_videos,
+        function_cache.ONE_HOUR,
+        _refresh=refresh,
+        page_token=context.get_param('page_token'),
     )
     if not json_data:
         return False
 
-    def filler(json_data, _remaining):
-        page_token = json_data.get('nextPageToken')
-        if not page_token:
-            return None
+    filler = partial(
+        function_cache.run,
+        client.get_trending_videos,
+        function_cache.ONE_HOUR,
+        _refresh=refresh,
+    )
+    json_data['_post_filler'] = filler
 
-        json_data = client.get_trending_videos(
-            page_token=page_token,
-        )
-        json_data['_filler'] = filler
-        return json_data
-
-    json_data['_filler'] = filler
     return v3.response_to_items(provider, context, json_data)
 
 
@@ -362,24 +358,16 @@ def _process_my_subscriptions(provider,
         if not json_data:
             return False
 
-        def filler(json_data, _remaining):
-            page_token = json_data.get('nextPageToken')
-            if not page_token:
-                return None
-
-            json_data = client.get_my_subscriptions(
-                page_token=json_data.get('nextPageToken'),
-                logged_in=logged_in,
-                do_filter=filtered,
-                feed_type=feed_type,
-                refresh=refresh,
-                use_cache=True,
-                progress_dialog=progress_dialog,
-            )
-            json_data['_filler'] = filler
-            return json_data
-
-        json_data['_filler'] = filler
+        filler = partial(
+            client.get_my_subscriptions,
+            logged_in=logged_in,
+            do_filter=filtered,
+            feed_type=feed_type,
+            refresh=refresh,
+            use_cache=True,
+            progress_dialog=progress_dialog,
+        )
+        json_data['_post_filler'] = filler
 
         if filtered:
             my_subscriptions_path = PATHS.MY_SUBSCRIPTIONS_FILTERED

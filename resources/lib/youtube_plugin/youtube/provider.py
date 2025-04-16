@@ -12,6 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from atexit import register as atexit_register
 from base64 import b64decode
+from functools import partial
 from json import loads as json_loads
 from re import compile as re_compile
 from weakref import proxy
@@ -797,22 +798,13 @@ class Provider(AbstractProvider):
             })
 
             if not filtered_uploads:
-                def filler(json_data, remaining):
-                    next_page_token = json_data.get('nextPageToken')
-                    if not next_page_token or remaining <= 0:
-                        return None
+                filler = partial(
+                    resource_manager.get_playlist_items,
+                    ids=(uploads,),
+                    defer_cache=False,
+                )
+                json_data['_post_filler'] = filler
 
-                    next_batch_id = (uploads, next_page_token)
-                    new_json_data = resource_manager.get_playlist_items(
-                        batch_id=next_batch_id,
-                        defer_cache=False,
-                    )
-                    if not new_json_data:
-                        return None
-                    new_json_data['_filler'] = filler
-                    return new_json_data
-
-                json_data['_filler'] = filler
             result.extend(v3.response_to_items(
                 provider, context, json_data,
                 item_filter={
