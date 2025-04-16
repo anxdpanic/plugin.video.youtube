@@ -406,14 +406,14 @@ def _process_my_subscriptions(provider,
             provider, context, json_data,
             item_filter={
                 'live_folder': True,
-                'shorts': False,
+                'shorts': True,
             } if feed_type == 'live' else {
                 'live': False,
                 'shorts': True,
                 'upcoming_live': False,
             } if feed_type == 'shorts' else {
                 'live': False,
-                'shorts': False,
+                'shorts': True,
                 'upcoming_live': False,
             }
         ))
