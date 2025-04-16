@@ -455,7 +455,7 @@ def _process_list_response(provider,
             ),
             'kwargs': {
                 '_force_run': True,
-                'defer_cache': True,
+                'defer_cache': False,
             },
             'thread': None,
             'updater': update_channel_items,
