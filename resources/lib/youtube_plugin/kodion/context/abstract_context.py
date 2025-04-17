@@ -309,7 +309,7 @@ class AbstractContext(Logger):
                     (('%' + param, ','.join([quote(item) for item in value]))
                      if len(value) > 1 else
                      (param, value[0]))
-                    if isinstance(value, (list, tuple)) else
+                    if value and isinstance(value, (list, tuple)) else
                     (param, value)
                     for param, value in params
                 ])
