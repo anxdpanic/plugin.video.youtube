@@ -100,6 +100,8 @@ def make_comment_item(context, snippet, uri, reply_count=0):
         ))))
         label_props.append(label_replies)
         plot_props.append(plot_replies)
+    else:
+        replies_value = 0
 
     published_at = snippet['publishedAt']
     updated_at = snippet['updatedAt']
@@ -141,7 +143,7 @@ def make_comment_item(context, snippet, uri, reply_count=0):
             plot=plot,
         )
 
-    comment_item.set_count(reply_count)
+    comment_item.set_count(replies_value)
 
     comment_item.set_short_details(label_stats)
     comment_item.set_production_code(label_stats)
