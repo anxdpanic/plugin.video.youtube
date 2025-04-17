@@ -268,7 +268,6 @@ class XbmcPlugin(AbstractPlugin):
         else:
             succeeded = bool(result)
             if not succeeded:
-                ui.clear_property(CONTENT_TYPE)
                 ui.clear_property(BUSY_FLAG)
                 for param in FORCE_PLAY_PARAMS:
                     ui.clear_property(param)
@@ -276,9 +275,11 @@ class XbmcPlugin(AbstractPlugin):
                 uri = context.get_uri()
                 fallback = options.get(provider.FALLBACK, True)
                 if isinstance(fallback, string_type) and fallback != uri:
+                    ui.clear_property(CONTENT_TYPE)
                     context.parse_uri(fallback, update=True)
                     return self.run(provider, context, forced=forced)
                 if fallback:
+                    ui.clear_property(CONTENT_TYPE)
                     _post_run_action = None
 
                     if context.is_plugin_folder():
