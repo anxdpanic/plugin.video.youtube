@@ -35,7 +35,7 @@ from .items import (
     SearchHistoryItem,
     UriItem,
 )
-from .utils import to_unicode
+from .utils import format_stack, to_unicode
 
 
 class AbstractProvider(object):
@@ -316,7 +316,10 @@ class AbstractProvider(object):
                     )
         except Exception as exc:
             context.log_error('Rerouting - Error'
-                              '\n\tException: {exc!r}'.format(exc=exc))
+                              '\n\tException: {exc!r}'
+                              '\n\tStack trace (most recent call last):\n{stack}'
+                              .format(exc=exc,
+                                      stack=format_stack()))
         finally:
             uri = context.create_uri(path, params)
             if result or not window_cache:
