@@ -659,6 +659,7 @@ def media_listitem(context,
                    media_item,
                    show_fanart=None,
                    focused=None,
+                   played=None,
                    **_kwargs):
     uri = media_item.get_uri()
     context.log_debug('Converting %s |%s|' % (media_item.__class__.__name__,
@@ -697,8 +698,11 @@ def media_listitem(context,
     resume = True
     prop_value = media_item.video_id
     if prop_value:
-        if focused and focused == prop_value:
+        if focused and prop_value == focused:
             set_play_count = False
+            resume = False
+        if played and prop_value == played:
+            set_play_count = 'forced'
             resume = False
         props[VIDEO_ID] = prop_value
 
@@ -740,7 +744,7 @@ def media_listitem(context,
     set_info(list_item,
              media_item,
              props,
-             set_play_count=set_play_count,
+             set_play_count=set_play_count and set_play_count != 'forced',
              resume=resume)
 
     if not set_play_count:

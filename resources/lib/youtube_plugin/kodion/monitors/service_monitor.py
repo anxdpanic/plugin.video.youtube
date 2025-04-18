@@ -18,6 +18,8 @@ from ..constants import (
     CHECK_SETTINGS,
     CONTAINER_FOCUS,
     PATHS,
+    PLAYBACK_STOPPED,
+    PLAYER_VIDEO_ID,
     PLAY_FORCED,
     PLUGIN_WAKEUP,
     REFRESH_CONTAINER,
@@ -220,6 +222,15 @@ class ServiceMonitor(xbmc.Monitor):
         elif event == RELOAD_ACCESS_MANAGER:
             self._context.reload_access_manager()
             self.refresh_container()
+
+        elif event == PLAYBACK_STOPPED:
+            if data:
+                data = json.loads(data)
+            if not data:
+                return
+
+            if data.get('play_data', {}).get('play_count'):
+                self.set_property(PLAYER_VIDEO_ID, data.get('video_id'))
 
     def onSettingsChanged(self, force=False):
         context = self._context

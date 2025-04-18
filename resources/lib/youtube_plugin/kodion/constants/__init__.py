@@ -96,6 +96,7 @@ DEVELOPER_CONFIGS = 'configs'
 LICENSE_TOKEN = 'license_token'
 LICENSE_URL = 'license_url'
 PLAYER_DATA = 'player_json'
+PLAYER_VIDEO_ID = 'player_video_id'
 PLAYLIST_PATH = 'playlist_path'
 PLAYLIST_POSITION = 'playlist_position'
 REROUTE_PATH = 'reroute_path'
@@ -165,6 +166,7 @@ __all__ = (
     'LICENSE_TOKEN',
     'LICENSE_URL',
     'PLAYER_DATA',
+    'PLAYER_VIDEO_ID',
     'PLAYLIST_PATH',
     'PLAYLIST_POSITION',
     'REROUTE_PATH',

@@ -21,6 +21,7 @@ from ...constants import (
     FORCE_PLAY_PARAMS,
     PATHS,
     PLAYBACK_FAILED,
+    PLAYER_VIDEO_ID,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
     PLAY_FORCED,
@@ -166,11 +167,6 @@ class XbmcPlugin(AbstractPlugin):
         if ui.get_property(PLUGIN_SLEEPING):
             context.wakeup(PLUGIN_WAKEUP)
 
-        if not ui.pop_property(REFRESH_CONTAINER) and forced:
-            focused = ui.get_property(VIDEO_ID)
-        else:
-            focused = False
-
         if ui.pop_property(RELOAD_ACCESS_MANAGER):
             context.reload_access_manager()
 
@@ -205,6 +201,18 @@ class XbmcPlugin(AbstractPlugin):
                 context.log_error(msg)
                 ui.on_ok('Error in ContentProvider', exc.__str__())
 
+        if not ui.pop_property(REFRESH_CONTAINER) and forced:
+            player_video_id = ui.pop_property(PLAYER_VIDEO_ID)
+            if player_video_id:
+                focused_video_id = None
+                played_video_id = player_video_id
+            else:
+                focused_video_id = ui.get_property(VIDEO_ID)
+                played_video_id = None
+        else:
+            focused_video_id = None
+            played_video_id = None
+
         items = isinstance(result, (list, tuple))
         item_count = 0
         if items:
@@ -228,7 +236,8 @@ class XbmcPlugin(AbstractPlugin):
                     context,
                     item,
                     show_fanart=show_fanart,
-                    focused=focused,
+                    focused=focused_video_id,
+                    played=played_video_id,
                 )
                 for item in result
                 if self.classify_list_item(item, options, force_resolve)
