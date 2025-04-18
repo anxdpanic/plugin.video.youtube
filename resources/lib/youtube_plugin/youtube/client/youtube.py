@@ -1476,11 +1476,11 @@ class YouTube(LoginClient):
             related_videos = chain.from_iterable(related_videos)
 
         items = []
-        for video in related_videos:
-            if not video:
+        for item in related_videos:
+            if not item:
                 continue
-            new_video_id = video.get('videoId')
-            new_content_id = video.get('contentId')
+            new_video_id = item.get('videoId')
+            new_content_id = item.get('contentId')
             if new_video_id:
                 items.append({
                     'kind': 'youtube#video',
@@ -1489,7 +1489,7 @@ class YouTube(LoginClient):
                     '_related_channel_id': channel_id,
                     '_partial': True,
                     'snippet': {
-                        'title': self.json_traverse(video, path=(
+                        'title': self.json_traverse(item, path=(
                             'title',
                             (
                                 (
@@ -1502,8 +1502,8 @@ class YouTube(LoginClient):
                                 ),
                             )
                         )),
-                        'thumbnails': video['thumbnail']['thumbnails'],
-                        'channelId': self.json_traverse(video, path=(
+                        'thumbnails': item['thumbnail']['thumbnails'],
+                        'channelId': self.json_traverse(item, path=(
                             ('longBylineText', 'shortBylineText'),
                             'runs',
                             0,
@@ -1514,39 +1514,87 @@ class YouTube(LoginClient):
                     },
                 })
             elif new_content_id:
-                items.append({
-                    'kind': 'youtube#video',
-                    'id': new_content_id,
-                    '_related_video_id': video_id,
-                    '_related_channel_id': channel_id,
-                    '_partial': True,
-                    'snippet': {
-                        'title': self.json_traverse(video, path=(
-                            'metadata',
-                            'lockupMetadataViewModel',
-                            'title',
-                            'content',
-                        )),
-                        'thumbnails': self.json_traverse(video, path=(
-                            'contentImage',
-                            'thumbnailViewModel',
-                            'image',
-                            'sources',
-                        )),
-                        'channelId': self.json_traverse(video, path=(
-                            'metadata',
-                            'lockupMetadataViewModel',
-                            'image',
-                            'decoratedAvatarViewModel',
-                            'rendererContext',
-                            'commandContext',
-                            'onTap',
-                            'innertubeCommand',
-                            'browseEndpoint',
-                            'browseId',
-                        )),
-                    },
-                })
+                content_type = item.get('contentType')
+                if content_type == 'LOCKUP_CONTENT_TYPE_VIDEO':
+                    items.append({
+                        'kind': 'youtube#video',
+                        'id': new_content_id,
+                        '_related_video_id': video_id,
+                        '_related_channel_id': channel_id,
+                        '_partial': True,
+                        'snippet': {
+                            'title': self.json_traverse(item, path=(
+                                'metadata',
+                                'lockupMetadataViewModel',
+                                'title',
+                                'content',
+                            )),
+                            'thumbnails': self.json_traverse(item, path=(
+                                'contentImage',
+                                'thumbnailViewModel',
+                                'image',
+                                'sources',
+                            )),
+                            'channelId': self.json_traverse(item, path=(
+                                'metadata',
+                                'lockupMetadataViewModel',
+                                'image',
+                                'decoratedAvatarViewModel',
+                                'rendererContext',
+                                'commandContext',
+                                'onTap',
+                                'innertubeCommand',
+                                'browseEndpoint',
+                                'browseId',
+                            )),
+                        },
+                    })
+                elif content_type == 'LOCKUP_CONTENT_TYPE_PLAYLIST':
+                    items.append({
+                        'kind': 'youtube#playlist',
+                        'id': new_content_id,
+                        '_related_video_id': video_id,
+                        '_related_channel_id': channel_id,
+                        '_partial': True,
+                        'snippet': {
+                            'title': self.json_traverse(item, path=(
+                                'metadata',
+                                'lockupMetadataViewModel',
+                                'title',
+                                'content',
+                            )),
+                            'thumbnails': self.json_traverse(item, path=(
+                                'contentImage',
+                                'collectionThumbnailViewModel',
+                                'primaryThumbnail',
+                                'thumbnailViewModel',
+                                'image',
+                                'sources',
+                            )),
+                            'channelId': self.json_traverse(item, path=(
+                                'metadata',
+                                'lockupMetadataViewModel',
+                                'image',
+                                'decoratedAvatarViewModel',
+                                'rendererContext',
+                                'commandContext',
+                                'onTap',
+                                'innertubeCommand',
+                                'browseEndpoint',
+                                'browseId',
+                            )),
+                            'resourceId': {
+                                'videoId': self.json_traverse(item, path=(
+                                    'rendererContext',
+                                    'commandContext',
+                                    'onTap',
+                                    'innertubeCommand',
+                                    'watchEndpoint',
+                                    'videoId',
+                                )),
+                            },
+                        },
+                    })
 
         if retry:
             page_token = ''

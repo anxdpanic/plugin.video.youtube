@@ -263,6 +263,9 @@ def _process_list_response(provider,
                     item_params,
                 )
             else:
+                video_id = snippet.get('resourceId', {}).get('videoId')
+                if video_id:
+                    item_params['video_id'] = item_id
                 item_uri = context.create_uri(
                     (PATHS.PLAYLIST, item_id,),
                     item_params,
