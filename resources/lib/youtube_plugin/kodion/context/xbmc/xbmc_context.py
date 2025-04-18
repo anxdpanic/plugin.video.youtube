@@ -29,6 +29,7 @@ from ...constants import (
     CONTENT,
     CONTENT_TYPE,
     PLAY_FORCE_AUDIO,
+    REROUTE_CONTENT_TYPE,
     SORT,
     WAKEUP,
 )
@@ -574,10 +575,15 @@ class XbmcContext(AbstractContext):
 
     def set_content(self, content_type, sub_type=None, category_label=None):
         ui = self.get_ui()
-        ui.set_property(CONTENT_TYPE, json.dumps(
-            (content_type, sub_type, category_label),
-            ensure_ascii=False,
-        ))
+        ui.set_property(
+            REROUTE_CONTENT_TYPE
+            if ui.get_property(REROUTE_CONTENT_TYPE) == CONTENT_TYPE else
+            CONTENT_TYPE,
+            json.dumps(
+                (content_type, sub_type, category_label),
+                ensure_ascii=False,
+            ),
+        )
 
     def apply_content(self):
         # ui local variable used for ui.get_view_manager() in unofficial version

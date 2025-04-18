@@ -20,7 +20,9 @@ from .constants import (
     CONTAINER_ID,
     CONTAINER_POSITION,
     CONTENT,
+    CONTENT_TYPE,
     PATHS,
+    REROUTE_CONTENT_TYPE,
     REROUTE_PATH,
     WINDOW_CACHE,
     WINDOW_FALLBACK,
@@ -315,6 +317,7 @@ class AbstractProvider(object):
             if window_cache:
                 function_cache = context.get_function_cache()
                 with ui.on_busy():
+                    ui.set_property(REROUTE_CONTENT_TYPE, CONTENT_TYPE)
                     result, options = function_cache.run(
                         self.navigate,
                         _refresh=True,
@@ -342,6 +345,7 @@ class AbstractProvider(object):
                                           window_replace=window_replace,
                                           window_return=window_return))
             else:
+                ui.clear_property(REROUTE_CONTENT_TYPE)
                 context.log_debug('Rerouting - No results'
                                   '\n\tURI: {uri}'
                                   .format(uri=uri))
@@ -353,6 +357,10 @@ class AbstractProvider(object):
 
             if window_cache:
                 ui.set_property(REROUTE_PATH, path)
+                ui.set_property(
+                    CONTENT_TYPE,
+                    ui.pop_property(REROUTE_CONTENT_TYPE),
+                )
                 if container and position:
                     ui.set_property(CONTAINER_ID, container)
                     ui.set_property(CONTAINER_POSITION, position)

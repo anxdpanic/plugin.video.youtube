@@ -99,6 +99,7 @@ PLAYER_DATA = 'player_json'
 PLAYER_VIDEO_ID = 'player_video_id'
 PLAYLIST_PATH = 'playlist_path'
 PLAYLIST_POSITION = 'playlist_position'
+REROUTE_CONTENT_TYPE = 'reroute_content_type'
 REROUTE_PATH = 'reroute_path'
 
 # Routing parameters
@@ -169,6 +170,7 @@ __all__ = (
     'PLAYER_VIDEO_ID',
     'PLAYLIST_PATH',
     'PLAYLIST_POSITION',
+    'REROUTE_CONTENT_TYPE',
     'REROUTE_PATH',
 
     # Routing parameters
