@@ -255,11 +255,15 @@ class AbstractProvider(object):
 
     @staticmethod
     def on_reroute(provider, context, re_match):
-        return provider.reroute(context=context, path=re_match.group('path'))
+        return provider.reroute(
+            context=context,
+            path=re_match.group('path'),
+            params=context.get_params(),
+        )
 
     def reroute(self, context, path=None, params=None, uri=None):
-        current_path = context.get_path()
-        current_params = context.get_params()
+        container_uri = context.get_infolabel('Container.FolderPath')
+        current_path, current_params = context.parse_uri(container_uri)
 
         if uri is None:
             if path is None:
@@ -290,17 +294,20 @@ class AbstractProvider(object):
         container = None
         position = None
         refresh = params.get('refresh', 0)
-        if refresh:
+        if (refresh or (
+                params == current_params
+                and path.rstrip('/') == current_path.rstrip('/')
+        )):
             if refresh < 0:
                 del params['refresh']
             else:
                 container = context.get_infolabel('System.CurrentControlId')
                 position = context.get_infolabel('Container.CurrentItem')
-                params['refresh'] = refresh + 1
-        elif (params == current_params
-              and path.rstrip('/') == current_path.rstrip('/')):
-            context.log_error('Rerouting - Unable to reroute to current path')
-            return False
+                params['refresh'] = context.refresh_requested(
+                    force=True,
+                    on=True,
+                    params=params,
+                )
 
         ui = context.get_ui()
         result = None
@@ -368,12 +375,12 @@ class AbstractProvider(object):
             else:
                 context.execute(
                     action,
-                    wait=True,
+                    # wait=True,
                     # wait_for=(REROUTE_PATH if window_cache else None),
                     # wait_for_set=False,
                     # block_ui=True,
                 )
-        return True
+                return True
 
     @staticmethod
     def on_bookmarks(provider, context, re_match):

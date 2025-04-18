@@ -143,19 +143,17 @@ def _process_remove_video(provider,
             context.get_ui().set_focus_next_item()
 
         if playlist_id in container_uri:
-            uri = container_uri
-            path = None
-            params = {'refresh': context.refresh_requested(force=True, on=True)}
+            path, params = context.parse_uri(container_uri)
+            if 'refresh' not in params:
+                params['refresh'] = True
         else:
             path = params.pop('reload_path', False if confirmed else None)
-            uri = None
 
-        if uri or path is not False:
+        if path is not False:
             provider.reroute(
                 context,
                 path=path,
                 params=params,
-                uri=uri,
             )
         return True
     return False
