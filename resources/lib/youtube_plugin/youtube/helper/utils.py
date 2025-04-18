@@ -655,6 +655,8 @@ def update_video_items(provider, context, video_id_dict,
                 if duration.seconds:
                     # subtract 1s because YouTube duration is +1s too long
                     duration = duration.seconds - 1
+                else:
+                    duration = 0
         if duration:
             media_item.set_duration_from_seconds(duration)
             if duration <= shorts_duration:
