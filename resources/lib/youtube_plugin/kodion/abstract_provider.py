@@ -281,6 +281,8 @@ class AbstractProvider(object):
         if not path:
             context.log_error('Rerouting - No route path')
             return False
+        elif path.startswith(PATHS.ROUTE):
+            path = path[len(PATHS.ROUTE):]
 
         window_cache = params.pop(WINDOW_CACHE, True)
         window_fallback = params.pop(WINDOW_FALLBACK, False)
