@@ -39,11 +39,11 @@ from .utils import format_stack, to_unicode
 
 
 class AbstractProvider(object):
-    CACHE_TO_DISC = 'provider_cache_to_disc'  # (bool)
-    FALLBACK = 'provider_fallback'  # (bool, str)
-    FORCE_PLAY = 'provider_force_play'  # (bool)
-    FORCE_RESOLVE = 'provider_force_resolve'  # (bool)
-    UPDATE_LISTING = 'provider_update_listing'  # (bool)
+    CACHE_TO_DISC = 'provider_cache_to_disc'  # type: bool
+    FALLBACK = 'provider_fallback'  # type: bool | str
+    FORCE_PLAY = 'provider_force_play'  # type: bool
+    FORCE_RESOLVE = 'provider_force_resolve'  # type: bool
+    UPDATE_LISTING = 'provider_update_listing'  # type: bool
 
     # map for regular expression (path) to method (names)
     _dict_path = {}

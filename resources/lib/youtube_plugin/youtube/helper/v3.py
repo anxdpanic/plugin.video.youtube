@@ -206,7 +206,6 @@ def _process_list_response(provider,
             item_id = snippet['resourceId']['channelId']
             # map channel id with subscription id - needed to unsubscribe
             subscription_id_dict[item_id] = subscription_id
-
             item_uri = context.create_uri(
                 (PATHS.CHANNEL, item_id,),
                 item_params
@@ -238,7 +237,6 @@ def _process_list_response(provider,
                 uri_channel_id = channel_id
             if not uri_channel_id:
                 continue
-
             item_uri = context.create_uri(
                 (PATHS.CHANNEL, uri_channel_id, item_id,),
                 item_params,
@@ -283,7 +281,6 @@ def _process_list_response(provider,
         elif kind_type == 'playlistitem':
             playlist_item_id = item_id
             item_id = snippet['resourceId']['videoId']
-
             item_params['video_id'] = item_id
             item_uri = context.create_uri(
                 (PATHS.PLAY,),
@@ -317,7 +314,6 @@ def _process_list_response(provider,
                 item_id = details['upload']['videoId']
             else:
                 continue
-
             item_params['video_id'] = item_id
             item_uri = context.create_uri(
                 (PATHS.PLAY,),
@@ -344,7 +340,6 @@ def _process_list_response(provider,
             else:
                 item_uri = ''
                 reply_count = 0
-
             item = make_comment_item(context,
                                      snippet,
                                      uri=item_uri,
@@ -519,7 +514,9 @@ def _process_list_response(provider,
     }
 
     remaining = len(resources)
-    deferred = sum(1 for resource in resources.values() if resource['defer'])
+    deferred = len([
+        1 for resource in resources.values() if resource['defer']
+    ])
     completed = []
     iterator = iter(resources)
     threads['loop'].set()

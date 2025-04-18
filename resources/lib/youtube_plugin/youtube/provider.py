@@ -240,8 +240,8 @@ class Provider(AbstractProvider):
                 )
                 self.reset_client()
 
-        num_access_tokens = sum(1 for token in access_tokens if token)
-        num_refresh_tokens = sum(1 for token in refresh_tokens if token)
+        num_access_tokens = len([1 for token in access_tokens if token])
+        num_refresh_tokens = len([1 for token in refresh_tokens if token])
         context.log_debug(
             'Access token count: |{0}|, refresh token count: |{1}|'
             .format(num_access_tokens, num_refresh_tokens)
@@ -298,7 +298,7 @@ class Provider(AbstractProvider):
                         refresh_token=refresh_token,
                     )
 
-                num_access_tokens = sum(1 for token in access_tokens if token)
+                num_access_tokens = len([1 for token in access_tokens if token])
 
             if num_access_tokens and access_tokens[1]:
                 self._logged_in = True
@@ -703,16 +703,12 @@ class Provider(AbstractProvider):
         resource_manager = provider.get_resource_manager(context)
         result = []
 
-        page = params.get('page', 1)
-        page_token = params.get('page_token', '')
-        hide_folders = params.get('hide_folders')
-
         playlists = resource_manager.get_related_playlists(channel_id)
         uploads = playlists.get('uploads') if playlists else None
         if uploads and not uploads.startswith('UU'):
             uploads = None
 
-        if page == 1 and not hide_folders:
+        if params.get('page', 1) == 1 and not params.get('hide_folders'):
             v3_response = {
                 'kind': 'youtube#pluginListResponse',
                 'items': [
@@ -777,6 +773,7 @@ class Provider(AbstractProvider):
             else:
                 filtered_uploads = None
             while 1:
+                page_token = params.get('page_token')
                 if filtered_uploads:
                     batch_id = (filtered_uploads, page_token or 0)
                 else:
@@ -948,9 +945,7 @@ class Provider(AbstractProvider):
 
         channel_id = params.get('channel_id') or params.get('channelId')
         event_type = params.get('event_type') or params.get('eventType')
-        hide_folders = params.get('hide_folders')
         location = params.get('location')
-        page = params.get('page', 1)
         page_token = params.get('page_token') or params.get('pageToken') or ''
         search_type = params.get('search_type', 'video') or params.get('type')
 
@@ -959,7 +954,7 @@ class Provider(AbstractProvider):
         else:
             context.set_content(CONTENT.LIST_CONTENT)
 
-        if not hide_folders and page == 1:
+        if params.get('page', 1) == 1 and not params.get('hide_folders'):
             if event_type or search_type != 'video':
                 video_params = dict(params,
                                     search_type='video',
@@ -1231,8 +1226,10 @@ class Provider(AbstractProvider):
             if not client_secret:
                 missing_list.append(localize('api.secret'))
                 log_list.append('Secret')
-            ui.show_notification(localize('api.personal.failed') % ', '.join(missing_list))
-            context.log_debug('Failed to enable personal API keys. Missing: %s' % ', '.join(log_list))
+            ui.show_notification(localize('api.personal.failed')
+                                 % ', '.join(missing_list))
+            context.log_error('Failed to enable personal API keys. Missing: %s'
+                              % ', '.join(log_list))
 
     @staticmethod
     def on_playback_history(provider, context, re_match):
@@ -1408,7 +1405,8 @@ class Provider(AbstractProvider):
         local_history = settings.use_local_history()
 
         # Home / Recommendations
-        if logged_in and settings_bool('youtube.folder.recommendations.show', True):
+        if (logged_in
+                and settings_bool('youtube.folder.recommendations.show', True)):
             recommendations_item = DirectoryItem(
                 localize('recommendations'),
                 create_uri(PATHS.RECOMMENDATIONS),
@@ -1460,7 +1458,8 @@ class Provider(AbstractProvider):
             result.append(quick_search_incognito_item)
 
         # my location
-        if settings_bool('youtube.folder.my_location.show', True) and settings.get_location():
+        if (settings_bool('youtube.folder.my_location.show', True)
+                and settings.get_location()):
             my_location_item = DirectoryItem(
                 localize('my_location'),
                 create_uri(('location', 'mine')),
@@ -1526,7 +1525,8 @@ class Provider(AbstractProvider):
                 result.append(watch_later_item)
 
         # liked videos
-        if logged_in and settings_bool('youtube.folder.liked_videos.show', True):
+        if (logged_in
+                and settings_bool('youtube.folder.liked_videos.show', True)):
             resource_manager = provider.get_resource_manager(context)
             playlists = resource_manager.get_related_playlists('mine')
             if playlists and 'likes' in playlists:
@@ -1556,7 +1556,8 @@ class Provider(AbstractProvider):
                 result.append(liked_videos_item)
 
         # disliked videos
-        if logged_in and settings_bool('youtube.folder.disliked_videos.show', True):
+        if (logged_in
+                and settings_bool('youtube.folder.disliked_videos.show', True)):
             disliked_videos_item = DirectoryItem(
                 localize('video.disliked'),
                 create_uri(PATHS.DISLIKED_VIDEOS),
@@ -1636,7 +1637,8 @@ class Provider(AbstractProvider):
         #     result.append(playlists_item)
 
         # subscriptions
-        if logged_in and settings_bool('youtube.folder.subscriptions.show', True):
+        if (logged_in
+                and settings_bool('youtube.folder.subscriptions.show', True)):
             subscriptions_item = DirectoryItem(
                 localize('subscriptions'),
                 create_uri(('subscriptions', 'list')),
@@ -1670,7 +1672,8 @@ class Provider(AbstractProvider):
             result.append(bookmarks_item)
 
         # browse channels
-        if logged_in and settings_bool('youtube.folder.browse_channels.show', True):
+        if (logged_in
+                and settings_bool('youtube.folder.browse_channels.show', True)):
             browse_channels_item = DirectoryItem(
                 localize('browse_channels'),
                 create_uri(('special', 'browse_channels')),
@@ -1801,9 +1804,9 @@ class Provider(AbstractProvider):
                     kind = 'youtube#channel'
                     yt_id = item_id
                     item_name = ''
-                    partial = True
+                    partial_result = True
                 elif isinstance(item, BaseItem):
-                    partial = False
+                    partial_result = False
 
                     if isinstance(item, VideoItem):
                         kind = 'youtube#video'
@@ -1820,7 +1823,7 @@ class Provider(AbstractProvider):
                     kind = None
                     yt_id = None
                     item_name = ''
-                    partial = False
+                    partial_result = False
 
                 if not yt_id:
                     if isinstance(item, BaseItem):
@@ -1834,7 +1837,7 @@ class Provider(AbstractProvider):
                                 to_delete = True
                                 continue
                             kind = 'youtube#' + kind
-                            partial = True
+                            partial_result = True
                             break
                         else:
                             if to_delete:
@@ -1846,7 +1849,7 @@ class Provider(AbstractProvider):
                 item = {
                     'kind': kind,
                     'id': yt_id,
-                    '_partial': partial,
+                    '_partial': partial_result,
                     '_context_menu': {
                         'context_menu': (
                             menu_items.bookmark_remove(
@@ -1918,7 +1921,7 @@ class Provider(AbstractProvider):
                 return False, {provider.FALLBACK: False}
 
             context.get_bookmarks_list().del_item(item_id)
-            context.get_ui().refresh_container()
+            ui.refresh_container()
 
             ui.show_notification(
                 localize('removed') % bookmark_name,
