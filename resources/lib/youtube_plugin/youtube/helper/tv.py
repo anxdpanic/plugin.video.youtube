@@ -56,7 +56,7 @@ def tv_videos_to_items(provider, context, json_data):
     utils.update_channel_info(provider, context, channel_items_dict)
 
     if item_filter:
-        result = utils.filter_videos(items, **item_filter)
+        result, _ = utils.filter_videos(items, **item_filter)
     else:
         result = items
 

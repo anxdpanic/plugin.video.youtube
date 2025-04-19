@@ -1314,22 +1314,26 @@ def filter_videos(items,
                   custom=None,
                   callback=None,
                   **_kwargs):
-    return [
-        item
-        for item in items
+    accepted = []
+    rejected = []
+    for item in items:
         if ((not item.callback or item.callback(item))
-            and (not callback or callback(item))
-            and (not custom or filter_parse(item, custom))
-            and (not item.playable
-                 or not ((exclude and item.video_id in exclude)
-                         or (not completed and item.completed)
-                         or (not live and item.live and not item.upcoming)
-                         or (not upcoming and item.upcoming)
-                         or (not premieres and item.upcoming and not item.live)
-                         or (not upcoming_live and item.upcoming and item.live)
-                         or (not vod and item.vod)
-                         or (not shorts and item.short))))
-    ]
+                and (not callback or callback(item))
+                and (not custom or filter_parse(item, custom))
+                and (not item.playable or not (
+                        (exclude and item.video_id in exclude)
+                        or (not completed and item.completed)
+                        or (not live and item.live and not item.upcoming)
+                        or (not upcoming and item.upcoming)
+                        or (not premieres and item.upcoming and not item.live)
+                        or (not upcoming_live and item.upcoming and item.live)
+                        or (not vod and item.vod)
+                        or (not shorts and item.short)
+                ))):
+            accepted.append(item)
+        else:
+            rejected.append(item)
+    return accepted, rejected
 
 
 def filter_parse(item,

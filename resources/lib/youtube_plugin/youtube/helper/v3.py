@@ -692,9 +692,20 @@ def response_to_items(provider,
                 callback = None
 
             if items and (_item_filter or do_callbacks or callback):
-                _items = filter_videos(items, callback=callback, **_item_filter)
-                filtered += (len(items) - len(_items))
-                items = _items
+                items, filtered_out = filter_videos(
+                    items,
+                    callback=callback,
+                    **_item_filter
+                )
+                if filtered_out:
+                    filtered += len(filtered_out)
+                    context.debug_log and context.log_debug(
+                        'v3.response_to_item - Items filtered out'
+                        '\n\tItems: [\n\t\t{filtered_out}\n\t]'
+                        .format(filtered_out=',\n\t\t'.join([
+                            str(item) for item in filtered_out
+                        ]))
+                    )
 
             post_filler = json_data.get('_post_filler')
             num_items = 0
