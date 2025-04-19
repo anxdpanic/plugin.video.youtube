@@ -209,14 +209,14 @@ def _play_playlist(provider, context):
         if playlist_ids:
             json_data = resource_manager.get_playlist_items(playlist_ids)
             if not json_data:
-                return False
+                return False, None
             chunks = json_data.values()
             total = sum(len(chunk.get('items', [])) for chunk in chunks)
         elif video_ids:
             json_data = resource_manager.get_videos(video_ids,
                                                     live_details=True)
             if not json_data:
-                return False
+                return False, None
             chunks = [{
                 'kind': 'plugin#playlistItemListResponse',
                 'items': json_data.values(),
@@ -236,16 +236,27 @@ def _play_playlist(provider, context):
             progress_dialog.update(steps=len(result))
 
         if not video_items:
-            return False
+            return False, None
 
-        return (
-            process_items_for_playlist(context, video_items, action=action),
-            {
-                provider.CACHE_TO_DISC: action == 'list',
-                provider.FORCE_RESOLVE: action != 'list',
-                provider.UPDATE_LISTING: action != 'list',
-            },
-        )
+        result = process_items_for_playlist(context, video_items, action=action)
+        if action == 'list':
+            options = {
+                provider.CACHE_TO_DISC: True,
+                provider.FORCE_RESOLVE: False,
+                provider.UPDATE_LISTING: False,
+                provider.CONTENT_TYPE: {
+                    'content_type': CONTENT.VIDEO_CONTENT,
+                    'sub_type': None,
+                    'category_label': None,
+                },
+            }
+        else:
+            options = {
+                provider.CACHE_TO_DISC: False,
+                provider.FORCE_RESOLVE: True,
+                provider.UPDATE_LISTING: True,
+            }
+        return result, options
 
 
 def _play_channel_live(provider, context):
@@ -420,7 +431,6 @@ def process_items_for_playlist(context,
         return False
 
     if action == 'list':
-        context.set_content(CONTENT.VIDEO_CONTENT)
         return items
 
     # stop and clear the playlist

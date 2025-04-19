@@ -91,7 +91,6 @@ FORCE_PLAY_PARAMS = frozenset((
 CONTAINER_ID = 'container_id'
 CONTAINER_FOCUS = 'container_focus'
 CONTAINER_POSITION = 'container_position'
-CONTENT_TYPE = 'content_type'
 DEVELOPER_CONFIGS = 'configs'
 LICENSE_TOKEN = 'license_token'
 LICENSE_URL = 'license_url'
@@ -99,7 +98,6 @@ PLAYER_DATA = 'player_json'
 PLAYER_VIDEO_ID = 'player_video_id'
 PLAYLIST_PATH = 'playlist_path'
 PLAYLIST_POSITION = 'playlist_position'
-REROUTE_CONTENT_TYPE = 'reroute_content_type'
 REROUTE_PATH = 'reroute_path'
 
 # Routing parameters
@@ -162,7 +160,6 @@ __all__ = (
     'CONTAINER_ID',
     'CONTAINER_FOCUS',
     'CONTAINER_POSITION',
-    'CONTENT_TYPE',
     'DEVELOPER_CONFIGS',
     'LICENSE_TOKEN',
     'LICENSE_URL',
@@ -170,7 +167,6 @@ __all__ = (
     'PLAYER_VIDEO_ID',
     'PLAYLIST_PATH',
     'PLAYLIST_POSITION',
-    'REROUTE_CONTENT_TYPE',
     'REROUTE_PATH',
 
     # Routing parameters

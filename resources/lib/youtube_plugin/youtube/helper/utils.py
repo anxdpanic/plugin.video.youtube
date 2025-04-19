@@ -256,7 +256,7 @@ def update_channel_items(provider, context, channel_id_dict,
         channel_item.set_short_details(label_stats)
         # Hack to force a custom label mask containing production code,
         # activated on sort order selection, to display details
-        # Refer XbmcContext.set_content for usage
+        # Refer XbmcContext.apply_content for usage
         channel_item.set_production_code(label_stats)
 
         # channel name and title
@@ -426,7 +426,7 @@ def update_playlist_items(provider, context, playlist_id_dict,
         playlist_item.set_short_details(label_details)
         # Hack to force a custom label mask containing production code,
         # activated on sort order selection, to display details
-        # Refer XbmcContext.set_content for usage
+        # Refer XbmcContext.apply_content for usage
         playlist_item.set_production_code(label_details)
 
         # title
@@ -791,7 +791,7 @@ def update_video_items(provider, context, video_id_dict,
         media_item.set_short_details(label_stats)
         # Hack to force a custom label mask containing production code,
         # activated on sort order selection, to display details
-        # Refer XbmcContext.set_content for usage
+        # Refer XbmcContext.apply_content for usage
         media_item.set_production_code(label_stats)
 
         # update and set the title

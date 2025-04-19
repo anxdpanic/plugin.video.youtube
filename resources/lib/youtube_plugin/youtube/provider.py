@@ -369,8 +369,6 @@ class Provider(AbstractProvider):
 
         * CHANNEL_ID: YouTube Channel ID
         """
-        context.set_content(CONTENT.LIST_CONTENT)
-
         channel_id = re_match.group('channel_id')
 
         params = context.get_params()
@@ -432,13 +430,20 @@ class Provider(AbstractProvider):
 
         json_data = resource_manager.get_my_playlists(channel_id, page_token)
         if not json_data:
-            return False
+            return False, None
 
         if result and 'items' in json_data:
             result.extend(json_data['items'])
             json_data['items'] = result
         result = v3.response_to_items(provider, context, json_data)
-        return result
+        options = {
+            provider.CONTENT_TYPE: {
+                'content_type': CONTENT.LIST_CONTENT,
+                'sub_type': None,
+                'category_label': None,
+            },
+        }
+        return result, options
 
     @AbstractProvider.register_path(
         r'^/channel/(?P<channel_id>[^/]+)'
@@ -462,8 +467,6 @@ class Provider(AbstractProvider):
         * CHANNEL_ID: YouTube channel ID
         * PLAYLIST_ID: YouTube live stream playlist ID beginning with UULV
         """
-        context.set_content(CONTENT.VIDEO_CONTENT)
-
         resource_manager = provider.get_resource_manager(context)
 
         if re_match:
@@ -474,9 +477,9 @@ class Provider(AbstractProvider):
                 playlist_id = playlists.get('uploads') if playlists else None
                 if playlist_id and playlist_id.startswith('UU'):
                     playlist_id = playlist_id.replace('UU', 'UULV', 1)
-
         if not channel_id or not playlist_id:
-            return False
+            return False, None
+
         new_params = {
             'channel_id': channel_id,
             'playlist_id': playlist_id,
@@ -486,7 +489,7 @@ class Provider(AbstractProvider):
         batch_id = (playlist_id, context.get_param('page_token') or 0)
         json_data = resource_manager.get_playlist_items(batch_id=batch_id)
         if not json_data:
-            return False
+            return False, None
 
         live_streams = provider.get_client(context).get_browse_videos(
             channel_id=channel_id,
@@ -537,7 +540,14 @@ class Provider(AbstractProvider):
                 'live_folder': True,
             },
         )
-        return result
+        options = {
+            provider.CONTENT_TYPE: {
+                'content_type': CONTENT.VIDEO_CONTENT,
+                'sub_type': None,
+                'category_label': None,
+            },
+        }
+        return result, options
 
     @AbstractProvider.register_path(
         r'^/channel/(?P<channel_id>[^/]+)'
@@ -561,8 +571,6 @@ class Provider(AbstractProvider):
         * CHANNEL_ID: YouTube channel ID
         * PLAYLIST_ID: YouTube live stream playlist ID beginning with UUSH
         """
-        context.set_content(CONTENT.VIDEO_CONTENT)
-
         resource_manager = provider.get_resource_manager(context)
 
         if re_match:
@@ -573,9 +581,9 @@ class Provider(AbstractProvider):
                 playlist_id = playlists.get('uploads') if playlists else None
                 if playlist_id and playlist_id.startswith('UU'):
                     playlist_id = playlist_id.replace('UU', 'UUSH', 1)
-
         if not playlist_id:
-            return False
+            return False, None
+
         new_params = {
             'playlist_id': playlist_id,
         }
@@ -586,14 +594,22 @@ class Provider(AbstractProvider):
         batch_id = (playlist_id, context.get_param('page_token') or 0)
         json_data = resource_manager.get_playlist_items(batch_id=batch_id)
         if not json_data:
-            return False
+            return False, None
+
         result = v3.response_to_items(
             provider, context, json_data,
             item_filter={
                 'shorts': True,
             },
         )
-        return result
+        options = {
+            provider.CONTENT_TYPE: {
+                'content_type': CONTENT.VIDEO_CONTENT,
+                'sub_type': None,
+                'category_label': None,
+            },
+        }
+        return result, options
 
     @AbstractProvider.register_path(
         r'^(?:/channel/(?P<channel_id>[^/]+))?'
@@ -622,15 +638,22 @@ class Provider(AbstractProvider):
             new_params['channel_id'] = channel_id
         context.parse_params(new_params)
 
-        context.set_content(CONTENT.VIDEO_CONTENT)
         resource_manager = provider.get_resource_manager(context)
 
         batch_id = (playlist_id, context.get_param('page_token') or 0)
         json_data = resource_manager.get_playlist_items(batch_id=batch_id)
         if not json_data:
-            return False
+            return False, None
+
         result = v3.response_to_items(provider, context, json_data)
-        return result
+        options = {
+            provider.CONTENT_TYPE: {
+                'content_type': CONTENT.VIDEO_CONTENT,
+                'sub_type': None,
+                'category_label': None,
+            },
+        }
+        return result, options
 
     @AbstractProvider.register_path(
         r'^/(?P<command>(channel|handle|user))'
@@ -699,9 +722,15 @@ class Provider(AbstractProvider):
             'channel_id': channel_id,
         })
 
-        context.set_content(CONTENT.VIDEO_CONTENT)
         resource_manager = provider.get_resource_manager(context)
         result = []
+        options = {
+            provider.CONTENT_TYPE: {
+                'content_type': CONTENT.VIDEO_CONTENT,
+                'sub_type': None,
+                'category_label': None,
+            },
+        }
 
         playlists = resource_manager.get_related_playlists(channel_id)
         uploads = playlists.get('uploads') if playlists else None
@@ -788,7 +817,7 @@ class Provider(AbstractProvider):
                 if filtered_uploads:
                     filtered_uploads = None
                     continue
-                return result
+                return result, options
 
             context.parse_params({
                 'playlist_id': filtered_uploads or uploads,
@@ -810,17 +839,22 @@ class Provider(AbstractProvider):
                     'upcoming_live': False,
                 },
             ))
-        return result
+        return result, options
 
     @AbstractProvider.register_path('^/location/mine/?$')
     @staticmethod
-    def on_my_location(context, **_kwargs):
-        context.set_content(CONTENT.LIST_CONTENT)
-
+    def on_my_location(provider, context, **_kwargs):
         create_uri = context.create_uri
         localize = context.localize
         settings = context.get_settings()
         result = []
+        options = {
+            provider.CONTENT_TYPE: {
+                'content_type': CONTENT.LIST_CONTENT,
+                'sub_type': None,
+                'category_label': None,
+            },
+        }
 
         # search
         search_item = SearchItem(
@@ -865,7 +899,7 @@ class Provider(AbstractProvider):
         )
         result.append(live_events_item)
 
-        return result
+        return result, options
 
     @AbstractProvider.register_path('^/users/(?P<action>[^/]+)/?$')
     @staticmethod
@@ -938,10 +972,13 @@ class Provider(AbstractProvider):
             return result, {
                 self.CACHE_TO_DISC: False,
                 self.FALLBACK: False,
+                self.CONTENT_TYPE: {
+                    'content_type': CONTENT.LIST_CONTENT,
+                    'sub_type': None,
+                    'category_label': query,
+                },
             }
         result = []
-
-        context.set_params(category_label=query)
 
         channel_id = params.get('channel_id') or params.get('channelId')
         event_type = params.get('event_type') or params.get('eventType')
@@ -949,10 +986,18 @@ class Provider(AbstractProvider):
         page_token = params.get('page_token') or params.get('pageToken') or ''
         search_type = params.get('search_type', 'video') or params.get('type')
 
-        if search_type == 'video':
-            context.set_content(CONTENT.VIDEO_CONTENT)
-        else:
-            context.set_content(CONTENT.LIST_CONTENT)
+        options = {
+            self.CACHE_TO_DISC: False,
+            self.CONTENT_TYPE: {
+                'content_type': (
+                    CONTENT.VIDEO_CONTENT
+                    if search_type == 'video' else
+                    CONTENT.LIST_CONTENT
+                ),
+                'sub_type': None,
+                'category_label': query,
+            },
+        }
 
         if params.get('page', 1) == 1 and not params.get('hide_folders'):
             if event_type or search_type != 'video':
@@ -1068,7 +1113,7 @@ class Provider(AbstractProvider):
                 'live': False,
             },
         ))
-        return result, {self.CACHE_TO_DISC: False}
+        return result, options
 
     @AbstractProvider.register_path('^/config/(?P<action>[^/]+)/?$')
     @staticmethod
@@ -1093,10 +1138,10 @@ class Provider(AbstractProvider):
         channel_name = context.get_param('item_name')
         command = re_match.group('command')
         if not channel_name or not command:
-            return
+            return False, None
 
         if not settings.subscriptions_filter_enabled():
-            return
+            return False, None
 
         filter_string, filters_set, custom_filters = channel_filter_split(
             settings.subscriptions_filter()
@@ -1106,14 +1151,14 @@ class Provider(AbstractProvider):
             num_filters = len(filters_set)
             filters_set.add(channel_name)
             if len(filters_set) == num_filters:
-                return False
+                return False, None
         elif command == 'remove':
             try:
                 filters_set.remove(channel_name)
             except KeyError:
-                return False
+                return False, None
         else:
-            return False
+            return False, None
 
         filter_list = list(filters_set)
         if custom_filters:
@@ -1132,6 +1177,7 @@ class Provider(AbstractProvider):
             if command == 'add' else
             'my_subscriptions.filter.removed'
         ))
+        return True, None
 
     @AbstractProvider.register_path(
         r'^/maintenance'
@@ -1174,6 +1220,9 @@ class Provider(AbstractProvider):
             )
             ui.refresh_container()
             ui.show_notification(localize('succeeded' if success else 'failed'))
+        else:
+            success = False
+        return success, None
 
     @AbstractProvider.register_path('^/api/update/?$')
     @staticmethod
@@ -1236,17 +1285,16 @@ class Provider(AbstractProvider):
         params = context.get_params()
         command = re_match.group('command')
         if not command:
-            return False
+            return False, None
 
         localize = context.localize
         playback_history = context.get_playback_history()
         ui = context.get_ui()
 
         if command in {'list', 'play'}:
-            context.set_content(CONTENT.VIDEO_CONTENT, sub_type='history')
             items = playback_history.get_items()
             if not items:
-                return True
+                return True, None
 
             v3_response = {
                 'kind': 'youtube#videoListResponse',
@@ -1278,7 +1326,14 @@ class Provider(AbstractProvider):
                     action='play',
                     play_from='start',
                 )
-            return video_items
+            options = {
+                provider.CONTENT_TYPE: {
+                    'content_type': CONTENT.VIDEO_CONTENT,
+                    'sub_type': 'history',
+                    'category_label': None,
+                },
+            }
+            return video_items, options
 
         if command == 'clear':
             if not ui.on_yes_no_input(
@@ -1362,10 +1417,12 @@ class Provider(AbstractProvider):
         logged_in = provider.is_logged_in()
         # _.get_my_playlists()
 
-        # context.set_content(CONTENT.LIST_CONTENT)
-        context.set_params(category_label=localize('youtube'))
-
         result = []
+        options = {
+            provider.CONTENT_TYPE: {
+                'category_label': localize('youtube'),
+            },
+        }
 
         # sign in
         if not logged_in and settings_bool('youtube.folder.sign.in.show', True):
@@ -1746,21 +1803,20 @@ class Provider(AbstractProvider):
             )
             result.append(settings_menu_item)
 
-        return result
+        return result, options
 
     @staticmethod
     def on_bookmarks(provider, context, re_match):
         params = context.get_params()
         command = re_match.group('command')
         if not command:
-            return False
+            return False, None
 
         if command in {'list', 'play'}:
-            context.set_content(CONTENT.VIDEO_CONTENT)
             bookmarks_list = context.get_bookmarks_list()
             items = bookmarks_list.get_items()
             if not items:
-                return True
+                return True, None
 
             v3_response = {
                 'kind': 'youtube#pluginListResponse',
@@ -1874,7 +1930,14 @@ class Provider(AbstractProvider):
                     action='play',
                     play_from='start',
                 )
-            return bookmarks
+            options = {
+                provider.CONTENT_TYPE: {
+                    'content_type': CONTENT.VIDEO_CONTENT,
+                    'sub_type': None,
+                    'category_label': None,
+                },
+            }
+            return bookmarks, options
 
         ui = context.get_ui()
         localize = context.localize
@@ -1937,16 +2000,15 @@ class Provider(AbstractProvider):
         params = context.get_params()
         command = re_match.group('command')
         if not command:
-            return False
+            return False, None
 
         localize = context.localize
         ui = context.get_ui()
 
         if command in {'list', 'play'}:
-            context.set_content(CONTENT.VIDEO_CONTENT, sub_type='watch_later')
             items = context.get_watch_later_list().get_items()
             if not items:
-                return True
+                return True, None
 
             v3_response = {
                 'kind': 'youtube#videoListResponse',
@@ -1978,7 +2040,14 @@ class Provider(AbstractProvider):
                     action='play',
                     play_from='start',
                 )
-            return video_items
+            options = {
+                provider.CONTENT_TYPE: {
+                    'content_type': CONTENT.VIDEO_CONTENT,
+                    'sub_type': 'watch_later',
+                    'category_label': None,
+                },
+            }
+            return video_items, options
 
         if command == 'clear':
             if not ui.on_yes_no_input(

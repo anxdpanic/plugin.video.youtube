@@ -27,9 +27,7 @@ from ...constants import (
     ABORT_FLAG,
     ADDON_ID,
     CONTENT,
-    CONTENT_TYPE,
     PLAY_FORCE_AUDIO,
-    REROUTE_CONTENT_TYPE,
     SORT,
     WAKEUP,
 )
@@ -573,33 +571,18 @@ class XbmcContext(AbstractContext):
         result = to_unicode(result) if result else default_text
         return result
 
-    def set_content(self, content_type, sub_type=None, category_label=None):
-        ui = self.get_ui()
-        ui.set_property(
-            REROUTE_CONTENT_TYPE
-            if ui.get_property(REROUTE_CONTENT_TYPE) == CONTENT_TYPE else
-            CONTENT_TYPE,
-            json.dumps(
-                (content_type, sub_type, category_label),
-                ensure_ascii=False,
-            ),
-        )
-
-    def apply_content(self):
+    def apply_content(self,
+                      content_type=None,
+                      sub_type=None,
+                      category_label=None):
         # ui local variable used for ui.get_view_manager() in unofficial version
         ui = self.get_ui()
 
-        content_type = ui.pop_property(CONTENT_TYPE)
         if content_type:
-            content_type, sub_type, category_label = json.loads(content_type)
-            self.log_debug('Applying content-type: |{type}| for |{path}|'.format(
-                type=(sub_type or content_type), path=self.get_path()
-            ))
+            self.log_debug('Applying content-type: |{type}| for |{path}|'
+                           .format(type=(sub_type or content_type),
+                                   path=self.get_path()))
             xbmcplugin.setContent(self._plugin_handle, content_type)
-        else:
-            content_type = None
-            sub_type = None
-            category_label = None
 
         if category_label is None:
             category_label = self.get_param('category_label')

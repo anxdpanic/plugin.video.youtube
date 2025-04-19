@@ -20,7 +20,6 @@ from ...kodion.utils import strip_html_from_text
 
 
 def _process_related_videos(provider, context, client):
-    context.set_content(CONTENT.VIDEO_CONTENT)
     function_cache = context.get_function_cache()
     refresh = context.refresh_requested()
     params = context.get_params()
@@ -35,7 +34,7 @@ def _process_related_videos(provider, context, client):
             page_token=params.get('page_token', ''),
         )
         if not json_data:
-            return False
+            return False, None
 
         filler = partial(
             function_cache.run,
@@ -53,12 +52,22 @@ def _process_related_videos(provider, context, client):
             _refresh=refresh,
         )
         if not json_data:
-            return False
+            return False, None
 
-    return v3.response_to_items(provider,
-                                context,
-                                json_data,
-                                allow_duplicates=False)
+    result = v3.response_to_items(
+        provider,
+        context,
+        json_data,
+        allow_duplicates=False,
+    )
+    options = {
+        provider.CONTENT_TYPE: {
+            'content_type': CONTENT.VIDEO_CONTENT,
+            'sub_type': None,
+            'category_label': None,
+        },
+    }
+    return result, options
 
 
 def _process_comments(provider, context, client):
@@ -66,11 +75,7 @@ def _process_comments(provider, context, client):
     video_id = params.get('video_id')
     parent_id = params.get('parent_id')
     if not video_id and not parent_id:
-        return False
-
-    context.set_content(CONTENT.LIST_CONTENT,
-                        sub_type='comments',
-                        category_label=params.get('item_name', video_id))
+        return False, None
 
     if video_id:
         json_data = client.get_parent_comments(
@@ -84,14 +89,21 @@ def _process_comments(provider, context, client):
         )
     else:
         json_data = None
-
     if not json_data:
-        return False
-    return v3.response_to_items(provider, context, json_data)
+        return False, None
+
+    result = v3.response_to_items(provider, context, json_data)
+    options = {
+        provider.CONTENT_TYPE: {
+            'content_type': CONTENT.LIST_CONTENT,
+            'sub_type': 'comments',
+            'category_label': params.get('item_name', video_id),
+        },
+    }
+    return result, options
 
 
 def _process_recommendations(provider, context, client):
-    context.set_content(CONTENT.VIDEO_CONTENT)
     function_cache = context.get_function_cache()
     refresh = context.refresh_requested()
     params = context.get_params()
@@ -107,7 +119,7 @@ def _process_recommendations(provider, context, client):
         click_tracking=params.get('click_tracking'),
     )
     if not json_data:
-        return False
+        return False, None
 
     filler = partial(
         function_cache.run,
@@ -118,14 +130,23 @@ def _process_recommendations(provider, context, client):
     json_data['_pre_filler'] = filler
     json_data['_post_filler'] = filler
 
-    return v3.response_to_items(provider,
-                                context,
-                                json_data,
-                                allow_duplicates=False)
+    result = v3.response_to_items(
+        provider,
+        context,
+        json_data,
+        allow_duplicates=False,
+    )
+    options = {
+        provider.CONTENT_TYPE: {
+            'content_type': CONTENT.VIDEO_CONTENT,
+            'sub_type': None,
+            'category_label': None,
+        },
+    }
+    return result, options
 
 
 def _process_trending(provider, context, client):
-    context.set_content(CONTENT.VIDEO_CONTENT)
     function_cache = context.get_function_cache()
     refresh = context.refresh_requested()
 
@@ -136,7 +157,7 @@ def _process_trending(provider, context, client):
         page_token=context.get_param('page_token'),
     )
     if not json_data:
-        return False
+        return False, None
 
     filler = partial(
         function_cache.run,
@@ -146,12 +167,18 @@ def _process_trending(provider, context, client):
     )
     json_data['_post_filler'] = filler
 
-    return v3.response_to_items(provider, context, json_data)
+    result = v3.response_to_items(provider, context, json_data)
+    options = {
+        provider.CONTENT_TYPE: {
+            'content_type': CONTENT.VIDEO_CONTENT,
+            'sub_type': None,
+            'category_label': None,
+        },
+    }
+    return result, options
 
 
 def _process_browse_channels(provider, context, client):
-    context.set_content(CONTENT.LIST_CONTENT)
-
     guide_id = context.get_param('guide_id')
     if guide_id:
         json_data = client.get_guide_category(guide_id)
@@ -162,27 +189,39 @@ def _process_browse_channels(provider, context, client):
             function_cache.ONE_MONTH,
             _refresh=context.refresh_requested(),
         )
-
     if not json_data:
-        return False
-    return v3.response_to_items(provider, context, json_data)
+        return False, None
+
+    result = v3.response_to_items(provider, context, json_data)
+    options = {
+        provider.CONTENT_TYPE: {
+            'content_type': CONTENT.LIST_CONTENT,
+            'sub_type': None,
+            'category_label': None,
+        },
+    }
+    return result, options
 
 
 def _process_disliked_videos(provider, context, client):
-    context.set_content(CONTENT.VIDEO_CONTENT)
-
     json_data = client.get_disliked_videos(
         page_token=context.get_param('page_token', '')
     )
-
     if not json_data:
-        return False
-    return v3.response_to_items(provider, context, json_data)
+        return False, None
+
+    result = v3.response_to_items(provider, context, json_data)
+    options = {
+        provider.CONTENT_TYPE: {
+            'content_type': CONTENT.VIDEO_CONTENT,
+            'sub_type': None,
+            'category_label': None,
+        },
+    }
+    return result, options
 
 
 def _process_live_events(provider, context, client, event_type='live'):
-    context.set_content(CONTENT.VIDEO_CONTENT)
-
     # TODO: cache result
     json_data = client.get_live_events(
         event_type=event_type,
@@ -191,10 +230,18 @@ def _process_live_events(provider, context, client, event_type='live'):
         location=context.get_param('location', False),
         after={'days': 3} if event_type == 'completed' else None,
     )
-
     if not json_data:
-        return False
-    return v3.response_to_items(provider, context, json_data)
+        return False, None
+
+    result = v3.response_to_items(provider, context, json_data)
+    options = {
+        provider.CONTENT_TYPE: {
+            'content_type': CONTENT.VIDEO_CONTENT,
+            'sub_type': None,
+            'category_label': None,
+        },
+    }
+    return result, options
 
 
 def _process_description_links(provider, context):
@@ -203,7 +250,6 @@ def _process_description_links(provider, context):
     addon_id = params.get('addon_id', '')
 
     def _extract_urls(video_id):
-        context.set_content(CONTENT.VIDEO_CONTENT)
         url_resolver = UrlResolver(context)
 
         with context.get_ui().create_progress_dialog(
@@ -218,7 +264,7 @@ def _process_description_links(provider, context):
                     title=context.localize('video.description_links'),
                     text=context.localize('video.description_links.not_found')
                 )
-                return False
+                return False, None
             snippet = yt_item['snippet']
             description = strip_html_from_text(snippet['description'])
 
@@ -246,13 +292,22 @@ def _process_description_links(provider, context):
             url_to_item_converter.add_urls(res_urls, context)
             result = url_to_item_converter.get_items(provider, context)
 
-        if result:
-            return result
-        context.get_ui().on_ok(
-            title=context.localize('video.description_links'),
-            text=context.localize('video.description_links.not_found')
-        )
-        return False
+        if not result:
+            context.get_ui().on_ok(
+                title=context.localize('video.description_links'),
+                text=context.localize('video.description_links.not_found')
+            )
+            return False, None
+
+        options = {
+            provider.CONTENT_TYPE: {
+                'content_type': CONTENT.VIDEO_CONTENT,
+                'sub_type': None,
+                'category_label': None,
+            },
+        }
+        return result, options
+
 
     def _display_channels(channel_ids):
         item_params = {}
@@ -276,9 +331,20 @@ def _process_description_links(provider, context):
         utils.update_channel_items(provider, context, channel_id_dict)
 
         # clean up - remove empty entries
-        return [channel_item
-                for channel_item in channel_id_dict.values()
-                if channel_item.get_name()]
+        result = [channel_item
+                  for channel_item in channel_id_dict.values()
+                  if channel_item.get_name()]
+        if not result:
+            return False, None
+
+        options = {
+            provider.CONTENT_TYPE: {
+                'content_type': CONTENT.LIST_CONTENT,
+                'sub_type': None,
+                'category_label': None,
+            },
+        }
+        return result, options
 
     def _display_playlists(playlist_ids):
         item_params = {}
@@ -307,9 +373,20 @@ def _process_description_links(provider, context):
         utils.update_channel_info(provider, context, channel_items_dict)
 
         # clean up - remove empty entries
-        return [playlist_item
-                for playlist_item in playlist_id_dict.values()
-                if playlist_item.get_name()]
+        result = [playlist_item
+                  for playlist_item in playlist_id_dict.values()
+                  if playlist_item.get_name()]
+        if not result:
+            return False, None
+
+        options = {
+            provider.CONTENT_TYPE: {
+                'content_type': CONTENT.VIDEO_CONTENT,
+                'sub_type': None,
+                'category_label': None,
+            },
+        }
+        return result, options
 
     video_id = params.get('video_id', '')
     if video_id:
@@ -324,20 +401,26 @@ def _process_description_links(provider, context):
         return _display_playlists(playlist_ids)
 
     context.log_error('Missing video_id or playlist_ids for description links')
-    return False
+    return False, None
 
 
 def _process_saved_playlists_tv(provider, context, client):
-    context.set_content(CONTENT.LIST_CONTENT)
-
     json_data = client.get_saved_playlists(
         page_token=context.get_param('next_page_token', 0),
         offset=context.get_param('offset', 0)
     )
-
     if not json_data:
-        return False
-    return tv.saved_playlists_to_items(provider, context, json_data)
+        return False, None
+
+    result = tv.saved_playlists_to_items(provider, context, json_data)
+    options = {
+        provider.CONTENT_TYPE: {
+            'content_type': CONTENT.LIST_CONTENT,
+            'sub_type': None,
+            'category_label': None,
+        },
+    }
+    return result, options
 
 
 def _process_my_subscriptions(provider,
@@ -346,8 +429,6 @@ def _process_my_subscriptions(provider,
                               filtered=False,
                               feed_type=None,
                               _feed_types={'videos', 'shorts', 'live'}):
-    context.set_content(CONTENT.VIDEO_CONTENT)
-
     logged_in = provider.is_logged_in()
     refresh = context.refresh_requested()
 
@@ -368,7 +449,7 @@ def _process_my_subscriptions(provider,
             progress_dialog=progress_dialog,
         )
         if not json_data:
-            return False
+            return False, None
 
         filler = partial(
             client.get_my_subscriptions,
@@ -402,6 +483,13 @@ def _process_my_subscriptions(provider,
                 image='{media}/live.png',
             ) if feed_type != 'live' else None,
         ]
+        options = {
+            provider.CONTENT_TYPE: {
+                'content_type': CONTENT.VIDEO_CONTENT,
+                'sub_type': None,
+                'category_label': None,
+            },
+        }
         result.extend(v3.response_to_items(
             provider, context, json_data,
             item_filter={
@@ -417,7 +505,7 @@ def _process_my_subscriptions(provider,
                 'upcoming_live': False,
             }
         ))
-        return result
+        return result, options
 
 
 def process(provider, context, re_match=None, category=None, sub_category=None):

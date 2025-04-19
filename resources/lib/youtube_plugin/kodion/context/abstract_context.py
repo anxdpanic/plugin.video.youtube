@@ -525,7 +525,10 @@ class AbstractContext(Logger):
     def localize(self, text_id, default_text=None):
         raise NotImplementedError()
 
-    def set_content(self, content_type, sub_type=None, category_label=None):
+    def apply_content(self,
+                      content_type=None,
+                      sub_type=None,
+                      category_label=None):
         raise NotImplementedError()
 
     def add_sort_method(self, *sort_methods):

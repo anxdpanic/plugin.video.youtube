@@ -17,7 +17,6 @@ from ...constants import (
     CONTAINER_FOCUS,
     CONTAINER_ID,
     CONTAINER_POSITION,
-    CONTENT_TYPE,
     FORCE_PLAY_PARAMS,
     PATHS,
     PLAYBACK_FAILED,
@@ -264,7 +263,11 @@ class XbmcPlugin(AbstractPlugin):
                 )
 
         if item_count:
-            context.apply_content()
+            content_type = options.get(provider.CONTENT_TYPE)
+            if content_type:
+                context.apply_content(**content_type)
+            else:
+                context.apply_content()
             succeeded = xbmcplugin.addDirectoryItems(
                 handle, items, item_count
             )
@@ -284,11 +287,9 @@ class XbmcPlugin(AbstractPlugin):
                 uri = context.get_uri()
                 fallback = options.get(provider.FALLBACK, True)
                 if isinstance(fallback, string_type) and fallback != uri:
-                    ui.clear_property(CONTENT_TYPE)
                     context.parse_uri(fallback, update=True)
                     return self.run(provider, context, forced=forced)
                 if fallback:
-                    ui.clear_property(CONTENT_TYPE)
                     _post_run_action = None
 
                     if context.is_plugin_folder():

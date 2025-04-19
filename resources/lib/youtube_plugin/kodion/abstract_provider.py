@@ -20,9 +20,7 @@ from .constants import (
     CONTAINER_ID,
     CONTAINER_POSITION,
     CONTENT,
-    CONTENT_TYPE,
     PATHS,
-    REROUTE_CONTENT_TYPE,
     REROUTE_PATH,
     WINDOW_CACHE,
     WINDOW_FALLBACK,
@@ -46,6 +44,7 @@ class AbstractProvider(object):
     FORCE_PLAY = 'provider_force_play'  # type: bool
     FORCE_RESOLVE = 'provider_force_resolve'  # type: bool
     UPDATE_LISTING = 'provider_update_listing'  # type: bool
+    CONTENT_TYPE = 'provider_content_type'  # type: tuple[str, str, str]
 
     # map for regular expression (path) to method (names)
     _dict_path = {}
@@ -319,7 +318,6 @@ class AbstractProvider(object):
             if window_cache:
                 function_cache = context.get_function_cache()
                 with ui.on_busy():
-                    ui.set_property(REROUTE_CONTENT_TYPE, CONTENT_TYPE)
                     result, options = function_cache.run(
                         self.navigate,
                         _refresh=True,
@@ -347,7 +345,6 @@ class AbstractProvider(object):
                                           window_replace=window_replace,
                                           window_return=window_return))
             else:
-                ui.clear_property(REROUTE_CONTENT_TYPE)
                 context.log_debug('Rerouting - No results'
                                   '\n\tURI: {uri}'
                                   .format(uri=uri))
@@ -359,10 +356,6 @@ class AbstractProvider(object):
 
             if window_cache:
                 ui.set_property(REROUTE_PATH, path)
-                ui.set_property(
-                    CONTENT_TYPE,
-                    ui.pop_property(REROUTE_CONTENT_TYPE),
-                )
                 if container and position:
                     ui.set_property(CONTAINER_ID, container)
                     ui.set_property(CONTAINER_POSITION, position)
@@ -555,11 +548,17 @@ class AbstractProvider(object):
                 }
             return result, options
 
-        context.set_content(CONTENT.LIST_CONTENT,
-                            category_label=localize('search'))
-        result = []
-
         location = context.get_param('location', False)
+
+        result = []
+        options = {
+            provider.CACHE_TO_DISC: False,
+            provider.CONTENT_TYPE: {
+                'content_type': CONTENT.LIST_CONTENT,
+                'sub_type': None,
+                'category_label': localize('search'),
+            },
+        }
 
         # 'New Search...'
         new_search_item = NewSearchItem(
@@ -578,7 +577,7 @@ class AbstractProvider(object):
             )
             result.append(search_history_item)
 
-        return result, {provider.CACHE_TO_DISC: False}
+        return result, options
 
     @staticmethod
     def on_command(re_match, **_kwargs):
