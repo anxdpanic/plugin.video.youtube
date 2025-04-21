@@ -604,11 +604,11 @@ class XbmcContext(AbstractContext):
             )
         elif sub_type == 'comments':
             self.add_sort_method(
-                (SORT.CHANNEL,          '[%A - ]%T \u2022 %P',       '%J'),
-                (SORT.ARTIST,           '[%J - ]%T \u2022 %P',       '%A'),
-                (SORT.PROGRAM_COUNT,    '[%A - ]%T \u2022 %P | %J',  '%C'),
-                (SORT.DATE,             '[%A - ]%T \u2022 %P',       '%J'),
-                (SORT.TRACKNUM,         '[%N. ][%A - ]%T \u2022 %P', '%J'),
+                (SORT.CHANNEL,          '[%A - ]%P \u2022 %T',       '%J'),
+                (SORT.ARTIST,           '[%J - ]%P \u2022 %T',       '%A'),
+                (SORT.PROGRAM_COUNT,    '[%A - ]%P | %J \u2022 %T',  '%C'),
+                (SORT.DATE,             '[%A - ]%P \u2022 %T',       '%J'),
+                (SORT.TRACKNUM,         '[%N. ][%A - ]%P \u2022 %T', '%J'),
             ) if detailed_labels else self.add_sort_method(
                 (SORT.CHANNEL,          '[%A - ]%T'),
                 (SORT.ARTIST,           '[%A - ]%T'),
