@@ -71,6 +71,7 @@ class AbstractContext(Logger):
         'hide_progress',
         'hide_search',
         'hide_shorts',
+        'hide_videos',
         'incognito',
         'location',
         'logged_in',

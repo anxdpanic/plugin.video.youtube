@@ -308,7 +308,6 @@ def _process_description_links(provider, context):
         }
         return result, options
 
-
     def _display_channels(channel_ids):
         item_params = {}
         if incognito:
@@ -466,23 +465,35 @@ def _process_my_subscriptions(provider,
             my_subscriptions_path = PATHS.MY_SUBSCRIPTIONS_FILTERED
         else:
             my_subscriptions_path = PATHS.MY_SUBSCRIPTIONS
-        result = [
-            DirectoryItem(
-                context.localize('my_subscriptions'),
-                context.create_uri(my_subscriptions_path),
-                image='{media}/new_uploads.png',
-            ) if feed_type != 'videos' else None,
-            DirectoryItem(
-                context.localize('shorts'),
-                context.create_uri((my_subscriptions_path, 'shorts')),
-                image='{media}/shorts.png',
-            ) if feed_type != 'shorts' else None,
-            DirectoryItem(
-                context.localize('live'),
-                context.create_uri((my_subscriptions_path, 'live')),
-                image='{media}/live.png',
-            ) if feed_type != 'live' else None,
-        ]
+
+        params = context.get_params()
+        if params.get('page', 1) == 1 and not params.get('hide_folders'):
+            result = [
+                DirectoryItem(
+                    context.localize('my_subscriptions'),
+                    context.create_uri(my_subscriptions_path),
+                    image='{media}/new_uploads.png',
+                )
+                if feed_type != 'videos' and not params.get('hide_videos') else
+                None,
+                DirectoryItem(
+                    context.localize('shorts'),
+                    context.create_uri((my_subscriptions_path, 'shorts')),
+                    image='{media}/shorts.png',
+                )
+                if feed_type != 'shorts' and not params.get('hide_shorts') else
+                None,
+                DirectoryItem(
+                    context.localize('live'),
+                    context.create_uri((my_subscriptions_path, 'live')),
+                    image='{media}/live.png',
+                )
+                if feed_type != 'live' and not params.get('hide_live') else
+                None,
+            ]
+        else:
+            result = []
+
         options = {
             provider.CONTENT_TYPE: {
                 'content_type': CONTENT.VIDEO_CONTENT,
