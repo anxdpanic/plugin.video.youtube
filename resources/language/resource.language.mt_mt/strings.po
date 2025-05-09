@@ -481,7 +481,7 @@ msgid "More Links from the description"
 msgstr ""
 
 msgctxt "#30545"
-msgid "No further links found."
+msgid "No videos found."
 msgstr ""
 
 msgctxt "#30546"
@@ -497,7 +497,7 @@ msgid ""
 msgstr ""
 
 msgctxt "#30549"
-msgid "No videos streams found"
+msgid "No streams found"
 msgstr ""
 
 msgctxt "#30550"

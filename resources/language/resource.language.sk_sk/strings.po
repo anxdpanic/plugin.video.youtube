@@ -480,8 +480,8 @@ msgid "More Links from the description"
 msgstr "Viac odkazov z popisu"
 
 msgctxt "#30545"
-msgid "No further links found."
-msgstr "Ďalšie odkazy neboli nájdené."
+msgid "No videos found."
+msgstr ""
 
 msgctxt "#30546"
 msgid "Please complete all login prompts"
@@ -496,8 +496,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30549"
-msgid "No videos streams found"
-msgstr "Žiadne video prúdy neboli nájdené"
+msgid "No streams found"
+msgstr ""
 
 msgctxt "#30550"
 msgid ""
@@ -1582,6 +1582,14 @@ msgstr "Prehrať od začiatku"
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30545"
+#~ msgid "No further links found."
+#~ msgstr "Ďalšie odkazy neboli nájdené."
+
+#~ msgctxt "#30549"
+#~ msgid "No videos streams found"
+#~ msgstr "Žiadne video prúdy neboli nájdené"
 
 #~ msgctxt "#30106"
 #~ msgid "Next Page (%d)"

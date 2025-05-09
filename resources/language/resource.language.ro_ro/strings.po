@@ -481,8 +481,8 @@ msgid "More Links from the description"
 msgstr "Mai multe legături din descriere"
 
 msgctxt "#30545"
-msgid "No further links found."
-msgstr "Nu mai sunt alte legături."
+msgid "No videos found."
+msgstr ""
 
 msgctxt "#30546"
 msgid "Please complete all login prompts"
@@ -497,8 +497,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30549"
-msgid "No videos streams found"
-msgstr "Nu a fost găsit niciun flux video"
+msgid "No streams found"
+msgstr ""
 
 msgctxt "#30550"
 msgid ""
@@ -1583,6 +1583,14 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30545"
+#~ msgid "No further links found."
+#~ msgstr "Nu mai sunt alte legături."
+
+#~ msgctxt "#30549"
+#~ msgid "No videos streams found"
+#~ msgstr "Nu a fost găsit niciun flux video"
 
 #~ msgctxt "#30106"
 #~ msgid "Next Page (%d)"
