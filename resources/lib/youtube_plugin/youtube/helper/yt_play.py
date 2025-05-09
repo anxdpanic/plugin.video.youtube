@@ -46,7 +46,7 @@ def _play_stream(provider, context):
     params = context.get_params()
     video_id = params.get('video_id')
     if not video_id:
-        message = context.localize('error.no_video_streams_found')
+        message = context.localize('error.no_streams_found')
         ui.show_notification(message, time_ms=5000)
         return False
 
@@ -95,7 +95,7 @@ def _play_stream(provider, context):
             return False
 
         if not streams:
-            message = context.localize('error.no_video_streams_found')
+            message = context.localize('error.no_streams_found')
             ui.show_notification(message, time_ms=5000)
             return False
 
@@ -209,14 +209,14 @@ def _play_playlist(provider, context):
         if playlist_ids:
             json_data = resource_manager.get_playlist_items(playlist_ids)
             if not json_data:
-                return False
+                return False, None
             chunks = json_data.values()
             total = sum(len(chunk.get('items', [])) for chunk in chunks)
         elif video_ids:
             json_data = resource_manager.get_videos(video_ids,
                                                     live_details=True)
             if not json_data:
-                return False
+                return False, None
             chunks = [{
                 'kind': 'plugin#playlistItemListResponse',
                 'items': json_data.values(),
@@ -236,16 +236,27 @@ def _play_playlist(provider, context):
             progress_dialog.update(steps=len(result))
 
         if not video_items:
-            return False
+            return False, None
 
-        return (
-            process_items_for_playlist(context, video_items, action=action),
-            {
-                provider.CACHE_TO_DISC: action == 'list',
-                provider.FORCE_RESOLVE: action != 'list',
-                provider.UPDATE_LISTING: action != 'list',
-            },
-        )
+        result = process_items_for_playlist(context, video_items, action=action)
+        if action == 'list':
+            options = {
+                provider.CACHE_TO_DISC: True,
+                provider.FORCE_RESOLVE: False,
+                provider.UPDATE_LISTING: False,
+                provider.CONTENT_TYPE: {
+                    'content_type': CONTENT.VIDEO_CONTENT,
+                    'sub_type': None,
+                    'category_label': None,
+                },
+            }
+        else:
+            options = {
+                provider.CACHE_TO_DISC: False,
+                provider.FORCE_RESOLVE: True,
+                provider.UPDATE_LISTING: True,
+            }
+        return result, options
 
 
 def _play_channel_live(provider, context):
@@ -420,7 +431,6 @@ def process_items_for_playlist(context,
         return False
 
     if action == 'list':
-        context.set_content(CONTENT.VIDEO_CONTENT)
         return items
 
     # stop and clear the playlist
@@ -475,10 +485,10 @@ def process_items_for_playlist(context,
         return items
     if action == 'play':
         ui = context.get_ui()
-        max_wait_time = position
-        while ui.busy_dialog_active() or playlist_player.size() < position:
-            max_wait_time -= 1
-            if max_wait_time < 0:
+        timeout = position
+        while ui.busy_dialog_visible() or playlist_player.size() < position:
+            timeout -= 1
+            if timeout < 0:
                 command = playlist_player.play_playlist_item(position,
                                                              defer=True)
                 return UriItem(command)

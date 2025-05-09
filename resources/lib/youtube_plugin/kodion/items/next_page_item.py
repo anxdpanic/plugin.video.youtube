@@ -32,8 +32,16 @@ class NextPageItem(DirectoryItem):
             params['page_token'] = self.create_page_token(page, items_per_page)
 
         name = context.localize('page.next') % page
-        if params.get('back_fill'):
-            name = ''.join((name, ' (', context.localize('filtered'), ')'))
+        filtered = params.get('filtered')
+        if filtered:
+            name = ''.join((
+                name,
+                ' (',
+                str(filtered),
+                ' ',
+                context.localize('filtered'),
+                ')',
+            ))
 
         super(NextPageItem, self).__init__(
             name,

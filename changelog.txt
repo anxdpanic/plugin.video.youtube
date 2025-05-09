@@ -1,3 +1,30 @@
+## v7.2.0+beta.9
+### Fixed
+- Fix incorrect deletion of provider parameter in 10c3758 #1160
+- Fix possible hangs in multiple busy dialog workaround
+- Fix misidentifying channels in channel filter #1159
+- Attempt to avoid race condition where user input occurs prior to window rerouting #1021
+- Fix incorrectly referencing channels as playlist in My Subscriptions after db44928
+- Improve handling of invalid playlists in My Subscriptions after db44928
+- Update YouTube.get_related_videos and YouTube.get_related_for_home #1161
+- Fix error with listing comments if number of replies is 1000+
+
+### Changed
+- Use channel handle by default when adding/removing/matching channels
+  - Channel filters may need to be updated to use handles instead of channel name
+  - e.g. "@channel_1_handle,@channel_2_handle" instead of "channel 1 name, channel 2 name"
+  - Channels can be added/removed from the filter through the Subscriptions or Bookmarks context menu
+- Use channel handle as artist and in channel info for visibility
+- Reduce number of GET requests when using v3 Data API
+- Improve listing filler handling #1035
+  - Migrate My Subscriptions, Recommendations, Related, Trending and channel listings to use new filler methods
+- Show comment statistics before text in listings
+- Respect hide_folders plugin url query parameter in My Subscriptions
+  - Also respect value of hide_videos (new), hide_shorts, and hide_live params
+
+### New
+- Add hide_progress plugin url query parameter
+
 ## v7.2.0+beta.8
 ### Fixed
 - Fix regression in opening playlists of logged in user #1154

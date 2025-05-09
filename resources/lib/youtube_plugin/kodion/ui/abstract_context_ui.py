@@ -10,8 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from ..compatibility import string_type
-
 
 class AbstractContextUI(object):
     def __init__(self):
@@ -52,6 +50,9 @@ class AbstractContextUI(object):
                           time_ms=5000, audible=True):
         raise NotImplementedError()
 
+    def on_busy(self):
+        raise NotImplementedError()
+
     @staticmethod
     def refresh_container():
         """
@@ -60,136 +61,3 @@ class AbstractContextUI(object):
         :return:
         """
         raise NotImplementedError()
-
-
-class AbstractProgressDialog(object):
-    def __init__(self,
-                 ui,
-                 dialog,
-                 background,
-                 heading,
-                 message='',
-                 total=0,
-                 message_template=None,
-                 template_params=None):
-        self._ui = ui
-        if ui.busy_dialog_active():
-            self._dialog = dialog()
-            self._dialog.create(heading, message)
-            self._created = True
-        else:
-            self._dialog = dialog()
-            self._created = False
-
-        self._background = background
-
-        self._position = None
-        self._total = total
-
-        self._heading = heading
-        self._message = message
-        if message_template:
-            self._message_template = message_template
-            self._template_params = {
-                '_message': message,
-                '_progress': (0, self._total),
-                '_current': 0,
-                '_total': self._total,
-            }
-            if template_params:
-                self._template_params.update(template_params)
-        else:
-            self._message_template = None
-            self._template_params = None
-
-        # simple reset because KODI won't do it :(
-        self.update(position=0)
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
-        self.close()
-
-    def get_total(self):
-        return self._total
-
-    def get_position(self):
-        return self._position
-
-    def close(self):
-        if self._dialog and self._created:
-            self._dialog.close()
-            self._dialog = None
-            self._created = False
-
-    def is_aborted(self):
-        if self._dialog and self._created:
-            return getattr(self._dialog, 'iscanceled', bool)()
-        return False
-
-    def set_total(self, total):
-        self._total = int(total)
-
-    def reset_total(self, new_total, **kwargs):
-        self._total = int(new_total)
-        self.update(position=0, **kwargs)
-
-    def update_total(self, new_total, **kwargs):
-        self._total = int(new_total)
-        self.update(steps=0, **kwargs)
-
-    def grow_total(self, new_total=None, delta=None):
-        if delta:
-            delta = int(delta)
-            self._total += delta
-        elif new_total:
-            total = int(new_total)
-            if total > self._total:
-                self._total = total
-        return self._total
-
-    def update(self, steps=1, position=None, message=None, **template_params):
-        if not self._dialog:
-            return
-
-        if position is None:
-            self._position += steps
-        else:
-            self._position = position
-
-        if not self._total:
-            percent = 0
-        elif self._position >= self._total:
-            percent = 100
-            self._total = self._position
-        else:
-            percent = int(100 * self._position / self._total)
-
-        if isinstance(message, string_type):
-            self._message = message
-        elif self._message_template:
-            if template_params:
-                self._template_params.update(template_params)
-            template_params = self._template_params
-            progress = (self._position, self._total)
-            template_params['_progress'] = progress
-            template_params['_current'], template_params['_total'] = progress
-            message = self._message_template.format(
-                *template_params['_progress'],
-                **template_params
-            )
-            self._message = message
-
-        if not self._created:
-            if self._ui.busy_dialog_active():
-                return
-            self._dialog.create(self._heading, self._message)
-            self._created = True
-
-        # Kodi 18 renamed XbmcProgressDialog.update argument line1 to message.
-        # Only use positional arguments to maintain compatibility
-        if self._background:
-            self._dialog.update(percent, self._heading, self._message)
-        else:
-            self._dialog.update(percent, self._message)
