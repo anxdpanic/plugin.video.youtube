@@ -61,10 +61,7 @@ class BaseItem(object):
         self._studios = None
 
     def __str__(self):
-        return ('{type}'
-                '\n\tName:  |{name}|'
-                '\n\tURI:   |{uri}|'
-                '\n\tImage: |image}|'
+        return ('{type}(name="{name}", uri="{uri}", image="{image}")'
                 .format(type=self.__class__.__name__,
                         name=self._name,
                         uri=self._uri,

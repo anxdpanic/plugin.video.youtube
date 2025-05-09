@@ -73,7 +73,7 @@ def video_comments(context, video_id, video_name=None):
 
 def content_from_description(context, video_id):
     return (
-        context.localize('video.description.links'),
+        context.localize('video.description_links'),
         context.create_uri(
             (PATHS.ROUTE, PATHS.DESCRIPTION_LINKS),
             {

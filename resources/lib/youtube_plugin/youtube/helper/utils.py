@@ -100,6 +100,8 @@ def make_comment_item(context, snippet, uri, reply_count=0):
         ))))
         label_props.append(label_replies)
         plot_props.append(plot_replies)
+    else:
+        replies_value = 0
 
     published_at = snippet['publishedAt']
     updated_at = snippet['updatedAt']
@@ -141,7 +143,7 @@ def make_comment_item(context, snippet, uri, reply_count=0):
             plot=plot,
         )
 
-    comment_item.set_count(reply_count)
+    comment_item.set_count(replies_value)
 
     comment_item.set_short_details(label_stats)
     comment_item.set_production_code(label_stats)
@@ -254,16 +256,17 @@ def update_channel_items(provider, context, channel_id_dict,
         channel_item.set_short_details(label_stats)
         # Hack to force a custom label mask containing production code,
         # activated on sort order selection, to display details
-        # Refer XbmcContext.set_content for usage
+        # Refer XbmcContext.apply_content for usage
         channel_item.set_production_code(label_stats)
 
         # channel name and title
         localised_info = snippet.get('localized') or {}
+        channel_handle = snippet.get('customUrl')
         channel_name = (localised_info.get('title')
                         or snippet.get('title')
                         or untitled)
         channel_item.set_name(channel_name)
-        channel_item.add_artist(channel_name)
+        channel_item.add_artist(channel_handle or channel_name)
 
         # plot
         description = strip_html_from_text(localised_info.get('description')
@@ -275,9 +278,10 @@ def update_channel_items(provider, context, channel_id_dict,
                 ui.new_line(stats, cr_after=1) if stats else '',
                 ui.new_line(description, cr_after=1) if description else '',
                 ui.new_line('--------', cr_before=1, cr_after=1),
-                'https://www.youtube.com/' + channel_id
-                if channel_id.startswith('@') else
-                'https://www.youtube.com/channel/' + channel_id,
+                'https://www.youtube.com/',
+                channel_handle if channel_handle else
+                channel_id if channel_id.startswith('@') else
+                '/channel/' + channel_id,
             ))
         channel_item.set_plot(description)
 
@@ -318,10 +322,10 @@ def update_channel_items(provider, context, channel_id_dict,
         if filters_set is not None:
             context_menu.append(
                 menu_items.remove_my_subscriptions_filter(
-                    context, channel_name
+                    context, channel_handle or channel_name
                 ) if client.channel_match(channel_id, filters_set) else
                 menu_items.add_my_subscriptions_filter(
-                    context, channel_name
+                    context, channel_handle or channel_name
                 )
             )
 
@@ -422,7 +426,7 @@ def update_playlist_items(provider, context, playlist_id_dict,
         playlist_item.set_short_details(label_details)
         # Hack to force a custom label mask containing production code,
         # activated on sort order selection, to display details
-        # Refer XbmcContext.set_content for usage
+        # Refer XbmcContext.apply_content for usage
         playlist_item.set_production_code(label_details)
 
         # title
@@ -651,6 +655,8 @@ def update_video_items(provider, context, video_id_dict,
                 if duration.seconds:
                     # subtract 1s because YouTube duration is +1s too long
                     duration = duration.seconds - 1
+                else:
+                    duration = 0
         if duration:
             media_item.set_duration_from_seconds(duration)
             if duration <= shorts_duration:
@@ -684,10 +690,8 @@ def update_video_items(provider, context, video_id_dict,
             start_at = None
 
             if item_filter and (
-                    (not item_filter['shorts']
-                     and media_item.short)
-                    or (not item_filter['completed']
-                        and media_item.completed)
+                    (not item_filter['completed']
+                     and media_item.completed)
                     or (not item_filter['live']
                         and media_item.live and not media_item.upcoming)
                     or (not item_filter['upcoming']
@@ -698,6 +702,8 @@ def update_video_items(provider, context, video_id_dict,
                         and media_item.upcoming and media_item.live)
                     or (not item_filter['vod']
                         and media_item.vod)
+                    or (not item_filter['shorts']
+                        and media_item.short)
             ):
                 continue
 
@@ -785,7 +791,7 @@ def update_video_items(provider, context, video_id_dict,
         media_item.set_short_details(label_stats)
         # Hack to force a custom label mask containing production code,
         # activated on sort order selection, to display details
-        # Refer XbmcContext.set_content for usage
+        # Refer XbmcContext.apply_content for usage
         media_item.set_production_code(label_stats)
 
         # update and set the title
@@ -1251,46 +1257,49 @@ def get_shelf_index_by_title(context, json_data, shelf_title):
 
 def add_related_video_to_playlist(provider, context, client, v3, video_id):
     playlist_player = context.get_playlist_player()
+    if playlist_player.size() > 999:
+        return
+    playlist_items = playlist_player.get_items()
 
-    if playlist_player.size() <= 999:
-        a = 0
-        add_item = None
-        page_token = ''
-        playlist_items = playlist_player.get_items()
+    next_item = None
+    page_token = ''
+    for _ in range(2):
+        json_data = client.get_related_videos(
+            video_id,
+            page_token=page_token,
+        )
+        if not json_data:
+            break
 
-        while not add_item and a <= 2:
-            a += 1
-            result_items = []
+        result_items = v3.response_to_items(
+            provider,
+            context,
+            json_data,
+            process_next_page=False,
+        )
 
-            try:
-                json_data = client.get_related_videos(video_id,
-                                                      page_token=page_token,
-                                                      max_results=5)
-                result_items = v3.response_to_items(provider,
-                                                    context,
-                                                    json_data,
-                                                    process_next_page=False)
-                page_token = json_data.get('nextPageToken', '')
-            except Exception:
-                context.get_ui().show_notification('Failed to add a suggested video.', time_ms=5000)
+        try:
+            next_item = next((
+                item for item in result_items
+                if item
+                   and not any((item.get_uri() == playlist_item.get('file')
+                                or item.get_name() == playlist_item.get('title')
+                                for playlist_item in playlist_items))
+            ))
+        except StopIteration:
+            page_token = json_data.get('nextPageToken')
 
-            if result_items:
-                add_item = next((
-                    item for item in result_items
-                    if not any((item.get_uri() == pitem.get('file') or
-                                item.get_name() == pitem.get('title'))
-                               for pitem in playlist_items)),
-                    None)
+        if not page_token:
+            break
 
-            if not add_item and page_token:
-                continue
-
-            if add_item:
-                playlist_player.add(add_item)
-                break
-
-            if not page_token:
-                break
+    if next_item:
+        playlist_player.add(next_item)
+    else:
+        context.get_ui().show_notification(
+            context.localize('error.no_videos_found'),
+            header=context.localize('after_watch.play_suggested'),
+            time_ms=5000,
+        )
 
 
 def filter_videos(items,
@@ -1305,22 +1314,26 @@ def filter_videos(items,
                   custom=None,
                   callback=None,
                   **_kwargs):
-    return [
-        item
-        for item in items
+    accepted = []
+    rejected = []
+    for item in items:
         if ((not item.callback or item.callback(item))
-            and (not callback or callback(item))
-            and (not custom or filter_parse(item, custom))
-            and (not item.playable
-                 or not ((exclude and item.video_id in exclude)
-                         or (not completed and item.completed)
-                         or (not live and item.live and not item.upcoming)
-                         or (not upcoming and item.upcoming)
-                         or (not premieres and item.upcoming and not item.live)
-                         or (not upcoming_live and item.upcoming and item.live)
-                         or (not vod and item.vod)
-                         or (not shorts and item.short))))
-    ]
+                and (not callback or callback(item))
+                and (not custom or filter_parse(item, custom))
+                and (not item.playable or not (
+                        (exclude and item.video_id in exclude)
+                        or (not completed and item.completed)
+                        or (not live and item.live and not item.upcoming)
+                        or (not upcoming and item.upcoming)
+                        or (not premieres and item.upcoming and not item.live)
+                        or (not upcoming_live and item.upcoming and item.live)
+                        or (not vod and item.vod)
+                        or (not shorts and item.short)
+                ))):
+            accepted.append(item)
+        else:
+            rejected.append(item)
+    return accepted, rejected
 
 
 def filter_parse(item,
@@ -1341,12 +1354,11 @@ def filter_parse(item,
                      'search': re_search,
                  },
                  _none=lambda: None):
-    replacement_criteria = []
     criteria_met = False
     for idx, criteria in enumerate(all_criteria):
         if isinstance(criteria, string_type):
             criteria = criteria_re.findall(criteria)
-            replacement_criteria.append((idx, criteria))
+            all_criteria[idx] = criteria
         for input_1, op_str, input_2 in criteria:
             try:
                 if input_1.startswith('.'):
@@ -1393,8 +1405,6 @@ def filter_parse(item,
         else:
             criteria_met = True
             break
-    for idx, criteria in replacement_criteria:
-        all_criteria[idx] = criteria
     return criteria_met
 
 

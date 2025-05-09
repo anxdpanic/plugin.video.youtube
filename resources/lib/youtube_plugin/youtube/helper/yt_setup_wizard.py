@@ -24,7 +24,7 @@ def process_pre_run(context):
     context.get_function_cache().clear()
 
 
-def process_language(context, step, steps):
+def process_language(context, step, steps, **_kwargs):
     localize = context.localize
     ui = context.get_ui()
 

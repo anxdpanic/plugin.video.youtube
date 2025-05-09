@@ -17,10 +17,10 @@ from ...constants import (
     CONTAINER_FOCUS,
     CONTAINER_ID,
     CONTAINER_POSITION,
-    CONTENT_TYPE,
     FORCE_PLAY_PARAMS,
     PATHS,
     PLAYBACK_FAILED,
+    PLAYER_VIDEO_ID,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
     PLAY_FORCED,
@@ -79,7 +79,7 @@ class XbmcPlugin(AbstractPlugin):
         succeeded = False
         for was_busy in (ui.pop_property(BUSY_FLAG),):
             if was_busy:
-                if ui.busy_dialog_active():
+                if ui.busy_dialog_visible():
                     ui.set_property(BUSY_FLAG)
                 if route:
                     break
@@ -123,30 +123,30 @@ class XbmcPlugin(AbstractPlugin):
                     else:
                         continue
 
-            max_wait_time = 30
-            while ui.busy_dialog_active():
-                max_wait_time -= 1
-                if max_wait_time < 0:
+            timeout = 30
+            while ui.busy_dialog_visible():
+                timeout -= 1
+                if timeout < 0:
                     context.log_error('Multiple busy dialogs active'
                                       ' - Extended busy period')
-                    continue
+                    break
                 context.sleep(1)
 
             context.log_warning('Multiple busy dialogs active'
-                                ' - Reloading playlist')
+                                ' - Reloading playlist...')
 
             num_items = playlist_player.add_items(items)
             if position:
-                max_wait_time = min(position, num_items)
+                timeout = min(position, num_items)
             else:
                 position = 1
-                max_wait_time = num_items
+                timeout = num_items
 
-            while ui.busy_dialog_active() or playlist_player.size() < position:
-                max_wait_time -= 1
-                if max_wait_time < 0:
+            while ui.busy_dialog_visible() or playlist_player.size() < position:
+                timeout -= 1
+                if timeout < 0:
                     context.log_error('Multiple busy dialogs active'
-                                      ' - Unable to restart playback')
+                                      ' - Playback restart failed, retrying...')
                     command = playlist_player.play_playlist_item(position,
                                                                  defer=True)
                     result, post_run_action = self.uri_action(
@@ -154,7 +154,7 @@ class XbmcPlugin(AbstractPlugin):
                         command,
                     )
                     succeeded = False
-                    continue
+                    break
                 context.sleep(1)
             else:
                 playlist_player.play_playlist_item(position)
@@ -165,11 +165,6 @@ class XbmcPlugin(AbstractPlugin):
 
         if ui.get_property(PLUGIN_SLEEPING):
             context.wakeup(PLUGIN_WAKEUP)
-
-        if not ui.pop_property(REFRESH_CONTAINER) and forced:
-            focused = ui.get_property(VIDEO_ID)
-        else:
-            focused = False
 
         if ui.pop_property(RELOAD_ACCESS_MANAGER):
             context.reload_access_manager()
@@ -191,6 +186,8 @@ class XbmcPlugin(AbstractPlugin):
                 )
             else:
                 result, options = provider.navigate(context)
+                if ui.get_property(REROUTE_PATH):
+                    return
         except KodionException as exc:
             result = None
             options = {}
@@ -202,6 +199,18 @@ class XbmcPlugin(AbstractPlugin):
                                stack=format_stack()))
                 context.log_error(msg)
                 ui.on_ok('Error in ContentProvider', exc.__str__())
+
+        if not ui.pop_property(REFRESH_CONTAINER) and forced:
+            player_video_id = ui.pop_property(PLAYER_VIDEO_ID)
+            if player_video_id:
+                focused_video_id = None
+                played_video_id = player_video_id
+            else:
+                focused_video_id = ui.get_property(VIDEO_ID)
+                played_video_id = None
+        else:
+            focused_video_id = None
+            played_video_id = None
 
         items = isinstance(result, (list, tuple))
         item_count = 0
@@ -226,7 +235,8 @@ class XbmcPlugin(AbstractPlugin):
                     context,
                     item,
                     show_fanart=show_fanart,
-                    focused=focused,
+                    focused=focused_video_id,
+                    played=played_video_id,
                 )
                 for item in result
                 if self.classify_list_item(item, options, force_resolve)
@@ -253,7 +263,11 @@ class XbmcPlugin(AbstractPlugin):
                 )
 
         if item_count:
-            context.apply_content()
+            content_type = options.get(provider.CONTENT_TYPE)
+            if content_type:
+                context.apply_content(**content_type)
+            else:
+                context.apply_content()
             succeeded = xbmcplugin.addDirectoryItems(
                 handle, items, item_count
             )
@@ -274,7 +288,6 @@ class XbmcPlugin(AbstractPlugin):
         else:
             succeeded = bool(result)
             if not succeeded:
-                ui.clear_property(CONTENT_TYPE)
                 ui.clear_property(BUSY_FLAG)
                 for param in FORCE_PLAY_PARAMS:
                     ui.clear_property(param)
@@ -359,7 +372,7 @@ class XbmcPlugin(AbstractPlugin):
     def post_run(context, ui, *actions, **kwargs):
         timeout = kwargs.get('timeout', 30)
         for action in actions:
-            while ui.busy_dialog_active():
+            while ui.busy_dialog_visible():
                 timeout -= 1
                 if timeout < 0:
                     context.log_error('Multiple busy dialogs active'

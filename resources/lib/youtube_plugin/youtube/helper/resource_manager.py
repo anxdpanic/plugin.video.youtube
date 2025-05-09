@@ -101,6 +101,7 @@ class ResourceManager(object):
         if to_update:
             notify_and_raise = not suppress_errors
             new_data = [client.get_channels(list_of_50,
+                                            max_results=50,
                                             notify=notify_and_raise,
                                             raise_exc=notify_and_raise)
                         for list_of_50 in self._list_batch(to_update, n=50)]
@@ -175,6 +176,7 @@ class ResourceManager(object):
             notify_and_raise = not suppress_errors
             client = self._provider.get_client(context)
             new_data = [client.get_channels(list_of_50,
+                                            max_results=50,
                                             notify=notify_and_raise,
                                             raise_exc=notify_and_raise)
                         for list_of_50 in self._list_batch(to_update, n=50)]
@@ -266,6 +268,7 @@ class ResourceManager(object):
             notify_and_raise = not suppress_errors
             client = self._provider.get_client(context)
             new_data = [client.get_playlists(list_of_50,
+                                             max_results=50,
                                              notify=notify_and_raise,
                                              raise_exc=notify_and_raise)
                         for list_of_50 in self._list_batch(to_update, n=50)]
@@ -302,7 +305,11 @@ class ResourceManager(object):
 
         return result
 
-    def get_playlist_items(self, ids=None, batch_id=None, defer_cache=False):
+    def get_playlist_items(self,
+                           ids=None,
+                           batch_id=None,
+                           page_token=None,
+                           defer_cache=False):
         if not ids and not batch_id:
             return None
 
@@ -312,6 +319,10 @@ class ResourceManager(object):
         if batch_id:
             ids = [batch_id[0]]
             page_token = batch_id[1]
+            fetch_next = False
+        elif page_token is None:
+            fetch_next = True
+        elif len(ids) == 1:
             fetch_next = False
         else:
             page_token = None
@@ -396,6 +407,8 @@ class ResourceManager(object):
                 if batch_id in result
             }
 
+        if not fetch_next:
+            return result[batch_ids[0]]
         return result
 
     def get_related_playlists(self, channel_id, defer_cache=False):
@@ -473,6 +486,7 @@ class ResourceManager(object):
             client = self._provider.get_client(context)
             new_data = [client.get_videos(list_of_50,
                                           live_details,
+                                          max_results=50,
                                           notify=notify_and_raise,
                                           raise_exc=notify_and_raise)
                         for list_of_50 in self._list_batch(to_update, n=50)]

@@ -61,7 +61,6 @@ class AbstractContext(Logger):
         PLAY_STRM,
         PLAY_TIMESHIFT,
         PLAY_WITH,
-        'back_fill',
         'confirmed',
         'clip',
         'enable',
@@ -69,8 +68,10 @@ class AbstractContext(Logger):
         'hide_live',
         'hide_next_page',
         'hide_playlists',
+        'hide_progress',
         'hide_search',
         'hide_shorts',
+        'hide_videos',
         'incognito',
         'location',
         'logged_in',
@@ -83,6 +84,7 @@ class AbstractContext(Logger):
     }
     _INT_PARAMS = {
         'fanart_type',
+        'filtered',
         'items_per_page',
         'live',
         'next_page_token',
@@ -308,7 +310,7 @@ class AbstractContext(Logger):
                     (('%' + param, ','.join([quote(item) for item in value]))
                      if len(value) > 1 else
                      (param, value[0]))
-                    if isinstance(value, (list, tuple)) else
+                    if value and isinstance(value, (list, tuple)) else
                     (param, value)
                     for param, value in params
                 ])
@@ -524,7 +526,10 @@ class AbstractContext(Logger):
     def localize(self, text_id, default_text=None):
         raise NotImplementedError()
 
-    def set_content(self, content_type, sub_type=None, category_label=None):
+    def apply_content(self,
+                      content_type=None,
+                      sub_type=None,
+                      category_label=None):
         raise NotImplementedError()
 
     def add_sort_method(self, *sort_methods):
@@ -533,7 +538,12 @@ class AbstractContext(Logger):
     def clone(self, new_path=None, new_params=None):
         raise NotImplementedError()
 
-    def execute(self, command, wait=False, wait_for=None):
+    def execute(self,
+                command,
+                wait=False,
+                wait_for=None,
+                wait_for_set=True,
+                block_ui=False):
         raise NotImplementedError()
 
     @staticmethod

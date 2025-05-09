@@ -27,7 +27,6 @@ from ...constants import (
     ABORT_FLAG,
     ADDON_ID,
     CONTENT,
-    CONTENT_TYPE,
     PLAY_FORCE_AUDIO,
     SORT,
     WAKEUP,
@@ -66,6 +65,7 @@ class XbmcContext(AbstractContext):
     }
 
     LOCAL_MAP = {
+        'after_watch.play_suggested': 30582,
         'api.config': 30634,
         'api.config.bookmark': 30638,
         'api.config.not_updated': 30635,
@@ -120,7 +120,8 @@ class XbmcContext(AbstractContext):
         'datetime.yesterday_at': 30682,
         'delete': 117,
         'disliked.video': 30717,
-        'error.no_video_streams_found': 30549,
+        'error.no_streams_found': 30549,
+        'error.no_videos_found': 30545,
         'error.rtmpe_not_supported': 30542,
         'failed': 30576,
         'feeds': 30518,
@@ -301,8 +302,8 @@ class XbmcContext(AbstractContext):
         'video.comments.edited': 30735,
         'video.comments.likes': 30733,
         'video.comments.replies': 30734,
-        'video.description.links': 30544,
-        'video.description.links.not_found': 30545,
+        'video.description_links': 30544,
+        'video.description_links.not_found': 30545,
         'video.disliked': 30538,
         'video.liked': 30508,
         'video.more': 22082,
@@ -570,29 +571,19 @@ class XbmcContext(AbstractContext):
         result = to_unicode(result) if result else default_text
         return result
 
-    def set_content(self, content_type, sub_type=None, category_label=None):
-        ui = self.get_ui()
-        ui.set_property(CONTENT_TYPE, json.dumps(
-            (content_type, sub_type, category_label),
-            ensure_ascii=False,
-        ))
-
-    def apply_content(self):
+    def apply_content(self,
+                      content_type=None,
+                      sub_type=None,
+                      category_label=None):
         # ui local variable used for ui.get_view_manager() in unofficial version
         ui = self.get_ui()
 
-        content_type = ui.pop_property(CONTENT_TYPE)
         if content_type:
-            content_type, sub_type, category_label = json.loads(content_type)
-            self.log_debug('Applying content-type: |{type}| for |{path}|'.format(
-                type=(sub_type or content_type), path=self.get_path()
-            ))
+            self.log_debug('Applying content-type: |{type}| for |{path}|'
+                           .format(type=(sub_type or content_type),
+                                   path=self.get_path()))
             xbmcplugin.setContent(self._plugin_handle, content_type)
             ui.get_view_manager().set_view_mode(content_type)
-        else:
-            content_type = None
-            sub_type = None
-            category_label = None
 
         if category_label is None:
             category_label = self.get_param('category_label')
@@ -614,11 +605,11 @@ class XbmcContext(AbstractContext):
             )
         elif sub_type == 'comments':
             self.add_sort_method(
-                (SORT.CHANNEL,          '[%A - ]%T \u2022 %P',       '%J'),
-                (SORT.ARTIST,           '[%J - ]%T \u2022 %P',       '%A'),
-                (SORT.PROGRAM_COUNT,    '[%A - ]%T \u2022 %P | %J',  '%C'),
-                (SORT.DATE,             '[%A - ]%T \u2022 %P',       '%J'),
-                (SORT.TRACKNUM,         '[%N. ][%A - ]%T \u2022 %P', '%J'),
+                (SORT.CHANNEL,          '[%A - ]%P \u2022 %T',       '%J'),
+                (SORT.ARTIST,           '[%J - ]%P \u2022 %T',       '%A'),
+                (SORT.PROGRAM_COUNT,    '[%A - ]%P | %J \u2022 %T',  '%C'),
+                (SORT.DATE,             '[%A - ]%P \u2022 %T',       '%J'),
+                (SORT.TRACKNUM,         '[%N. ][%A - ]%P \u2022 %T', '%J'),
             ) if detailed_labels else self.add_sort_method(
                 (SORT.CHANNEL,          '[%A - ]%T'),
                 (SORT.ARTIST,           '[%A - ]%T'),
@@ -688,20 +679,36 @@ class XbmcContext(AbstractContext):
 
         return new_context
 
-    def execute(self, command, wait=False, wait_for=None):
+    def execute(self,
+                command,
+                wait=False,
+                wait_for=None,
+                wait_for_set=True,
+                block_ui=False):
         if not wait_for:
             xbmc.executebuiltin(command, wait)
             return
 
         ui = self.get_ui()
-        ui.clear_property(wait_for)
-        pop_property = ui.pop_property
         waitForAbort = xbmc.Monitor().waitForAbort
 
         xbmc.executebuiltin(command, wait)
 
-        while not pop_property(wait_for) and not waitForAbort(1):
-            pass
+        if block_ui:
+            xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+
+        if wait_for_set:
+            ui.clear_property(wait_for)
+            pop_property = ui.pop_property
+            while not pop_property(wait_for) and not waitForAbort(1):
+                pass
+        else:
+            get_property = ui.get_property
+            while get_property(wait_for) and not waitForAbort(1):
+                pass
+
+        if block_ui:
+            xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
 
     @staticmethod
     def sleep(timeout=None):
@@ -924,8 +931,10 @@ class XbmcContext(AbstractContext):
             folder_name = xbmc.getInfoLabel('Container.FolderName')
         return folder_name == self._plugin_name
 
-    def refresh_requested(self, force=False, on=False, off=False):
-        refresh = self.get_param('refresh', 0)
+    def refresh_requested(self, force=False, on=False, off=False, params=None):
+        if params is None:
+            params = self.get_params()
+        refresh = params.get('refresh', 0)
         if not force:
             return refresh > 0
 

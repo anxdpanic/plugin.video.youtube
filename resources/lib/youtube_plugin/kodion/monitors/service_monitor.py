@@ -18,6 +18,8 @@ from ..constants import (
     CHECK_SETTINGS,
     CONTAINER_FOCUS,
     PATHS,
+    PLAYBACK_STOPPED,
+    PLAYER_VIDEO_ID,
     PLAY_FORCED,
     PLUGIN_WAKEUP,
     REFRESH_CONTAINER,
@@ -58,7 +60,7 @@ class ServiceMonitor(xbmc.Monitor):
         super(ServiceMonitor, self).__init__()
 
     @staticmethod
-    def busy_dialog_active(dialog_ids=frozenset((
+    def busy_dialog_visible(dialog_ids=frozenset((
             10100,  # WINDOW_DIALOG_YES_NO
             10101,  # WINDOW_DIALOG_PROGRESS
             10103,  # WINDOW_DIALOG_KEYBOARD
@@ -69,6 +71,8 @@ class ServiceMonitor(xbmc.Monitor):
             12000,  # WINDOW_DIALOG_SELECT
             12002,  # WINDOW_DIALOG_OK
     ))):
+        if xbmc.getCondVisibility('System.HasVisibleModalDialog'):
+            return True
         dialog_id = xbmcgui.getCurrentWindowDialogId()
         if dialog_id in dialog_ids:
             return dialog_id
@@ -78,7 +82,7 @@ class ServiceMonitor(xbmc.Monitor):
     def is_plugin_container(url='plugin://{0}/'.format(ADDON_ID),
                             check_all=False,
                             _bool=xbmc.getCondVisibility,
-                            _busy=busy_dialog_active.__func__,
+                            _busy=busy_dialog_visible.__func__,
                             _label=xbmc.getInfoLabel):
         if check_all:
             return (not _bool('Container.IsUpdating')
@@ -91,10 +95,17 @@ class ServiceMonitor(xbmc.Monitor):
             'is_active': is_plugin and not _busy(),
         }
 
-    @staticmethod
-    def set_property(property_id, value='true'):
-        property_id = '-'.join((ADDON_ID, property_id))
-        xbmcgui.Window(10000).setProperty(property_id, value)
+    def clear_property(self, property_id):
+        self._context.log_debug('Clear property |{id}|'.format(id=property_id))
+        _property_id = '-'.join((ADDON_ID, property_id))
+        xbmcgui.Window(10000).clearProperty(_property_id)
+        return None
+
+    def set_property(self, property_id, value='true'):
+        self._context.log_debug('Set property |{id}|: {value!r}'
+                                .format(id=property_id, value=value))
+        _property_id = '-'.join((ADDON_ID, property_id))
+        xbmcgui.Window(10000).setProperty(_property_id, value)
         return value
 
     def refresh_container(self, force=False):
@@ -211,6 +222,15 @@ class ServiceMonitor(xbmc.Monitor):
         elif event == RELOAD_ACCESS_MANAGER:
             self._context.reload_access_manager()
             self.refresh_container()
+
+        elif event == PLAYBACK_STOPPED:
+            if data:
+                data = json.loads(data)
+            if not data:
+                return
+
+            if data.get('play_data', {}).get('play_count'):
+                self.set_property(PLAYER_VIDEO_ID, data.get('video_id'))
 
     def onSettingsChanged(self, force=False):
         context = self._context
