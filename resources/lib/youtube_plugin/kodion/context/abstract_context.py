@@ -36,7 +36,6 @@ from ..constants import (
     WINDOW_REPLACE,
     WINDOW_RETURN,
 )
-from ..json_store import AccessManager
 from ..sql_store import (
     BookmarksList,
     DataCache,
@@ -192,67 +191,82 @@ class AbstractContext(Logger):
 
     def get_playback_history(self):
         uuid = self.get_uuid()
-        if not self._playback_history or self._playback_history.uuid != uuid:
+        playback_history = self._playback_history
+        if not playback_history or playback_history.uuid != uuid:
             filepath = (self.get_data_path(), uuid, 'history.sqlite')
-            self._playback_history = PlaybackHistory(filepath)
-        return self._playback_history
+            playback_history = PlaybackHistory(filepath)
+            self._playback_history = playback_history
+        return playback_history
 
     def get_feed_history(self):
         uuid = self.get_uuid()
-        if not self._feed_history or self._feed_history.uuid != uuid:
+        feed_history = self._feed_history
+        if not feed_history or feed_history.uuid != uuid:
             filepath = (self.get_data_path(), uuid, 'feeds.sqlite')
-            self._feed_history = FeedHistory(filepath)
-        return self._feed_history
+            feed_history = FeedHistory(filepath)
+            self._feed_history = feed_history
+        return feed_history
 
     def get_data_cache(self):
         uuid = self.get_uuid()
-        if not self._data_cache or self._data_cache.uuid != uuid:
+        data_cache = self._data_cache
+        if not data_cache or data_cache.uuid != uuid:
             filepath = (self.get_data_path(), uuid, 'data_cache.sqlite')
-            self._data_cache = DataCache(
+            data_cache = DataCache(
                 filepath,
                 max_file_size_mb=self.get_settings().cache_size() / 2,
             )
-        return self._data_cache
+            self._data_cache = data_cache
+        return data_cache
 
     def get_function_cache(self):
         uuid = self.get_uuid()
-        if not self._function_cache or self._function_cache.uuid != uuid:
+        function_cache = self._function_cache
+        if not function_cache or function_cache.uuid != uuid:
             filepath = (self.get_data_path(), uuid, 'cache.sqlite')
-            self._function_cache = FunctionCache(
+            function_cache = FunctionCache(
                 filepath,
                 max_file_size_mb=self.get_settings().cache_size() / 2,
             )
-        return self._function_cache
+            self._function_cache = function_cache
+        return function_cache
 
     def get_search_history(self):
         uuid = self.get_uuid()
-        if not self._search_history or self._search_history.uuid != uuid:
+        search_history = self._search_history
+        if not search_history or search_history.uuid != uuid:
             filepath = (self.get_data_path(), uuid, 'search.sqlite')
-            self._search_history = SearchHistory(
+            search_history = SearchHistory(
                 filepath,
                 max_item_count=self.get_settings().get_search_history_size(),
             )
-        return self._search_history
+            self._search_history = search_history
+        return search_history
 
     def get_bookmarks_list(self):
         uuid = self.get_uuid()
-        if not self._bookmarks_list or self._bookmarks_list.uuid != uuid:
+        bookmarks_list = self._bookmarks_list
+        if not bookmarks_list or bookmarks_list.uuid != uuid:
             filepath = (self.get_data_path(), uuid, 'bookmarks.sqlite')
-            self._bookmarks_list = BookmarksList(filepath)
-        return self._bookmarks_list
+            bookmarks_list = BookmarksList(filepath)
+            self._bookmarks_list = bookmarks_list
+        return bookmarks_list
 
     def get_watch_later_list(self):
         uuid = self.get_uuid()
-        if not self._watch_later_list or self._watch_later_list.uuid != uuid:
+        watch_later_list = self._watch_later_list
+        if not watch_later_list or watch_later_list.uuid != uuid:
             filepath = (self.get_data_path(), uuid, 'watch_later.sqlite')
-            self._watch_later_list = WatchLaterList(filepath)
-        return self._watch_later_list
+            watch_later_list = WatchLaterList(filepath)
+            self._watch_later_list = watch_later_list
+        return watch_later_list
 
     def get_uuid(self):
         uuid = self._uuid
-        if uuid:
-            return uuid
-        return self.reload_access_manager(get_uuid=True)
+        if not uuid:
+            uuid = self.get_access_manager().get_current_user_id()
+            self._uuid = uuid
+        return uuid
 
     def get_access_manager(self):
         access_manager = self._access_manager
@@ -260,14 +274,8 @@ class AbstractContext(Logger):
             return access_manager
         return self.reload_access_manager()
 
-    def reload_access_manager(self, get_uuid=False):
-        access_manager = AccessManager(self)
-        self._access_manager = access_manager
-        uuid = access_manager.get_current_user_id()
-        self._uuid = uuid
-        if get_uuid:
-            return uuid
-        return access_manager
+    def reload_access_manager(self):
+        raise NotImplementedError()
 
     def get_playlist_player(self):
         raise NotImplementedError()

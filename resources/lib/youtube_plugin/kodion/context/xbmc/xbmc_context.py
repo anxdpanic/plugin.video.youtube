@@ -31,6 +31,7 @@ from ...constants import (
     SORT,
     WAKEUP,
 )
+from ...json_store import AccessManager
 from ...player import XbmcPlaylistPlayer
 from ...settings import XbmcPluginSettings
 from ...ui import XbmcContextUI
@@ -509,17 +510,26 @@ class XbmcContext(AbstractContext):
             language = xbmc.convertLanguage(language, xbmc.ISO_639_1)
         return language
 
+    def reload_access_manager(self):
+        access_manager = AccessManager(proxy(self))
+        self._access_manager = access_manager
+        return access_manager
+
     def get_playlist_player(self, playlist_type=None):
         if self.get_param(PLAY_FORCE_AUDIO) or self.get_settings().audio_only():
             playlist_type = 'audio'
-        if not self._playlist or playlist_type:
-            self._playlist = XbmcPlaylistPlayer(proxy(self), playlist_type)
-        return self._playlist
+        playlist_player = self._playlist
+        if not playlist_player or playlist_type:
+            playlist_player = XbmcPlaylistPlayer(proxy(self), playlist_type)
+            self._playlist = playlist_player
+        return playlist_player
 
     def get_ui(self):
-        if not self._ui:
-            self._ui = XbmcContextUI(proxy(self))
-        return self._ui
+        ui = self._ui
+        if not ui:
+            ui = XbmcContextUI(proxy(self))
+            self._ui = ui
+        return ui
 
     def get_data_path(self):
         return self._data_path
