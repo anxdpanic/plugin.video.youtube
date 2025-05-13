@@ -31,7 +31,7 @@ from ...constants import (
     SORT,
     WAKEUP,
 )
-from ...json_store import AccessManager
+from ...json_store import APIKeyStore, AccessManager
 from ...player import XbmcPlaylistPlayer
 from ...settings import XbmcPluginSettings
 from ...ui import XbmcContextUI
@@ -515,6 +515,11 @@ class XbmcContext(AbstractContext):
         self._access_manager = access_manager
         return access_manager
 
+    def reload_api_store(self):
+        api_store = APIKeyStore(proxy(self))
+        self._api_store = api_store
+        return api_store
+
     def get_playlist_player(self, playlist_type=None):
         if self.get_param(PLAY_FORCE_AUDIO) or self.get_settings().audio_only():
             playlist_type = 'audio'
@@ -674,6 +679,7 @@ class XbmcContext(AbstractContext):
 
         new_context._access_manager = self._access_manager
         new_context._uuid = self._uuid
+        new_context._api_store = self._api_store
 
         new_context._bookmarks_list = self._bookmarks_list
         new_context._data_cache = self._data_cache

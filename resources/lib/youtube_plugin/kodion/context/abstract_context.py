@@ -142,6 +142,7 @@ class AbstractContext(Logger):
     def __init__(self, path='/', params=None, plugin_id=''):
         self._access_manager = None
         self._uuid = None
+        self._api_store = None
 
         self._bookmarks_list = None
         self._data_cache = None
@@ -275,6 +276,15 @@ class AbstractContext(Logger):
         return self.reload_access_manager()
 
     def reload_access_manager(self):
+        raise NotImplementedError()
+
+    def get_api_store(self):
+        api_store = self._api_store
+        if api_store:
+            return api_store
+        return self.reload_api_store()
+
+    def reload_api_store(self):
         raise NotImplementedError()
 
     def get_playlist_player(self):

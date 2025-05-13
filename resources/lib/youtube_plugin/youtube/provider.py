@@ -17,7 +17,7 @@ from json import loads as json_loads
 from re import compile as re_compile
 from weakref import proxy
 
-from .client import APICheck, YouTube
+from .client import YouTube
 from .helper import (
     ResourceManager,
     UrlResolver,
@@ -58,7 +58,6 @@ class Provider(AbstractProvider):
         super(Provider, self).__init__()
         self._resource_manager = None
         self._client = None
-        self._api_check = None
         self._logged_in = False
 
         self.on_video_x = self.register_path(
@@ -177,14 +176,99 @@ class Provider(AbstractProvider):
 
     def reset_client(self):
         self._client = None
-        self._api_check = None
 
     def get_client(self, context):
         access_manager = context.get_access_manager()
+        api_store = context.get_api_store()
+        settings = context.get_settings()
 
-        if not self._api_check:
-            self._api_check = APICheck(context)
-        configs = self._api_check.get_configs()
+        if not self._client:
+            api_data = api_store.get_data()
+
+            update_saved_values = False
+            update_settings_values = False
+
+            saved_details = (
+                api_data['keys']['personal'].get('api_key', ''),
+                api_data['keys']['personal'].get('client_id', ''),
+                api_data['keys']['personal'].get('client_secret', ''),
+            )
+            if all(saved_details):
+                update_settings_values = True
+                # users are now pasting keys into api_keys.json
+                # try stripping whitespace and domain suffix from API details
+                # and save the results if they differ
+                stripped_details = api_store.strip_details(*saved_details)
+                if all(stripped_details) and saved_details != stripped_details:
+                    saved_details = stripped_details
+                    api_data['keys']['personal'] = {
+                        'api_key': saved_details[0],
+                        'client_id': saved_details[1],
+                        'client_secret': saved_details[2],
+                    }
+                    update_saved_values = True
+
+            setting_details = (
+                settings.api_key(),
+                settings.api_id(),
+                settings.api_secret(),
+            )
+            if all(setting_details):
+                update_settings_values = False
+                stripped_details = api_store.strip_details(*setting_details)
+                if all(stripped_details) and setting_details != stripped_details:
+                    setting_details = (
+                        settings.api_key(stripped_details[0]),
+                        settings.api_id(stripped_details[1]),
+                        settings.api_secret(stripped_details[2]),
+                    )
+
+                if saved_details != setting_details:
+                    api_data['keys']['personal'] = {
+                        'api_key': setting_details[0],
+                        'client_id': setting_details[1],
+                        'client_secret': setting_details[2],
+                    }
+                    update_saved_values = True
+
+            if update_saved_values:
+                api_store.save(api_data)
+
+            if update_settings_values:
+                settings.api_key(saved_details[0])
+                settings.api_id(saved_details[1])
+                settings.api_secret(saved_details[2])
+
+            switch = api_store.get_current_switch()
+            current_key_set = api_store.get_key_set(switch)
+            current_hash = access_manager.calc_key_hash(**current_key_set)
+            last_hash = access_manager.get_last_key_hash()
+
+            changed = current_hash != last_hash
+            if changed and switch == 'own':
+                old_key_set = api_store.get_key_set('own_old')
+                old_hash = access_manager.calc_key_hash(**old_key_set)
+                changed = old_hash != last_hash
+                if not changed:
+                    access_manager.set_last_key_hash(current_hash)
+            api_store.changed = changed
+
+            context.log_debug('User: |{user}|, '
+                              'Using API key set: |{switch}|'
+                              .format(user=access_manager.get_current_user(),
+                                      switch=switch))
+
+            if changed:
+                context.log_debug('API key set changed: Signing out')
+                access_manager.set_last_key_hash(current_hash)
+                context.execute(context.create_uri(
+                    ('sign', 'out'),
+                    {
+                        'confirmed': True,
+                    },
+                    run=True,
+                ))
+        configs = api_store.get_configs()
 
         dev_id = context.get_param('addon_id')
         if not dev_id or dev_id == ADDON_ID:
@@ -229,7 +313,7 @@ class Provider(AbstractProvider):
         if any(refresh_tokens):
             keys_changed = access_manager.dev_keys_changed(
                 dev_id, dev_keys['key'], dev_keys['id'], dev_keys['secret']
-            ) if dev_id else self._api_check.changed
+            ) if dev_id else api_store.changed
             if keys_changed:
                 context.log_warning('API key set changed: Resetting client'
                                     ' and updating access token')
@@ -247,13 +331,11 @@ class Provider(AbstractProvider):
             .format(num_access_tokens, num_refresh_tokens)
         )
 
-        settings = context.get_settings()
         client = YouTube(context=context,
                          language=settings.get_language(),
                          region=settings.get_region(),
                          items_per_page=settings.items_per_page(),
                          configs=configs)
-
         with client:
             # create new access tokens
             if num_refresh_tokens and num_access_tokens != num_refresh_tokens:
