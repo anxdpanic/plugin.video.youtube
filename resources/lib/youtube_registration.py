@@ -13,7 +13,6 @@ from base64 import b64encode
 
 from youtube_plugin.kodion.constants import ADDON_ID
 from youtube_plugin.kodion.context import XbmcContext
-from youtube_plugin.kodion.json_store import APIKeyStore
 
 
 def register_api_keys(addon_id, api_key, client_id, client_secret):
@@ -50,7 +49,7 @@ def register_api_keys(addon_id, api_key, client_id, client_secret):
         context.log_error('Register API Keys: |%s| Invalid addon_id' % addon_id)
         return
 
-    api_jstore = APIKeyStore()
+    api_jstore = context.get_api_store()
     json_api = api_jstore.get_data()
 
     access_manager = context.get_access_manager()
