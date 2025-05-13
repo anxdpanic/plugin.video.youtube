@@ -13,10 +13,8 @@ import uuid
 from hashlib import md5
 
 from .json_store import JSONStore
+from ..compatibility import string_type
 from ..constants import ADDON_ID
-
-
-__author__ = 'bromix'
 
 
 class AccessManager(JSONStore):
@@ -39,93 +37,131 @@ class AccessManager(JSONStore):
 
     def set_defaults(self, reset=False):
         data = {} if reset else self.get_data()
-        if 'access_manager' not in data:
-            data = {
-                'access_manager': {
-                    'users': {
-                        0: self.DEFAULT_NEW_USER.copy()
-                    }
+
+        access_manager = data.get('access_manager')
+        if not access_manager or not isinstance(access_manager, dict):
+            users = {
+                0: self.DEFAULT_NEW_USER.copy(),
+            }
+            access_manager = {
+                'users': users,
+                'current_user': 0,
+                'last_origin': ADDON_ID,
+                'developers': {},
+            }
+        else:
+            users = access_manager.get('users')
+            if not users or not isinstance(users, dict):
+                users = {
+                    0: self.DEFAULT_NEW_USER.copy(),
                 }
-            }
-        if 'users' not in data['access_manager']:
-            data['access_manager']['users'] = {
-                0: self.DEFAULT_NEW_USER.copy()
-            }
-        if 0 not in data['access_manager']['users']:
-            data['access_manager']['users'][0] = self.DEFAULT_NEW_USER.copy()
-        if 'current_user' not in data['access_manager']:
-            data['access_manager']['current_user'] = 0
-        if 'last_origin' not in data['access_manager']:
-            data['access_manager']['last_origin'] = ADDON_ID
-        if 'developers' not in data['access_manager']:
-            data['access_manager']['developers'] = {}
+            elif any(not isinstance(user_id, int) for user_id in users):
+                new_users = {}
+                old_users = {}
+                for user_id, user in users.items():
+                    if isinstance(user_id, int):
+                        new_users[user_id] = user
+                    else:
+                        try:
+                            user_id = int(user_id)
+                            if user_id in users:
+                                raise ValueError
+                            new_users[user_id] = user
+                        except (TypeError, ValueError):
+                            old_users[user_id] = user
+                if new_users:
+                    users = new_users
+                if old_users:
+                    new_user_id = max(users) + 1 if users else 0
+                    for user in old_users.values():
+                        users[new_user_id] = user
+                        new_user_id += 1
+            access_manager['users'] = users
 
-        # clean up
-        if data['access_manager']['current_user'] == 'default':
-            data['access_manager']['current_user'] = 0
-        if 'access_token' in data['access_manager']:
-            del data['access_manager']['access_token']
-        if 'refresh_token' in data['access_manager']:
-            del data['access_manager']['refresh_token']
-        if 'token_expires' in data['access_manager']:
-            del data['access_manager']['token_expires']
-        if 'default' in data['access_manager']:
-            if ((data['access_manager']['default'].get('access_token')
-                 or data['access_manager']['default'].get('refresh_token'))
-                    and not data['access_manager']['users'][0].get(
-                        'access_token')
-                    and not data['access_manager']['users'][0].get(
-                        'refresh_token')):
-                if 'name' not in data['access_manager']['default']:
-                    data['access_manager']['default']['name'] = 'Default'
-                data['access_manager']['users'][0] = data['access_manager'][
-                    'default']
-            del data['access_manager']['default']
-        # end clean up
+            current_id = access_manager.get('current_user')
+            if (not current_id
+                    or current_id == 'default'
+                    or current_id not in users):
+                current_id = min(users)
+            else:
+                if not isinstance(current_id, int):
+                    try:
+                        current_id = int(current_id)
+                        if current_id not in users:
+                            raise ValueError
+                    except (TypeError, ValueError):
+                        current_id = min(users)
+            access_manager['current_user'] = current_id
+            current_user = users[current_id]
+            current_user.setdefault('watch_later', 'WL')
+            current_user.setdefault('watch_history', 'HL')
 
-        current_user = data['access_manager']['current_user']
-        if 'watch_later' not in data['access_manager']['users'][current_user]:
-            data['access_manager']['users'][current_user]['watch_later'] = 'WL'
-        if 'watch_history' not in data['access_manager']['users'][current_user]:
-            data['access_manager']['users'][current_user][
-                'watch_history'] = 'HL'
+            if 'default' in access_manager:
+                default_user = access_manager['default']
+                if (isinstance(default_user, dict)
+                        and (default_user.get('access_token')
+                             or default_user.get('refresh_token'))
+                        and not current_user.get('access_token')
+                        and not current_user.get('refresh_token')):
+                    default_user.setdefault('name', 'Default')
+                    users[current_id] = default_user
+                del access_manager['default']
+
+            if 'access_token' in access_manager:
+                del access_manager['access_token']
+
+            if 'refresh_token' in access_manager:
+                del access_manager['refresh_token']
+
+            if 'token_expires' in access_manager:
+                del access_manager['token_expires']
+
+            last_origin = access_manager.get('last_origin')
+            if not last_origin or not isinstance(last_origin, string_type):
+                access_manager['last_origin'] = ADDON_ID
+
+            developers = access_manager.get('developers')
+            if not developers or not isinstance(developers, dict):
+                access_manager['developers'] = {}
+        data['access_manager'] = access_manager
 
         # ensure all users have uuid
         uuids = set()
-        for user in data['access_manager']['users'].values():
-            c_uuid = user.get('id')
-            while not c_uuid or c_uuid in uuids:
-                c_uuid = uuid.uuid4().hex
-            uuids.add(c_uuid)
-            user['id'] = c_uuid
+        for user in users.values():
+            user_uuid = user.get('id')
+            if user_uuid:
+                if user_uuid in uuids:
+                    user['old_id'] = user_uuid
+                    user_uuid = None
+                else:
+                    uuids.add(user_uuid)
+                    continue
+            while not user_uuid or user_uuid in uuids:
+                user_uuid = uuid.uuid4().hex
+            uuids.add(user_uuid)
+            user['id'] = user_uuid
         # end uuid check
 
         self.save(data)
 
     @staticmethod
     def _process_data(data):
-        # process users, change str keys (old format) to int (current format)
-        users = data['access_manager']['users']
-        if '0' in users:
-            data['access_manager']['users'] = {
-                int(key): value
-                for key, value in users.items()
-            }
-        current_user = data['access_manager']['current_user']
-        try:
-            data['access_manager']['current_user'] = int(current_user)
-        except (TypeError, ValueError):
-            pass
-        return data
-
-    def get_data(self, process=_process_data.__func__):
-        return super(AccessManager, self).get_data(process)
-
-    def load(self, process=_process_data.__func__):
-        return super(AccessManager, self).load(process)
-
-    def save(self, data, update=False, process=_process_data.__func__):
-        return super(AccessManager, self).save(data, update, process)
+        output = {}
+        for key, value in data:
+            if key in output:
+                continue
+            if key.isdigit():
+                try:
+                    key = int(key)
+                except (TypeError, ValueError):
+                    continue
+            elif key == 'current_user':
+                try:
+                    value = int(value)
+                except (TypeError, ValueError):
+                    value = 0
+            output[key] = value
+        return output
 
     def get_current_user_details(self, addon_id=None):
         """

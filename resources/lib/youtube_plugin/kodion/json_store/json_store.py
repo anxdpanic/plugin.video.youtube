@@ -21,6 +21,8 @@ from ..utils import make_dirs, merge_dicts, to_unicode
 class JSONStore(Logger):
     BASE_PATH = make_dirs(DATA_PATH)
 
+    _process_data = None
+
     def __init__(self, filename):
         if self.BASE_PATH:
             self.filepath = os.path.join(self.BASE_PATH, filename)
@@ -35,7 +37,7 @@ class JSONStore(Logger):
     def set_defaults(self, reset=False):
         raise NotImplementedError
 
-    def save(self, data, update=False, process=None):
+    def save(self, data, update=False, process=True):
         if not self.filepath:
             return
 
@@ -52,13 +54,16 @@ class JSONStore(Logger):
         try:
             if not data:
                 raise ValueError
-            _data = json.loads(json.dumps(data, ensure_ascii=False))
+            _data = json.loads(
+                json.dumps(data, ensure_ascii=False),
+                object_pairs_hook=(self._process_data if process else None),
+            )
             with open(self.filepath, mode='w', encoding='utf-8') as jsonfile:
                 jsonfile.write(to_unicode(json.dumps(_data,
                                                      ensure_ascii=False,
                                                      indent=4,
                                                      sort_keys=True)))
-            self._data = process(_data) if process is not None else _data
+            self._data = _data
         except (IOError, OSError) as exc:
             self.log_error('JSONStore.save - Access error'
                            '\n\tException: {exc!r}'
@@ -72,7 +77,7 @@ class JSONStore(Logger):
                            .format(exc=exc, data=data))
             self.set_defaults(reset=True)
 
-    def load(self, process=None):
+    def load(self, process=True):
         if not self.filepath:
             return
 
@@ -84,8 +89,11 @@ class JSONStore(Logger):
                 data = jsonfile.read()
             if not data:
                 raise ValueError
-            _data = json.loads(data)
-            self._data = process(_data) if process is not None else _data
+            _data = json.loads(
+                data,
+                object_pairs_hook=(self._process_data if process else None),
+            )
+            self._data = _data
         except (IOError, OSError) as exc:
             self.log_error('JSONStore.load - Access error'
                            '\n\tException: {exc!r}'
@@ -97,17 +105,23 @@ class JSONStore(Logger):
                            '\n\tData:      {data}'
                            .format(exc=exc, data=data))
 
-    def get_data(self, process=None):
+    def get_data(self, process=True):
         try:
             if not self._data:
                 raise ValueError
-            _data = json.loads(json.dumps(self._data, ensure_ascii=False))
-            return process(_data) if process is not None else _data
+            _data = json.loads(
+                json.dumps(self._data, ensure_ascii=False),
+                object_pairs_hook=(self._process_data if process else None),
+            )
+            return _data
         except (TypeError, ValueError) as exc:
             self.log_error('JSONStore.get_data - Invalid data'
                            '\n\tException: {exc!r}'
                            '\n\tData:      {data}'
                            .format(exc=exc, data=self._data))
             self.set_defaults(reset=True)
-        _data = json.loads(json.dumps(self._data, ensure_ascii=False))
-        return process(_data) if process is not None else _data
+        _data = json.loads(
+            json.dumps(self._data, ensure_ascii=False),
+            object_pairs_hook=(self._process_data if process else None),
+        )
+        return _data
