@@ -40,20 +40,39 @@ class LoginClient(YouTubeRequestClient):
         'personal': 'personal',
     }
 
+    _config = {}
+    _config_tv = {}
+    _access_token = ''
+    _access_token_tv = ''
+
     def __init__(self,
                  configs=None,
                  access_token='',
                  access_token_tv='',
                  **kwargs):
-        if not configs:
-            configs = {}
-        self._config = configs.get('main') or {}
-        self._config_tv = configs.get('youtube-tv') or {}
-
-        self._access_token = access_token
-        self._access_token_tv = access_token_tv
-
         super(LoginClient, self).__init__(exc_type=LoginException, **kwargs)
+        LoginClient.init(
+            configs=configs,
+            access_token=access_token,
+            access_token_tv=access_token_tv,
+        )
+
+    @classmethod
+    def init(cls,
+             configs=None,
+             access_token='',
+             access_token_tv='',
+             **_kwargs):
+        if configs is None:
+            configs = {}
+        cls._config = configs.get('main') or {}
+        cls._config_tv = configs.get('youtube-tv') or {}
+        cls._access_token = access_token
+        cls._access_token_tv = access_token_tv
+
+    def reinit(self, **kwargs):
+        super(LoginClient, self).reinit(**kwargs)
+        LoginClient.init(**kwargs)
 
     @staticmethod
     def _response_hook(**kwargs):

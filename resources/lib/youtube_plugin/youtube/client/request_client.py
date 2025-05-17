@@ -551,29 +551,40 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
     }
 
-    def __init__(self,
-                 context,
-                 language=None,
-                 region=None,
-                 exc_type=None,
-                 **_kwargs):
-        common_client = self.CLIENTS['_common']['json']['context']['client']
-        # the default language is always en_US (like YouTube on the WEB)
-        language = language.replace('-', '_') if language else 'en_US'
-        self._language = common_client['hl'] = language
-        self._region = common_client['gl'] = region if region else 'US'
+    _language = 'en_US'
+    _region = 'US'
 
-        if isinstance(exc_type, tuple):
-            exc_type = (YouTubeException,) + exc_type
-        elif exc_type:
-            exc_type = (YouTubeException, exc_type)
-        else:
-            exc_type = (YouTubeException,)
-
+    def __init__(self, language='en_US', region='US', exc_type=None, **kwargs):
         super(YouTubeRequestClient, self).__init__(
-            context=context,
-            exc_type=exc_type,
-        )
+            exc_type=(
+                (YouTubeException,) + exc_type
+                if isinstance(exc_type, tuple) else
+                (YouTubeException, exc_type)
+                if exc_type else
+                (YouTubeException,)
+            ),
+            **kwargs)
+        YouTubeRequestClient.init(language=language, region=region)
+
+    @classmethod
+    def init(cls,
+             language='en_US',
+             region='US',
+             **_kwargs):
+        common_client = cls.CLIENTS['_common']['json']['context']['client']
+        # the default language is always en_US (like YouTube on the WEB)
+        cls._language = common_client['hl'] = language.replace('-', '_')
+        cls._region = common_client['gl'] = region
+
+    def reinit(self, **kwargs):
+        super(YouTubeRequestClient, self).reinit(**kwargs)
+        YouTubeRequestClient.init(**kwargs)
+
+    def get_language(self):
+        return self._language
+
+    def get_region(self):
+        return self._region
 
     @classmethod
     def json_traverse(cls, json_data, path, default=None):
