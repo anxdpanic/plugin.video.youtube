@@ -1830,7 +1830,7 @@ class YouTube(LoginClient):
                            params,
                            _video_only_params={
                                'eventType',
-                               'forMine'
+                               'forMine',
                                'location',
                                'relatedToVideoId',
                                'videoCaption',
