@@ -34,21 +34,32 @@ from ...kodion.utils import (
 
 
 class YouTube(LoginClient):
-    def __init__(self, context, **kwargs):
-        self._context = context
-        if 'items_per_page' in kwargs:
-            self._max_results = kwargs.pop('items_per_page')
+    _max_results = 50
 
-        super(YouTube, self).__init__(context=context, **kwargs)
+    def __init__(self, items_per_page=50, **kwargs):
+        super(YouTube, self).__init__(**kwargs)
+        YouTube.init(items_per_page=items_per_page)
+        self.initialised = True
+
+    @classmethod
+    def init(cls, items_per_page=50, **_kwargs):
+        cls._max_results = items_per_page
+
+    def reinit(self, **kwargs):
+        super(YouTube, self).reinit(**kwargs)
+        YouTube.init(**kwargs)
+        self.initialised = bool(kwargs)
+
+    @property
+    def initialised(self):
+        return self._initialised
+
+    @initialised.setter
+    def initialised(self, value):
+        self._initialised = value
 
     def max_results(self):
         return self._context.get_param('items_per_page') or self._max_results
-
-    def get_language(self):
-        return self._language
-
-    def get_region(self):
-        return self._region
 
     def update_watch_history(self, context, video_id, url, status=None):
         if status is None:

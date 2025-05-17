@@ -77,18 +77,57 @@ class BaseRequestsClass(Logger):
     ))
     atexit.register(_session.close)
 
-    def __init__(self, context, exc_type=None, **kwargs):
-        settings = context.get_settings()
-        self._verify = kwargs.get('verify_ssl') or settings.verify_ssl()
-        self._timeout = kwargs.get('timeout') or settings.requests_timeout()
-        self._proxy = kwargs.get('proxy_settings') or settings.proxy_settings()
+    _context = None
+    _verify = True
+    _timeout = (9.5, 27)
+    _proxy = None
+    _default_exc = (RequestException,)
 
-        if isinstance(exc_type, tuple):
-            self._default_exc = (RequestException,) + exc_type
-        elif exc_type:
-            self._default_exc = (RequestException, exc_type)
-        else:
-            self._default_exc = (RequestException,)
+    def __init__(self,
+                 context=None,
+                 verify_ssl=None,
+                 timeout=None,
+                 proxy_settings=None,
+                 exc_type=None,
+                 **_kwargs):
+        BaseRequestsClass.init(
+            context=context,
+            verify_ssl=verify_ssl,
+            timeout=timeout,
+            proxy_settings=proxy_settings,
+        )
+        self._default_exc = (
+            (RequestException,) + exc_type
+            if isinstance(exc_type, tuple) else
+            (RequestException, exc_type)
+            if exc_type else
+            (RequestException,)
+        )
+
+    @classmethod
+    def init(cls,
+             context=None,
+             verify_ssl=None,
+             timeout=None,
+             proxy_settings=None,
+             **_kwargs):
+        cls._context = (cls._context
+                        if context is None else
+                        context)
+        if cls._context:
+            settings = cls._context.get_settings()
+            cls._verify = (settings.verify_ssl()
+                           if verify_ssl is None else
+                           verify_ssl)
+            cls._timeout = (settings.requests_timeout()
+                            if timeout is None else
+                            timeout)
+            cls._proxy = (settings.proxy_settings()
+                          if proxy_settings is None else
+                          proxy_settings)
+
+    def reinit(self, **kwargs):
+        BaseRequestsClass.init(**kwargs)
 
     def __enter__(self):
         return self
