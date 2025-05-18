@@ -1,3 +1,205 @@
+## v7.2.0
+### Fixed
+- Fix Liked video playlist not loading #1175
+- Fix typo preventing some video only searches from working
+- Fix incorrect deletion of provider parameter in 10c3758 #1160
+- Fix possible hangs in multiple busy dialog workaround
+- Fix misidentifying channels in channel filter #1159
+- Attempt to avoid race condition where user input occurs prior to window rerouting #1021
+- Fix incorrectly referencing channels as playlist in My Subscriptions after db44928
+- Improve handling of invalid playlists in My Subscriptions after db44928
+- Update YouTube.get_related_videos and YouTube.get_related_for_home #1161
+- Fix error with listing comments if number of replies is 1000+
+- Fix regression in opening playlists of logged in user #1154
+- Fix regressions in checking channel filters
+- Clear old function cache values on initial run after install #1150
+- Fix My Subscriptions not loading old or previously accessed content #1123
+- Manually redirect video server requests if required #1127 #1135
+- Improve logging of client ID #1117
+- Fix possible exception that may occur if video thumbnails fail to update
+- Fix unsubscribing from My Subscriptions #1137
+- Fix folders for channel shorts and live streams not being routed correctly #988 #1060
+- Update YouTube.get_recommended_for_home #1107
+- Improve url resolver error handling
+- Fix showing Uploads playlist if all videos are private #988 #1060
+- Fix updating progress of background progress dialogs #1032
+- Fix showing duplicate channel progress dialogs in My Subscriptions #1032
+- Ensure correct playlist_type_hint is used with audio only playback
+- Workaround various issues with Kodi window opening and history navigation when accepting search inputs #1070
+- Fix various Python2 unicode encoding errors
+- Disable refresh parameter on Kodi forced refresh #1072
+- Improve handling of playlists feeds in My Subscriptions
+- Reprioritise clients and avoid re-authenticating requests if authentication already provided #1076
+- Reduce CPU usage while waiting for HTTP server input/output to be ready #1103
+- Fix repeated subtitle queries/prompts #1056
+- Fix always using video playlist even for audio items
+- Improve error handling and http server shutdown/restart #1056
+- Fix possible exception in creating request clients if client_data is not provided
+- Only force playback if plugin invocation was triggered through UI
+- Ensure that any set UI playback properties are cleared if playback does not start
+- Fix episode and season getter/setter not being available for AudioItem
+- Fix full playlist listings not being able to be redirected
+- Fix audio langauge fallback selection #989 #1036
+  - Also correctly distinguish between original vs default audio streams
+  - Respect Kodi Prefer default audio streams setting
+    - Applies to both default audio and original audio
+- Fix search context menu items for Next Page and New Search items
+- Fix lock acquire/release logic in My Subscriptions #1032
+- Avoid potential player request loop
+- Revert using configured language settings for player requests
+- Fix missing message argument for InvalidGrant #1038
+- Fix incorrectly trying to refresh access tokens when no refresh tokens exist #1038
+- Fix issues with handling duplicated and unavailable items in lists
+- Fix issues with processing channel handles
+- Fix processing of "q" and "channelId" search query params
+- Fix using incorrect client headers with cURL when ISA is not used
+- Fix incorrect use of str.lstrip
+- Ensure language and region are passed to StreamInfo instances #989
+- Fix not updating cache for empty feeds in My Subscriptions
+- Make parsing and serialising of list type parameters a reversible operation
+- Fix logic used to filter out various type of streams
+  - Was previously checking any inclusion filters
+  - Now any exclusion filter that matches will filter stream out
+- Fix plugin URI redirect from search
+- Fix incorrect path handling during migration of old sqlite databases in Setup Wizard
+- Fix errors with progress dialogs in Kodi 18 #1000
+- Fix remote watch history not updating #1008
+- Fix error when all subtitles are requested
+- Fix Python2 syntax error #1000
+- Fix interaction between certain plugin URI query parameters when used in STRM files
+- Fix playing clips in a playlist #1007
+- Fix not identifying own playlists in personal channel
+- Fix API requests when not signed in #1013
+- Fix potential leak of sensitive data via HTTPServer logging #1016
+- Fix adding/removing subscriptions to/from filter list
+- Fix playback not working when no API key is provided #1018
+- Fix using provided keys for requests that can't use them #1018
+- Fix window redirect on video playback failure #1018
+
+### Changed
+- Use channel handle by default when adding/removing/matching channels
+  - Channel filters may need to be updated to use handles instead of channel name
+  - e.g. "@channel_1_handle,@channel_2_handle" instead of "channel 1 name, channel 2 name"
+  - Channels can be added/removed from the filter through the Subscriptions or Bookmarks context menu
+- Use channel handle as artist and in channel info for visibility
+- Reduce number of GET requests when using v3 Data API
+- Improve listing filler handling #1035
+  - Migrate My Subscriptions, Recommendations, Related, Trending and channel listings to use new filler methods
+- Show comment statistics before text in listings
+- Respect hide_folders plugin url query parameter in My Subscriptions
+  - Also respect value of hide_videos (new), hide_shorts, and hide_live params
+- Improve handling of using filtered playlists in channels #988 #1060
+- Base64 encode/decode header query param to obfuscate in debug logs
+- Update client details
+- Automatically handle different types of identifiers as channel_id parameter
+- Improve pagination of filtered listings #984 #1035
+- Split My Subscriptions into Long Form, Shorts and Live folders #988
+- Various improvements to thread handling and cache usage in My Subscriptions #1072
+- Delay progress dialog creation if other dialogs are open #1072
+- Minor optimisation and improve reliability of stream proxy
+- Update client details and include player response visitorData
+- Improve handling of invalid filter attributes #1102 #984
+- Disable http server idle shutdown on Linux systems #1056
+- Fetch last updated subscription feeds first and fetch playlists feeds in My Subscriptions
+- Hide empty/unavailable standard playlists in channels #1060
+- Store date added to playlist for playlist items #1059
+- Add indication to Next page item if listing has been filtered #1035
+- Proxy stream requests using HTTPServer #527 #1040
+  - Correct primary video server url #1040
+  - Allow skipping adaptive formats for clients that may need PO tokens #1040
+  - Add option to redirect streams using stream proxy #1040
+    - As headers are not matched this can lead to detection of Kodi being used as a client
+- Use default http server listen address of 127.0.0.1
+- Allow playback parameters to be applied for entire listings
+- Further improvements to fallback window handling to minimise crashes and loss of window history
+  - Enable intercepting and redirecting PlayMedia calls
+  - Improve handling of search keyboard input when navigating through window history
+    - Also allow bookmarks/favourites to be created for Quick Search
+    - Remove need to store search query in data cache
+    - Improve handling of searching for YouTube urls
+- Store modified date from player requests as publishedAt for local history #991
+- Update player request client details
+- Reorganise video item context menu
+- Re-enable player request clients that require specific OAuth tokens
+- Re-enable OAuth authorisation for YouTube TV
+- Update itags for 30fps HLS VP9.2 streams
+- Update player client details and selections
+- Add some ultra low quality itags
+- Optimise wakeup to ensure http server is only started when required
+- Improve check for Kodi subtitle language
+- Improve handling of audio language selection #989
+- Replace preferred language subtitle option with preferred language + fallback + no ASR option #992
+- Allow for caching of subscriptions API requests in My Subscriptions
+- Only use OAuth tokens if necessary #994 #996
+- Set default live stream type to MPEG-DASH for Kodi 21+ #1004
+- Skip asking or re-ordering playlists if there is only 1 item in the list
+- Prevent caching in incognito mode
+- Improve caching and updating of playlist details #1024
+- Improve listen address config in Setup Wizard #1016
+  - Also make 127.0.0.1 the default listen address
+  - Fallback to 0.0.0.0 if no other local address works
+
+### New
+- Add hide_progress plugin url query parameter
+- Show broadcasting streams at the top of channel live streams folder listings #1092
+- Send JSON-RPC event notification when video playback fails
+- Add additional debug logging of complete API response content #1107
+- Add "Play recently added" context menu item to playlists #1059
+  - Will play all videos added to the playlist in the last day
+- Allow channels and playlists to be played from Info dialog
+- Add IPv6 support for http server #1039
+- Show total number of uploads, shorts and live videos in channel playlists
+- Add support for more channel url formats
+- Update display of comments to be match other listings
+  - Make comment details follow "Show video details in video lists" setting
+  - Allow various sorting options
+  - Truncate comment to 140 characters in listing, full comment available in info dialog
+  - Show user thumbnail in listing
+  - Show user with thumbnail in info dialog
+  - Show video/comment details in navigation breadcrumb bar
+- Overhaul update of fanart and other channel info for listings
+  - Add additional channel info to all items in listings in one pass
+    - channel name thumbnail in info dialog
+    - channel name in context menu items
+    - channel fanart if enabled
+  - Reduce network requests
+  - Improve cache usage
+  - Reduce thread usage
+- Add custom Shorts duration #984
+- Allow use of HLS streams in external players
+  - Also allows for playing in Kodi without InputStream.Adaptive
+- Add ability to create arbitrary filter criteria to My Subscriptions #984
+  - "{ATTR_1}{OPERATOR_1}{VALUE_1}[{ATTR_X}{OPERATOR_X}{VALUE_X}...]"
+    - where ATTR_X can be any valid item getter or property e.g.
+      - "duration", "title", "artists"/"artists_string", "plot", "date", etc. or
+      - ".live", ".upcoming", ".completed" etc. Note the "." prefix
+    - where OPERATOR_X can be
+      - ">", ">=" (default), "<", "<=", "=", "==", "!=" typically for a int/float/bool type VALUE or
+      - "contains", "startswith", "endswith", "search" for a string type VALUE
+    - where VALUE_X is the desired criteria value.
+      - String type values are wrapped in double quote marks eg. "example"
+        - "," must be encoded as "%2C" eg. "example,test" becomes "example%2Ctest"
+        - "}" must be encoded as "%7D" eg. "example}test" becomes "example%7Dtest"
+    - any number of criteria rules can be used together
+      - rules seperated by a comma are OR rules
+      - rules contained within a comma group are AND rules
+- Add filler parameter to v3.response_to_items
+  - Allows listings to be recursively filled after post request filtering
+  - Also show progress dialog for all listings
+- Add support for sequentially filling Recommendations listing
+- Add support for sequentially filling Trending listing
+- Add new advanced list filter setting
+  - Works in the same manner as the My Subscriptions filter, but for all listings
+  - Can also be set using the item_filter plugin URI query parameter
+- Add option to prefer lower resolution streams for unselected codecs
+- Populate My Subscription listings using feed details
+- Store video details from player requests for local history #991
+- Add separate Shorts sub-folder in Channel folders #988
+  - Implementation by @mhomak
+- Allow adding/removing bookmarks to/from filter list
+- Add direct playback of temporary playlists from YouTube or plugin urls in the form
+  - plugin://plugin.video.youtube/play?video_ids=xxxxxxxx,xxxxxxxx
+
 ## v7.2.0+beta.9
 ### Fixed
 - Fix incorrect deletion of provider parameter in 10c3758 #1160
@@ -243,7 +445,6 @@
 - Allow adding/removing bookmarks to/from filter list
 - Add direct playback of temporary playlists from YouTube or plugin urls in the form
   - plugin://plugin.video.youtube/play?video_ids=xxxxxxxx,xxxxxxxx
-
 
 ## v7.1.1.6
 ### Fixed
