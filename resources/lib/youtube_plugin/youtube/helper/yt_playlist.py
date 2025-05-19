@@ -212,9 +212,9 @@ def _process_select_playlist(provider, context):
     # add the 'Watch Later' playlist
     playlists = resource_manager.get_related_playlists('mine')
     if playlists and 'watchLater' in playlists:
-        watch_later_id = context.get_access_manager().get_watch_later_id()
+        watch_later_id = playlists['watchLater'] or 'WL'
     else:
-        watch_later_id = None
+        watch_later_id = context.get_access_manager().get_watch_later_id()
 
     thumb_size = context.get_settings().get_thumbnail_size()
     default_thumb = context.create_resource_path('media', 'playlist.png')
