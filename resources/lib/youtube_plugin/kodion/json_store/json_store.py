@@ -39,7 +39,7 @@ class JSONStore(Logger):
 
     def save(self, data, update=False, process=True):
         if not self.filepath:
-            return
+            return False
 
         if update:
             data = merge_dicts(self._data, data)
@@ -47,7 +47,7 @@ class JSONStore(Logger):
             self.log_debug('JSONStore.save - data unchanged'
                            '\n\tFile: {filepath}'
                            .format(filepath=self.filepath))
-            return
+            return None
         self.log_debug('JSONStore.save - saving'
                        '\n\tFile: {filepath}'
                        .format(filepath=self.filepath))
@@ -69,13 +69,15 @@ class JSONStore(Logger):
                            '\n\tException: {exc!r}'
                            '\n\tFile:      {filepath}'
                            .format(exc=exc, filepath=self.filepath))
-            return
+            return False
         except (TypeError, ValueError) as exc:
             self.log_error('JSONStore.save - Invalid data'
                            '\n\tException: {exc!r}'
                            '\n\tData:      {data}'
                            .format(exc=exc, data=data))
             self.set_defaults(reset=True)
+            return False
+        return True
 
     def load(self, process=True):
         if not self.filepath:

@@ -142,7 +142,7 @@ class AccessManager(JSONStore):
             user['id'] = user_uuid
         # end uuid check
 
-        self.save(data)
+        return self.save(data)
 
     @staticmethod
     def _process_data(data):

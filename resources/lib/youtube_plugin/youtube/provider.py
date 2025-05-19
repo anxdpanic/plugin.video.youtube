@@ -1185,23 +1185,11 @@ class Provider(AbstractProvider):
         if target == 'access_manager' and ui.on_yes_no_input(
                 context.get_name(), localize('reset.access_manager.check')
         ):
-            addon_id = context.get_param('addon_id', None)
             access_manager = context.get_access_manager()
-            client = provider.get_client(context)
-            refresh_tokens = access_manager.get_refresh_token()
-            success = True
-            if any(refresh_tokens):
-                for refresh_token in frozenset(refresh_tokens):
-                    try:
-                        if refresh_token:
-                            client.revoke(refresh_token)
-                    except LoginException:
-                        success = False
-            provider.reset_client()
-            access_manager.update_access_token(
-                addon_id, access_token='', expiry=-1, refresh_token='',
+            success = (
+                    yt_login.process(yt_login.SIGN_OUT, provider, context)
+                    and access_manager.set_defaults(reset=True)
             )
-            ui.refresh_container()
             ui.show_notification(localize('succeeded' if success else 'failed'))
         else:
             success = False
