@@ -32,7 +32,7 @@ class XbmcContextUI(AbstractContextUI):
                                background=False,
                                message_template=None,
                                template_params=None):
-        if not message_template:
+        if not message_template and background:
             message_template = '{_message} {_current}/{_total}'
 
         return XbmcProgressDialog(
