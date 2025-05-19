@@ -482,8 +482,8 @@ msgid "More Links from the description"
 msgstr "Meer links van de beschrijving"
 
 msgctxt "#30545"
-msgid "No further links found."
-msgstr "Geen verdere links gevonden"
+msgid "No videos found."
+msgstr ""
 
 msgctxt "#30546"
 msgid "Please complete all login prompts"
@@ -498,8 +498,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30549"
-msgid "No videos streams found"
-msgstr "Geen videostreams gevonden"
+msgid "No streams found"
+msgstr ""
 
 msgctxt "#30550"
 msgid ""
@@ -1584,6 +1584,14 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30545"
+#~ msgid "No further links found."
+#~ msgstr "Geen verdere links gevonden"
+
+#~ msgctxt "#30549"
+#~ msgid "No videos streams found"
+#~ msgstr "Geen videostreams gevonden"
 
 #~ msgctxt "#30106"
 #~ msgid "Next Page (%d)"
