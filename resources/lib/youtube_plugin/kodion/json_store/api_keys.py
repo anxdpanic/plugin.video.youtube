@@ -12,6 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 from base64 import b64decode
 
 from ... import key_sets
+from ..constants import DEVELOPER_CONFIGS
 from .json_store import JSONStore
 
 
@@ -159,5 +160,63 @@ class APIKeyStore(JSONStore):
         return {
             'youtube-tv': self.get_api_keys('youtube-tv'),
             'main': self.get_api_keys(self.get_current_switch()),
-            'developer': self.get_api_keys('developer')
+        }
+
+    def get_developer_config(self, developer_id):
+        context = self._context
+
+        developer_configs = self.get_api_keys('developer')
+        if developer_id and developer_configs:
+            config = developer_configs.get(developer_id)
+        else:
+            config = context.get_ui().pop_property(DEVELOPER_CONFIGS)
+            if config:
+                context.log_warning('Storing developer keys in window property'
+                                    ' has been deprecated. Please use the'
+                                    ' youtube_registration module instead')
+                config = self.load_data(config)
+
+        if not config:
+            return {}
+
+        if not context.get_settings().allow_dev_keys():
+            context.log_debug('Developer config ignored')
+            return {}
+
+        origin = config.get('origin', developer_id)
+        key_details = config.get('main')
+        required_details = {'key', 'id', 'secret'}
+        if (not origin
+                or not key_details
+                or not required_details.issubset(key_details)):
+            context.log_error('Invalid developer config: |{config}|'
+                              '\n\tExpected: |{{'
+                              ' "origin": ADDON_ID,'
+                              ' "main": {{'
+                              ' "system": SYSTEM_NAME,'
+                              ' "key": API_KEY,'
+                              ' "id": CLIENT_ID,'
+                              ' "secret": CLIENT_SECRET'
+                              '}}}}|'
+                              .format(config=config))
+            return {}
+
+        key_system = key_details.get('system')
+        if key_system == 'JSONStore':
+            for key in required_details:
+                key_details[key] = b64decode(key_details[key]).decode('utf-8')
+
+        context.log_debug('Using developer config'
+                          '\n\tOrigin: |{origin}|'
+                          '\n\tSystem: |{system}|'
+                          .format(origin=origin, system=key_system))
+
+        return {
+            'origin': origin,
+            'main': {
+                'system': key_system,
+                'key': key_details['key'],
+                'id': key_details['id'],
+                'secret': key_details['secret'],
+            }
         }

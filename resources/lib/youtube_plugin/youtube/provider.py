@@ -11,9 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from atexit import register as atexit_register
-from base64 import b64decode
 from functools import partial
-from json import loads as json_loads
 from re import compile as re_compile
 from weakref import proxy
 
@@ -38,7 +36,6 @@ from ..kodion.constants import (
     ADDON_ID,
     CHANNEL_ID,
     CONTENT,
-    DEVELOPER_CONFIGS,
     PATHS,
 )
 from ..kodion.items import (
@@ -108,71 +105,6 @@ class Provider(AbstractProvider):
 
     def is_logged_in(self):
         return self._logged_in
-
-    @staticmethod
-    def get_dev_config(context, addon_id, dev_configs):
-        _dev_config = context.get_ui().pop_property(DEVELOPER_CONFIGS)
-
-        dev_config = {}
-        if _dev_config:
-            context.log_warning('Using window property for developer keys is'
-                                ' deprecated. Please use the'
-                                ' youtube_registration module instead')
-            try:
-                dev_config = json_loads(_dev_config)
-            except ValueError:
-                context.log_error('Error loading developer key: |invalid json|')
-        if not dev_config and addon_id and dev_configs:
-            dev_config = dev_configs.get(addon_id)
-
-        if dev_config and not context.get_settings().allow_dev_keys():
-            context.log_debug('Developer config ignored')
-            return {}
-
-        if dev_config:
-            dev_main = dev_origin = None
-            if {'main', 'origin'}.issubset(dev_config):
-                dev_main = dev_config['main']
-                dev_origin = dev_config['origin']
-
-                if not {'system', 'key', 'id', 'secret'}.issubset(dev_main):
-                    dev_main = None
-
-            if not dev_main:
-                context.log_error('Invalid developer config: |{dev_config}|'
-                                  '\n\texpected: |{{'
-                                  ' "origin": ADDON_ID,'
-                                  ' "main": {{'
-                                  ' "system": SYSTEM_NAME,'
-                                  ' "key": API_KEY,'
-                                  ' "id": CLIENT_ID,'
-                                  ' "secret": CLIENT_SECRET'
-                                  '}}}}|'.format(dev_config=dev_config))
-                return {}
-
-            dev_system = dev_main['system']
-            if dev_system == 'JSONStore':
-                dev_key = b64decode(dev_main['key'])
-                dev_id = b64decode(dev_main['id'])
-                dev_secret = b64decode(dev_main['secret'])
-            else:
-                dev_key = dev_main['key']
-                dev_id = dev_main['id']
-                dev_secret = dev_main['secret']
-            context.log_debug('Using developer config: '
-                              '|origin: {origin}, system: {system}|'
-                              .format(origin=dev_origin, system=dev_system))
-            return {
-                'origin': dev_origin,
-                'main': {
-                    'system': dev_system,
-                    'id': dev_id,
-                    'secret': dev_secret,
-                    'key': dev_key,
-                }
-            }
-
-        return {}
 
     def reset_client(self):
         self._client = None
@@ -275,8 +207,7 @@ class Provider(AbstractProvider):
             dev_id = dev_keys = None
             origin = ADDON_ID
         else:
-            dev_config = self.get_dev_config(
-                context, dev_id, configs['developer']
+            dev_config = api_store.get_developer_config(dev_id)
             )
             origin = dev_config.get('origin') or dev_id
             dev_keys = dev_config.get('main')

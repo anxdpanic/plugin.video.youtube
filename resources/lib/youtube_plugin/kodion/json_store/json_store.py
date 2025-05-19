@@ -125,3 +125,17 @@ class JSONStore(Logger):
             object_pairs_hook=(self._process_data if process else None),
         )
         return _data
+
+    def load_data(self, data, process=True):
+        try:
+            _data = json.loads(
+                data,
+                object_pairs_hook=(self._process_data if process else None),
+            )
+            return _data
+        except (TypeError, ValueError) as exc:
+            self.log_error('JSONStore.load_data - Invalid data'
+                           '\n\tException: {exc!r}'
+                           '\n\tData:      |{data}|'
+                           .format(exc=exc, data=data))
+        return {}
