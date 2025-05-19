@@ -73,7 +73,7 @@ class JSONStore(Logger):
         except (TypeError, ValueError) as exc:
             self.log_error('JSONStore.save - Invalid data'
                            '\n\tException: {exc!r}'
-                           '\n\tData:      {data}'
+                           '\n\tData:      |{data}|'
                            .format(exc=exc, data=data))
             self.set_defaults(reset=True)
             return False
@@ -104,10 +104,10 @@ class JSONStore(Logger):
         except (TypeError, ValueError) as exc:
             self.log_error('JSONStore.load - Invalid data'
                            '\n\tException: {exc!r}'
-                           '\n\tData:      {data}'
+                           '\n\tData:      |{data}|'
                            .format(exc=exc, data=data))
 
-    def get_data(self, process=True):
+    def get_data(self, process=True, fallback=True):
         try:
             if not self._data:
                 raise ValueError
@@ -119,14 +119,12 @@ class JSONStore(Logger):
         except (TypeError, ValueError) as exc:
             self.log_error('JSONStore.get_data - Invalid data'
                            '\n\tException: {exc!r}'
-                           '\n\tData:      {data}'
+                           '\n\tData:      |{data}|'
                            .format(exc=exc, data=self._data))
-            self.set_defaults(reset=True)
-        _data = json.loads(
-            json.dumps(self._data, ensure_ascii=False),
-            object_pairs_hook=(self._process_data if process else None),
-        )
-        return _data
+            if fallback:
+                self.set_defaults(reset=True)
+                return self.get_data(process=process, fallback=False)
+            raise exc
 
     def load_data(self, data, process=True):
         try:

@@ -24,6 +24,7 @@ class AccessManager(JSONStore):
         'token_expires': -1,
         'last_key_hash': '',
         'name': 'Default',
+        'id': None,
         'watch_later': 'WL',
         'watch_history': 'HL'
     }
@@ -189,16 +190,9 @@ class AccessManager(JSONStore):
         new_uuid = None
         while not new_uuid or new_uuid in uuids:
             new_uuid = uuid.uuid4().hex
-        return {
-            'access_token': '',
-            'refresh_token': '',
-            'token_expires': -1,
-            'last_key_hash': '',
-            'name': username,
-            'id': new_uuid,
-            'watch_later': 'WL',
-            'watch_history': 'HL'
-        }
+        return dict(self.DEFAULT_NEW_USER,
+                    name=username,
+                    id=new_uuid)
 
     def get_users(self):
         """
