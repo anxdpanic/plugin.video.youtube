@@ -220,3 +220,63 @@ class APIKeyStore(JSONStore):
                 'secret': key_details['secret'],
             }
         }
+
+    def sync(self):
+        api_data = self.get_data()
+        settings = self._context.get_settings()
+
+        update_saved_values = False
+        update_settings_values = False
+
+        saved_details = (
+            api_data['keys']['personal'].get('api_key', ''),
+            api_data['keys']['personal'].get('client_id', ''),
+            api_data['keys']['personal'].get('client_secret', ''),
+        )
+        if all(saved_details):
+            update_settings_values = True
+            # users are now pasting keys into api_keys.json
+            # try stripping whitespace and domain suffix from API details
+            # and save the results if they differ
+            stripped_details = self.strip_details(*saved_details)
+            if all(stripped_details) and saved_details != stripped_details:
+                saved_details = stripped_details
+                api_data['keys']['personal'] = {
+                    'api_key': saved_details[0],
+                    'client_id': saved_details[1],
+                    'client_secret': saved_details[2],
+                }
+                update_saved_values = True
+
+        setting_details = (
+            settings.api_key(),
+            settings.api_id(),
+            settings.api_secret(),
+        )
+        if all(setting_details):
+            update_settings_values = False
+            stripped_details = self.strip_details(*setting_details)
+            if all(stripped_details) and setting_details != stripped_details:
+                setting_details = (
+                    settings.api_key(stripped_details[0]),
+                    settings.api_id(stripped_details[1]),
+                    settings.api_secret(stripped_details[2]),
+                )
+
+            if saved_details != setting_details:
+                api_data['keys']['personal'] = {
+                    'api_key': setting_details[0],
+                    'client_id': setting_details[1],
+                    'client_secret': setting_details[2],
+                }
+                update_saved_values = True
+
+        if update_settings_values:
+            settings.api_key(saved_details[0])
+            settings.api_id(saved_details[1])
+            settings.api_secret(saved_details[2])
+
+        if update_saved_values:
+            self.save(api_data)
+            return True
+        return False

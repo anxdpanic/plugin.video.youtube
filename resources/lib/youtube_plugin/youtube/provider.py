@@ -108,165 +108,132 @@ class Provider(AbstractProvider):
 
     def reset_client(self, **kwargs):
         self._client = None
+        if self._client:
+            self._client.reinit(**kwargs)
 
     def get_client(self, context):
         access_manager = context.get_access_manager()
         api_store = context.get_api_store()
         settings = context.get_settings()
 
-        if not self._client:
-            api_data = api_store.get_data()
-
-            update_saved_values = False
-            update_settings_values = False
-
-            saved_details = (
-                api_data['keys']['personal'].get('api_key', ''),
-                api_data['keys']['personal'].get('client_id', ''),
-                api_data['keys']['personal'].get('client_secret', ''),
-            )
-            if all(saved_details):
-                update_settings_values = True
-                # users are now pasting keys into api_keys.json
-                # try stripping whitespace and domain suffix from API details
-                # and save the results if they differ
-                stripped_details = api_store.strip_details(*saved_details)
-                if all(stripped_details) and saved_details != stripped_details:
-                    saved_details = stripped_details
-                    api_data['keys']['personal'] = {
-                        'api_key': saved_details[0],
-                        'client_id': saved_details[1],
-                        'client_secret': saved_details[2],
-                    }
-                    update_saved_values = True
-
-            setting_details = (
-                settings.api_key(),
-                settings.api_id(),
-                settings.api_secret(),
-            )
-            if all(setting_details):
-                update_settings_values = False
-                stripped_details = api_store.strip_details(*setting_details)
-                if all(stripped_details) and setting_details != stripped_details:
-                    setting_details = (
-                        settings.api_key(stripped_details[0]),
-                        settings.api_id(stripped_details[1]),
-                        settings.api_secret(stripped_details[2]),
-                    )
-
-                if saved_details != setting_details:
-                    api_data['keys']['personal'] = {
-                        'api_key': setting_details[0],
-                        'client_id': setting_details[1],
-                        'client_secret': setting_details[2],
-                    }
-                    update_saved_values = True
-
-            if update_saved_values:
-                api_store.save(api_data)
-
-            if update_settings_values:
-                settings.api_key(saved_details[0])
-                settings.api_id(saved_details[1])
-                settings.api_secret(saved_details[2])
-
-            switch = api_store.get_current_switch()
-            current_key_set = api_store.get_key_set(switch)
-            current_hash = access_manager.calc_key_hash(**current_key_set)
-            last_hash = access_manager.get_last_key_hash()
-
-            changed = current_hash != last_hash
-            if changed and switch == 'own':
-                old_key_set = api_store.get_key_set('own_old')
-                old_hash = access_manager.calc_key_hash(**old_key_set)
-                changed = old_hash != last_hash
-                if not changed:
-                    access_manager.set_last_key_hash(current_hash)
-            api_store.changed = changed
-
-            context.log_debug('User: |{user}|, '
-                              'Using API key set: |{switch}|'
-                              .format(user=access_manager.get_current_user(),
-                                      switch=switch))
-
-            if changed:
-                context.log_debug('API key set changed: Signing out')
-                access_manager.set_last_key_hash(current_hash)
-                context.execute(context.create_uri(
-                    ('sign', 'out'),
-                    {
-                        'confirmed': True,
-                    },
-                    run=True,
-                ))
+        user = access_manager.get_current_user()
+        api_last_origin = access_manager.get_last_origin()
         configs = api_store.get_configs()
+
+        client = self._client
+        if not client or not client.initialised:
+            synced = api_store.sync()
+        else:
+            synced = False
 
         dev_id = context.get_param('addon_id')
         if not dev_id or dev_id == ADDON_ID:
-            dev_id = dev_keys = None
             origin = ADDON_ID
+            dev_id = None
+            if synced:
+                switch = api_store.get_current_switch()
+                key_details = api_store.get_key_set(switch)
+                context.log_debug('Using personal API details'
+                                  '\n\tConfig:  |{config}|'
+                                  '\n\tUser #:  |{user}|'
+                                  '\n\tKey set: |{switch}|'
+                                  .format(config=configs['main']['system'],
+                                          user=user,
+                                          switch=switch))
+            else:
+                switch = None
+                key_details = None
         else:
             dev_config = api_store.get_developer_config(dev_id)
-            )
-            origin = dev_config.get('origin') or dev_id
-            dev_keys = dev_config.get('main')
+            origin = dev_config.get('origin')
+            key_details = dev_config.get('main')
+            if key_details:
+                configs['main'] = key_details
+                switch = 'developer'
+                context.log_debug('Using developer provided API details'
+                                  '\n\tConfig:  |{config}|'
+                                  '\n\tUser #:  |{user}|'
+                                  '\n\tKey set: |{switch}|'
+                                  .format(config=key_details['system'],
+                                          user=user,
+                                          switch=switch))
+            else:
+                key_details = configs['main']
+                switch = api_store.get_current_switch()
+                context.log_debug('Using developer provided access tokens'
+                                  '\n\tConfig:  |{config}|'
+                                  '\n\tUser #:  |{user}|'
+                                  '\n\tKey set: |{switch}|'
+                                  .format(config=key_details['system'],
+                                          user=user,
+                                          switch=switch))
 
-        api_last_origin = access_manager.get_last_origin()
+        if not client:
+            client = YouTube(
+                context=context,
+                language=settings.get_language(),
+                region=settings.get_region(),
+                items_per_page=settings.items_per_page(),
+                configs=configs,
+            )
+            self._client = client
+
+        if key_details:
+            keys_changed = access_manager.keys_changed(
+                addon_id=dev_id,
+                api_key=key_details['key'],
+                client_id=key_details['id'],
+                client_secret=key_details['secret'],
+            )
+            if keys_changed and switch == 'own':
+                key_details = api_store.get_key_set('own_old')
+                keys_changed = access_manager.keys_changed(
+                    addon_id=dev_id,
+                    api_key=key_details['key'],
+                    client_id=key_details['id'],
+                    client_secret=key_details['secret'],
+                    update_hash=False,
+                )
+            if keys_changed:
+                context.log_notice('API key set changed: Signing out')
+                yt_login.process(yt_login.SIGN_OUT, self, context)
+
         if api_last_origin != origin:
-            context.log_debug('API key origin changed: |{old}| to |{new}|'
-                              .format(old=api_last_origin, new=origin))
+            context.log_notice('API key origin changed: Resetting client'
+                               '\n\tPrevious: |{old}|'
+                               '\n\tCurrent:  |{new}|'
+                               .format(old=api_last_origin, new=origin))
             access_manager.set_last_origin(origin)
             self.reset_client()
 
-        access_tokens = access_manager.get_access_token(dev_id)
-        if access_manager.is_access_token_expired(dev_id):
-            # reset access_token
-            access_tokens = [None, None]
-            access_manager.update_access_token(dev_id, access_token='')
-        elif self._client:
-            return self._client
+        if not client.initialised:
+            self.reset_client(
+                context=context,
+                language=settings.get_language(),
+                region=settings.get_region(),
+                items_per_page=settings.items_per_page(),
+                configs=configs,
+            )
 
-        if not dev_id:
-            context.log_debug('Selecting YouTube config "{0}"'
-                              .format(configs['main']['system']))
-        elif dev_keys:
-            context.log_debug('Selecting YouTube developer config "{0}"'
-                              .format(dev_id))
-            configs['main'] = dev_keys
-        else:
-            dev_keys = configs['main']
-            context.log_debug('Selecting YouTube config "{0}"'
-                              ' w/ developer access tokens'
-                              .format(dev_keys['system']))
+        num_access_tokens, expired = access_manager.access_token_status(dev_id)
+        if num_access_tokens:
+            if expired:
+                access_manager.update_access_token(dev_id, access_token='')
+                num_access_tokens = 0
+            elif self._logged_in:
+                return client
 
         refresh_tokens = access_manager.get_refresh_token(dev_id)
-        if any(refresh_tokens):
-            keys_changed = access_manager.dev_keys_changed(
-                dev_id, dev_keys['key'], dev_keys['id'], dev_keys['secret']
-            ) if dev_id else api_store.changed
-            if keys_changed:
-                context.log_warning('API key set changed: Resetting client'
-                                    ' and updating access token')
-                access_tokens = [None, None]
-                refresh_tokens = [None, None]
-                access_manager.update_access_token(
-                    dev_id, access_token='', expiry=-1, refresh_token=''
-                )
-                self.reset_client()
-
-        num_access_tokens = len([1 for token in access_tokens if token])
         num_refresh_tokens = len([1 for token in refresh_tokens if token])
-        context.log_debug(
-            'Access token count: |{0}|, refresh token count: |{1}|'
-            .format(num_access_tokens, num_refresh_tokens)
-        )
 
-        client = YouTube(context=context,
-                         language=settings.get_language(),
-                         region=settings.get_region(),
-                         items_per_page=settings.items_per_page(),
-                         configs=configs)
+        if num_access_tokens or num_refresh_tokens:
+            context.log_debug(
+                'Access token count: |{0}|, refresh token count: |{1}|'
+                .format(num_access_tokens, num_refresh_tokens)
+            )
+        else:
+            return client
+
         with client:
             # create new access tokens
             if num_refresh_tokens and num_access_tokens != num_refresh_tokens:
@@ -312,6 +279,8 @@ class Provider(AbstractProvider):
                     )
 
                 num_access_tokens = len([1 for token in access_tokens if token])
+            else:
+                access_tokens = access_manager.get_access_token()
 
             if num_access_tokens and access_tokens[1]:
                 self._logged_in = True
@@ -325,8 +294,7 @@ class Provider(AbstractProvider):
                 context.log_debug('User is not logged in')
                 client.set_access_token(personal='', tv='')
 
-        self._client = client
-        return self._client
+        return client
 
     def get_resource_manager(self, context, progress_dialog=None):
         resource_manager = self._resource_manager

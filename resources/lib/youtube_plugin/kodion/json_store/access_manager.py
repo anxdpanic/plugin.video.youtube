@@ -167,7 +167,7 @@ class AccessManager(JSONStore):
         """
         :return: current user
         """
-        if addon_id:
+        if addon_id and addon_id != ADDON_ID:
             return self.get_developers().get(addon_id, {})
         return self.get_users()[self._user]
 
@@ -453,20 +453,20 @@ class AccessManager(JSONStore):
         details = self.get_current_user_details(addon_id)
         return details.get('refresh_token', '').split('|')
 
-    def is_access_token_expired(self, addon_id=None):
+    def access_token_status(self, addon_id=None):
         """
-        Returns True if the access_token is expired otherwise False.
-        If no expiration date was provided and an access_token exists
-        this method will always return True
+        Returns tuple containing the number of access tokens and whether they
+        are expired.
         :return:
         """
         details = self.get_current_user_details(addon_id)
-        access_token = details.get('access_token')
+        access_tokens = details.get('access_token').split('|')
+        num_access_tokens = len([1 for token in access_tokens if token])
         expires = int(details.get('token_expires', -1))
 
-        if access_token and expires <= int(time.time()):
-            return True
-        return False
+        if num_access_tokens:
+            return num_access_tokens, expires <= int(time.time())
+        return 0, False
 
     def update_access_token(self,
                             addon_id,
@@ -511,7 +511,7 @@ class AccessManager(JSONStore):
                 'developers': {
                     addon_id: details,
                 },
-            } if addon_id else {
+            } if addon_id and addon_id != ADDON_ID else {
                 'users': {
                     self._user: details,
                 },
@@ -531,7 +531,7 @@ class AccessManager(JSONStore):
                         'last_key_hash': key_hash,
                     },
                 },
-            } if addon_id else {
+            } if addon_id and addon_id != ADDON_ID else {
                 'users': {
                     self._user: {
                         'last_key_hash': key_hash,
@@ -570,19 +570,25 @@ class AccessManager(JSONStore):
         data['access_manager']['developers'] = developers
         self.save(data)
 
-    def dev_keys_changed(self, addon_id, api_key, client_id, client_secret):
+    def keys_changed(self,
+                     addon_id,
+                     api_key,
+                     client_id,
+                     client_secret,
+                     update_hash=True):
         last_hash = self.get_last_key_hash(addon_id)
         current_hash = self.calc_key_hash(api_key, client_id, client_secret)
 
+        keys_changed = False
         if not last_hash and current_hash:
-            self.set_last_key_hash(current_hash, addon_id)
-            return False
-
-        if last_hash != current_hash:
-            self.set_last_key_hash(current_hash, addon_id)
-            return True
-
-        return False
+            if update_hash:
+                self.set_last_key_hash(current_hash, addon_id)
+        elif (not current_hash and last_hash
+              or last_hash != current_hash):
+            if update_hash:
+                self.set_last_key_hash(current_hash, addon_id)
+            keys_changed = True
+        return keys_changed
 
     @staticmethod
     def calc_key_hash(key, id, secret, **_kwargs):
