@@ -252,13 +252,14 @@ def _process_select_playlist(provider, context):
             snippet = playlist.get('snippet', {})
             title = snippet.get('title', '')
             description = snippet.get('description', '')
-            thumbnail = get_thumbnail(thumb_size, snippet.get('thumbnails'))
             playlist_id = playlist.get('id', '')
             if title and playlist_id:
                 items.append((
                     title, description,
                     playlist_id,
-                    thumbnail or default_thumb
+                    get_thumbnail(
+                        thumb_size, snippet.get('thumbnails'), default_thumb
+                    )
                 ))
 
         if page_token:
