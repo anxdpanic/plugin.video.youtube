@@ -1193,9 +1193,9 @@ THUMB_TYPES = {
 }
 
 
-def get_thumbnail(thumb_size, thumbnails):
+def get_thumbnail(thumb_size, thumbnails, default_thumb=None):
     if not thumbnails:
-        return None
+        return default_thumb
     is_dict = isinstance(thumbnails, dict)
     size_limit = thumb_size['size']
     ratio_limit = thumb_size['ratio']
@@ -1231,7 +1231,7 @@ def get_thumbnail(thumb_size, thumbnails):
     url = (thumbnail[1] if is_dict else thumbnail).get('url')
     if url and url.startswith('//'):
         url = 'https:' + url
-    return url
+    return url or default_thumb
 
 
 def get_shelf_index_by_title(context, json_data, shelf_title):

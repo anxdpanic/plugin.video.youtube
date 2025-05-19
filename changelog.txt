@@ -1,5 +1,6 @@
-## v7.2.0
+## v7.2.0.1
 ### Fixed
+- Fix handling of custom Watch Later playlist in add to playlist dialog
 - Fix Liked video playlist not loading #1175
 - Fix typo preventing some video only searches from working
 - Fix incorrect deletion of provider parameter in 10c3758 #1160
@@ -77,6 +78,7 @@
 - Fix window redirect on video playback failure #1018
 
 ### Changed
+- Properly identify custom History playlist in add to playlist dialog
 - Use channel handle by default when adding/removing/matching channels
   - Channel filters may need to be updated to use handles instead of channel name
   - e.g. "@channel_1_handle,@channel_2_handle" instead of "channel 1 name, channel 2 name"
