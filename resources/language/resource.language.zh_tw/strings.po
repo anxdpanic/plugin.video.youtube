@@ -481,8 +481,8 @@ msgid "More Links from the description"
 msgstr "符合此描述範圍的其他連結"
 
 msgctxt "#30545"
-msgid "No further links found."
-msgstr "沒有此範圍的其他連結。"
+msgid "No videos found."
+msgstr ""
 
 msgctxt "#30546"
 msgid "Please complete all login prompts"
@@ -497,8 +497,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30549"
-msgid "No videos streams found"
-msgstr "沒有影片串流"
+msgid "No streams found"
+msgstr ""
 
 msgctxt "#30550"
 msgid ""
@@ -1583,6 +1583,14 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30545"
+#~ msgid "No further links found."
+#~ msgstr "沒有此範圍的其他連結。"
+
+#~ msgctxt "#30549"
+#~ msgid "No videos streams found"
+#~ msgstr "沒有影片串流"
 
 #~ msgctxt "#30106"
 #~ msgid "Next Page (%d)"

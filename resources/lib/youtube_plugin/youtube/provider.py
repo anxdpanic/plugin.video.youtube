@@ -1587,7 +1587,7 @@ class Provider(AbstractProvider):
             resource_manager = provider.get_resource_manager(context)
             playlists = resource_manager.get_related_playlists('mine')
             if playlists and 'likes' in playlists:
-                liked_list_id = playlists['likes']
+                liked_list_id = playlists['likes'] or 'WL'
                 liked_videos_item = DirectoryItem(
                     localize('video.liked'),
                     create_uri(

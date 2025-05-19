@@ -5,17 +5,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-04-12 14:59+0000\n"
-"Last-Translator: NicoYazawa <1161118059@qq.com>\n"
-"Language-Team: Chinese (China) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/zh_cn/>\n"
+"PO-Revision-Date: 2025-05-15 12:50+0000\n"
+"Last-Translator: wabisabi926 <liwenliang926@163.com>\n"
+"Language-Team: Chinese (Simplified Han script) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/zh_Hans/>\n"
 "Language: zh_cn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.4.3\n"
+"X-Generator: Weblate 5.11.3\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -50,16 +50,16 @@ msgstr ""
 
 msgctxt "#30003"
 msgid "YouTube"
-msgstr ""
+msgstr "YouTube"
 
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
 msgid "Use InputStream.Adaptive"
-msgstr ""
+msgstr "使用 InputStream.Adaptive"
 
 msgctxt "#30008"
 msgid "Configure InputStream.Adaptive"
-msgstr ""
+msgstr "配置 InputStream.Adaptive"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -67,7 +67,7 @@ msgstr "总是询问视频分辨率"
 
 msgctxt "#30010"
 msgid "Maximum video quality"
-msgstr ""
+msgstr "最高视频质量"
 
 msgctxt "#30011"
 msgid "480p"
@@ -79,15 +79,15 @@ msgstr "720p (HD)"
 
 msgctxt "#30013"
 msgid "1080p (FHD)"
-msgstr ""
+msgstr "1080p (FHD)"
 
 msgctxt "#30014"
 msgid "2160p (4K)"
-msgstr ""
+msgstr "2160p (4K)"
 
 msgctxt "#30015"
 msgid "4320p (8K)"
-msgstr ""
+msgstr "4320p (8K)"
 
 msgctxt "#30016"
 msgid "240p"
@@ -103,7 +103,7 @@ msgstr "1080p 直播 / 720p (HD)"
 
 msgctxt "#30019"
 msgid "144p"
-msgstr ""
+msgstr "144p"
 
 msgctxt "#30020"
 msgid "Allow 3D"
@@ -127,11 +127,11 @@ msgstr "缓存大小 (MB)"
 
 msgctxt "#30025"
 msgid "Enable Setup Wizard"
-msgstr ""
+msgstr "启用安装向导"
 
 msgctxt "#30026"
 msgid "Override views"
-msgstr ""
+msgstr "覆盖视图"
 
 msgctxt "#30027"
 msgid "View: Default"
@@ -147,7 +147,7 @@ msgstr "视图：电影"
 
 msgctxt "#30030"
 msgid "Configure %s?"
-msgstr ""
+msgstr "配置 %s？"
 
 msgctxt "#30031"
 msgid ""
@@ -185,11 +185,11 @@ msgstr "定制 “历史记录” 播放列表 ID"
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
 msgid "Bookmarks"
-msgstr ""
+msgstr "书签"
 
 msgctxt "#30101"
 msgid "Bookmark"
-msgstr ""
+msgstr "书签"
 
 msgctxt "#30102"
 msgid "Search"
@@ -205,11 +205,11 @@ msgstr ""
 
 msgctxt "#30105"
 msgid "filtered"
-msgstr ""
+msgstr "过滤"
 
 msgctxt "#30106"
 msgid "Next page: %d"
-msgstr ""
+msgstr "下一页：%d"
 
 msgctxt "#30107"
 msgid "Watch Later"
@@ -265,11 +265,11 @@ msgstr "请稍候..."
 
 msgctxt "#30120"
 msgid "Confirm clear"
-msgstr ""
+msgstr "确认清除"
 
 msgctxt "#30121"
 msgid "Clear %s?"
-msgstr ""
+msgstr "清除 %s？"
 
 # YouTube
 # empty strings from id 30121 to 30199
@@ -313,7 +313,7 @@ msgstr "转到 %s"
 
 msgctxt "#30503"
 msgid "Channel fanart"
-msgstr ""
+msgstr "频道背景图"
 
 msgctxt "#30504"
 msgid "Subscriptions"
@@ -353,7 +353,7 @@ msgstr "浏览频道"
 
 msgctxt "#30513"
 msgid "Trending"
-msgstr ""
+msgstr "趋势"
 
 msgctxt "#30514"
 msgid "Related Videos"
@@ -361,7 +361,7 @@ msgstr "相关视频"
 
 msgctxt "#30515"
 msgid "Auto-Remove from Watch Later"
-msgstr ""
+msgstr "自动从“稍后观看”中移除"
 
 msgctxt "#30516"
 msgid "Folders"
@@ -373,7 +373,7 @@ msgstr "订阅 %s"
 
 msgctxt "#30518"
 msgid "Feeds"
-msgstr ""
+msgstr "订阅源"
 
 msgctxt "#30519"
 msgid "and enter the following code:"
@@ -405,11 +405,11 @@ msgstr "选择区域"
 
 msgctxt "#30526"
 msgid "Setup Wizard"
-msgstr ""
+msgstr "安装向导"
 
 msgctxt "#30527"
 msgid "Language and Region"
-msgstr ""
+msgstr "语言和地区"
 
 msgctxt "#30528"
 msgid "Rate..."
@@ -480,8 +480,8 @@ msgid "More Links from the description"
 msgstr "符合此描述内容的更多链接"
 
 msgctxt "#30545"
-msgid "No further links found."
-msgstr "沒有符合此描述内容的其他链接。"
+msgid "No videos found."
+msgstr ""
 
 msgctxt "#30546"
 msgid "Please complete all login prompts"
@@ -496,8 +496,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30549"
-msgid "No videos streams found"
-msgstr "沒有找到视频流"
+msgid "No streams found"
+msgstr ""
 
 msgctxt "#30550"
 msgid ""
@@ -1582,6 +1582,14 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30545"
+#~ msgid "No further links found."
+#~ msgstr "沒有符合此描述内容的其他链接。"
+
+#~ msgctxt "#30549"
+#~ msgid "No videos streams found"
+#~ msgstr "沒有找到视频流"
 
 #~ msgctxt "#30106"
 #~ msgid "Next Page (%d)"

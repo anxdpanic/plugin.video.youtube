@@ -481,8 +481,8 @@ msgid "More Links from the description"
 msgstr "Flere lenker fra beskrivelsen"
 
 msgctxt "#30545"
-msgid "No further links found."
-msgstr "Ingen flere lenker funnet."
+msgid "No videos found."
+msgstr ""
 
 msgctxt "#30546"
 msgid "Please complete all login prompts"
@@ -497,8 +497,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30549"
-msgid "No videos streams found"
-msgstr "Ingen videostrøm funnet"
+msgid "No streams found"
+msgstr ""
 
 msgctxt "#30550"
 msgid ""
@@ -1583,6 +1583,14 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30545"
+#~ msgid "No further links found."
+#~ msgstr "Ingen flere lenker funnet."
+
+#~ msgctxt "#30549"
+#~ msgid "No videos streams found"
+#~ msgstr "Ingen videostrøm funnet"
 
 #~ msgctxt "#30106"
 #~ msgid "Next Page (%d)"
