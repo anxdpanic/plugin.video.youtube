@@ -106,7 +106,7 @@ class Provider(AbstractProvider):
     def is_logged_in(self):
         return self._logged_in
 
-    def reset_client(self):
+    def reset_client(self, **kwargs):
         self._client = None
 
     def get_client(self, context):
@@ -924,26 +924,28 @@ class Provider(AbstractProvider):
 
     @AbstractProvider.register_path('^/sign/(?P<mode>[^/]+)/?$')
     @staticmethod
-    def on_sign(provider, context, re_match):
-        sign_out_confirmed = context.get_param('confirmed')
+    def on_sign_x(provider, context, re_match):
+        confirmed = context.get_param('confirmed')
         mode = re_match.group('mode')
-        if mode == 'in':
-            refresh_tokens = context.get_access_manager().get_refresh_token()
-            if any(refresh_tokens):
-                yt_login.process('out',
+        client = provider.get_client(context)
+        if mode == yt_login.SIGN_IN:
+            if provider.is_logged_in():
+                yt_login.process(yt_login.SIGN_OUT,
                                  provider,
                                  context,
-                                 sign_out_refresh=False)
-
-        if (not sign_out_confirmed and mode == 'out'
-                and context.get_ui().on_yes_no_input(
+                                 client=client,
+                                 refresh=False)
+                client = None
+        elif mode == yt_login.SIGN_OUT:
+            if not confirmed and not context.get_ui().on_yes_no_input(
                     context.localize('sign.out'),
                     context.localize('are_you_sure')
-                )):
-            sign_out_confirmed = True
+            ):
+                return False
+        else:
+            return False
 
-        if mode == 'in' or (mode == 'out' and sign_out_confirmed):
-            yt_login.process(mode, provider, context)
+        yt_login.process(mode, provider, context, client=client)
         return True
 
     def _search_channel_or_playlist(self,

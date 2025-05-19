@@ -23,11 +23,8 @@ __all__ = (
     'sign_out',
 )
 
-_SIGN_IN = 'in'
-_SIGN_OUT = 'out'
 
-
-def __add_new_developer(addon_id):
+def _add_new_developer(addon_id):
     """
 
     :param addon_id: id of the add-on being added
@@ -43,7 +40,7 @@ def __add_new_developer(addon_id):
         context.log_debug('Creating developer user: |%s|' % addon_id)
 
 
-def __auth(addon_id, mode=_SIGN_IN):
+def _auth(addon_id, mode=yt_login.SIGN_IN):
     """
 
     :param addon_id: id of the add-on being signed in
@@ -52,37 +49,37 @@ def __auth(addon_id, mode=_SIGN_IN):
     """
     if not addon_id or addon_id == ADDON_ID:
         context = XbmcContext()
-        context.log_error('Developer authentication: |%s| Invalid addon_id' % addon_id)
-        return
-    __add_new_developer(addon_id)
+        context.log_error('Developer authentication - Invalid addon_id'
+                          '\n\tAddon ID: |{0}|'
+                          .format(addon_id))
+        return False
+
+    _add_new_developer(addon_id)
+
     provider = Provider()
     context = XbmcContext(params={'addon_id': addon_id})
 
-    _ = provider.get_client(context=context)
+    client = provider.get_client(context=context)
     logged_in = provider.is_logged_in()
-    if mode == _SIGN_IN:
+
+    if mode == yt_login.SIGN_IN:
         if logged_in:
-            return True
-        else:
-            provider.reset_client()
-            yt_login.process(mode, provider, context, sign_out_refresh=False)
-    elif mode == _SIGN_OUT:
-        if not logged_in:
-            return True
-        else:
-            provider.reset_client()
-            try:
-                yt_login.process(mode, provider, context, sign_out_refresh=False)
-            except LoginException:
-                reset_access_tokens(addon_id)
-    else:
+            yt_login.process(yt_login.SIGN_OUT,
+                             provider,
+                             context,
+                             client=client,
+                             refresh=False)
+            client = None
+    elif mode != yt_login.SIGN_OUT:
         raise Exception('Unknown mode: |%s|' % mode)
 
+    yt_login.process(mode, provider, context, client=client, refresh=False)
+
     _ = provider.get_client(context=context)
-    if mode == _SIGN_IN:
-        return provider.is_logged_in()
-    else:
-        return not provider.is_logged_in()
+    logged_in = provider.is_logged_in()
+    if mode == yt_login.SIGN_IN:
+        return logged_in
+    return not logged_in
 
 
 def sign_in(addon_id):
@@ -120,7 +117,7 @@ def sign_in(addon_id):
     :return: boolean, True when signed in
     """
 
-    return __auth(addon_id, mode=_SIGN_IN)
+    return _auth(addon_id, mode=yt_login.SIGN_IN)
 
 
 def sign_out(addon_id):
@@ -151,7 +148,7 @@ def sign_out(addon_id):
     :return: boolean, True when signed out
     """
 
-    return __auth(addon_id, mode=_SIGN_OUT)
+    return _auth(addon_id, mode=yt_login.SIGN_OUT)
 
 
 def reset_access_tokens(addon_id):
