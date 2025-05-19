@@ -216,6 +216,14 @@ def _process_select_playlist(provider, context):
     else:
         watch_later_id = context.get_access_manager().get_watch_later_id()
 
+    # add the 'History' playlist
+    if playlists and 'watchHistory' in playlists:
+        watch_history_id = playlists['watchHistory'] or 'HL'
+    else:
+        watch_history_id = context.get_access_manager().get_watch_history_id()
+
+    account_playlists = {watch_later_id, watch_history_id}
+
     thumb_size = context.get_settings().get_thumbnail_size()
     default_thumb = context.create_resource_path('media', 'playlist.png')
 
@@ -248,14 +256,24 @@ def _process_select_playlist(provider, context):
                     context.create_resource_path('media', 'watch_later.png')
                 ))
 
+            # add the 'History' playlist
+            if watch_history_id:
+                items.append((
+                    ui.bold(context.localize('history')), '',
+                    watch_history_id,
+                    context.create_resource_path('media', 'history.png')
+                ))
+
         for playlist in playlists:
+            playlist_id = playlist.get('id')
+            if playlist_id in account_playlists:
+                continue
             snippet = playlist.get('snippet', {})
-            title = snippet.get('title', '')
-            description = snippet.get('description', '')
-            playlist_id = playlist.get('id', '')
+            title = snippet.get('title')
             if title and playlist_id:
                 items.append((
-                    title, description,
+                    title,
+                    snippet.get('description', ''),
                     playlist_id,
                     get_thumbnail(
                         thumb_size, snippet.get('thumbnails'), default_thumb
