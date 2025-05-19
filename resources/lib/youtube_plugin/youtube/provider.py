@@ -1198,58 +1198,7 @@ class Provider(AbstractProvider):
     @AbstractProvider.register_path('^/api/update/?$')
     @staticmethod
     def on_api_key_update(context, **_kwargs):
-        localize = context.localize
-        settings = context.get_settings()
-        ui = context.get_ui()
-
-        params = context.get_params()
-        api_key = params.get('api_key')
-        client_id = params.get('client_id')
-        client_secret = params.get('client_secret')
-        enable = params.get('enable')
-
-        updated_list = []
-        log_list = []
-
-        if api_key:
-            settings.api_key(api_key)
-            updated_list.append(localize('api.key'))
-            log_list.append('Key')
-        if client_id:
-            settings.api_id(client_id)
-            updated_list.append(localize('api.id'))
-            log_list.append('Id')
-        if client_secret:
-            settings.api_secret(client_secret)
-            updated_list.append(localize('api.secret'))
-            log_list.append('Secret')
-        if updated_list:
-            ui.show_notification(localize('updated_') % ', '.join(updated_list))
-        context.log_debug('Updated API keys: %s' % ', '.join(log_list))
-
-        client_id = settings.api_id()
-        client_secret = settings.api_secret()
-        api_key = settings.api_key
-        missing_list = []
-        log_list = []
-
-        if enable and client_id and client_secret and api_key:
-            ui.show_notification(localize('api.personal.enabled'))
-            context.log_debug('Personal API keys enabled')
-        elif enable:
-            if not api_key:
-                missing_list.append(localize('api.key'))
-                log_list.append('Key')
-            if not client_id:
-                missing_list.append(localize('api.id'))
-                log_list.append('Id')
-            if not client_secret:
-                missing_list.append(localize('api.secret'))
-                log_list.append('Secret')
-            ui.show_notification(localize('api.personal.failed')
-                                 % ', '.join(missing_list))
-            context.log_error('Failed to enable personal API keys. Missing: %s'
-                              % ', '.join(log_list))
+        context.get_api_store().update()
 
     @staticmethod
     def on_playback_history(provider, context, re_match):
