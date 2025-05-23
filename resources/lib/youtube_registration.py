@@ -61,8 +61,12 @@ def register_api_keys(addon_id, api_key, client_id, client_secret):
     client_secret = b64encode(bytes(client_secret, 'utf-8')).decode('ascii')
 
     api_keys = {
-        'origin': addon_id, 'main': {
-            'system': 'JSONStore', 'key': api_key, 'id': client_id, 'secret': client_secret
+        'origin': addon_id,
+        'main': {
+            'system': 'JSONStore',
+            'key': api_key,
+            'id': client_id,
+            'secret': client_secret,
         }
     }
 
@@ -73,8 +77,5 @@ def register_api_keys(addon_id, api_key, client_id, client_secret):
         api_jstore.save(json_api)
         context.log_debug('Register API Keys: |%s| Keys registered' % addon_id)
 
-    developers = access_manager.get_developers()
-    if not developers.get(addon_id, None):
-        developers[addon_id] = access_manager.get_new_developer()
-        access_manager.set_developers(developers)
+    if access_manager.add_new_developer(addon_id):
         context.log_debug('Creating developer user: |%s|' % addon_id)

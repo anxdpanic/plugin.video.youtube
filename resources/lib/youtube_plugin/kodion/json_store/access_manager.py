@@ -28,6 +28,12 @@ class AccessManager(JSONStore):
         'watch_later': 'WL',
         'watch_history': 'HL'
     }
+    DEFAULT_NEW_DEVELOPER = {
+        'access_token': '',
+        'refresh_token': '',
+        'token_expires': -1,
+        'last_key_hash': ''
+    }
 
     def __init__(self, context):
         super(AccessManager, self).__init__('access_manager.json')
@@ -535,18 +541,6 @@ class AccessManager(JSONStore):
         }
         self.save(data, update=True)
 
-    @staticmethod
-    def get_new_developer():
-        """
-        :return: a new developer dict
-        """
-        return {
-            'access_token': '',
-            'refresh_token': '',
-            'token_expires': -1,
-            'last_key_hash': ''
-        }
-
     def get_developers(self):
         """
         Returns developers
@@ -554,15 +548,19 @@ class AccessManager(JSONStore):
         """
         return self._data['access_manager'].get('developers', {})
 
-    def set_developers(self, developers):
+    def add_new_developer(self, addon_id):
         """
-        Updates the users
-        :param developers: dict, developers
+        Updates the developer users
+        :param addon_id: str
         :return:
         """
         data = self.get_data()
-        data['access_manager']['developers'] = developers
-        self.save(data)
+        developers = data['access_manager'].get('developers', {})
+        if addon_id not in developers:
+            developers[addon_id] = self.DEFAULT_NEW_DEVELOPER.copy()
+            data['access_manager']['developers'] = developers
+            return self.save(data)
+        return False
 
     def keys_changed(self,
                      addon_id,

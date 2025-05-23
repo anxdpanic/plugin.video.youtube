@@ -24,22 +24,6 @@ __all__ = (
 )
 
 
-def _add_new_developer(addon_id):
-    """
-
-    :param addon_id: id of the add-on being added
-    :return:
-    """
-    context = XbmcContext(params={'addon_id': addon_id})
-
-    access_manager = context.get_access_manager()
-    developers = access_manager.get_developers()
-    if not developers.get(addon_id, None):
-        developers[addon_id] = access_manager.get_new_developer()
-        access_manager.set_developers(developers)
-        context.log_debug('Creating developer user: |%s|' % addon_id)
-
-
 def _auth(addon_id, mode=yt_login.SIGN_IN):
     """
 
@@ -54,10 +38,12 @@ def _auth(addon_id, mode=yt_login.SIGN_IN):
                           .format(addon_id))
         return False
 
-    _add_new_developer(addon_id)
-
     provider = Provider()
     context = XbmcContext(params={'addon_id': addon_id})
+
+    access_manager = context.get_access_manager()
+    if access_manager.add_new_developer(addon_id):
+        context.log_debug('Creating developer user: |%s|' % addon_id)
 
     client = provider.get_client(context=context)
     logged_in = provider.is_logged_in()
