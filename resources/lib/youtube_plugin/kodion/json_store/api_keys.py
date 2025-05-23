@@ -9,11 +9,11 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from base64 import b64decode
+from base64 import b64decode, b64encode
 
-from ... import key_sets
-from ..constants import DEVELOPER_CONFIGS
 from .json_store import JSONStore
+from ..constants import DEVELOPER_CONFIGS
+from ... import key_sets
 
 
 class APIKeyStore(JSONStore):
@@ -220,6 +220,35 @@ class APIKeyStore(JSONStore):
                 'secret': key_details['secret'],
             }
         }
+
+    def update_developer_config(self,
+                                developer_id,
+                                api_key,
+                                client_id,
+                                client_secret):
+        data = self.get_data()
+        existing_config = data['keys']['developer'].get(developer_id, {})
+
+        new_config = {
+            'origin': developer_id,
+            'main': {
+                'system': 'JSONStore',
+                'key': b64encode(
+                    bytes(api_key, 'utf-8')
+                ).decode('ascii'),
+                'id': b64encode(
+                    bytes(client_id, 'utf-8')
+                ).decode('ascii'),
+                'secret': b64encode(
+                    bytes(client_secret, 'utf-8')
+                ).decode('ascii'),
+            }
+        }
+
+        if existing_config and existing_config == new_config:
+            return False
+        data['keys']['developer'][developer_id] = new_config
+        return self.save(data)
 
     def sync(self):
         api_data = self.get_data()

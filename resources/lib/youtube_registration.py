@@ -9,8 +9,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from base64 import b64encode
-
 from youtube_plugin.kodion.constants import ADDON_ID
 from youtube_plugin.kodion.context import XbmcContext
 
@@ -49,33 +47,15 @@ def register_api_keys(addon_id, api_key, client_id, client_secret):
         context.log_error('Register API Keys: |%s| Invalid addon_id' % addon_id)
         return
 
-    api_jstore = context.get_api_store()
-    json_api = api_jstore.get_data()
 
     access_manager = context.get_access_manager()
-
-    jkeys = json_api['keys']['developer'].get(addon_id, {})
-
-    api_key = b64encode(bytes(api_key, 'utf-8')).decode('ascii')
-    client_id = b64encode(bytes(client_id, 'utf-8')).decode('ascii')
-    client_secret = b64encode(bytes(client_secret, 'utf-8')).decode('ascii')
-
-    api_keys = {
-        'origin': addon_id,
-        'main': {
-            'system': 'JSONStore',
-            'key': api_key,
-            'id': client_id,
-            'secret': client_secret,
-        }
-    }
-
-    if jkeys and jkeys == api_keys:
-        context.log_debug('Register API Keys: |%s| No update required' % addon_id)
-    else:
-        json_api['keys']['developer'][addon_id] = api_keys
-        api_jstore.save(json_api)
-        context.log_debug('Register API Keys: |%s| Keys registered' % addon_id)
-
     if access_manager.add_new_developer(addon_id):
         context.log_debug('Creating developer user: |%s|' % addon_id)
+
+    api_store = context.get_api_store()
+    if api_store.update_developer_config(
+            addon_id, api_key, client_id, client_secret
+    ):
+        context.log_debug('Keys registered: |%s|' % addon_id)
+    else:
+        context.log_debug('No update performed: |%s|' % addon_id)
