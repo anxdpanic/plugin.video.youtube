@@ -10,6 +10,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from ..youtube_exceptions import YouTubeException
+from ...kodion.compatibility import range_type
 from ...kodion.network import BaseRequestsClass
 from ...kodion.utils import merge_dicts
 
@@ -597,7 +598,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                             continue
                         return new_result
 
-                if isinstance(next_key, (range, list)):
+                if isinstance(next_key, range_type):
                     results_limit = len(next_key)
                     new_results = []
                     for part in result[keys]:
