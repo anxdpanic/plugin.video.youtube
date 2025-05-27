@@ -1,5 +1,8 @@
-## v7.2.0.1
+## v7.2.0.2
 ### Fixed
+- Fix regression preventing video playback from Kodi Info dialog #1184
+- Fix exception in youtube.helper.v3.response_to_items when using Kodi 18 (Python 2) #1188
+- Fix exception in YouTubeRequestClient.json_traverse when using Kodi 18 (Python 2) #1187
 - Fix handling of custom Watch Later playlist in add to playlist dialog
 - Fix Liked video playlist not loading #1175
 - Fix typo preventing some video only searches from working
@@ -78,6 +81,7 @@
 - Fix window redirect on video playback failure #1018
 
 ### Changed
+- Update client details #1185
 - Properly identify custom History playlist in add to playlist dialog
 - Use channel handle by default when adding/removing/matching channels
   - Channel filters may need to be updated to use handles instead of channel name

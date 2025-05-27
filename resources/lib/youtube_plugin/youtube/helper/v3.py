@@ -611,7 +611,7 @@ def response_to_items(provider,
     current_page = params.get('page') or 1
     exclude_current = params.get('exclude')
     if exclude_current:
-        exclude_current = exclude_current.copy()
+        exclude_current = exclude_current[:]
     else:
         exclude_current = []
     exclude_next = []

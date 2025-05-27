@@ -79,7 +79,7 @@ class XbmcPlugin(AbstractPlugin):
         succeeded = False
         for was_busy in (ui.pop_property(BUSY_FLAG),):
             if was_busy:
-                if ui.busy_dialog_visible():
+                if ui.busy_dialog_active():
                     ui.set_property(BUSY_FLAG)
                 if route:
                     break
@@ -124,7 +124,7 @@ class XbmcPlugin(AbstractPlugin):
                         continue
 
             timeout = 30
-            while ui.busy_dialog_visible():
+            while ui.busy_dialog_active():
                 timeout -= 1
                 if timeout < 0:
                     context.log_error('Multiple busy dialogs active'
@@ -142,7 +142,7 @@ class XbmcPlugin(AbstractPlugin):
                 position = 1
                 timeout = num_items
 
-            while ui.busy_dialog_visible() or playlist_player.size() < position:
+            while ui.busy_dialog_active() or playlist_player.size() < position:
                 timeout -= 1
                 if timeout < 0:
                     context.log_error('Multiple busy dialogs active'
@@ -372,7 +372,7 @@ class XbmcPlugin(AbstractPlugin):
     def post_run(context, ui, *actions, **kwargs):
         timeout = kwargs.get('timeout', 30)
         for action in actions:
-            while ui.busy_dialog_visible():
+            while ui.busy_dialog_active():
                 timeout -= 1
                 if timeout < 0:
                     context.log_error('Multiple busy dialogs active'

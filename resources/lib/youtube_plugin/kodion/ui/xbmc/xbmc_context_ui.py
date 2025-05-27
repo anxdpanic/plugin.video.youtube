@@ -273,7 +273,7 @@ class XbmcContextUI(AbstractContextUI):
         )
 
     @staticmethod
-    def busy_dialog_visible(dialog_ids=frozenset((
+    def busy_dialog_active(all_modals=False, dialog_ids=frozenset((
             10100,  # WINDOW_DIALOG_YES_NO
             10101,  # WINDOW_DIALOG_PROGRESS
             10103,  # WINDOW_DIALOG_KEYBOARD
@@ -284,7 +284,7 @@ class XbmcContextUI(AbstractContextUI):
             12000,  # WINDOW_DIALOG_SELECT
             12002,  # WINDOW_DIALOG_OK
     ))):
-        if xbmc.getCondVisibility('System.HasVisibleModalDialog'):
+        if all_modals and xbmc.getCondVisibility('System.HasActiveModalDialog'):
             return True
         dialog_id = xbmcgui.getCurrentWindowDialogId()
         if dialog_id in dialog_ids:
@@ -309,7 +309,7 @@ class XbmcProgressDialog(object):
             return
 
         self._ui = ui
-        if ui.busy_dialog_visible():
+        if ui.busy_dialog_active(all_modals=True):
             self._dialog = dialog()
             self._dialog.create(heading, message)
             self._created = True
@@ -430,7 +430,7 @@ class XbmcProgressDialog(object):
             self._message = message
 
         if not self._created:
-            if self._ui.busy_dialog_visible():
+            if self._ui.busy_dialog_active(all_modals=True):
                 return
             self._dialog.create(self._heading, self._message)
             self._created = True

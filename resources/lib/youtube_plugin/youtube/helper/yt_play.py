@@ -486,7 +486,7 @@ def process_items_for_playlist(context,
     if action == 'play':
         ui = context.get_ui()
         timeout = position
-        while ui.busy_dialog_visible() or playlist_player.size() < position:
+        while ui.busy_dialog_active() or playlist_player.size() < position:
             timeout -= 1
             if timeout < 0:
                 command = playlist_player.play_playlist_item(position,

@@ -247,7 +247,7 @@ class AbstractProvider(object):
             del params['exclude']
         params = dict(params, page=page, page_token=page_token)
 
-        if (not ui.busy_dialog_visible()
+        if (not ui.busy_dialog_active()
                 and context.is_plugin_path(
                     context.get_infolabel('Container.FolderPath'),
                     partial=True,
@@ -369,7 +369,7 @@ class AbstractProvider(object):
             ))
 
             timeout = 30
-            while ui.busy_dialog_visible():
+            while ui.busy_dialog_active():
                 timeout -= 1
                 if timeout < 0:
                     context.log_warning('Multiple busy dialogs active'

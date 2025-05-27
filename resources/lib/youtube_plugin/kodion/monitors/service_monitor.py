@@ -60,7 +60,7 @@ class ServiceMonitor(xbmc.Monitor):
         super(ServiceMonitor, self).__init__()
 
     @staticmethod
-    def busy_dialog_visible(dialog_ids=frozenset((
+    def busy_dialog_active(all_modals=False, dialog_ids=frozenset((
             10100,  # WINDOW_DIALOG_YES_NO
             10101,  # WINDOW_DIALOG_PROGRESS
             10103,  # WINDOW_DIALOG_KEYBOARD
@@ -71,7 +71,7 @@ class ServiceMonitor(xbmc.Monitor):
             12000,  # WINDOW_DIALOG_SELECT
             12002,  # WINDOW_DIALOG_OK
     ))):
-        if xbmc.getCondVisibility('System.HasVisibleModalDialog'):
+        if all_modals and xbmc.getCondVisibility('System.HasActiveModalDialog'):
             return True
         dialog_id = xbmcgui.getCurrentWindowDialogId()
         if dialog_id in dialog_ids:
@@ -82,7 +82,7 @@ class ServiceMonitor(xbmc.Monitor):
     def is_plugin_container(url='plugin://{0}/'.format(ADDON_ID),
                             check_all=False,
                             _bool=xbmc.getCondVisibility,
-                            _busy=busy_dialog_visible.__func__,
+                            _busy=busy_dialog_active.__func__,
                             _label=xbmc.getInfoLabel):
         if check_all:
             return (not _bool('Container.IsUpdating')

@@ -10,6 +10,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from ..youtube_exceptions import YouTubeException
+from ...kodion.compatibility import range_type
 from ...kodion.network import BaseRequestsClass
 from ...kodion.utils import merge_dicts
 
@@ -72,14 +73,14 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_id': {
                 'client_id': 28,
                 'client_name': 'ANDROID_VR',
-                'client_version': '1.62.27',
-                'android_sdk_version': '32',
+                'client_version': '1.64.34',
+                'android_sdk_version': '34',
                 'device_codename': 'eureka',
                 'device_make': 'Oculus',
                 'device_model': 'Quest 3',
                 'os_name': 'Android',
-                'os_version': '12L',
-                'os_build': 'SQ3A.220605.009.A1',
+                'os_version': '14',
+                'os_build': 'UP1A.231005.007.A1',
                 'package_id': 'com.google.android.apps.youtube.vr.oculus',
             },
             '_query_subtitles': False,
@@ -117,10 +118,10 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_id': {
                 'client_id': 29,
                 'client_name': 'ANDROID_UNPLUGGED',
-                'client_version': '9.03.2',
-                'android_sdk_version': '32',
+                'client_version': '9.21.0',
+                'android_sdk_version': '34',
                 'os_name': 'Android',
-                'os_version': '12',
+                'os_version': '14',
                 'package_id': 'com.google.android.apps.youtube.unplugged',
                 'platform': 'TV',
             },
@@ -221,14 +222,14 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_id': {
                 'client_id': 5,
                 'client_name': 'IOS',
-                'client_version': '20.11.6',
+                'client_version': '20.20.7',
                 'device_make': 'Apple',
                 'device_model': 'iPhone16,2',
                 'os_name': 'iOS',
                 'os_major': '18',
-                'os_minor': '3',
-                'os_patch': '2',
-                'os_build': '22D82',
+                'os_minor': '5',
+                'os_patch': '0',
+                'os_build': '22F76',
                 'package_id': 'com.google.ios.youtube',
                 'platform': 'MOBILE',
             },
@@ -267,14 +268,14 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_id': {
                 'client_id': 33,
                 'client_name': 'IOS_UNPLUGGED',
-                'client_version': '9.04',
+                'client_version': '9.21',
                 'device_make': 'Apple',
                 'device_model': 'iPhone16,2',
                 'os_name': 'iOS',
                 'os_major': '18',
-                'os_minor': '3',
-                'os_patch': '2',
-                'os_build': '22D82',
+                'os_minor': '5',
+                'os_patch': '0',
+                'os_build': '22F76',
                 'package_id': 'com.google.ios.youtubeunplugged',
                 'platform': 'MOBILE',
             },
@@ -597,7 +598,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                             continue
                         return new_result
 
-                if isinstance(next_key, (range, list)):
+                if isinstance(next_key, range_type):
                     results_limit = len(next_key)
                     new_results = []
                     for part in result[keys]:
