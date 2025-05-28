@@ -11,9 +11,12 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from .utils import get_thumbnail
+from ...kodion import logging
 
 
 class ResourceManager(object):
+    log = logging.getLogger(__name__)
+
     def __init__(self, provider, context, progress_dialog=None):
         self._provider = provider
         self._context = context
@@ -89,11 +92,11 @@ class ResourceManager(object):
                      or result[id_].get('_partial')]
 
         if result:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_channels'
-                ' - Using cached data for {num} channel(s)'
-                '\n\tChannel IDs: {ids}'
-                .format(num=len(result), ids=list(result))
+            self.log.debugging and self.log.debug(
+                ('Using cached data for {num} channel(s)',
+                 'Channel IDs: {ids}'),
+                num=len(result),
+                ids=list(result),
             )
             if self._progress_dialog:
                 self._progress_dialog.update(steps=len(result) - len(to_update))
@@ -118,11 +121,11 @@ class ResourceManager(object):
             new_data = None
 
         if new_data:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_channels'
-                ' - Retrieved new data for {num} channel(s)'
-                '\n\tChannel IDs: {ids}'
-                .format(num=len(to_update), ids=to_update)
+            self.log.debugging and self.log.debug(
+                ('Retrieved new data for {num} channel(s)',
+                 'Channel IDs: {ids}'),
+                num=len(to_update),
+                ids=to_update,
             )
             result.update(new_data)
             self.cache_data(new_data, defer=defer_cache)
@@ -163,11 +166,11 @@ class ResourceManager(object):
                      or result[id_].get('_partial')]
 
         if result:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_channel_info'
-                ' - Using cached data for {num} channel(s)'
-                '\n\tChannel IDs: {ids}'
-                .format(num=len(result), ids=list(result))
+            self.log.debugging and self.log.debug(
+                ('Using cached data for {num} channel(s)',
+                 'Channel IDs: {ids}'),
+                num=len(result),
+                ids=list(result),
             )
             if self._progress_dialog:
                 self._progress_dialog.update(steps=len(result) - len(to_update))
@@ -193,11 +196,11 @@ class ResourceManager(object):
             new_data = None
 
         if new_data:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_channel_info'
-                ' - Retrieved new data for {num} channel(s)'
-                '\n\tChannel IDs: {ids}'
-                .format(num=len(to_update), ids=to_update)
+            self.log.debugging and self.log.debug(
+                ('Retrieved new data for {num} channel(s)',
+                 'Channel IDs: {ids}'),
+                num=len(to_update),
+                ids=to_update,
             )
             result.update(new_data)
             self.cache_data(new_data, defer=defer_cache)
@@ -255,11 +258,11 @@ class ResourceManager(object):
                      or result[id_].get('_partial')]
 
         if result:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_playlists'
-                ' - Using cached data for {num} playlist(s)'
-                '\n\tPlaylist IDs: {ids}'
-                .format(num=len(result), ids=list(result))
+            self.log.debugging and self.log.debug(
+                ('Using cached data for {num} playlist(s)',
+                 'Playlist IDs: {ids}'),
+                num=len(result),
+                ids=list(result),
             )
             if self._progress_dialog:
                 self._progress_dialog.update(steps=len(result) - len(to_update))
@@ -285,11 +288,11 @@ class ResourceManager(object):
             new_data = None
 
         if new_data:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_playlists'
-                ' - Retrieved new data for {num} playlist(s)'
-                '\n\tPlaylist IDs: {ids}'
-                .format(num=len(to_update), ids=to_update)
+            self.log.debugging and self.log.debug(
+                ('Retrieved new data for {num} playlist(s)',
+                 'Playlist IDs: {ids}'),
+                num=len(to_update),
+                ids=to_update,
             )
             result.update(new_data)
             self.cache_data(new_data, defer=defer_cache)
@@ -354,11 +357,11 @@ class ResourceManager(object):
                     break
 
         if result:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_playlist_items'
-                ' - Using cached data for {num} playlist part(s)'
-                '\n\tBatch IDs: {ids}'
-                .format(num=len(result), ids=list(result))
+            self.log.debugging and self.log.debug(
+                ('Using cached data for {num} playlist part(s)',
+                 'Batch IDs: {ids}'),
+                num=len(result),
+                ids=list(result),
             )
             if self._progress_dialog:
                 self._progress_dialog.update(steps=len(result) - len(to_update))
@@ -386,11 +389,11 @@ class ResourceManager(object):
                 insert_point += len(new_batch_ids)
 
         if new_data:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_playlist_items'
-                ' - Retrieved new data for {num} playlist part(s)'
-                '\n\tBatch IDs: {ids}'
-                .format(num=len(new_data), ids=list(new_data))
+            self.log.debugging and self.log.debug(
+                ('Retrieved new data for {num} playlist part(s)',
+                 'Batch IDs: {ids}'),
+                num=len(new_data),
+                ids=list(new_data),
             )
             result.update(new_data)
             self.cache_data({
@@ -441,11 +444,11 @@ class ResourceManager(object):
             if yt_item
         }
         if new_data:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_my_playlists'
-                ' - Retrieved new data for {num} playlist(s)'
-                '\n\tPlaylist IDs: {ids}'
-                .format(num=len(new_data), ids=list(new_data))
+            self.log.debugging and self.log.debug(
+                ('Retrieved new data for {num} playlist(s)',
+                 'Playlist IDs: {ids}'),
+                num=len(new_data),
+                ids=list(new_data),
             )
             self.cache_data(new_data, defer=defer_cache)
 
@@ -472,11 +475,11 @@ class ResourceManager(object):
                           or result[id_].get('_partial'))]
 
         if result:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_videos'
-                ' - Using cached data for {num} video(s)'
-                '\n\tVideo IDs: {ids}'
-                .format(num=len(result), ids=list(result))
+            self.log.debugging and self.log.debug(
+                ('Using cached data for {num} video(s)',
+                 'Video IDs: {ids}'),
+                num=len(result),
+                ids=list(result),
             )
             if self._progress_dialog:
                 self._progress_dialog.update(steps=len(result) - len(to_update))
@@ -503,11 +506,11 @@ class ResourceManager(object):
             new_data = None
 
         if new_data:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_videos'
-                ' - Retrieved new data for {num} video(s)'
-                '\n\tVideo IDs: {ids}'
-                .format(num=len(to_update), ids=to_update)
+            self.log.debugging and self.log.debug(
+                ('Retrieved new data for {num} video(s)',
+                 'Video IDs: {ids}'),
+                num=len(to_update),
+                ids=to_update,
             )
             new_data = dict(dict.fromkeys(to_update, {'_unavailable': True}),
                             **new_data)
@@ -540,9 +543,6 @@ class ResourceManager(object):
         return result
 
     def cache_data(self, data=None, defer=False):
-        if self._incognito:
-            return
-
         if defer:
             if data:
                 self.new_data.update(data)
@@ -553,13 +553,20 @@ class ResourceManager(object):
             data = self.new_data
             flush = True
         if data:
-            context = self._context
-            context.get_data_cache().set_items(data)
-            context.debug_log and context.log_debug(
-                'ResourceManager.cache_data'
-                ' - Storing new data to cache for {num} item(s)'
-                '\n\tIDs: {ids}'
-                .format(num=len(data), ids=list(data))
-            )
+            if self._incognito:
+                self.log.debugging and self.log.debug(
+                    ('Incognito mode active - discarded data for {num} item(s)',
+                     'IDs: {ids}'),
+                    num=len(data),
+                    ids=list(data),
+                )
+            else:
+                self.log.debugging and self.log.debug(
+                    ('Storing new data to cache for {num} item(s)',
+                     'IDs: {ids}'),
+                    num=len(data),
+                    ids=list(data),
+                )
+                self._context.get_data_cache().set_items(data)
         if flush:
             self.new_data = {}

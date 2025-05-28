@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from . import logging
 from .constants import (
     ABORT_FLAG,
     PLUGIN_SLEEPING,
@@ -29,13 +30,18 @@ def run():
     context = XbmcContext()
     provider = Provider()
 
+    monitor = ServiceMonitor(context=context)
+    player = PlayerMonitor(provider=provider,
+                           context=context,
+                           monitor=monitor)
+
     system_version = context.get_system_version()
-    context.log_notice('Service: Starting v{version}'
-                       '\n\tKodi:   v{kodi}'
-                       '\n\tPython: v{python}'
-                       .format(version=context.get_version(),
-                               kodi=str(system_version),
-                               python=system_version.get_python_version()))
+    logging.info(('Starting v{version}',
+                  'Kodi:    v{kodi}',
+                  'Python:  v{python}'),
+                 version=context.get_version(),
+                 kodi=str(system_version),
+                 python=system_version.get_python_version())
 
     get_listitem_info = context.get_listitem_info
     get_listitem_property = context.get_listitem_property
@@ -45,11 +51,6 @@ def run():
     set_property = ui.set_property
 
     clear_property(ABORT_FLAG)
-
-    monitor = ServiceMonitor(context=context)
-    player = PlayerMonitor(provider=provider,
-                           context=context,
-                           monitor=monitor)
 
     # wipe add-on temp folder on updates/restarts (subtitles, and mpd files)
     rm_dir(TEMP_PATH)

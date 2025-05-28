@@ -16,13 +16,15 @@ import sqlite3
 import time
 from threading import Lock
 
+from .. import logging
 from ..compatibility import to_str
-from ..logger import Logger
 from ..utils.datetime_parser import fromtimestamp, since_epoch
-from ..utils.methods import format_stack, make_dirs
+from ..utils.methods import make_dirs
 
 
 class Storage(object):
+    log = logging.getLogger(__name__)
+
     ONE_MINUTE = 60
     ONE_HOUR = 60 * ONE_MINUTE
     ONE_DAY = 24 * ONE_HOUR
@@ -225,23 +227,20 @@ class Storage(object):
             )
             self._base._table_updated = True
 
-        for _ in range(3):
+        for attempt in range(1, 4):
             try:
                 db = sqlite3.connect(self._filepath,
                                      check_same_thread=False,
                                      isolation_level=None)
                 break
             except (sqlite3.Error, sqlite3.OperationalError) as exc:
-                msg = ('SQLStorage._open - Error'
-                       '\n\tException: {exc!r}'
-                       '\n\tStack trace (most recent call last):\n{stack}'
-                       .format(exc=exc,
-                               stack=format_stack()))
-                if isinstance(exc, sqlite3.OperationalError):
-                    Logger.log_warning(msg)
+                if attempt < 3 and isinstance(exc, sqlite3.OperationalError):
+                    self.log.warning('Retry, attempt %d of 3',
+                                     attempt,
+                                     exc_info=True)
                     time.sleep(0.1)
                 else:
-                    Logger.log_error(msg)
+                    self.log.exception('Failed')
                     return None, None
 
         else:
@@ -295,10 +294,9 @@ class Storage(object):
             self._db.close()
             self._db = None
 
-    @staticmethod
-    def _execute(cursor, query, values=None, many=False, script=False):
+    def _execute(self, cursor, query, values=None, many=False, script=False):
         if not cursor:
-            Logger.log_error('SQLStorage._execute - Database not available')
+            self.log.error_trace('Database not available')
             return []
         if values is None:
             values = ()
@@ -307,7 +305,7 @@ class Storage(object):
         This happens no so often, but just to be sure, we try at least 3 times
         to execute our statement.
         """
-        for _ in range(3):
+        for attempt in range(1, 4):
             try:
                 if many:
                     return cursor.executemany(query, values)
@@ -315,16 +313,13 @@ class Storage(object):
                     return cursor.executescript(query)
                 return cursor.execute(query, values)
             except (sqlite3.Error, sqlite3.OperationalError) as exc:
-                msg = ('SQLStorage._execute - Error'
-                       '\n\tException: {exc!r}'
-                       '\n\tStack trace (most recent call last):\n{stack}'
-                       .format(exc=exc,
-                               stack=format_stack()))
-                if isinstance(exc, sqlite3.OperationalError):
-                    Logger.log_warning(msg)
+                if attempt < 3 and isinstance(exc, sqlite3.OperationalError):
+                    self.log.warning('Retry, attempt %d of 3',
+                                     attempt,
+                                     exc_info=True)
                     time.sleep(0.1)
                 else:
-                    Logger.log_error(msg)
+                    self.log.exception('Failed')
                     return []
         return []
 

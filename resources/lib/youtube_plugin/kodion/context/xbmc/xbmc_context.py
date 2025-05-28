@@ -16,6 +16,7 @@ import sys
 from weakref import proxy
 
 from ..abstract_context import AbstractContext
+from ... import logging
 from ...compatibility import (
     parse_qsl,
     urlsplit,
@@ -48,6 +49,8 @@ from ...utils import (
 
 
 class XbmcContext(AbstractContext):
+    log = logging.getLogger(__name__)
+
     # https://github.com/xbmc/xbmc/blob/master/xbmc/LangInfo.cpp#L1230
     _KODI_UI_PLAYER_LANGUAGE_OPTIONS = {
         None,  # No setting value
@@ -594,9 +597,9 @@ class XbmcContext(AbstractContext):
         ui = self.get_ui()
 
         if content_type:
-            self.log_debug('Applying content-type: |{type}| for |{path}|'
-                           .format(type=(sub_type or content_type),
-                                   path=self.get_path()))
+            self.log.debug('Applying content-type: |{type}| for |{path}|',
+                           type=(sub_type or content_type),
+                           path=self.get_path())
             xbmcplugin.setContent(self._plugin_handle, content_type)
 
         if category_label is None:
@@ -735,15 +738,13 @@ class XbmcContext(AbstractContext):
                                    'properties': ['enabled']})
         try:
             return response['result']['addon']['enabled'] is True
-        except (KeyError, TypeError) as exc:
+        except (KeyError, TypeError):
             error = response.get('error', {})
-            self.log_error('XbmcContext.addon_enabled - Error'
-                           '\n\tException: {exc!r}'
-                           '\n\tCode:      {code}'
-                           '\n\tMessage:   {msg}'
-                           .format(exc=exc,
-                                   code=error.get('code', 'Unknown'),
-                                   msg=error.get('message', 'Unknown')))
+            self.log.exception(('Error',
+                                'Code:    {code}',
+                                'Message: {message}'),
+                               code=error.get('code', 'Unknown'),
+                               message=error.get('message', 'Unknown'))
             return False
 
     def set_addon_enabled(self, addon_id, enabled=True):
@@ -752,15 +753,13 @@ class XbmcContext(AbstractContext):
                                    'enabled': enabled})
         try:
             return response['result'] == 'OK'
-        except (KeyError, TypeError) as exc:
+        except (KeyError, TypeError):
             error = response.get('error', {})
-            self.log_error('XbmcContext.set_addon_enabled - Error'
-                           '\n\tException: {exc!r}'
-                           '\n\tCode:      {code}'
-                           '\n\tMessage:   {msg}'
-                           .format(exc=exc,
-                                   code=error.get('code', 'Unknown'),
-                                   msg=error.get('message', 'Unknown')))
+            self.log.exception(('Error',
+                                'Code:    {code}',
+                                'Message: {message}'),
+                               code=error.get('code', 'Unknown'),
+                               message=error.get('message', 'Unknown'))
             return False
 
     @staticmethod
@@ -849,7 +848,8 @@ class XbmcContext(AbstractContext):
             return False
 
     def abort_requested(self):
-        return self.get_ui().get_property(ABORT_FLAG).lower() == 'true'
+        return self.get_ui().get_property(ABORT_FLAG,
+                                          stacklevel=3).lower() == 'true'
 
     @staticmethod
     def get_infobool(name):
@@ -919,26 +919,29 @@ class XbmcContext(AbstractContext):
 
                 if target == response_target:
                     if response:
-                        self.log_debug('Wakeup |{0}| in {1}ms'
-                                       .format(response_target,
-                                               timeout - remaining))
+                        self.log.debug('Wakeup |{target}| in {elapsed}ms',
+                                       target=response_target,
+                                       elapsed=(timeout - remaining))
                     else:
-                        self.log_error('Wakeup |{0}| in {1}ms - failed'
-                                       .format(response_target,
-                                               timeout - remaining))
+                        self.log.error('Wakeup |{target}| in {elapsed}ms'
+                                       ' - Failed',
+                                       target=response_target,
+                                       elapsed=(timeout - remaining))
                     return response
 
-                self.log_error('Wakeup |{0}| in {1}ms - expected |{2}|'
-                               .format(response_target,
-                                       timeout - remaining,
-                                       target))
+                self.log.error('Wakeup |{target}| in {elapsed}ms'
+                               ' - Expected |{actual}|',
+                               target=response_target,
+                               elapsed=(timeout - remaining),
+                               actual=target)
                 break
 
             wait(wait_period)
             remaining -= wait_period_ms
         else:
-            self.log_error('Wakeup |{0}| timed out in {1}ms'
-                           .format(target, timeout))
+            self.log.error('Wakeup |{target}| timed out in {elapsed}ms',
+                           target=target,
+                           elapsed=timeout)
         return False
 
     def is_plugin_folder(self, folder_name=None):

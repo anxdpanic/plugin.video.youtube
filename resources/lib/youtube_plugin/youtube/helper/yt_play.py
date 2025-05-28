@@ -15,6 +15,7 @@ import random
 
 from ..helper import utils, v3
 from ..youtube_exceptions import YouTubeException
+from ...kodion import logging
 from ...kodion.compatibility import string_type, urlencode, urlunsplit, xbmc
 from ...kodion.constants import (
     BUSY_FLAG,
@@ -36,7 +37,6 @@ from ...kodion.network import get_connect_address
 from ...kodion.utils import (
     datetime_parser,
     find_video_id,
-    format_stack,
     select_stream,
 )
 
@@ -46,8 +46,7 @@ def _play_stream(provider, context):
     params = context.get_params()
     video_id = params.get('video_id')
     if not video_id:
-        message = context.localize('error.no_streams_found')
-        ui.show_notification(message, time_ms=5000)
+        ui.show_notification(context.localize('error.no_streams_found'))
         return False
 
     client = provider.get_client(context)
@@ -85,18 +84,12 @@ def _play_stream(provider, context):
                 use_mpd=use_mpd,
             )
         except YouTubeException as exc:
-            msg = ('yt_play.play_video - Error'
-                   '\n\tException: {exc!r}'
-                   '\n\tStack trace (most recent call last):\n{stack}'
-                   .format(exc=exc,
-                           stack=format_stack()))
-            context.log_error(msg)
+            logging.exception('Error')
             ui.show_notification(message=exc.get_message())
             return False
 
         if not streams:
-            message = context.localize('error.no_streams_found')
-            ui.show_notification(message, time_ms=5000)
+            ui.show_notification(context.localize('error.no_streams_found'))
             return False
 
         stream = select_stream(
@@ -112,11 +105,10 @@ def _play_stream(provider, context):
 
     video_type = stream.get('video')
     if video_type and video_type.get('rtmpe'):
-        message = context.localize('error.rtmpe_not_supported')
-        ui.show_notification(message, time_ms=5000)
+        ui.show_notification(context.localize('error.rtmpe_not_supported'))
         return False
 
-    play_suggested = settings.get_bool('youtube.suggested_videos', False)
+    play_suggested = settings.get_bool('youtube.suggested_videos')
     if play_suggested and not screensaver:
         utils.add_related_video_to_playlist(provider,
                                             context,

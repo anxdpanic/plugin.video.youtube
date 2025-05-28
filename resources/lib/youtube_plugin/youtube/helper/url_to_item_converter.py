@@ -17,6 +17,7 @@ from re import (
 )
 
 from . import utils
+from ...kodion import logging
 from ...kodion.compatibility import parse_qsl, urlsplit
 from ...kodion.constants import PATHS
 from ...kodion.items import DirectoryItem, UriItem, VideoItem
@@ -24,6 +25,8 @@ from ...kodion.utils import duration_to_seconds
 
 
 class UrlToItemConverter(object):
+    log = logging.getLogger(__name__)
+
     RE_PATH_ID = re_compile(r'/[^/]*?[/@](?P<id>[^/?#]+)', re_IGNORECASE)
     VALID_HOSTNAMES = {
         'youtube.com',
@@ -49,9 +52,9 @@ class UrlToItemConverter(object):
         parsed_url = urlsplit(url)
         if (not parsed_url.hostname
                 or parsed_url.hostname.lower() not in self.VALID_HOSTNAMES):
-            context.log_debug('Unknown hostname "{0}" in url "{1}"'.format(
-                parsed_url.hostname, url
-            ))
+            self.log.debug('Unknown hostname "{hostname}" in url "{url}"',
+                           hostname=parsed_url.hostname,
+                           url=url)
             return
 
         url_params = dict(parse_qsl(parsed_url.query))
@@ -83,9 +86,9 @@ class UrlToItemConverter(object):
             re_match = self.RE_PATH_ID.match(parsed_url.path)
             new_params['video_id'] = re_match.group('id')
         else:
-            context.log_debug('Unknown path "{0}" in url "{1}"'.format(
-                parsed_url.path, url
-            ))
+            self.log.debug('Unknown path "{path}" in url "{url}"',
+                           path=parsed_url.path,
+                           url=url)
             return
 
         item = None
@@ -156,7 +159,7 @@ class UrlToItemConverter(object):
             self._channel_id_dict[channel_id] = item
 
         if not item:
-            context.log_debug('No items found in url "{0}"'.format(url))
+            self.log.debug('No items found in url "%s"', url)
 
     def add_urls(self, urls, context):
         for url in urls:

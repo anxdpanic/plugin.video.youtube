@@ -11,6 +11,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import os
 
+from . import logging
 from .compatibility import parse_qsl, urlsplit, xbmc, xbmcaddon, xbmcvfs
 from .constants import (
     DATA_PATH,
@@ -30,6 +31,9 @@ from .network import (
 )
 from .utils import rm_dir
 from ..youtube import Provider
+
+
+log = logging.getLogger(__name__)
 
 
 def _config_actions(context, action, *_args):
@@ -468,19 +472,33 @@ def run(argv):
             if params:
                 params = dict(parse_qsl(args.query))
 
+        log_level = context.get_settings().log_level()
+        if log_level:
+            log.debugging = True
+            if log_level & 2:
+                log.stack_info = True
+                log.verbose_logging = True
+            else:
+                log.stack_info = False
+                log.verbose_logging = False
+        else:
+            log.debugging = False
+            log.stack_info = False
+            log.verbose_logging = False
+
         system_version = context.get_system_version()
-        context.log_notice('Script: Running v{version}'
-                           '\n\tKodi:     v{kodi}'
-                           '\n\tPython:   v{python}'
-                           '\n\tCategory: |{category}|'
-                           '\n\tAction:   |{action}|'
-                           '\n\tParams:   |{params}|'
-                           .format(version=context.get_version(),
-                                   kodi=str(system_version),
-                                   python=system_version.get_python_version(),
-                                   category=category,
-                                   action=action,
-                                   params=params))
+        log.info(('Running v{version}',
+                  'Kodi:     v{kodi}',
+                  'Python:   v{python}',
+                  'Category: |{category}|',
+                  'Action:   |{action}|',
+                  'Params:   |{params}|'),
+                 version=context.get_version(),
+                 kodi=str(system_version),
+                 python=system_version.get_python_version(),
+                 category=category,
+                 action=action,
+                 params=params)
 
         if not category:
             xbmcaddon.Addon().openSettings()

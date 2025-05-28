@@ -11,6 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from ..abstract_plugin import AbstractPlugin
+from ... import logging
 from ...compatibility import string_type, xbmc, xbmcgui, xbmcplugin
 from ...constants import (
     BUSY_FLAG,
@@ -44,7 +45,7 @@ from ...items import (
     playback_item,
     uri_listitem,
 )
-from ...utils import format_stack, parse_and_redact_uri
+from ...utils import parse_and_redact_uri
 
 
 class XbmcPlugin(AbstractPlugin):
@@ -95,8 +96,8 @@ class XbmcPlugin(AbstractPlugin):
             if playing:
                 items = playlist_player.get_items()
                 playlist_player.clear()
-                context.log_warning('Multiple busy dialogs active'
-                                    ' - Playlist cleared to avoid Kodi crash')
+                logging.warning('Multiple busy dialogs active'
+                                ' - Playlist cleared to avoid Kodi crash')
 
             xbmcplugin.endOfDirectory(
                 handle,
@@ -106,8 +107,8 @@ class XbmcPlugin(AbstractPlugin):
             )
 
             if not playing:
-                context.log_warning('Multiple busy dialogs active'
-                                    ' - Plugin call ended to avoid Kodi crash')
+                logging.warning('Multiple busy dialogs active'
+                                ' - Plugin call ended to avoid Kodi crash')
                 result, post_run_action = self.uri_action(context, uri)
                 succeeded = result
                 continue
@@ -127,13 +128,13 @@ class XbmcPlugin(AbstractPlugin):
             while ui.busy_dialog_active():
                 timeout -= 1
                 if timeout < 0:
-                    context.log_error('Multiple busy dialogs active'
-                                      ' - Extended busy period')
+                    logging.error('Multiple busy dialogs active'
+                                  ' - Extended busy period')
                     break
                 context.sleep(1)
 
-            context.log_warning('Multiple busy dialogs active'
-                                ' - Reloading playlist...')
+            logging.warning('Multiple busy dialogs active'
+                            ' - Reloading playlist...')
 
             num_items = playlist_player.add_items(items)
             if position:
@@ -145,8 +146,8 @@ class XbmcPlugin(AbstractPlugin):
             while ui.busy_dialog_active() or playlist_player.size() < position:
                 timeout -= 1
                 if timeout < 0:
-                    context.log_error('Multiple busy dialogs active'
-                                      ' - Playback restart failed, retrying...')
+                    logging.error('Multiple busy dialogs active'
+                                  ' - Playback restart failed, retrying...')
                     command = playlist_player.play_playlist_item(position,
                                                                  defer=True)
                     result, post_run_action = self.uri_action(
@@ -192,12 +193,7 @@ class XbmcPlugin(AbstractPlugin):
             result = None
             options = {}
             if not provider.handle_exception(context, exc):
-                msg = ('XbmcRunner.run - Error'
-                       '\n\tException: {exc!r}'
-                       '\n\tStack trace (most recent call last):\n{stack}'
-                       .format(exc=exc,
-                               stack=format_stack()))
-                context.log_error(msg)
+                logging.exception('Error')
                 ui.on_ok('Error in ContentProvider', exc.__str__())
 
         if not ui.pop_property(REFRESH_CONTAINER) and forced:
@@ -367,8 +363,8 @@ class XbmcPlugin(AbstractPlugin):
             while ui.busy_dialog_active():
                 timeout -= 1
                 if timeout < 0:
-                    context.log_error('Multiple busy dialogs active'
-                                      ' - Post run action unable to execute')
+                    logging.error('Multiple busy dialogs active'
+                                  ' - Post run action unable to execute')
                     break
                 context.sleep(1)
             else:
@@ -471,12 +467,7 @@ class XbmcPlugin(AbstractPlugin):
             result = False
             return result, action
 
-        context.log_debug(''.join((
-            log_action,
-            ': |',
-            log_uri,
-            '|',
-        )))
+        logging.debug('{action}: |{uri}|', action=log_action, uri=log_uri)
         return result, action
 
     def classify_list_item(self, item, options, force_resolve):

@@ -31,7 +31,7 @@ from .helper import (
 )
 from .helper.utils import channel_filter_split, update_duplicate_items
 from .youtube_exceptions import InvalidGrant, LoginException
-from ..kodion import AbstractProvider
+from ..kodion import AbstractProvider, logging
 from ..kodion.constants import (
     ADDON_ID,
     CHANNEL_ID,
@@ -51,6 +51,8 @@ from ..kodion.utils import strip_html_from_text, to_unicode
 
 
 class Provider(AbstractProvider):
+    log = logging.getLogger(__name__)
+
     def __init__(self):
         super(Provider, self).__init__()
         self._resource_manager = None
@@ -133,13 +135,13 @@ class Provider(AbstractProvider):
             if synced:
                 switch = api_store.get_current_switch()
                 key_details = api_store.get_key_set(switch)
-                context.log_debug('Using personal API details'
-                                  '\n\tConfig:  |{config}|'
-                                  '\n\tUser #:  |{user}|'
-                                  '\n\tKey set: |{switch}|'
-                                  .format(config=configs['main']['system'],
-                                          user=user,
-                                          switch=switch))
+                self.log.debug(('Using personal API details',
+                                'Config:  |{config}|',
+                                'User #:  |{user}|',
+                                'Key set: |{switch}|'),
+                               config=configs['main']['system'],
+                               user=user,
+                               switch=switch)
             else:
                 switch = None
                 key_details = None
@@ -150,23 +152,23 @@ class Provider(AbstractProvider):
             if key_details:
                 configs['main'] = key_details
                 switch = 'developer'
-                context.log_debug('Using developer provided API details'
-                                  '\n\tConfig:  |{config}|'
-                                  '\n\tUser #:  |{user}|'
-                                  '\n\tKey set: |{switch}|'
-                                  .format(config=key_details['system'],
-                                          user=user,
-                                          switch=switch))
+                self.log.debug(('Using developer provided API details',
+                                'Config:  |{config}|',
+                                'User #:  |{user}|',
+                                'Key set: |{switch}|'),
+                               config=key_details['system'],
+                               user=user,
+                               switch=switch)
             else:
                 key_details = configs['main']
                 switch = api_store.get_current_switch()
-                context.log_debug('Using developer provided access tokens'
-                                  '\n\tConfig:  |{config}|'
-                                  '\n\tUser #:  |{user}|'
-                                  '\n\tKey set: |{switch}|'
-                                  .format(config=key_details['system'],
-                                          user=user,
-                                          switch=switch))
+                self.log.debug(('Using developer provided access tokens',
+                                'Config:  |{config}|',
+                                'User #:  |{user}|',
+                                'Key set: |{switch}|'),
+                               config=key_details['system'],
+                               user=user,
+                               switch=switch)
 
         if not client:
             client = YouTube(
@@ -195,14 +197,15 @@ class Provider(AbstractProvider):
                     update_hash=False,
                 )
             if keys_changed:
-                context.log_notice('API key set changed: Signing out')
+                self.log.info('API key set changed - Signing out')
                 yt_login.process(yt_login.SIGN_OUT, self, context)
 
         if api_last_origin != origin:
-            context.log_notice('API key origin changed: Resetting client'
-                               '\n\tPrevious: |{old}|'
-                               '\n\tCurrent:  |{new}|'
-                               .format(old=api_last_origin, new=origin))
+            self.log.info(('API key origin changed - Resetting client',
+                           'Previous: |{old}|',
+                           'Current:  |{new}|'),
+                          old=api_last_origin,
+                          new=origin)
             access_manager.set_last_origin(origin)
             self.reset_client()
 
@@ -221,17 +224,18 @@ class Provider(AbstractProvider):
                 access_manager.update_access_token(dev_id, access_token='')
                 num_access_tokens = 0
             elif self._logged_in:
+                self.log.info('User is logged in')
                 return client
 
         refresh_tokens = access_manager.get_refresh_token(dev_id)
         num_refresh_tokens = len([1 for token in refresh_tokens if token])
 
         if num_access_tokens or num_refresh_tokens:
-            context.log_debug(
-                'Access token count: |{0}|, refresh token count: |{1}|'
-                .format(num_access_tokens, num_refresh_tokens)
-            )
+            self.log.debug('# Access tokens: |%d|, # Refresh tokens: |%d|',
+                           num_access_tokens,
+                           num_refresh_tokens)
         else:
+            self.log.info('User is not logged in')
             return client
 
         with client:
@@ -284,14 +288,14 @@ class Provider(AbstractProvider):
 
             if num_access_tokens and access_tokens[1]:
                 self._logged_in = True
-                context.log_debug('User is logged in')
+                self.log.info('User is logged in')
                 client.set_access_token(
                     personal=access_tokens[1],
                     tv=access_tokens[0],
                 )
             else:
                 self._logged_in = False
-                context.log_debug('User is not logged in')
+                self.log.info('User is not logged in')
                 client.set_access_token(personal='', tv='')
 
         return client
@@ -2022,64 +2026,57 @@ class Provider(AbstractProvider):
             return False
 
         ok_dialog = False
-        message_timeout = 5000
-
         message = exception_to_handle.get_message()
-        msg = exception_to_handle.get_message()
-        log_message = exception_to_handle.get_message()
-
-        error = ''
-        code = ''
-        if isinstance(msg, dict):
-            if 'error_description' in msg:
-                message = strip_html_from_text(msg['error_description'])
-                log_message = strip_html_from_text(msg['error_description'])
-            elif 'message' in msg:
-                message = strip_html_from_text(msg['message'])
-                log_message = strip_html_from_text(msg['message'])
+        if isinstance(message, dict):
+            log_msg = message.get('error_description') or message.get('message')
+            if log_msg:
+                log_msg = strip_html_from_text(log_msg)
             else:
-                message = 'No error message'
-                log_message = 'No error message'
+                log_msg = 'No error message provided'
 
-            if 'error' in msg:
-                error = msg['error']
-
-            if 'code' in msg:
-                code = msg['code']
-
-        if error and code:
-            title = '%s: [%s] %s' % ('LoginException', code, error)
-        elif error:
-            title = '%s: %s' % ('LoginException', error)
+            error_type = message.get('error', 'Unknown error')
+            error_code = message.get('code', 'N/A')
+            if error_type == 'deleted_client':
+                notification = context.localize('key.requirement')
+                context.get_access_manager().update_access_token(
+                    context.get_param('addon_id', None),
+                    access_token='',
+                    expiry=-1,
+                    refresh_token='',
+                )
+                ok_dialog = True
+            elif error_type == 'invalid_client':
+                if log_msg == 'The OAuth client was not found.':
+                    notification = context.localize('client.id.incorrect')
+                elif log_msg == 'Unauthorized':
+                    notification = context.localize('client.secret.incorrect')
+                else:
+                    notification = log_msg
+            else:
+                notification = log_msg
         else:
-            title = 'LoginException'
+            notification = log_msg = message
+            error_type = 'Unknown error'
+            error_code = 'N/A'
 
-        context.log_error('%s: %s' % (title, log_message))
+        self.log.error(('Error - {error_type} (code: {error_code})',
+                        'Message:   {message}',
+                        'Exception: {exc!r}'),
+                       error_type=error_type,
+                       error_code=error_code,
+                       message=log_msg,
+                       exc=exception_to_handle)
 
-        if error == 'deleted_client':
-            message = context.localize('key.requirement')
-            context.get_access_manager().update_access_token(
-                context.get_param('addon_id', None),
-                access_token='',
-                expiry=-1,
-                refresh_token='',
-            )
-            ok_dialog = True
-
-        if error == 'invalid_client':
-            if message == 'The OAuth client was not found.':
-                message = context.localize('client.id.incorrect')
-                message_timeout = 7000
-            elif message == 'Unauthorized':
-                message = context.localize('client.secret.incorrect')
-                message_timeout = 7000
-
+        title = '{name}: {message} - {error_type} (code: {error_code})'.format(
+            name=context.get_name(),
+            message=exception_to_handle.get_message(),
+            error_type=error_type,
+            error_code=error_code,
+        )
         if ok_dialog:
-            context.get_ui().on_ok(title, message)
+            context.get_ui().on_ok(title, notification)
         else:
-            context.get_ui().show_notification(message,
-                                               title,
-                                               time_ms=message_timeout)
+            context.get_ui().show_notification(notification, title)
         return True
 
     def tear_down(self):

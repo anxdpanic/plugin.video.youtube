@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from . import logging
 from .constants import CHECK_SETTINGS
 from .context import XbmcContext
 from .debug import Profiler
@@ -20,12 +21,14 @@ from ..youtube import Provider
 __all__ = ('run',)
 
 _context = XbmcContext()
+_log = logging.getLogger(__name__)
 _plugin = XbmcPlugin()
 _provider = Provider()
 _profiler = Profiler(enabled=False, print_callees=False, num_lines=20)
 
 
 def run(context=_context,
+        log=_log,
         plugin=_plugin,
         provider=_provider,
         profiler=_profiler):
@@ -36,12 +39,21 @@ def run(context=_context,
     else:
         settings = context.get_settings()
 
-    debug = settings.logging_enabled()
-    if debug:
-        context.debug_log(on=True)
+    log_level = settings.log_level()
+    if log_level:
+        log.debugging = True
+        if log_level & 2:
+            log.stack_info = True
+            log.verbose_logging = True
+        else:
+            log.stack_info = False
+            log.verbose_logging = False
         profiler.enable(flush=True)
     else:
-        context.debug_log(off=True)
+        log.debugging = False
+        log.stack_info = False
+        log.verbose_logging = False
+        profiler.disable()
 
     current_uri = context.get_uri()
     current_path = context.get_path()
@@ -70,20 +82,20 @@ def run(context=_context,
             log_params[key] = '<redacted>'
 
     system_version = context.get_system_version()
-    context.log_notice('Plugin: Running v{version}'
-                       '\n\tKodi:   v{kodi}'
-                       '\n\tPython: v{python}'
-                       '\n\tHandle: {handle}'
-                       '\n\tPath:   |{path}|'
-                       '\n\tParams: |{params}|'
-                       .format(version=context.get_version(),
-                               kodi=str(system_version),
-                               python=system_version.get_python_version(),
-                               handle=new_handle,
-                               path=context.get_path(),
-                               params=log_params))
+    log.info(('Running v{version}',
+              'Kodi:   v{kodi}',
+              'Python: v{python}',
+              'Handle: {handle}',
+              'Path:   |{path}|',
+              'Params: |{params}|'),
+             version=context.get_version(),
+             kodi=str(system_version),
+             python=system_version.get_python_version(),
+             handle=new_handle,
+             path=context.get_path(),
+             params=log_params)
 
     plugin.run(provider, context, forced=forced)
 
-    if debug:
+    if log_level:
         profiler.print_stats()

@@ -9,6 +9,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from youtube_plugin.kodion import logging
 from youtube_plugin.kodion.constants import ADDON_ID
 from youtube_plugin.kodion.context import XbmcContext
 from youtube_plugin.youtube.helper import yt_login
@@ -32,10 +33,7 @@ def _auth(addon_id, mode=yt_login.SIGN_IN):
     :return: addon provider, context and client
     """
     if not addon_id or addon_id == ADDON_ID:
-        context = XbmcContext()
-        context.log_error('Developer authentication - Invalid addon_id'
-                          '\n\tAddon ID: |{0}|'
-                          .format(addon_id))
+        logging.error_trace('Invalid addon_id: |%s|', addon_id)
         return False
 
     provider = Provider()
@@ -43,7 +41,7 @@ def _auth(addon_id, mode=yt_login.SIGN_IN):
 
     access_manager = context.get_access_manager()
     if access_manager.add_new_developer(addon_id):
-        context.log_debug('Creating developer user: |%s|' % addon_id)
+        logging.debug('Creating developer user: |%s|', addon_id)
 
     client = provider.get_client(context=context)
     logged_in = provider.is_logged_in()
@@ -144,10 +142,9 @@ def reset_access_tokens(addon_id):
     :return:
     """
     if not addon_id or addon_id == ADDON_ID:
-        context = XbmcContext()
-        context.log_error('Reset addon access tokens - invalid addon_id: |{0}|'
-                          .format(addon_id))
+        logging.error_trace('Invalid addon_id: |%s|', addon_id)
         return
+
     context = XbmcContext(params={'addon_id': addon_id})
     context.get_access_manager().update_access_token(
         addon_id, access_token='', expiry=-1, refresh_token=''

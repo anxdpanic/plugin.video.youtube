@@ -21,6 +21,7 @@ from select import select
 from textwrap import dedent
 
 from .requests import BaseRequestsClass
+from .. import logging
 from ..compatibility import (
     BaseHTTPRequestHandler,
     TCPServer,
@@ -101,6 +102,8 @@ class HTTPServer(ThreadingMixIn, TCPServer):
 
 
 class RequestHandler(BaseHTTPRequestHandler, object):
+    log = logging.getLogger(__name__)
+
     protocol_version = 'HTTP/1.1'
     server_version = 'plugin.video.youtube/1.0'
 
@@ -205,23 +208,21 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         }
 
         if not path['path'].startswith(PATHS.PING):
-            msg = ('HTTPServer - {method}'
-                   '\n\tPath:        |{path}|'
-                   '\n\tParams:      |{params}|'
-                   '\n\tAddress:     |{client_ip}|'
-                   '\n\tWhitelisted: {is_whitelisted}'
-                   '\n\tLocal range: {is_local}'
-                   '\n\tStatus:      {status}'
-                   .format(method=method,
-                           path=path['path'],
-                           params=path['log_params'],
+            self.log.debug(('{status}',
+                            'Method:      |{method}|',
+                            'Path:        |{path[path]}|',
+                            'Params:      |{path[log_params]}|',
+                            'Address:     |{client_ip}|',
+                            'Whitelisted: {is_whitelisted}',
+                            'Local range: {is_local}'),
+                           status=('Allowed' if ip_allowed else 'Blocked'),
+                           method=method,
+                           path=path,
                            client_ip=client_ip,
                            is_whitelisted=is_whitelisted,
                            is_local=('Undetermined'
                                      if is_local is None else
-                                     is_local),
-                           status='Allowed' if ip_allowed else 'Blocked'))
-            self._context.log_debug(msg)
+                                     is_local))
         return ip_allowed, path
 
     # noinspection PyPep8Naming
@@ -397,11 +398,10 @@ class RequestHandler(BaseHTTPRequestHandler, object):
 
             stream_redirect = settings.httpd_stream_redirect()
 
-            log_msg = ('HTTPServer - Stream proxy response {success}'
-                       '\n\tServer: |{server}|'
-                       '\n\tTarget: |{target}|'
-                       '\n\tStatus: |{status}|'
-                       '\n\tReason: |{reason}|')
+            log_msg = ('Stream proxy response {success}',
+                       'Server: |{server}|',
+                       'Target: |{target}|',
+                       'Status: |{status} {reason}|')
 
             response = None
             server = None
@@ -479,24 +479,23 @@ class RequestHandler(BaseHTTPRequestHandler, object):
 
                     if 100 <= status < 400:
                         success = True
-                        log_level = context.LOGDEBUG
+                        log_level = logging.DEBUG
                         if server not in priority_list:
                             priority_list.append(server)
                     else:
                         success = False
-                        log_level = context.LOGWARNING
+                        log_level = logging.WARNING
                         if server in priority_list:
                             priority_list.remove(server)
 
-                    context.log(
-                        log_msg.format(
-                            success='OK' if success else 'not OK',
-                            server=server,
-                            target=target,
-                            status=status,
-                            reason=reason,
-                        ),
-                        log_level=log_level
+                    self.log.log(
+                        level=log_level,
+                        msg=log_msg,
+                        success=('OK' if success else 'not OK'),
+                        server=server,
+                        target=target,
+                        status=status,
+                        reason=reason,
                     )
 
                     if not success:
@@ -618,9 +617,9 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                               re.MULTILINE)
             if match:
                 authorized_types = match.group('authorized_types').split(',')
-                self._context.log_debug('HTTPServer - Found authorized formats'
-                                        '\n\tFormats: {auth_fmts}'
-                                        .format(auth_fmts=authorized_types))
+                self.log.debug(('Found authorized formats',
+                                'Formats: %s'),
+                               authorized_types)
 
                 fmt_to_px = {
                     'SD': (1280 * 528) - 1,
@@ -905,10 +904,10 @@ def get_http_server(address, port, context):
         server = HTTPServer((address, port), RequestHandler)
         return server
     except socket.error as exc:
-        context.log_error('HTTPServer - Failed to start'
-                          '\n\tAddress:  |{address}:{port}|'
-                          '\n\tResponse: {response}'
-                          .format(address=address, port=port, response=exc))
+        logging.exception(('Failed to start',
+                           'Address:  |{address}:{port}|'),
+                          address=address,
+                          port=port)
         xbmcgui.Dialog().notification(context.get_name(),
                                       str(exc),
                                       context.get_icon(),
@@ -936,11 +935,11 @@ def httpd_status(context, address=None):
         if result == 204:
             return True
 
-    context.log_debug('HTTPServer - Ping'
-                      '\n\tAddress:  |{netloc}|'
-                      '\n\tResponse: {response}'
-                      .format(netloc=netloc,
-                              response=result or 'failed'))
+    logging.debug(('Ping',
+                   'Address:  |{netloc}|',
+                   'Response: {response}'),
+                  netloc=netloc,
+                  response=(result or 'failed'))
     return False
 
 
@@ -988,30 +987,21 @@ def get_connect_address(context, as_netloc=False, address=None):
                 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             if hasattr(socket, 'SO_REUSEPORT'):
                 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-    except socket.error as exc:
-        context.log_error('HTTPServer'
-                          ' - get_connect_address failed to create socket'
-                          '\n\tException: {exc!r}'
-                          .format(exc=exc))
+    except socket.error:
+        logging.exception('Failed to create socket')
         connect_address = xbmc.getIPAddress()
     else:
         sock.settimeout(0)
         try:
             sock.connect((broadcast_address, 0))
-        except socket.error as exc:
-            context.log_error('HTTPServer'
-                              ' - get_connect_address failed connect'
-                              '\n\tException: {exc!r}'
-                              .format(exc=exc))
+        except socket.error:
+            logging.exception('Failed to connect')
             connect_address = xbmc.getIPAddress()
         else:
             try:
                 connect_address = sock.getsockname()[0]
-            except socket.error as exc:
-                context.log_error('HTTPServer'
-                                  ' - get_connect_address failed to get address'
-                                  '\n\tException: {exc!r}'
-                                  .format(exc=exc))
+            except socket.error:
+                logging.exception('No address')
                 connect_address = xbmc.getIPAddress()
         finally:
             sock.close()

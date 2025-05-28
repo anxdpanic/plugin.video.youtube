@@ -23,17 +23,19 @@ from ..helper.stream_info import StreamInfo
 from ..helper.utils import channel_filter_split
 from ..helper.v3 import pre_fill
 from ..youtube_exceptions import InvalidJSON, YouTubeException
+from ...kodion import logging
 from ...kodion.compatibility import available_cpu_count, string_type, to_str
 from ...kodion.items import DirectoryItem
 from ...kodion.utils import (
     datetime_parser as dt,
-    format_stack,
     strip_html_from_text,
     to_unicode,
 )
 
 
 class YouTube(LoginClient):
+    log = logging.getLogger(__name__)
+
     _max_results = 50
 
     def __init__(self, items_per_page=50, **kwargs):
@@ -61,22 +63,22 @@ class YouTube(LoginClient):
     def max_results(self):
         return self._context.get_param('items_per_page') or self._max_results
 
-    def update_watch_history(self, context, video_id, url, status=None):
+    def update_watch_history(self, video_id, url, status=None):
         if status is None:
             cmt = st = et = state = None
         else:
             cmt, st, et, state = status
 
-        context.log_debug('Playback reported [{video_id}]:'
-                          ' current time={cmt},'
-                          ' segment start={st},'
-                          ' segment end={et},'
-                          ' state={state}'
-                          .format(video_id=video_id,
-                                  cmt=cmt,
-                                  st=st,
-                                  et=et,
-                                  state=state))
+        self.log.debug('Playback reported [{video_id}]:'
+                       ' current time={cmt},'
+                       ' segment start={st},'
+                       ' segment end={et},'
+                       ' state={state}',
+                       video_id=video_id,
+                       cmt=cmt,
+                       st=st,
+                       et=et,
+                       state=state)
 
         client_data = {
             '_video_id': video_id,
@@ -941,21 +943,21 @@ class YouTube(LoginClient):
 
         try:
             return json_data['items'][0]['id']
-        except (IndexError, KeyError, TypeError) as exc:
-            self._context.log_warning('YouTube.get_channel_by_identifier'
-                                      ' - Channel ID not found'
-                                      '\n\tException:   {exc!r}'
-                                      '\n\tData:        {data}'
-                                      '\n\tIdentifier:  |{identifier}|'
-                                      '\n\tmine:        |{mine}|'
-                                      '\n\tforHandle:   |{handle}|'
-                                      '\n\tforUsername: |{username}|'
-                                      .format(exc=exc,
-                                              data=json_data,
-                                              identifier=identifier,
-                                              mine=mine,
-                                              handle=handle,
-                                              username=username))
+        except (IndexError, KeyError, TypeError):
+            self.log.warning(('Channel ID not found',
+                              'Data:        {data}',
+                              'Identifier:  |{identifier}|',
+                              'mine:        |{mine}|',
+                              'forHandle:   |{handle}|',
+                              'forUsername: |{username}|'),
+                             data=json_data,
+                             identifier=identifier,
+                             mine=mine,
+                             handle=handle,
+                             username=username,
+                             exc_info=True,
+                             stack_info=True,
+                             stacklevel=2)
             if not do_search:
                 return None
 
@@ -2321,13 +2323,8 @@ class YouTube(LoginClient):
 
                 try:
                     success, complete = worker(output, **_kwargs)
-                except Exception as exc:
-                    msg = ('get_my_subscriptions._threaded_fetch - Error'
-                           '\n\tException: {exc!r}'
-                           '\n\tStack trace (most recent call last):\n{stack}'
-                           .format(exc=exc,
-                                   stack=format_stack()))
-                    context.log_error(msg)
+                except Exception:
+                    self.log.exception('Error')
                     continue
 
                 if complete or not success or not counts[pool_id]:
@@ -2777,14 +2774,18 @@ class YouTube(LoginClient):
     def _response_hook(self, **kwargs):
         response = kwargs['response']
         if kwargs.get('extended_debug'):
-            self._context.log_debug('API response: |{0.status_code}|'
-                                    '\n\tHeaders: |{0.headers}|'
-                                    '\n\tContent: |{0.text}|'
-                                    .format(response))
+            self.log.debug(('Request response',
+                            'Status:  |{response.status_code}|',
+                            'Headers: |{response.headers}|',
+                            'Content: |{response.text}|'),
+                           response=response,
+                           stacklevel=4)
         else:
-            self._context.log_debug('API response: |{0.status_code}|'
-                                    '\n\tHeaders: |{0.headers}|'
-                                    .format(response))
+            self.log.debug(('Request response',
+                            'Status:  |{response.status_code}|',
+                            'Headers: |{response.headers}|'),
+                           response=response,
+                           stacklevel=4)
 
         if response.status_code == 204 and 'no_content' in kwargs:
             return True
@@ -2817,10 +2818,7 @@ class YouTube(LoginClient):
             exception = None
 
         if not json_data or 'error' not in json_data:
-            info = ('Request - Failed'
-                    '\n\tException: {exc!r}')
-            details = kwargs
-            return None, info, details, data, None, exception
+            return 'API request error', None, None, data, exception
 
         details = json_data['error']
         reason = details.get('errors', [{}])[0].get('reason', 'Unknown')
@@ -2828,16 +2826,13 @@ class YouTube(LoginClient):
 
         if getattr(exc, 'notify', True):
             ok_dialog = False
-            timeout = 5000
             if reason in {'accessNotConfigured', 'forbidden'}:
                 notification = self._context.localize('key.requirement')
                 ok_dialog = True
             elif reason == 'keyInvalid' and message == 'Bad Request':
                 notification = self._context.localize('api.key.incorrect')
-                timeout = 7000
             elif reason in {'quotaExceeded', 'dailyLimitExceeded'}:
                 notification = message
-                timeout = 7000
             else:
                 notification = message
 
@@ -2845,15 +2840,17 @@ class YouTube(LoginClient):
             if ok_dialog:
                 self._context.get_ui().on_ok(title, notification)
             else:
-                self._context.get_ui().show_notification(notification,
-                                                         title,
-                                                         time_ms=timeout)
+                self._context.get_ui().show_notification(notification, title)
 
-        info = ('API error - {reason}'
-                '\n\tException: {exc!r}'
-                '\n\tMessage:   {message}')
-        details = {'reason': reason, 'message': message}
-        return '', info, details, data, False, exception
+        info = (
+            'Reason:   {error_reason}',
+            'Message:  {error_message}',
+        )
+        details = {
+            'error_reason': reason,
+            'error_message': message,
+        }
+        return 'API request error', info, details, data, exception
 
     def api_request(self,
                     client='v3',
@@ -2919,7 +2916,9 @@ class YouTube(LoginClient):
                 key = params['key']
                 if key:
                     abort = False
-                    log_params['key'] = '...'.join((key[:3], key[-3:]))
+                    log_params['key'] = ('...'.join((key[:3], key[-3:]))
+                                         if len(key) > 9 else
+                                         '...')
                 elif not client['_has_auth']:
                     abort = True
 
@@ -2937,30 +2936,31 @@ class YouTube(LoginClient):
             log_headers = None
 
         context = self._context
-        context.log_debug('API request:'
-                          '\n\ttype:      |{type}|'
-                          '\n\tmethod:    |{method}|'
-                          '\n\tpath:      |{path}|'
-                          '\n\tparams:    |{params}|'
-                          '\n\tpost_data: |{data}|'
-                          '\n\theaders:   |{headers}|'
-                          .format(type=client.get('_name'),
-                                  method=method,
-                                  path=path,
-                                  params=log_params,
-                                  data=client.get('json'),
-                                  headers=log_headers))
+        self.log.debug(('{request_name} API request',
+                        'method:    |{method}|',
+                        'path:      |{path}|',
+                        'params:    |{params}|',
+                        'post_data: |{data}|',
+                        'headers:   |{headers}|'),
+                       request_name=client.get('_name'),
+                       method=method,
+                       path=path,
+                       params=log_params,
+                       data=client.get('json'),
+                       headers=log_headers,
+                       stacklevel=2)
         if abort:
             if kwargs.get('notify', True):
                 context.get_ui().on_ok(
                     context.get_name(),
                     context.localize('key.requirement'),
                 )
-            context.log_warning('API request: aborted')
+            self.log.warning('Aborted', stacklevel=2)
             return {}
-        if context.get_settings().logging_enabled() & 2:
+        if context.get_settings().log_level() & 2:
             kwargs.setdefault('extended_debug', True)
         return self.request(response_hook=self._response_hook,
                             response_hook_kwargs=kwargs,
                             error_hook=self._error_hook,
+                            stacklevel=3,
                             **client)

@@ -9,6 +9,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from youtube_plugin.kodion import logging
 from youtube_plugin.kodion.constants import ADDON_ID
 from youtube_plugin.kodion.context import XbmcContext
 
@@ -41,21 +42,20 @@ def register_api_keys(addon_id, api_key, client_id, client_secret):
     :param client_secret: YouTube Data v3 Client secret
     """
 
-    context = XbmcContext()
-
     if not addon_id or addon_id == ADDON_ID:
-        context.log_error('Register API Keys: |%s| Invalid addon_id' % addon_id)
+        logging.error_trace('Invalid addon_id: |%s|', addon_id)
         return
 
+    context = XbmcContext()
 
     access_manager = context.get_access_manager()
     if access_manager.add_new_developer(addon_id):
-        context.log_debug('Creating developer user: |%s|' % addon_id)
+        logging.debug('Creating developer user: |%s|', addon_id)
 
     api_store = context.get_api_store()
     if api_store.update_developer_config(
             addon_id, api_key, client_id, client_secret
     ):
-        context.log_debug('Keys registered: |%s|' % addon_id)
+        logging.debug('Keys registered: |%s|', addon_id)
     else:
-        context.log_debug('No update performed: |%s|' % addon_id)
+        logging.debug('No update performed: |%s|', addon_id)

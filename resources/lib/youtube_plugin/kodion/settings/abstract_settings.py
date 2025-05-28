@@ -27,7 +27,7 @@ class AbstractSettings(object):
         _vars[name] = value
     del _vars
 
-    _echo = False
+    _echo_level = 0
     _cache = {}
     _check_set = True
 
@@ -35,28 +35,28 @@ class AbstractSettings(object):
     def flush(cls, xbmc_addon):
         raise NotImplementedError()
 
-    def get_bool(self, setting, default=None, echo=None):
+    def get_bool(self, setting, default=None, echo_level=2):
         raise NotImplementedError()
 
-    def set_bool(self, setting, value, echo=None):
+    def set_bool(self, setting, value, echo_level=2):
         raise NotImplementedError()
 
-    def get_int(self, setting, default=-1, converter=None, echo=None):
+    def get_int(self, setting, default=-1, converter=None, echo_level=2):
         raise NotImplementedError()
 
-    def set_int(self, setting, value, echo=None):
+    def set_int(self, setting, value, echo_level=2):
         raise NotImplementedError()
 
-    def get_string(self, setting, default='', echo=None):
+    def get_string(self, setting, default='', echo_level=2):
         raise NotImplementedError()
 
-    def set_string(self, setting, value, echo=None):
+    def set_string(self, setting, value, echo_level=2):
         raise NotImplementedError()
 
-    def get_string_list(self, setting, default=None, echo=None):
+    def get_string_list(self, setting, default=None, echo_level=2):
         raise NotImplementedError()
 
-    def set_string_list(self, setting, value, echo=None):
+    def set_string_list(self, setting, value, echo_level=2):
         raise NotImplementedError()
 
     def open_settings(self):
@@ -64,8 +64,8 @@ class AbstractSettings(object):
 
     def items_per_page(self, value=None):
         if value is not None:
-            return self.set_int(SETTINGS.ITEMS_PER_PAGE, value)
-        return self.get_int(SETTINGS.ITEMS_PER_PAGE, 50)
+            return self.set_int(SETTINGS.ITEMS_PER_PAGE, value, echo_level=3)
+        return self.get_int(SETTINGS.ITEMS_PER_PAGE, 50, echo_level=3)
 
     _VIDEO_QUALITY_MAP = {
         0: 240,
@@ -78,30 +78,30 @@ class AbstractSettings(object):
     def fixed_video_quality(self, value=None):
         default = 3
         if value is None:
-            _value = self.get_int(SETTINGS.VIDEO_QUALITY, default)
+            _value = self.get_int(SETTINGS.VIDEO_QUALITY, default, echo_level=3)
         else:
             _value = value
         if _value not in self._VIDEO_QUALITY_MAP:
             _value = default
         if value is not None:
-            self.set_int(SETTINGS.VIDEO_QUALITY, _value)
+            self.set_int(SETTINGS.VIDEO_QUALITY, _value, echo_level=3)
         return self._VIDEO_QUALITY_MAP[_value]
 
     def ask_for_video_quality(self):
         if self.use_mpd_videos():
-            return self.get_int(SETTINGS.MPD_STREAM_SELECT) == 4
-        return self.get_bool(SETTINGS.VIDEO_QUALITY_ASK, False)
+            return self.get_int(SETTINGS.MPD_STREAM_SELECT, echo_level=3) == 4
+        return self.get_bool(SETTINGS.VIDEO_QUALITY_ASK, False, echo_level=3)
 
     def fanart_selection(self):
-        return self.get_int(SETTINGS.FANART_SELECTION, 2)
+        return self.get_int(SETTINGS.FANART_SELECTION, 2, echo_level=3)
 
     def cache_size(self, value=None):
         if value is not None:
-            return self.set_int(SETTINGS.CACHE_SIZE, value)
-        return self.get_int(SETTINGS.CACHE_SIZE, 20)
+            return self.set_int(SETTINGS.CACHE_SIZE, value, echo_level=3)
+        return self.get_int(SETTINGS.CACHE_SIZE, 20, echo_level=3)
 
     def get_search_history_size(self):
-        return self.get_int(SETTINGS.SEARCH_SIZE, 10)
+        return self.get_int(SETTINGS.SEARCH_SIZE, 10, echo_level=3)
 
     def setup_wizard_enabled(self, value=None):
         # Set run_required to release date (as Unix timestamp in seconds)
@@ -110,65 +110,81 @@ class AbstractSettings(object):
         run_required = 1744070400
 
         if value is False:
-            self.set_int(SETTINGS.SETUP_WIZARD_RUNS, run_required)
-            return self.set_bool(SETTINGS.SETUP_WIZARD, False)
+            self.set_int(SETTINGS.SETUP_WIZARD_RUNS, run_required, echo_level=3)
+            return self.set_bool(SETTINGS.SETUP_WIZARD, False, echo_level=3)
         if value is True:
-            self.set_int(SETTINGS.SETUP_WIZARD_RUNS, 0)
-            return self.set_bool(SETTINGS.SETUP_WIZARD, True)
+            self.set_int(SETTINGS.SETUP_WIZARD_RUNS, 0, echo_level=3)
+            return self.set_bool(SETTINGS.SETUP_WIZARD, True, echo_level=3)
 
-        last_run = self.get_int(SETTINGS.SETUP_WIZARD_RUNS, 0)
+        last_run = self.get_int(SETTINGS.SETUP_WIZARD_RUNS, 0, echo_level=3)
         if last_run < run_required:
-            self.set_int(SETTINGS.SETUP_WIZARD_RUNS, run_required)
-            self.set_bool(SETTINGS.SETTINGS_END, True)
+            self.set_int(SETTINGS.SETUP_WIZARD_RUNS, run_required, echo_level=3)
+            self.set_bool(SETTINGS.SETTINGS_END, True, echo_level=3)
             return run_required
-        return self.get_bool(SETTINGS.SETUP_WIZARD, False)
+        return self.get_bool(SETTINGS.SETUP_WIZARD, False, echo_level=3)
 
     def support_alternative_player(self, value=None):
         if value is not None:
-            return self.set_bool(SETTINGS.SUPPORT_ALTERNATIVE_PLAYER, value)
-        return self.get_bool(SETTINGS.SUPPORT_ALTERNATIVE_PLAYER, False)
+            return self.set_bool(SETTINGS.SUPPORT_ALTERNATIVE_PLAYER,
+                                 value,
+                                 echo_level=3)
+        return self.get_bool(SETTINGS.SUPPORT_ALTERNATIVE_PLAYER,
+                             False,
+                             echo_level=3)
 
     def default_player_web_urls(self, value=None):
         if value is not None:
-            return self.set_bool(SETTINGS.DEFAULT_PLAYER_WEB_URLS, value)
+            return self.set_bool(SETTINGS.DEFAULT_PLAYER_WEB_URLS,
+                                 value,
+                                 echo_level=3)
         if self.support_alternative_player():
             return False
-        return self.get_bool(SETTINGS.DEFAULT_PLAYER_WEB_URLS, False)
+        return self.get_bool(SETTINGS.DEFAULT_PLAYER_WEB_URLS,
+                             False,
+                             echo_level=3)
 
     def alternative_player_web_urls(self, value=None):
         if value is not None:
-            return self.set_bool(SETTINGS.ALTERNATIVE_PLAYER_WEB_URLS, value)
+            return self.set_bool(SETTINGS.ALTERNATIVE_PLAYER_WEB_URLS,
+                                 value,
+                                 echo_level=3)
         if (self.support_alternative_player()
                 and not self.alternative_player_mpd()):
-            return self.get_bool(SETTINGS.ALTERNATIVE_PLAYER_WEB_URLS, False)
+            return self.get_bool(SETTINGS.ALTERNATIVE_PLAYER_WEB_URLS,
+                                 False,
+                                 echo_level=3)
         return False
 
     def alternative_player_mpd(self, value=None):
         if value is not None:
-            return self.set_bool(SETTINGS.ALTERNATIVE_PLAYER_MPD, value)
+            return self.set_bool(SETTINGS.ALTERNATIVE_PLAYER_MPD,
+                                 value,
+                                 echo_level=3)
         if self.support_alternative_player():
-            return self.get_bool(SETTINGS.ALTERNATIVE_PLAYER_MPD, False)
+            return self.get_bool(SETTINGS.ALTERNATIVE_PLAYER_MPD,
+                                 False,
+                                 echo_level=3)
         return False
 
     def use_isa(self, value=None):
         if value is not None:
-            return self.set_bool(SETTINGS.USE_ISA, value)
-        return self.get_bool(SETTINGS.USE_ISA, False)
+            return self.set_bool(SETTINGS.USE_ISA, value, echo_level=3)
+        return self.get_bool(SETTINGS.USE_ISA, False, echo_level=3)
 
     def subtitle_download(self):
-        return self.get_bool(SETTINGS.SUBTITLE_DOWNLOAD, False)
+        return self.get_bool(SETTINGS.SUBTITLE_DOWNLOAD, False, echo_level=3)
 
     def audio_only(self):
-        return self.get_bool(SETTINGS.AUDIO_ONLY, False)
+        return self.get_bool(SETTINGS.AUDIO_ONLY, False, echo_level=3)
 
     def get_subtitle_selection(self):
-        return self.get_int(SETTINGS.SUBTITLE_SELECTION, 0)
+        return self.get_int(SETTINGS.SUBTITLE_SELECTION, 0, echo_level=3)
 
     def set_subtitle_selection(self, value):
-        return self.set_int(SETTINGS.SUBTITLE_SELECTION, value)
+        return self.set_int(SETTINGS.SUBTITLE_SELECTION, value, echo_level=3)
 
     def set_subtitle_download(self, value):
-        return self.set_bool(SETTINGS.SUBTITLE_DOWNLOAD, value)
+        return self.set_bool(SETTINGS.SUBTITLE_DOWNLOAD, value, echo_level=3)
 
     _THUMB_SIZES = {
         0: {  # Medium (16:9)
@@ -188,7 +204,7 @@ class AbstractSettings(object):
     def get_thumbnail_size(self, value=None):
         default = 1
         if value is None:
-            value = self.get_int(SETTINGS.THUMB_SIZE, default)
+            value = self.get_int(SETTINGS.THUMB_SIZE, default, echo_level=3)
         if value in self._THUMB_SIZES:
             return self._THUMB_SIZES[value]
         return self._THUMB_SIZES[default]
@@ -200,30 +216,32 @@ class AbstractSettings(object):
     }
 
     def safe_search(self):
-        index = self.get_int(SETTINGS.SAFE_SEARCH, 0)
+        index = self.get_int(SETTINGS.SAFE_SEARCH, 0, echo_level=3)
         return self._SAFE_SEARCH_LEVELS[index]
 
     def age_gate(self):
-        return self.get_bool(SETTINGS.AGE_GATE, True)
+        return self.get_bool(SETTINGS.AGE_GATE, True, echo_level=3)
 
     def verify_ssl(self, value=None):
         if value is not None:
-            return self.set_bool(SETTINGS.VERIFY_SSL, value)
+            return self.set_bool(SETTINGS.VERIFY_SSL, value, echo_level=3)
 
         if sys.version_info <= (2, 7, 9):
             verify = False
         else:
-            verify = self.get_bool(SETTINGS.VERIFY_SSL, True)
+            verify = self.get_bool(SETTINGS.VERIFY_SSL, True, echo_level=3)
         return verify
 
     def requests_timeout(self, value=None):
         if value is not None:
-            self.set_int(SETTINGS.CONNECT_TIMEOUT, value[0])
-            self.set_int(SETTINGS.READ_TIMEOUT, value[1])
+            self.set_int(SETTINGS.CONNECT_TIMEOUT, value[0], echo_level=3)
+            self.set_int(SETTINGS.READ_TIMEOUT, value[1], echo_level=3)
             return value
 
-        connect_timeout = self.get_int(SETTINGS.CONNECT_TIMEOUT, 9) + 0.5
-        read_timout = self.get_int(SETTINGS.READ_TIMEOUT, 27)
+        connect_timeout = self.get_int(SETTINGS.CONNECT_TIMEOUT,
+                                       9,
+                                       echo_level=3) + 0.5
+        read_timout = self.get_int(SETTINGS.READ_TIMEOUT, 27, echo_level=3)
         return connect_timeout, read_timout
 
     _PROXY_TYPE_SCHEME = {
@@ -283,14 +301,14 @@ class AbstractSettings(object):
 
                 setting_type = setting.get('type', int)
                 if setting_type is int:
-                    self.set_int(setting_name, setting_value)
+                    self.set_int(setting_name, setting_value, echo_level=3)
                 elif setting_type is str:
-                    self.set_string(setting_name, setting_value)
+                    self.set_string(setting_name, setting_value, echo_level=3)
                 else:
-                    self.set_bool(setting_name, setting_value)
+                    self.set_bool(setting_name, setting_value, echo_level=3)
             return value
 
-        proxy_source = self.get_int(SETTINGS.PROXY_SOURCE, 1)
+        proxy_source = self.get_int(SETTINGS.PROXY_SOURCE, 1, echo_level=3)
         if not proxy_source:
             return None
 
@@ -303,12 +321,15 @@ class AbstractSettings(object):
                     setting.get('kodi_name'),
                     process=setting_type,
                 ) or setting_default
-            elif setting_type is int:
-                setting_value = self.get_int(setting_name, setting_default)
-            elif setting_type is str:
-                setting_value = self.get_string(setting_name, setting_default)
             else:
-                setting_value = self.get_bool(setting_name, setting_default)
+                setting_method = (
+                    self.get_int if setting_type is int else
+                    self.get_string if setting_type is str else
+                    self.get_bool
+                )
+                setting_value = setting_method(setting_name,
+                                               setting_default,
+                                               echo_level=3)
 
             settings[setting_name] = {
                 'value': setting_value,
@@ -372,13 +393,13 @@ class AbstractSettings(object):
         }
 
     def allow_dev_keys(self):
-        return self.get_bool(SETTINGS.ALLOW_DEV_KEYS, False)
+        return self.get_bool(SETTINGS.ALLOW_DEV_KEYS, False, echo_level=3)
 
     def use_mpd_videos(self, value=None):
         if self.use_isa():
             if value is not None:
-                return self.set_bool(SETTINGS.MPD_VIDEOS, value)
-            return self.get_bool(SETTINGS.MPD_VIDEOS, True)
+                return self.set_bool(SETTINGS.MPD_VIDEOS, value, echo_level=3)
+            return self.get_bool(SETTINGS.MPD_VIDEOS, True, echo_level=3)
         return False
 
     _LIVE_STREAM_TYPES = {
@@ -396,27 +417,31 @@ class AbstractSettings(object):
             default = 1
             setting = SETTINGS.LIVE_STREAMS + '.2'
         if value is not None:
-            return self.set_int(setting, value)
-        value = self.get_int(setting, default)
+            return self.set_int(setting, value, echo_level=3)
+        value = self.get_int(setting, default, echo_level=3)
         if value in self._LIVE_STREAM_TYPES:
             return self._LIVE_STREAM_TYPES[value]
         return self._LIVE_STREAM_TYPES[default]
 
     def use_isa_live_streams(self):
         if self.use_isa():
-            return self.get_int(SETTINGS.LIVE_STREAMS + '.1', 2) > 1
+            return self.get_int(SETTINGS.LIVE_STREAMS + '.1',
+                                2,
+                                echo_level=3) > 1
         return False
 
     def use_mpd_live_streams(self):
         if self.use_isa():
-            return self.get_int(SETTINGS.LIVE_STREAMS + '.1', 2) == 3
+            return self.get_int(SETTINGS.LIVE_STREAMS + '.1',
+                                2,
+                                echo_level=3) == 3
         return False
 
     def httpd_port(self, value=None):
         default = 50152
 
         if value is None:
-            port = self.get_int(SETTINGS.HTTPD_PORT, default)
+            port = self.get_int(SETTINGS.HTTPD_PORT, default, echo_level=3)
         else:
             port = value
 
@@ -426,14 +451,16 @@ class AbstractSettings(object):
             port = default
 
         if value is not None:
-            return self.set_int(SETTINGS.HTTPD_PORT, port)
+            return self.set_int(SETTINGS.HTTPD_PORT, port, echo_level=3)
         return port
 
     def httpd_listen(self, value=None):
         default = '127.0.0.1'
 
         if value is None:
-            ip_address = self.get_string(SETTINGS.HTTPD_LISTEN, default)
+            ip_address = self.get_string(SETTINGS.HTTPD_LISTEN,
+                                         default,
+                                         echo_level=3)
         else:
             ip_address = value
 
@@ -441,11 +468,13 @@ class AbstractSettings(object):
         ip_address = '.'.join(map(str, octets))
 
         if value is not None:
-            return self.set_string(SETTINGS.HTTPD_LISTEN, ip_address)
+            return self.set_string(SETTINGS.HTTPD_LISTEN,
+                                   ip_address,
+                                   echo_level=3)
         return ip_address
 
     def httpd_whitelist(self):
-        whitelist = self.get_string(SETTINGS.HTTPD_WHITELIST, '')
+        whitelist = self.get_string(SETTINGS.HTTPD_WHITELIST, '', echo_level=3)
         whitelist = ''.join(whitelist.split()).split(',')
         allow_list = []
         for ip_address in whitelist:
@@ -457,37 +486,43 @@ class AbstractSettings(object):
 
     def httpd_sleep_allowed(self, value=None):
         if value is not None:
-            return self.set_bool(SETTINGS.HTTPD_IDLE_SLEEP, value)
-        return self.get_bool(SETTINGS.HTTPD_IDLE_SLEEP, True)
+            return self.set_bool(SETTINGS.HTTPD_IDLE_SLEEP, value, echo_level=3)
+        return self.get_bool(SETTINGS.HTTPD_IDLE_SLEEP, True, echo_level=3)
 
     def httpd_stream_redirect(self, value=None):
         if value is not None:
-            return self.set_bool(SETTINGS.HTTPD_STREAM_REDIRECT, value)
-        return self.get_bool(SETTINGS.HTTPD_STREAM_REDIRECT, False)
+            return self.set_bool(SETTINGS.HTTPD_STREAM_REDIRECT,
+                                 value,
+                                 echo_level=3)
+        return self.get_bool(SETTINGS.HTTPD_STREAM_REDIRECT,
+                             False,
+                             echo_level=3)
 
     def api_config_page(self):
-        return self.get_bool(SETTINGS.API_CONFIG_PAGE, False)
+        return self.get_bool(SETTINGS.API_CONFIG_PAGE, False, echo_level=3)
 
     def api_id(self, new_id=None):
         if new_id is not None:
-            self.set_string(SETTINGS.API_ID, new_id)
+            self.set_string(SETTINGS.API_ID, new_id, echo_level=3)
             return new_id
-        return self.get_string(SETTINGS.API_ID)
+        return self.get_string(SETTINGS.API_ID, echo_level=3)
 
     def api_key(self, new_key=None):
         if new_key is not None:
-            self.set_string(SETTINGS.API_KEY, new_key)
+            self.set_string(SETTINGS.API_KEY, new_key, echo_level=3)
             return new_key
-        return self.get_string(SETTINGS.API_KEY)
+        return self.get_string(SETTINGS.API_KEY, echo_level=3)
 
     def api_secret(self, new_secret=None):
         if new_secret is not None:
-            self.set_string(SETTINGS.API_SECRET, new_secret)
+            self.set_string(SETTINGS.API_SECRET, new_secret, echo_level=3)
             return new_secret
-        return self.get_string(SETTINGS.API_SECRET)
+        return self.get_string(SETTINGS.API_SECRET, echo_level=3)
 
     def get_location(self):
-        location = self.get_string(SETTINGS.LOCATION, '').replace(' ', '').strip()
+        location = self.get_string(SETTINGS.LOCATION,
+                                   '',
+                                   echo_level=3).replace(' ', '').strip()
         coords = location.split(',')
         latitude = longitude = None
         if len(coords) == 2:
@@ -505,19 +540,22 @@ class AbstractSettings(object):
         return ''
 
     def set_location(self, value):
-        self.set_string(SETTINGS.LOCATION, value)
+        self.set_string(SETTINGS.LOCATION, value, echo_level=3)
 
     def get_location_radius(self):
-        return ''.join((self.get_int(SETTINGS.LOCATION_RADIUS, 500, str), 'km'))
+        return ''.join((
+            self.get_int(SETTINGS.LOCATION_RADIUS, 500, str, echo_level=3),
+            'km'
+        ))
 
     def get_play_count_min_percent(self):
-        return self.get_int(SETTINGS.PLAY_COUNT_MIN_PERCENT, 0)
+        return self.get_int(SETTINGS.PLAY_COUNT_MIN_PERCENT, 0, echo_level=3)
 
     def use_local_history(self):
-        return self.get_bool(SETTINGS.USE_LOCAL_HISTORY, False)
+        return self.get_bool(SETTINGS.USE_LOCAL_HISTORY, False, echo_level=3)
 
     def use_remote_history(self):
-        return self.get_bool(SETTINGS.USE_REMOTE_HISTORY, False)
+        return self.get_bool(SETTINGS.USE_REMOTE_HISTORY, False, echo_level=3)
 
     # Selections based on max width and min height at common (utra-)wide aspect ratios
     _QUALITY_SELECTIONS = {                                                                         # Setting | Resolution
@@ -536,10 +574,12 @@ class AbstractSettings(object):
 
     def mpd_video_qualities(self, value=None):
         if value is not None:
-            return self.set_int(SETTINGS.MPD_QUALITY_SELECTION, value)
+            return self.set_int(SETTINGS.MPD_QUALITY_SELECTION,
+                                value,
+                                echo_level=3)
         if not self.use_mpd_videos():
             return []
-        value = self.get_int(SETTINGS.MPD_QUALITY_SELECTION, 4)
+        value = self.get_int(SETTINGS.MPD_QUALITY_SELECTION, 4, echo_level=3)
         return [quality
                 for key, quality in sorted(self._QUALITY_SELECTIONS.items(),
                                            reverse=True)
@@ -547,8 +587,11 @@ class AbstractSettings(object):
 
     def stream_features(self, value=None):
         if value is not None:
-            return self.set_string_list(SETTINGS.MPD_STREAM_FEATURES, value)
-        return frozenset(self.get_string_list(SETTINGS.MPD_STREAM_FEATURES))
+            return self.set_string_list(SETTINGS.MPD_STREAM_FEATURES,
+                                        value,
+                                        echo_level=3)
+        return frozenset(self.get_string_list(SETTINGS.MPD_STREAM_FEATURES,
+                                              echo_level=3))
 
     _STREAM_SELECT = {
         1: 'auto',
@@ -566,8 +609,8 @@ class AbstractSettings(object):
             default = 2
 
         if value is not None:
-            return self.set_int(setting, value)
-        value = self.get_int(setting, default)
+            return self.set_int(setting, value, echo_level=3)
+        value = self.get_int(setting, default, echo_level=3)
         if value in self._STREAM_SELECT:
             return self._STREAM_SELECT[value]
         return self._STREAM_SELECT[default]
@@ -585,10 +628,10 @@ class AbstractSettings(object):
 
     def item_filter(self, update=None, override=None, exclude=None):
         if override is None:
-            override = self.get_string_list(SETTINGS.HIDE_VIDEOS)
+            override = self.get_string_list(SETTINGS.HIDE_VIDEOS, echo_level=3)
             override = dict.fromkeys(override, False)
-            override['custom'] = (self.get_string(SETTINGS.FILTER_LIST)
-                                  .split(','))
+            override['custom'] = self.get_string(SETTINGS.FILTER_LIST,
+                                                 echo_level=3).split(',')
         elif isinstance(override, (list, tuple)):
             _override = {'custom': []}
             for value in override:
@@ -619,61 +662,81 @@ class AbstractSettings(object):
 
     def subscriptions_filter_enabled(self, value=None):
         if value is not None:
-            return self.set_bool(SETTINGS.SUBSCRIPTIONS_FILTER_ENABLED, value)
-        return self.get_bool(SETTINGS.SUBSCRIPTIONS_FILTER_ENABLED, True)
+            return self.set_bool(SETTINGS.SUBSCRIPTIONS_FILTER_ENABLED,
+                                 value,
+                                 echo_level=3)
+        return self.get_bool(SETTINGS.SUBSCRIPTIONS_FILTER_ENABLED,
+                             True,
+                             echo_level=3)
 
     def subscriptions_filter_blacklist(self, value=None):
         if value is not None:
-            return self.set_bool(SETTINGS.SUBSCRIPTIONS_FILTER_BLACKLIST, value)
-        return self.get_bool(SETTINGS.SUBSCRIPTIONS_FILTER_BLACKLIST, True)
+            return self.set_bool(SETTINGS.SUBSCRIPTIONS_FILTER_BLACKLIST,
+                                 value,
+                                 echo_level=3)
+        return self.get_bool(SETTINGS.SUBSCRIPTIONS_FILTER_BLACKLIST,
+                             True,
+                             echo_level=3)
 
     def subscriptions_filter(self, value=None):
         if value is not None:
             if isinstance(value, (list, tuple, set)):
                 value = ','.join(value).lstrip(',')
-            return self.set_string(SETTINGS.SUBSCRIPTIONS_FILTER_LIST, value)
-        return self.get_string(
-            SETTINGS.SUBSCRIPTIONS_FILTER_LIST, ''
-        ).replace(', ', ',')
+            return self.set_string(SETTINGS.SUBSCRIPTIONS_FILTER_LIST,
+                                   value,
+                                   echo_level=3)
+        return self.get_string(SETTINGS.SUBSCRIPTIONS_FILTER_LIST,
+                               '',
+                               echo_level=3).replace(', ', ',')
 
     def shorts_duration(self, value=None):
         if value is not None:
-            return self.set_int(SETTINGS.SHORTS_DURATION, value)
-        return self.get_int(SETTINGS.SHORTS_DURATION, 60)
+            return self.set_int(SETTINGS.SHORTS_DURATION, value, echo_level=3)
+        return self.get_int(SETTINGS.SHORTS_DURATION, 60, echo_level=3)
 
     def show_detailed_description(self, value=None):
         if value is not None:
-            return self.set_bool(SETTINGS.DETAILED_DESCRIPTION, value)
-        return self.get_bool(SETTINGS.DETAILED_DESCRIPTION, True)
+            return self.set_bool(SETTINGS.DETAILED_DESCRIPTION,
+                                 value,
+                                 echo_level=3)
+        return self.get_bool(SETTINGS.DETAILED_DESCRIPTION, True, echo_level=3)
 
     def show_detailed_labels(self, value=None):
         if value is not None:
-            return self.set_bool(SETTINGS.DETAILED_LABELS, value)
-        return self.get_bool(SETTINGS.DETAILED_LABELS, True)
+            return self.set_bool(SETTINGS.DETAILED_LABELS, value, echo_level=3)
+        return self.get_bool(SETTINGS.DETAILED_LABELS, True, echo_level=3)
 
     def get_language(self):
-        return self.get_string(SETTINGS.LANGUAGE, 'en_US').replace('_', '-')
+        return self.get_string(SETTINGS.LANGUAGE,
+                               'en_US',
+                               echo_level=3).replace('_', '-')
 
     def set_language(self, language_id):
-        return self.set_string(SETTINGS.LANGUAGE, language_id)
+        return self.set_string(SETTINGS.LANGUAGE, language_id, echo_level=3)
 
     def get_region(self):
-        return self.get_string(SETTINGS.REGION, 'US')
+        return self.get_string(SETTINGS.REGION, 'US', echo_level=3)
 
     def set_region(self, region_id):
-        return self.set_string(SETTINGS.REGION, region_id)
+        return self.set_string(SETTINGS.REGION, region_id, echo_level=3)
 
     def get_watch_later_playlist(self):
-        return self.get_string(SETTINGS.WATCH_LATER_PLAYLIST, '').strip()
+        return self.get_string(SETTINGS.WATCH_LATER_PLAYLIST,
+                               '',
+                               echo_level=3).strip()
 
     def set_watch_later_playlist(self, value):
-        return self.set_string(SETTINGS.WATCH_LATER_PLAYLIST, value)
+        return self.set_string(SETTINGS.WATCH_LATER_PLAYLIST,
+                               value,
+                               echo_level=3)
 
     def get_history_playlist(self):
-        return self.get_string(SETTINGS.HISTORY_PLAYLIST, '').strip()
+        return self.get_string(SETTINGS.HISTORY_PLAYLIST,
+                               '',
+                               echo_level=3).strip()
 
     def set_history_playlist(self, value):
-        return self.set_string(SETTINGS.HISTORY_PLAYLIST, value)
+        return self.set_string(SETTINGS.HISTORY_PLAYLIST, value, echo_level=3)
 
     if current_system_version.compatible(20):
         _COLOR_SETTING_MAP = {
@@ -685,7 +748,7 @@ class AbstractSettings(object):
         def get_label_color(self, label_part):
             label_part = self._COLOR_SETTING_MAP.get(label_part) or label_part
             setting_name = '.'.join((SETTINGS.LABEL_COLOR, label_part))
-            return self.get_string(setting_name, 'white')
+            return self.get_string(setting_name, 'white', echo_level=3)
     else:
         _COLOR_MAP = {
             'commentCount': 'cyan',
@@ -699,8 +762,11 @@ class AbstractSettings(object):
             return self._COLOR_MAP.get(label_part, 'white')
 
     def get_channel_name_aliases(self):
-        return frozenset(self.get_string_list(SETTINGS.CHANNEL_NAME_ALIASES))
+        return frozenset(self.get_string_list(SETTINGS.CHANNEL_NAME_ALIASES,
+                                              echo_level=3))
 
-    def logging_enabled(self):
-        return (self.get_int(SETTINGS.LOGGING_ENABLED, 0)
+    def log_level(self, value=None):
+        if value is not None:
+            return self.set_int(SETTINGS.LOG_LEVEL, value, echo_level=3)
+        return (self.get_int(SETTINGS.LOG_LEVEL, 0, echo_level=3)
                 or get_kodi_setting_bool('debug.showloginfo'))

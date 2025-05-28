@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from functools import partial
 
 from . import UrlResolver, UrlToItemConverter, tv, utils, v3
-from ...kodion import KodionException
+from ...kodion import KodionException, logging
 from ...kodion.constants import CONTENT, PATHS
 from ...kodion.items import DirectoryItem, UriItem
 from ...kodion.utils import strip_html_from_text
@@ -285,7 +285,7 @@ def _process_description_links(provider, context):
                 res_urls.append(resolved_url)
 
                 if progress_dialog.is_aborted():
-                    context.log_debug('Resolving urls aborted')
+                    logging.debug('Resolving urls aborted')
                     break
 
             url_to_item_converter = UrlToItemConverter()
@@ -399,7 +399,7 @@ def _process_description_links(provider, context):
     if playlist_ids:
         return _display_playlists(playlist_ids)
 
-    context.log_error('Missing video_id or playlist_ids for description links')
+    logging.error('Missing video_id or playlist_ids for description links')
     return False, None
 
 

@@ -10,6 +10,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import os
 
+from ...kodion import logging
 from ...kodion.compatibility import (
     parse_qs,
     unescape,
@@ -58,6 +59,8 @@ SUBTITLE_SELECTIONS = {
 
 
 class Subtitles(object):
+    log = logging.getLogger(__name__)
+
     BASE_PATH = make_dirs(TEMP_PATH)
 
     FORMATS = {
@@ -190,8 +193,7 @@ class Subtitles(object):
         try:
             text = unescape(text)
         except Exception:
-            self._context.log_error('Subtitles._unescape - failed: |{text}|'
-                                    .format(text=text))
+            self.log.error('Failed: |%s|', text)
         return text
 
     def get_lang_details(self):
@@ -335,8 +337,7 @@ class Subtitles(object):
         num_total = num_captions + num_translations
 
         if not num_total:
-            self._context.log_debug('Subtitles._prompt'
-                                    ' - No subtitles found for prompt')
+            self.log.debug('No subtitles found for prompt')
         else:
             translation_lang = self._context.localize('subtitles.translation')
             choice = self._context.get_ui().on_select(
@@ -354,13 +355,11 @@ class Subtitles(object):
                 track_kind = 'translation'
                 choice = translations[choice - num_captions]
             else:
-                self._context.log_debug('Subtitles._prompt'
-                                        ' - Subtitle selection cancelled')
+                self.log.debug('Subtitle selection cancelled')
                 return False
 
             lang, language = choice
-            self._context.log_debug('Subtitles._prompt - selected: |{lang}|'
-                                    .format(lang=lang))
+            self.log.debug('Selected: |%s|', lang)
             url, mime_type = self._get_url(track=track, lang=lang)
             if url:
                 return {
@@ -398,22 +397,20 @@ class Subtitles(object):
                 self.FORMATS[sub_format]['extension']
             ))
             if not self.BASE_PATH:
-                self._context.log_error('Subtitles._get_url'
-                                        ' - Unable to access temp directory')
+                self.log.error_trace('Unable to access temp directory')
                 return None, None
 
             file_path = os.path.join(self.BASE_PATH, filename)
             if xbmcvfs.exists(file_path):
-                self._context.log_debug('Subtitles._get_url'
-                                        ' - Use existing subtitle for: |{lang}|'
-                                        '\n\tFile: {file}'
-                                        .format(lang=lang, file=file_path))
+                self.log.debug(('Use existing subtitle for: |{lang}|',
+                                'File: {file}'),
+                               lang=lang,
+                               file=file_path)
                 return file_path, self.FORMATS[sub_format]['mime_type']
 
         base_url = self._normalize_url(track.get('baseUrl'))
         if not base_url:
-            self._context.log_error('Subtitles._get_url - no URL for: |{lang}|'
-                                    .format(lang=lang))
+            self.log.error_trace('No URL for: |%s|', lang)
             return None, None
 
         subtitle_url = self._set_query_param(
@@ -422,10 +419,10 @@ class Subtitles(object):
             ('fmt', sub_format),
             ('tlang', tlang) if tlang else (None, None),
         )
-        self._context.log_debug('Subtitles._get_url'
-                                ' - found new subtitle for: |{lang}|'
-                                '\n\tURL: {url}'
-                                .format(lang=lang, url=subtitle_url))
+        self.log.debug(('Found new subtitle for: |{lang}|',
+                        'URL: {url}'),
+                       lang=lang,
+                       url=subtitle_url)
 
         if not download:
             return subtitle_url, self.FORMATS[sub_format]['mime_type']
@@ -433,9 +430,8 @@ class Subtitles(object):
         response = BaseRequestsClass(context=self._context).request(
             subtitle_url,
             headers=self.headers,
-            error_info=('Subtitles._get_url - GET failed for: |{lang}|'
-                        '\n\tException: {{exc!r}}'
-                        .format(lang=lang))
+            error_title='Failed to download subtitle for: |{sub_lang}|',
+            sub_lang=lang,
         )
         response = response and response.text
         if not response:
@@ -448,10 +444,10 @@ class Subtitles(object):
             with xbmcvfs.File(file_path, 'w') as sub_file:
                 success = sub_file.write(output)
         except (IOError, OSError):
-            self._context.log_error('Subtitles._get_url'
-                                    ' - write failed for: |{lang}|'
-                                    '\n\tFile: {file}'
-                                    .format(lang=lang, file=file_path))
+            self.log.exception(('Write failed for: |{lang}|',
+                                'File: {file}'),
+                               lang=lang,
+                               file=file_path)
         if success:
             return file_path, self.FORMATS[sub_format]['mime_type']
         return None, None
@@ -505,9 +501,7 @@ class Subtitles(object):
         if sel_track:
             return sel_track, sel_lang, sel_language, sel_kind
 
-        self._context.log_debug('Subtitles._get_track'
-                                ' - no subtitle for: |{lang}|'
-                                .format(lang=lang))
+        self.log.debug('No subtitle for: |%s|', lang)
         return None, None, None, None
 
     @staticmethod

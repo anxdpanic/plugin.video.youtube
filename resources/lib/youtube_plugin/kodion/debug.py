@@ -10,13 +10,9 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import atexit
-import os
-
-from .logger import Logger
-
 
 def debug_here(host='localhost'):
+    import os
     import sys
 
     for comp in sys.path:
@@ -51,17 +47,21 @@ class Profiler(object):
         'name',
     )
 
+    from . import logging as _logging
+    from atexit import register as _atexit_register
     from cProfile import Profile as _Profile
+    from functools import wraps as _wraps
     from pstats import Stats as _Stats
+    from weakref import ref as _ref
 
     try:
         from StringIO import StringIO as _StringIO
     except ImportError:
         from io import StringIO as _StringIO
-    from functools import wraps as _wraps
 
     _wraps = staticmethod(_wraps)
-    from weakref import ref as _ref
+    log = _logging.getLogger(__name__)
+    del _logging
 
     class Proxy(_ref):
         def __call__(self, *args, **kwargs):
@@ -135,7 +135,7 @@ class Profiler(object):
         if enabled and not lazy:
             self._create_profiler()
 
-        atexit.register(self.tear_down)
+        self._atexit_register(self.tear_down)
 
     def __enter__(self):
         if not self._enabled:
@@ -220,8 +220,10 @@ class Profiler(object):
 
     @classmethod
     def wait_timer(cls):
-        times = os.times()
-        return times.elapsed - (times.system + times.user)
+        from os import times
+
+        times_result = times()
+        return times_result.elapsed - (times_result.system + times_result.user)
 
     def disable(self):
         if self._profiler:
@@ -270,12 +272,14 @@ class Profiler(object):
         return output
 
     def print_stats(self):
-        Logger.log_debug('Profiling stats: {0}'.format(self.get_stats(
-            num_lines=self._num_lines,
-            print_callees=self._print_callees,
-            reuse=self._reuse,
-            sort_by=self._sort_by,
-        )))
+        self.log.info('Profiling stats: %s',
+                      self.get_stats(
+                          num_lines=self._num_lines,
+                          print_callees=self._print_callees,
+                          reuse=self._reuse,
+                          sort_by=self._sort_by,
+                      ),
+                      stacklevel=3)
 
     def tear_down(self):
         self.__class__._instances.discard(self)

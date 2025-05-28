@@ -19,6 +19,7 @@ from .. import (
     MediaItem,
     VideoItem,
 )
+from ... import logging
 from ...compatibility import to_str, xbmc, xbmcgui
 from ...constants import (
     CHANNEL_ID,
@@ -406,8 +407,10 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
 
 def playback_item(context, media_item, show_fanart=None, **_kwargs):
     uri = media_item.get_uri()
-    context.log_debug('Converting %s |%s|' % (media_item.__class__.__name__,
-                                              redact_ip_in_uri(uri)))
+    logging.debug('Converting %s: |%s|',
+                  media_item.__class__.__name__,
+                  redact_ip_in_uri(uri),
+                  stacklevel=2)
 
     params = context.get_params()
     settings = context.get_settings()
@@ -433,7 +436,8 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
         props = {
             'isPlayable': str(media_item.playable).lower(),
             'playlist_type_hint': (
-                xbmc.PLAYLIST_MUSIC if isinstance(media_item, AudioItem) else
+                xbmc.PLAYLIST_MUSIC
+                if isinstance(media_item, AudioItem) else
                 xbmc.PLAYLIST_VIDEO
             ),
         }
@@ -531,7 +535,7 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
 
 def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
     uri = directory_item.get_uri()
-    context.log_debug('Converting DirectoryItem |%s|' % uri)
+    logging.debug('Converting DirectoryItem: |%s|', uri, stacklevel=2)
 
     kwargs = {
         'label': directory_item.get_name(),
@@ -603,7 +607,7 @@ def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
 
 def image_listitem(context, image_item, show_fanart=None, **_kwargs):
     uri = image_item.get_uri()
-    context.log_debug('Converting ImageItem |%s|' % uri)
+    logging.debug('Converting ImageItem: |%s|', uri, stacklevel=2)
 
     kwargs = {
         'label': image_item.get_name(),
@@ -638,7 +642,7 @@ def image_listitem(context, image_item, show_fanart=None, **_kwargs):
 
 def uri_listitem(context, uri_item, **_kwargs):
     uri = uri_item.get_uri()
-    context.log_debug('Converting UriItem |%s|' % uri)
+    logging.debug('Converting UriItem: |%s|', uri, stacklevel=2)
 
     kwargs = {
         'label': uri_item.get_name(),
@@ -662,8 +666,9 @@ def media_listitem(context,
                    played=None,
                    **_kwargs):
     uri = media_item.get_uri()
-    context.log_debug('Converting %s |%s|' % (media_item.__class__.__name__,
-                                              uri))
+    logging.debug('Converting %s: |%s|',
+                  media_item.__class__.__name__, uri,
+                  stacklevel=2)
 
     kwargs = {
         'label': media_item.get_name(),
@@ -675,7 +680,8 @@ def media_listitem(context,
         'isPlayable': str(media_item.playable).lower(),
         'ForceResolvePlugin': 'true',
         'playlist_type_hint': (
-            xbmc.PLAYLIST_MUSIC if isinstance(media_item, AudioItem) else
+            xbmc.PLAYLIST_MUSIC
+            if isinstance(media_item, AudioItem) else
             xbmc.PLAYLIST_VIDEO
         ),
     }

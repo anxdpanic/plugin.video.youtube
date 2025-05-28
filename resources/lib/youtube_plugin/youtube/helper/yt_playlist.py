@@ -11,7 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from .utils import get_thumbnail
-from ...kodion import KodionException
+from ...kodion import KodionException, logging
 from ...kodion.constants import CHANNEL_ID, PATHS, PLAYLISTITEM_ID, PLAYLIST_ID
 from ...kodion.utils import find_video_id
 
@@ -45,8 +45,8 @@ def _process_add_video(provider, context, keymap_action=False):
     json_data = client.add_video_to_playlist(playlist_id=playlist_id,
                                              video_id=video_id)
     if not json_data:
-        context.log_debug('Playlist/Add: failed for playlist |{playlist_id}|'
-                          .format(playlist_id=playlist_id))
+        logging.debug('Playlist/Add: failed for playlist |{playlist_id}|'
+                      .format(playlist_id=playlist_id))
         return False
 
     context.get_ui().show_notification(
@@ -118,8 +118,8 @@ def _process_remove_video(provider,
         keymap_action = True
 
     if playlist_id.strip().lower() in {'wl', 'hl'}:
-        context.log_debug('Playlist/Remove: failed for playlist |{playlist_id}|'
-                          .format(playlist_id=playlist_id))
+        logging.debug('Playlist/Remove: failed for playlist |{playlist_id}|'
+                      .format(playlist_id=playlist_id))
         return False
 
     if confirmed or context.get_ui().on_remove_content(video_name):

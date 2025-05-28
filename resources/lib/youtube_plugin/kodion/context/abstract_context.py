@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import os
 
-from ..logger import Logger
+from .. import logging
 from ..compatibility import (
     parse_qsl,
     quote,
@@ -48,7 +48,9 @@ from ..sql_store import (
 from ..utils import current_system_version
 
 
-class AbstractContext(Logger):
+class AbstractContext(object):
+    log = logging.getLogger(__name__)
+
     _initialized = False
     _addon = None
     _settings = None
@@ -475,15 +477,15 @@ class AbstractContext(Logger):
                     if not parsed_value:
                         raise ValueError
                 else:
-                    self.log_debug('Unknown parameter - |{0}: {1!r}|'.format(
-                        param, value
-                    ))
+                    self.log.debug('Unknown parameter - |{param}: {value!r}|',
+                                   param=param,
+                                   value=value)
                     to_delete.append(param)
                     continue
             except (TypeError, ValueError):
-                self.log_error('Invalid parameter value - |{0}: {1}|'.format(
-                    param, value
-                ))
+                self.log.error('Invalid parameter value - |{param}: {value!r}|',
+                               param=param,
+                               value=value)
                 to_delete.append(param)
                 continue
 

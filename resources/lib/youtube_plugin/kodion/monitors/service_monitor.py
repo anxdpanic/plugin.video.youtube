@@ -12,6 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 import json
 import threading
 
+from .. import logging
 from ..compatibility import urlsplit, xbmc, xbmcgui
 from ..constants import (
     ADDON_ID,
@@ -31,6 +32,8 @@ from ..network import get_connect_address, get_http_server, httpd_status
 
 
 class ServiceMonitor(xbmc.Monitor):
+    log = logging.getLogger(__name__)
+
     _settings_changes = 0
     _settings_collect = False
     get_idle_time = xbmc.getGlobalIdleTime
@@ -95,15 +98,19 @@ class ServiceMonitor(xbmc.Monitor):
             'is_active': is_plugin and not _busy(),
         }
 
-    def clear_property(self, property_id):
-        self._context.log_debug('Clear property |{id}|'.format(id=property_id))
+    def clear_property(self, property_id, stacklevel=2):
+        self.log.debug_trace('Clear property |{property_id}|',
+                             property_id=property_id,
+                             stacklevel=stacklevel)
         _property_id = '-'.join((ADDON_ID, property_id))
         xbmcgui.Window(10000).clearProperty(_property_id)
         return None
 
-    def set_property(self, property_id, value='true'):
-        self._context.log_debug('Set property |{id}|: {value!r}'
-                                .format(id=property_id, value=value))
+    def set_property(self, property_id, value='true', stacklevel=2):
+        self.log.debug_trace('Set property |{property_id}|: {value!r}',
+                             property_id=property_id,
+                             value=value,
+                             stacklevel=stacklevel)
         _property_id = '-'.join((ADDON_ID, property_id))
         xbmcgui.Window(10000).setProperty(_property_id, value)
         return value
@@ -161,8 +168,9 @@ class ServiceMonitor(xbmc.Monitor):
 
                 if context.is_plugin_path(item_path):
                     if not context.is_plugin_path(item_path, PATHS.PLAY):
-                        context.log_warning('Playlist.OnAdd - non-playable path'
-                                            '\n\tPath: {0}'.format(item_path))
+                        self.log.warning(('Playlist.OnAdd item is not playable',
+                                          'Path: %s'),
+                                         item_path)
                         self.set_property(PLAY_FORCED)
 
             return
@@ -248,14 +256,23 @@ class ServiceMonitor(xbmc.Monitor):
             if total != self._settings_changes:
                 return
 
-            context.log_debug('onSettingsChanged: {0} change(s)'.format(total))
+            self.log.debug('onSettingsChanged: %d change(s)', total)
             self._settings_changes = 0
 
         settings = context.get_settings(refresh=True)
-        if settings.logging_enabled():
-            context.debug_log(on=True)
+        log_level = settings.log_level()
+        if log_level:
+            self.log.debugging = True
+            if log_level & 2:
+                self.log.stack_info = True
+                self.log.verbose_logging = True
+            else:
+                self.log.stack_info = False
+                self.log.verbose_logging = False
         else:
-            context.debug_log(off=True)
+            self.log.debugging = False
+            self.log.stack_info = False
+            self.log.verbose_logging = False
 
         self.set_property(CHECK_SETTINGS)
         self.refresh_container()
@@ -300,9 +317,9 @@ class ServiceMonitor(xbmc.Monitor):
             return True
 
         context = self._context
-        context.log_debug('HTTPServer: Starting |{ip}:{port}|'
-                          .format(ip=self._httpd_address,
-                                  port=self._httpd_port))
+        self.log.debug('HTTPServer: Starting |{ip}:{port}|',
+                       ip=self._httpd_address,
+                       port=self._httpd_port)
         self.httpd_address_sync()
         self.httpd = get_http_server(address=self._httpd_address,
                                      port=self._httpd_port,
@@ -316,9 +333,8 @@ class ServiceMonitor(xbmc.Monitor):
         self.httpd_thread.start()
 
         address = self.httpd.socket.getsockname()
-        context.log_debug('HTTPServer: Listening on |{ip}:{port}|'
-                          .format(ip=address[0],
-                                  port=address[1]))
+        self.log.debug('HTTPServer: Listening on |{address[0]}:{address[1]}|',
+                       address=address)
         self._httpd_error = False
         return True
 
@@ -328,9 +344,9 @@ class ServiceMonitor(xbmc.Monitor):
                     and (on_idle or self.system_idle)
                     and self.httpd_required(on_idle=True, player=player))):
             return
-        self._context.log_debug('HTTPServer: Shutting down |{ip}:{port}|'
-                                .format(ip=self._old_httpd_address,
-                                        port=self._old_httpd_port))
+        self.log.debug('HTTPServer: Shutting down |{ip}:{port}|',
+                       ip=self._old_httpd_address,
+                       port=self._old_httpd_port)
         self.httpd_address_sync()
 
         shutdown_thread = threading.Thread(target=self.httpd.shutdown)
@@ -351,12 +367,12 @@ class ServiceMonitor(xbmc.Monitor):
         self.httpd = None
 
     def restart_httpd(self):
-        self._context.log_debug('HTTPServer: Restarting'
-                                ' |{old_ip}:{old_port}| > |{ip}:{port}|'
-                                .format(old_ip=self._old_httpd_address,
-                                        old_port=self._old_httpd_port,
-                                        ip=self._httpd_address,
-                                        port=self._httpd_port))
+        self.log.debug('HTTPServer: Restarting'
+                       ' |{old_ip}:{old_port}| > |{ip}:{port}|',
+                       old_ip=self._old_httpd_address,
+                       old_port=self._old_httpd_port,
+                       ip=self._httpd_address,
+                       port=self._httpd_port)
         self.shutdown_httpd(terminate=True)
         self.start_httpd()
 

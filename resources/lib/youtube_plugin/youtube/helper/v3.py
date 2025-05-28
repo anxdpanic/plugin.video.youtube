@@ -22,7 +22,7 @@ from .utils import (
     update_playlist_items,
     update_video_items,
 )
-from ...kodion import KodionException
+from ...kodion import KodionException, logging
 from ...kodion.constants import (
     PATHS,
     PLAY_FORCE_AUDIO,
@@ -40,7 +40,10 @@ from ...kodion.items import (
     VideoItem,
     menu_items,
 )
-from ...kodion.utils import datetime_parser, format_stack, strip_html_from_text
+from ...kodion.utils import datetime_parser, strip_html_from_text
+
+
+_log = logging.getLogger(__name__)
 
 
 def _process_list_response(provider,
@@ -52,10 +55,11 @@ def _process_list_response(provider,
                            video_id_dict=None,
                            channel_id_dict=None,
                            playlist_id_dict=None,
-                           subscription_id_dict=None):
+                           subscription_id_dict=None,
+                           log=_log):
     yt_items = json_data.get('items', [])
     if not yt_items:
-        context.log_warning('v3 response: Items list is empty')
+        log.warning('Items list is empty')
         return None
 
     if video_id_dict is None:
@@ -100,7 +104,7 @@ def _process_list_response(provider,
     for yt_item in yt_items:
         kind, is_youtube, is_plugin, kind_type = _parse_kind(yt_item)
         if not (is_youtube or is_plugin) or not kind_type:
-            context.log_debug('v3 item discarded: |%s|' % kind)
+            log.debug('Item discarded: |%s|', kind)
             continue
 
         item_params = yt_item.get('_params', {})
@@ -156,7 +160,7 @@ def _process_list_response(provider,
                     'position': 0,
                 }
             else:
-                context.log_debug('v3 searchResult discarded: |%s|' % kind)
+                log.debug('searchResult discarded: |%s|', kind)
                 continue
 
         if kind_type == 'video':
@@ -500,12 +504,8 @@ def _process_list_response(provider,
             kwargs['data'] = data
 
             updater(*resource['upd_args'], **kwargs)
-        except Exception as exc:
-            msg = ('v3._process_list_response._fetch - Error'
-                   '\n\tException: {exc!r}'
-                   '\n\tStack trace (most recent call last):\n{stack}'
-                   .format(exc=exc, stack=format_stack()))
-            context.log_error(msg)
+        except Exception:
+            log.exception('Error')
         finally:
             resource['complete'] = True
             threads['current'].discard(resource['thread'])
@@ -602,7 +602,8 @@ def response_to_items(provider,
                       reverse=False,
                       allow_duplicates=True,
                       process_next_page=True,
-                      item_filter=None):
+                      item_filter=None,
+                      log=_log):
     params = context.get_params()
     settings = context.get_settings()
 
@@ -634,15 +635,11 @@ def response_to_items(provider,
         while 1:
             kind, is_youtube, is_plugin, kind_type = _parse_kind(json_data)
             if not is_youtube and not is_plugin:
-                context.log_debug('v3.response_to_items - Response discarded'
-                                  '\n\tKind: |{kind}|'
-                                  .format(kind=kind))
+                log.debug(('Response discarded', 'Kind: |%s|'), kind)
                 break
 
             if kind_type not in _KNOWN_RESPONSE_KINDS:
-                context.log_error('v3.response_to_items - Unknown kind'
-                                  '\n\tKind: |{kind}|'
-                                  .format(kind=kind))
+                log.error_trace(('Unknown kind', 'Kind: |%s|'), kind)
                 break
 
             pre_filler = json_data.get('_pre_filler')
@@ -699,12 +696,13 @@ def response_to_items(provider,
                 )
                 if filtered_out:
                     filtered += len(filtered_out)
-                    context.debug_log and context.log_debug(
-                        'v3.response_to_item - Items filtered out'
-                        '\n\tItems: [\n\t\t{filtered_out}\n\t]'
-                        .format(filtered_out=',\n\t\t'.join([
+                    log.debugging and log.debug(
+                        ('Items filtered out: [',
+                         '\t{filtered_out}',
+                         ']'),
+                        filtered_out=',\n\t\t'.join(
                             str(item) for item in filtered_out
-                        ]))
+                        ),
                     )
 
             post_filler = json_data.get('_post_filler')

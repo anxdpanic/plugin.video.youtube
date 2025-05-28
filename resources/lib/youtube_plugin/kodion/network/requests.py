@@ -18,8 +18,7 @@ from requests.exceptions import InvalidJSONError, RequestException, URLRequired
 from requests.utils import DEFAULT_CA_BUNDLE_PATH, extract_zipped_paths
 from urllib3.util.ssl_ import create_urllib3_context
 
-from ..logger import Logger
-from ..utils.methods import format_stack
+from .. import logging
 
 
 __all__ = (
@@ -63,7 +62,9 @@ class SSLHTTPAdapter(HTTPAdapter):
         return super(SSLHTTPAdapter, self).cert_verify(conn, url, verify, cert)
 
 
-class BaseRequestsClass(Logger):
+class BaseRequestsClass(object):
+    log = logging.getLogger(__name__)
+
     _session = Session()
     _session.mount('https://', SSLHTTPAdapter(
         pool_maxsize=10,
@@ -146,8 +147,10 @@ class BaseRequestsClass(Logger):
                 response_hook=None,
                 response_hook_kwargs=None,
                 error_hook=None,
-                error_hook_kwargs=None,
-                error_title=None, error_info=None, raise_exc=False, **_):
+                error_title=None,
+                error_info=None,
+                raise_exc=False,
+                **kwargs):
         if timeout is None:
             timeout = self._timeout
         if verify is None:
@@ -156,6 +159,7 @@ class BaseRequestsClass(Logger):
             proxies = self._proxy
         if allow_redirects is None:
             allow_redirects = True
+        stacklevel = kwargs.pop('stacklevel', 2)
 
         response = None
         try:
@@ -204,64 +208,58 @@ class BaseRequestsClass(Logger):
 
         except self._default_exc as exc:
             exc_response = exc.response or response
-            response_text = exc_response and exc_response.text
-            stack = format_stack()
-            error_details = {'exc': exc}
+            if exc_response:
+                response_text = exc_response.text
+                response_status = exc_response.status_code
+                response_reason = exc_response.reason
+            else:
+                response_text = None
+                response_status = 'Error'
+                response_reason = 'No response'
+
+            log_msg = [
+                '{title}',
+                'URL:       {method} {url}',
+                'Status:    {response_status} - {response_reason}',
+                'Response:  {response_text}',
+            ]
+
+            kwargs['exc'] = exc
+            kwargs['response'] = exc_response
 
             if error_hook:
-                if error_hook_kwargs is None:
-                    error_hook_kwargs = {}
-                error_hook_kwargs['exc'] = exc
-                error_hook_kwargs['response'] = exc_response
-                error_response = error_hook(**error_hook_kwargs)
-                _title, _info, _detail, _response, _trace, _exc = error_response
+                error_response = error_hook(**kwargs)
+                _title, _info, _detail, _response, _exc = error_response
                 if _title is not None:
                     error_title = _title
-                if _info is not None:
-                    error_info = _info
+                if _info:
+                    if isinstance(_info, (list, tuple)):
+                        log_msg.extend(_info)
+                    else:
+                        log_msg.append(_info)
                 if _detail is not None:
-                    error_details.update(_detail)
+                    kwargs.update(_detail)
                 if _response is not None:
                     response = _response
                     response_text = repr(_response)
-                if _trace is not None:
-                    stack = _trace
                 if _exc is not None:
                     raise_exc = _exc
 
-            if error_title is None:
-                error_title = 'Request - Failed'
+            if error_info:
+                if isinstance(error_info, (list, tuple)):
+                    log_msg.extend(error_info)
+                else:
+                    log_msg.append(error_info)
 
-            if error_info is None:
-                try:
-                    error_info = '\n\t'.join((
-                        'URL:       {method} {url}',
-                        'Status:    {response.status_code} - {response.reason}',
-                    )).format(method=method,
-                              url=url,
-                              response=exc.response)
-                except AttributeError:
-                    error_info = ('Exception: {exc!r}'
-                                  .format(exc=exc))
-            elif '{' in error_info:
-                try:
-                    error_info = error_info.format(**error_details)
-                except (AttributeError, IndexError, KeyError):
-                    error_info = ('Exception: {exc!r}'
-                                  .format(exc=exc))
-
-            if response_text:
-                response_text = ('Response:  {0}'
-                                 .format(response_text))
-
-            if stack:
-                stack = 'Stack trace (most recent call last):\n{stack}'.format(
-                    stack=''.join(stack)
-                )
-
-            self.log_error('\n\t'.join([part for part in [
-                error_title, error_info, response_text, stack
-            ] if part]))
+            self.log.exception(log_msg,
+                               title=(error_title or 'Failed'),
+                               method=method,
+                               url=url,
+                               response_status=response_status,
+                               response_reason=response_reason,
+                               response_text=response_text,
+                               stacklevel=stacklevel,
+                               **kwargs)
 
             if raise_exc:
                 if not isinstance(raise_exc, BaseException):

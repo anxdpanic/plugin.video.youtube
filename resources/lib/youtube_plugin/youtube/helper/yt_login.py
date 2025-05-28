@@ -11,6 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from ..youtube_exceptions import LoginException
+from ...kodion import logging
 
 
 SIGN_IN = 'in'
@@ -102,8 +103,7 @@ def _do_login(provider, context, client=None, **kwargs):
                         log_data['access_token'] = '<redacted>'
                     if 'refresh_token' in log_data:
                         log_data['refresh_token'] = '<redacted>'
-                    context.log_debug('Requesting access token: |{data}|'
-                                      .format(data=log_data))
+                    logging.debug('Requesting access token: |{%s}|', log_data)
 
                     if 'error' not in json_data:
                         access_token = json_data.get('access_token', '')
@@ -119,10 +119,8 @@ def _do_login(provider, context, client=None, **kwargs):
                         message = json_data['error']
                         title = '%s: %s' % (context.get_name(), message)
                         ui.show_notification(message, title)
-                        context.log_error(
-                            'Error requesting access token: |error|'
-                            .format(error=message)
-                        )
+                        logging.error_trace('Access token request error - %s',
+                                            message)
                         break
 
                     if progress_dialog.is_aborted():
@@ -134,15 +132,15 @@ def _do_login(provider, context, client=None, **kwargs):
             break
         finally:
             tokens[token_type] = new_token
-            context.log_debug('YouTube Login:'
-                              '\n\tType:          |{token}|'
-                              '\n\tAccess token:  |{has_access_token}|'
-                              '\n\tExpires:       |{expiry}|'
-                              '\n\tRefresh token: |{has_refresh_token}|'
-                              .format(token=token,
-                                      has_access_token=bool(new_token[0]),
-                                      expiry=new_token[1],
-                                      has_refresh_token=bool(new_token[2])))
+            logging.debug(('YouTube Login:',
+                           'Type:          |{token}|',
+                           'Access token:  |{has_access_token}|',
+                           'Expires:       |{expiry}|',
+                           'Refresh token: |{has_refresh_token}|'),
+                          token=token,
+                          has_access_token=bool(new_token[0]),
+                          expiry=new_token[1],
+                          has_refresh_token=bool(new_token[2]))
     else:
         provider.reset_client(**kwargs)
         access_manager.update_access_token(addon_id, *zip(*tokens))

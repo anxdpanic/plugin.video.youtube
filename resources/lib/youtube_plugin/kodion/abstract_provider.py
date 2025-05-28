@@ -15,6 +15,7 @@ from re import (
     compile as re_compile,
 )
 
+from . import logging
 from .constants import (
     CHECK_SETTINGS,
     CONTAINER_ID,
@@ -35,10 +36,12 @@ from .items import (
     SearchHistoryItem,
     UriItem,
 )
-from .utils import format_stack, to_unicode
+from .utils import to_unicode
 
 
 class AbstractProvider(object):
+    log = logging.getLogger(__name__)
+
     CACHE_TO_DISC = 'provider_cache_to_disc'  # type: bool
     FALLBACK = 'provider_fallback'  # type: bool | str
     FORCE_PLAY = 'provider_force_play'  # type: bool
@@ -278,7 +281,7 @@ class AbstractProvider(object):
             path, params = uri
 
         if not path:
-            context.log_error('Rerouting - No route path')
+            self.log.error_trace('No route path')
             return False
         elif path.startswith(PATHS.ROUTE):
             path = path[len(PATHS.ROUTE):]
@@ -291,7 +294,7 @@ class AbstractProvider(object):
         if window_fallback:
             container_uri = context.get_infolabel('Container.FolderPath')
             if context.is_plugin_path(container_uri):
-                context.log_debug('Rerouting - Fallback route not required')
+                self.log.debug('Rerouting - Fallback route not required')
                 return False, {self.FALLBACK: False}
 
         container = None
@@ -324,30 +327,24 @@ class AbstractProvider(object):
                         _scope=function_cache.SCOPE_NONE,
                         context=context.clone(path, params),
                     )
-        except Exception as exc:
-            context.log_error('Rerouting - Error'
-                              '\n\tException: {exc!r}'
-                              '\n\tStack trace (most recent call last):\n{stack}'
-                              .format(exc=exc,
-                                      stack=format_stack()))
+        except Exception:
+            self.log.exception('Error')
         finally:
             uri = context.create_uri(path, params)
             if result or not window_cache:
-                context.log_debug('Rerouting - Success'
-                                  '\n\tURI:      {uri}'
-                                  '\n\tCache:    |{window_cache}|'
-                                  '\n\tFallback: |{window_fallback}|'
-                                  '\n\tReplace:  |{window_replace}|'
-                                  '\n\tReturn:   |{window_return}|'
-                                  .format(uri=uri,
-                                          window_cache=window_cache,
-                                          window_fallback=window_fallback,
-                                          window_replace=window_replace,
-                                          window_return=window_return))
+                self.log.debug(('Success',
+                                'URI:      {uri}',
+                                'Cache:    |{window_cache}|',
+                                'Fallback: |{window_fallback}|',
+                                'Replace:  |{window_replace}|',
+                                'Return:   |{window_return}|'),
+                               uri=uri,
+                               window_cache=window_cache,
+                               window_fallback=window_fallback,
+                               window_replace=window_replace,
+                               window_return=window_return)
             else:
-                context.log_debug('Rerouting - No results'
-                                  '\n\tURI: {uri}'
-                                  .format(uri=uri))
+                self.log.debug(('No results', 'URI: %s'), uri)
                 return False
 
             reroute_path = ui.get_property(REROUTE_PATH)
@@ -371,8 +368,8 @@ class AbstractProvider(object):
             while ui.busy_dialog_active():
                 timeout -= 1
                 if timeout < 0:
-                    context.log_warning('Multiple busy dialogs active'
-                                        ' - Rerouting workaround')
+                    self.log.warning('Multiple busy dialogs active'
+                                     ' - Rerouting workaround')
                     return UriItem('command://{0}'.format(action))
                 context.sleep(1)
             else:

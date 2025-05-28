@@ -12,11 +12,14 @@ from __future__ import absolute_import, division, unicode_literals
 from base64 import b64decode, b64encode
 
 from .json_store import JSONStore
+from .. import logging
 from ..constants import DEVELOPER_CONFIGS
 from ... import key_sets
 
 
 class APIKeyStore(JSONStore):
+    log = logging.getLogger(__name__)
+
     DOMAIN_SUFFIX = '.apps.googleusercontent.com'
 
     def __init__(self, context):
@@ -116,40 +119,40 @@ class APIKeyStore(JSONStore):
 
         if api_key != stripped_key:
             if stripped_key not in api_key:
-                self._context.log_debug('Personal API key'
-                                        ' - skipped (mangled by stripping)')
+                self.log.debug('Personal API key'
+                               ' - skipped (mangled by stripping)')
                 return_key = api_key
             else:
-                self._context.log_debug('Personal API key'
-                                        ' - whitespace removed')
+                self.log.debug('Personal API key'
+                               ' - whitespace removed')
                 return_key = stripped_key
         else:
             return_key = api_key
 
         if client_id != stripped_id:
             if stripped_id not in client_id:
-                self._context.log_debug('Personal API client ID'
-                                        ' - skipped (mangled by stripping)')
+                self.log.debug('Personal API client ID'
+                               ' - skipped (mangled by stripping)')
                 return_id = client_id
             elif self.DOMAIN_SUFFIX in client_id:
-                self._context.log_debug('Personal API client ID'
-                                        ' - whitespace and domain removed')
+                self.log.debug('Personal API client ID'
+                               ' - whitespace and domain removed')
                 return_id = stripped_id
             else:
-                self._context.log_debug('Personal API client ID'
-                                        ' - whitespace removed')
+                self.log.debug('Personal API client ID'
+                               ' - whitespace removed')
                 return_id = stripped_id
         else:
             return_id = client_id
 
         if client_secret != stripped_secret:
             if stripped_secret not in client_secret:
-                self._context.log_debug('Personal API client secret'
-                                        ' - skipped (mangled by stripping)')
+                self.log.debug('Personal API client secret'
+                               ' - skipped (mangled by stripping)')
                 return_secret = client_secret
             else:
-                self._context.log_debug('Personal API client secret'
-                                        ' - whitespace removed')
+                self.log.debug('Personal API client secret'
+                               ' - whitespace removed')
                 return_secret = stripped_secret
         else:
             return_secret = client_secret
@@ -171,16 +174,16 @@ class APIKeyStore(JSONStore):
         else:
             config = context.get_ui().pop_property(DEVELOPER_CONFIGS)
             if config:
-                context.log_warning('Storing developer keys in window property'
-                                    ' has been deprecated. Please use the'
-                                    ' youtube_registration module instead')
+                self.log.warning('Storing developer keys in window property'
+                                 ' has been deprecated. Please use the'
+                                 ' youtube_registration module instead')
                 config = self.load_data(config)
 
         if not config:
             return {}
 
         if not context.get_settings().allow_dev_keys():
-            context.log_debug('Developer config ignored')
+            self.log.debug('Developer config ignored')
             return {}
 
         origin = config.get('origin', developer_id)
@@ -189,16 +192,17 @@ class APIKeyStore(JSONStore):
         if (not origin
                 or not key_details
                 or not required_details.issubset(key_details)):
-            context.log_error('Invalid developer config: |{config}|'
-                              '\n\tExpected: |{{'
-                              ' "origin": ADDON_ID,'
-                              ' "main": {{'
-                              ' "system": SYSTEM_NAME,'
-                              ' "key": API_KEY,'
-                              ' "id": CLIENT_ID,'
-                              ' "secret": CLIENT_SECRET'
-                              '}}}}|'
-                              .format(config=config))
+            self.log.error_trace(('Invalid developer config: |{config}|',
+                                  'Expected: |{{',
+                                  '    "origin": ADDON_ID,',
+                                  '    "main": {{',
+                                  '        "system": SYSTEM_NAME,',
+                                  '        "key": API_KEY,',
+                                  '        "id": CLIENT_ID,',
+                                  '        "secret": CLIENT_SECRET',
+                                  '    }},',
+                                  '}}|'),
+                                 config=config)
             return {}
 
         key_system = key_details.get('system')
@@ -206,10 +210,11 @@ class APIKeyStore(JSONStore):
             for key in required_details:
                 key_details[key] = b64decode(key_details[key]).decode('utf-8')
 
-        context.log_debug('Using developer config'
-                          '\n\tOrigin: |{origin}|'
-                          '\n\tSystem: |{system}|'
-                          .format(origin=origin, system=key_system))
+        self.log.debug(('Using developer config',
+                        'Origin: |{origin}|',
+                        'System: |{system}|'),
+                       origin=origin,
+                       system=key_system)
 
         return {
             'origin': origin,
@@ -328,18 +333,18 @@ class APIKeyStore(JSONStore):
         if api_key:
             settings.api_key(api_key)
             updated_list.append(localize('api.key'))
-            log_list.append('Key')
+            log_list.append('api_key')
         if client_id:
             settings.api_id(client_id)
             updated_list.append(localize('api.id'))
-            log_list.append('Id')
+            log_list.append('client_id')
         if client_secret:
             settings.api_secret(client_secret)
             updated_list.append(localize('api.secret'))
-            log_list.append('Secret')
+            log_list.append('client_secret')
         if updated_list:
             ui.show_notification(localize('updated_') % ', '.join(updated_list))
-        context.log_debug('Updated API keys: %s' % ', '.join(log_list))
+        self.log.debug('Updated API details: %s', log_list)
 
         client_id = settings.api_id()
         client_secret = settings.api_secret()
@@ -349,18 +354,19 @@ class APIKeyStore(JSONStore):
 
         if enable and client_id and client_secret and api_key:
             ui.show_notification(localize('api.personal.enabled'))
-            context.log_debug('Personal API keys enabled')
+            self.log.debug('Personal API keys enabled')
         elif enable:
             if not api_key:
                 missing_list.append(localize('api.key'))
-                log_list.append('Key')
+                log_list.append('api_key')
             if not client_id:
                 missing_list.append(localize('api.id'))
-                log_list.append('Id')
+                log_list.append('client_id')
             if not client_secret:
                 missing_list.append(localize('api.secret'))
-                log_list.append('Secret')
+                log_list.append('client_secret')
             ui.show_notification(localize('api.personal.failed')
                                  % ', '.join(missing_list))
-            context.log_error('Failed to enable personal API keys. Missing: %s'
-                              % ', '.join(log_list))
+            self.log.error_trace(('Failed to enable personal API keys',
+                                  'Missing: %s'),
+                                 log_list)

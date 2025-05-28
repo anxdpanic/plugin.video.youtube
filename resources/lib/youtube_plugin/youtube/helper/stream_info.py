@@ -22,6 +22,7 @@ from .subtitles import SUBTITLE_SELECTIONS, Subtitles
 from .utils import THUMB_TYPES
 from ..client.request_client import YouTubeRequestClient
 from ..youtube_exceptions import InvalidJSON, YouTubeException
+from ...kodion import logging
 from ...kodion.compatibility import (
     entity_escape,
     parse_qs,
@@ -37,7 +38,6 @@ from ...kodion.compatibility import (
 from ...kodion.constants import PATHS, TEMP_PATH
 from ...kodion.network import get_connect_address
 from ...kodion.utils import (
-    format_stack,
     make_dirs,
     merge_dicts,
     redact_ip_in_uri,
@@ -46,6 +46,8 @@ from ...kodion.utils.datetime_parser import fromtimestamp
 
 
 class StreamInfo(YouTubeRequestClient):
+    log = logging.getLogger(__name__)
+
     BASE_PATH = make_dirs(TEMP_PATH)
 
     FORMAT = {
@@ -867,27 +869,29 @@ class StreamInfo(YouTubeRequestClient):
             exception = None
 
         if not json_data or 'error' not in json_data:
-            info = ('Request - Failed'
-                    '\n\tException: {exc!r}'
-                    '\n\tvideo_id:  |{video_id}|'
-                    '\n\tClient:    |{client}|'
-                    '\n\tAuth:      |{auth}|')
-            return None, info, kwargs, data, None, exception
+            info = (
+                'video_id: |{video_id}|',
+                'Client:   |{client_name}|',
+                'Auth:     |{has_auth}|',
+            )
+            return None, info, None, data, exception
 
+        info = (
+            'Reason:   {error_reason}',
+            'Message:  {error_message}',
+            'video_id: |{video_id}|',
+            'Client:   |{client_name}|',
+            'Auth:     |{has_auth}|',
+        )
         details = json_data['error']
-        reason = details.get('errors', [{}])[0].get('reason', 'Unknown')
-        message = details.get('message', 'Unknown error')
-
-        info = ('Request - Failed'
-                '\n\tException: {exc!r}'
-                '\n\tReason:    {reason}'
-                '\n\tMessage:   {message}'
-                '\n\tvideo_id:  |{video_id}|'
-                '\n\tClient:    |{client}|'
-                '\n\tAuth:      |{auth}|')
-        kwargs['message'] = message
-        kwargs['reason'] = reason
-        return None, info, kwargs, data, None, exception
+        details = {
+            'error_reason': (
+                    (details.get('errors') or [{}])[0].get('reason')
+                    or 'Unknown'
+            ),
+            'error_message': details.get('message') or 'Unknown error',
+        }
+        return None, info, details, data, exception
 
     @staticmethod
     def _generate_cpn():
@@ -987,11 +991,9 @@ class StreamInfo(YouTubeRequestClient):
             response_hook=self._response_hook_text,
             error_title='Failed to get player html',
             error_hook=self._error_hook,
-            error_hook_kwargs={
-                'video_id': self.video_id,
-                'client': client_name,
-                'auth': False,
-            },
+            video_id=self.video_id,
+            client_name=client_name,
+            has_auth=False,
         )
         if not result:
             return None
@@ -1018,7 +1020,7 @@ class StreamInfo(YouTubeRequestClient):
             start_index += len(pattern)
             end_index = html.find('"', start_index)
             player_key = html[start_index:end_index]
-            self._context.log_debug('Player key found: {0}'.format(player_key))
+            self.log.debug('Player key found: %r', player_key)
             return player_key
         return None
 
@@ -1063,11 +1065,9 @@ class StreamInfo(YouTubeRequestClient):
             response_hook=self._response_hook_text,
             error_title='Failed to get player JavaScript',
             error_hook=self._error_hook,
-            error_hook_kwargs={
-                'video_id': self.video_id,
-                'client': client_name,
-                'auth': False,
-            },
+            video_id=self.video_id,
+            client_name=client_name,
+            has_auth=False,
         )
         if not result:
             return ''
@@ -1169,7 +1169,6 @@ class StreamInfo(YouTubeRequestClient):
             selected_height = qualities[0]['nom_height']
         else:
             selected_height = settings.fixed_video_quality()
-        log_debug = context.log_debug
 
         for client_name, response in responses.items():
             url = response['hls_manifest']
@@ -1184,11 +1183,9 @@ class StreamInfo(YouTubeRequestClient):
                 response_hook=self._response_hook_text,
                 error_title='Failed to get HLS manifest',
                 error_hook=self._error_hook,
-                error_hook_kwargs={
-                    'video_id': self.video_id,
-                    'client': client_name,
-                    'auth': False,
-                },
+                video_id=self.video_id,
+                client_name=client_name,
+                has_auth=False,
             )
             if not result:
                 continue
@@ -1229,9 +1226,10 @@ class StreamInfo(YouTubeRequestClient):
                 )
                 if yt_format is None:
                     stream_info = redact_ip_in_uri(match.group(1))
-                    log_debug('Unknown itag - {itag}'
-                              '\n\t{stream}'
-                              .format(itag=itag, stream=stream_info))
+                    self.log.debug(('Unknown itag - {itag}',
+                                    '{stream}'),
+                                   itag=itag,
+                                   stream=stream_info)
                 if (not yt_format
                         or (yt_format.get('hls/video')
                             and not yt_format.get('hls/audio'))):
@@ -1269,7 +1267,6 @@ class StreamInfo(YouTubeRequestClient):
             selected_height = qualities[0]['nom_height']
         else:
             selected_height = settings.fixed_video_quality()
-        log_debug = context.log_debug
 
         for client_name, response in responses.items():
             streams = response['progressive_fmts']
@@ -1322,9 +1319,10 @@ class StreamInfo(YouTubeRequestClient):
                         stream_map['conn'] = redact_ip_in_uri(conn)
                     if stream:
                         stream_map['stream'] = redact_ip_in_uri(stream)
-                    log_debug('Unknown itag - {itag}'
-                              '\n\t{stream}'
-                              .format(itag=itag, stream=stream_map))
+                    self.log.debug(('Unknown itag - {itag}',
+                                    '{stream}'),
+                                   itag=itag,
+                                   stream=stream_map)
                 if (not yt_format
                         or (yt_format.get('dash/video')
                             and not yt_format.get('dash/audio'))):
@@ -1357,7 +1355,7 @@ class StreamInfo(YouTubeRequestClient):
 
     def _process_signature_cipher(self, stream_map):
         if self._cipher is None:
-            self._context.log_debug('signatureCipher detected')
+            self.log.debug('signatureCipher detected')
             if self._player_js is None:
                 self._player_js = self._get_player_js()
             self._cipher = Cipher(self._context, javascript=self._player_js)
@@ -1379,16 +1377,9 @@ class StreamInfo(YouTubeRequestClient):
         if not signature:
             try:
                 signature = self._cipher.get_signature(encrypted_signature)
-            except Exception as exc:
-                msg = ('StreamInfo._process_signature_cipher'
-                       ' - Failed to extract URL'
-                       '\n\tException: {exc!r}'
-                       '\n\tSignature: |{sig}|'
-                       '\n\tStack trace (most recent call last):\n{stack}'
-                       .format(exc=exc,
-                               sig=encrypted_signature,
-                               stack=format_stack()))
-                self._context.log_error(msg)
+            except Exception:
+                self.log.exception(('Failed to extract URL', 'Signature: |%s|'),
+                                   encrypted_signature)
                 self._cipher = False
                 return None
             data_cache.set_item(encrypted_signature, {'sig': signature})
@@ -1414,7 +1405,7 @@ class StreamInfo(YouTubeRequestClient):
             if self._player_js is None:
                 self._player_js = self._get_player_js()
             if self._calculate_n is True:
-                self._context.log_debug('nsig detected')
+                self.log.debug('nsig detected')
                 self._calculate_n = ratebypass.CalculateN(self._player_js)
 
             # Cipher n to get the updated value
@@ -1423,7 +1414,7 @@ class StreamInfo(YouTubeRequestClient):
                 new_params['n'] = new_n
                 new_params['ratebypass'] = 'yes'
             else:
-                self._context.log_error('nsig handling failed')
+                self.log.error('nsig handling failed')
                 self._calculate_n = False
 
         if 'lmt' in params:
@@ -1512,11 +1503,9 @@ class StreamInfo(YouTubeRequestClient):
                 response_hook=self._response_hook_json,
                 error_title='Caption player request failed',
                 error_hook=self._error_hook,
-                error_hook_kwargs={
-                    'video_id': video_id,
-                    'client': client_name,
-                    'auth': client.get('_has_auth', False),
-                },
+                video_id=video_id,
+                client_name=client_name,
+                has_auth=client.get('_has_auth', False),
                 **client
             )
 
@@ -1594,9 +1583,6 @@ class StreamInfo(YouTubeRequestClient):
         responses = {}
         stream_list = {}
 
-        log_debug = context.log_debug
-        log_warning = context.log_warning
-
         abort_reasons = {
             'country',
             'not available',
@@ -1661,11 +1647,9 @@ class StreamInfo(YouTubeRequestClient):
                         response_hook=self._response_hook_json,
                         error_title='Player request failed',
                         error_hook=self._error_hook,
-                        error_hook_kwargs={
-                            'video_id': video_id,
-                            'client': _client_name,
-                            'auth': _has_auth,
-                        },
+                        video_id=video_id,
+                        client_name=_client_name,
+                        has_auth=_has_auth,
                         **_client
                     ) or {}
 
@@ -1707,21 +1691,17 @@ class StreamInfo(YouTubeRequestClient):
                         'ERROR',
                         'UNPLAYABLE',
                     }:
-                        log_warning(
-                            'Failed to retrieve video info'
-                            '\n\tStatus:   {status}'
-                            '\n\tReason:   {reason}'
-                            '\n\tvideo_id: |{video_id}|'
-                            '\n\tClient:   |{client}|'
-                            '\n\tAuth:     |{auth}|'
-                            .format(
-                                status=_status,
-                                reason=_reason or 'UNKNOWN',
-                                video_id=video_id,
-                                client=_client_name,
-                                auth=_has_auth,
-                            )
-                        )
+                        self.log.warning(('Failed to retrieve video info',
+                                          'Status:   {status}',
+                                          'Reason:   {reason}',
+                                          'video_id: |{video_id}|',
+                                          'Client:   |{client}|',
+                                          'Auth:     |{auth}|'),
+                                         status=_status,
+                                         reason=_reason or 'UNKNOWN',
+                                         video_id=video_id,
+                                         client=_client_name,
+                                         auth=_has_auth)
                         compare_reason = _reason.lower()
                         if any(why in compare_reason for why in reauth_reasons):
                             if client_data.get('_auth_required'):
@@ -1739,11 +1719,9 @@ class StreamInfo(YouTubeRequestClient):
                             abort = True
                             break
                     else:
-                        log_debug(
-                            'Unknown playabilityStatus in player response'
-                            '\n\tplayabilityStatus: {0}'
-                            .format(_playability)
-                        )
+                        self.log.debug(('Unknown playabilityStatus in response',
+                                        'playabilityStatus: %s'),
+                                       _playability)
                 else:
                     break
                 if not restart:
@@ -1754,17 +1732,13 @@ class StreamInfo(YouTubeRequestClient):
                 break
 
             if _status == 'OK':
-                log_debug(
-                    'Retrieved video info:'
-                    '\n\tvideo_id: |{video_id}|'
-                    '\n\tClient:   |{client}|'
-                    '\n\tAuth:     |{auth}|'
-                    .format(
-                        video_id=video_id,
-                        client=_client_name,
-                        auth=_has_auth,
-                    )
-                )
+                self.log.debug(('Retrieved video info:',
+                                'video_id: |{video_id}|',
+                                'Client:   |{client}|',
+                                'Auth:     |{auth}|'),
+                               video_id=video_id,
+                               client=_client_name,
+                               auth=_has_auth)
 
                 video_details = merge_dicts(
                     _video_details,
@@ -2272,9 +2246,11 @@ class StreamInfo(YouTubeRequestClient):
                     'channels': channels,
                 }
                 data[mime_group][itag] = data[quality_group][itag] = details
+                self.log.debug('Found stream: %s (%s - %s - %s)',
+                               itag, client_name, mime_group, label)
 
         if not video_data and not audio_only:
-            context.log_debug('Generate MPD: No video mime-types found')
+            self.log.debug('No video mime-types found')
             return None, None
 
         def _stream_sort(stream, alt_sort=('alt_sort' in stream_features)):
@@ -2331,12 +2307,8 @@ class StreamInfo(YouTubeRequestClient):
         if not video_data or not audio_data:
             return None, None
 
-        context = self._context
-        log_error = context.log_error
-
         if not self.BASE_PATH:
-            log_error('StreamInfo._generate_mpd_manifest'
-                      ' - Unable to access temp directory')
+            self.log.error_trace('Unable to access temp directory')
             return None, None
 
         def _filter_group(previous_group, previous_stream, item):
@@ -2383,6 +2355,7 @@ class StreamInfo(YouTubeRequestClient):
             )
             return skip_group
 
+        context = self._context
         settings = context.get_settings()
         stream_features = settings.stream_features()
         do_filter = 'filter' in stream_features
@@ -2629,12 +2602,8 @@ class StreamInfo(YouTubeRequestClient):
         try:
             with xbmcvfs.File(filepath, 'w') as mpd_file:
                 success = mpd_file.write(output)
-        except (IOError, OSError) as exc:
-            log_error('StreamInfo._generate_mpd_manifest'
-                      ' - File write failed'
-                      '\n\tException: {exc!r}'
-                      '\n\tFile:      {filepath}'
-                      .format(exc=exc, filepath=filepath))
+        except (IOError, OSError):
+            self.log.exception(('File write failed', 'File: %s'), filepath)
             success = False
         if success:
             return urlunsplit((

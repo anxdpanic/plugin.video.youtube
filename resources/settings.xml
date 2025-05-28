@@ -1139,15 +1139,16 @@
                     <control type="toggle"/>
                 </setting>
             </group>
-            <group id="logging" label="14092">
-                <setting id="kodion.logging.level" type="integer" label="20191" help="36392">
+            <group id="debug" label="14260">
+                <setting id="kodion.debug.log.level" type="integer" label="20191" help="36392">
                     <level>0</level>
                     <default>0</default>
                     <constraints>
                         <options>
                             <option label="13106">0</option> <!-- Disabled -->
                             <option label="305">1</option>   <!-- Enabled -->
-                            <option label="666">2</option>   <!-- Component specific -->
+                            <option label="30621">2</option> <!-- Verbose -->
+                            <!-- <option label="666">4</option> -->   <!-- Component specific -->
                         </options>
                     </constraints>
                     <control format="string" type="spinner"/>

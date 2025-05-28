@@ -13,22 +13,29 @@ from __future__ import absolute_import, division, unicode_literals
 import json
 
 from ..abstract_playlist_player import AbstractPlaylistPlayer
+from ... import logging
 from ...compatibility import xbmc
 from ...items import VideoItem, media_listitem
 from ...utils.methods import jsonrpc, wait
 
 
 class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
+    log = logging.getLogger(__name__)
+
     _CACHE = {
         'player_id': None,
         'playlist_id': None
     }
 
     PLAYLIST_MAP = {
+        -1: 'none',
         0: 'music',
         1: 'video',
-        'video': xbmc.PLAYLIST_VIDEO,  # 1
+        2: 'picture',
+        'none': -1,
         'audio': xbmc.PLAYLIST_MUSIC,  # 0
+        'video': xbmc.PLAYLIST_VIDEO,  # 1
+        'picture': 2,
     }
 
     def __init__(self, context, playlist_type=None, retry=None):
@@ -165,15 +172,13 @@ class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
         try:
             result = response['result']['items']
             return json.dumps(result, ensure_ascii=False) if dumps else result
-        except (KeyError, TypeError, ValueError) as exc:
+        except (KeyError, TypeError, ValueError):
             error = response.get('error', {})
-            self._context.log_error('XbmcPlaylist.get_items - Error'
-                                    '\n\tException: {exc!r}'
-                                    '\n\tCode:      {code}'
-                                    '\n\tMessage:   {msg}'
-                                    .format(exc=exc,
-                                            code=error.get('code', 'Unknown'),
-                                            msg=error.get('message', 'Unknown')))
+            self.log.exception(('Error',
+                                'Code:    {code}',
+                                'Message: {message}'),
+                               code=error.get('code', 'Unknown'),
+                               message=error.get('message', 'Unknown'))
         return '' if dumps else []
 
     def add_items(self, items, loads=False):
@@ -202,18 +207,17 @@ class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
         first item in the playlist is position 1
         """
 
-        context = self._context
         playlist_id = self._playlist.getPlayListId()
 
         if position == 'next':
             position, _ = self.get_position(offset=1)
         if not position:
-            context.log_warning('Unable to play from playlist position: {0}'
-                                .format(position))
-            return
-        context.log_debug('Playing from playlist: {id}, position: {position}'
-                          .format(id=playlist_id,
-                                  position=position))
+            self.log.warning('Unable to play from playlist position: %s',
+                             position)
+            return None
+        self.log.debug('Playing from playlist: %d, position: %d',
+                       playlist_id,
+                       position)
 
         if not resume:
             command = 'Playlist.PlayOffset({type},{position})'.format(
@@ -225,12 +229,14 @@ class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
             return self._context.execute(command)
 
         # JSON Player.Open can be too slow but is needed if resuming is enabled
-        jsonrpc(method='Player.Open',
-                params={'item': {'playlistid': playlist_id,
-                                 # Convert 1 indexed to 0 indexed position
-                                 'position': position - 1}},
-                options={'resume': True},
-                no_response=True)
+        return jsonrpc(
+            method='Player.Open',
+            params={'item': {'playlistid': playlist_id,
+                             # Convert 1 indexed to 0 indexed position
+                             'position': position - 1}},
+            options={'resume': True},
+            no_response=True,
+        )
 
     def play(self, playlist_index=-1, defer=False):
         """
@@ -279,9 +285,9 @@ class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
 
         # A playlist with only one element has no next item
         if playlist_size >= 1 and position <= playlist_size:
-            self._context.log_debug('playlist_id: {0}, position - {1}/{2}'
-                                    .format(self.get_playlist_id(),
-                                            position,
-                                            playlist_size))
+            self.log.debug('playlist_id: %d, position - %d/%d',
+                           self.get_playlist_id(),
+                           position,
+                           playlist_size)
             return position, (playlist_size - position)
         return None, None

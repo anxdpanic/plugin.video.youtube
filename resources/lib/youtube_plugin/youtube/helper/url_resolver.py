@@ -12,6 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from re import compile as re_compile
 
+from ...kodion import logging
 from ...kodion.compatibility import parse_qsl, unescape, urlencode, urlsplit
 from ...kodion.network import BaseRequestsClass
 
@@ -224,6 +225,8 @@ class CommonResolver(AbstractResolver):
 
 
 class UrlResolver(object):
+    log = logging.getLogger(__name__)
+
     def __init__(self, context):
         self._context = context
         self._resolvers = (
@@ -240,14 +243,14 @@ class UrlResolver(object):
             if not method:
                 continue
 
-            self._context.log_debug('Resolving |{uri}| using |{name} {method}|'
-                                    .format(uri=resolved_url,
-                                            name=resolver_name,
-                                            method=method))
+            self.log.debug('Resolving |{uri}| using |{name} {method}|',
+                           uri=resolved_url,
+                           name=resolver_name,
+                           method=method)
             resolved_url = resolver.resolve(resolved_url,
                                             url_components,
                                             method)
-            self._context.log_debug('Resolved to |{0}|'.format(resolved_url))
+            self.log.debug('Resolved to |%s|', resolved_url)
         return resolved_url
 
     def resolve(self, url):
