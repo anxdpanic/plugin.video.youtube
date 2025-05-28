@@ -99,3 +99,4 @@ HTTPD_IDLE_SLEEP = 'youtube.http.idle_sleep'  # (bool)
 HTTPD_STREAM_REDIRECT = 'youtube.http.stream_redirect'  # (bool)
 
 LOG_LEVEL = 'kodion.debug.log.level'  # (int)
+EXEC_LIMIT = 'kodion.debug.exec.limit'  # (int)

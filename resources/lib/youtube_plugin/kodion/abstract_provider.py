@@ -28,6 +28,7 @@ from .constants import (
     WINDOW_REPLACE,
     WINDOW_RETURN,
 )
+from .debug import ExecTimeout
 from .exceptions import KodionException
 from .items import (
     DirectoryItem,
@@ -180,6 +181,10 @@ class AbstractProvider(object):
             re_match = re_path.search(path)
             if not re_match:
                 continue
+
+            exec_limit = context.get_settings().exec_limit()
+            if exec_limit:
+                handler = ExecTimeout(exec_limit)(handler)
 
             options = {
                 self.CACHE_TO_DISC: True,

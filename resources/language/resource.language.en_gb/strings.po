@@ -558,11 +558,11 @@ msgid "View all"
 msgstr ""
 
 msgctxt "#30563"
-msgid ""
+msgid "Plugin execution timeout"
 msgstr ""
 
 msgctxt "#30564"
-msgid ""
+msgid "For testing only - forcibly terminate plugin execution after set time limit. Set to 0 seconds (default) to disable."
 msgstr ""
 
 msgctxt "#30565"

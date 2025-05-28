@@ -1153,6 +1153,19 @@
                     </constraints>
                     <control format="string" type="spinner"/>
                 </setting>
+                <setting id="kodion.debug.exec.limit" type="integer" label="30563" help="30564">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>
+                        <minimum>0</minimum>
+                        <step>1</step>
+                        <maximum>60</maximum>
+                    </constraints>
+                    <control format="integer" type="slider">
+                        <popup>False</popup>
+                        <formatlabel>14045</formatlabel>
+                    </control>
+                </setting>
             </group>
         </category>
         <category id="maintenance" label="30552" help="">
