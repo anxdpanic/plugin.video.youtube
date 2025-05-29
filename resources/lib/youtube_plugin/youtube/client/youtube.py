@@ -961,6 +961,21 @@ class YouTube(LoginClient):
         except (IndexError, KeyError, TypeError):
             return None
 
+    def get_channels_by_identifiers(self, identifiers, **kwargs):
+        function_cache = self._context.get_function_cache()
+        refresh = self._context.refresh_requested()
+
+        return {
+            function_cache.run(
+                self.get_channel_by_identifier,
+                function_cache.ONE_MONTH,
+                _refresh=refresh,
+                identifier=identifier,
+                **kwargs
+            )
+            for identifier in identifiers
+        }
+
     def channel_match(self, identifier, identifiers, exclude=False):
         if not identifier or not identifiers:
             return False
@@ -976,16 +991,13 @@ class YouTube(LoginClient):
             identifier=identifier,
         )
         if channel_id:
-            channel_ids = {
-                function_cache.run(
-                    self.get_channel_by_identifier,
-                    function_cache.ONE_MONTH,
-                    _refresh=refresh,
-                    identifier=channel,
-                    do_search=True,
-                )
-                for channel in identifiers
-            }
+            channel_ids = function_cache.run(
+                self.get_channels_by_identifiers,
+                function_cache.ONE_MONTH,
+                _refresh=refresh,
+                identifiers=identifiers,
+                do_search=True,
+            )
             if channel_id in channel_ids:
                 result = True
 
@@ -1958,6 +1970,7 @@ class YouTube(LoginClient):
 
         context = self._context
         feed_history = context.get_feed_history()
+        function_cache = context.get_function_cache()
         settings = context.get_settings()
 
         if do_filter:
@@ -2139,7 +2152,8 @@ class YouTube(LoginClient):
                          utf8=context.get_system_version().compatible(19),
                          filters=channel_filters,
                          ns=namespaces,
-                         feed_history=feed_history):
+                         feed_history=feed_history,
+                         function_cache=function_cache):
             if progress_dialog:
                 total = len(feeds)
                 progress_dialog.reset_total(
@@ -2242,10 +2256,13 @@ class YouTube(LoginClient):
                     continue
 
                 if filters and filters['names']:
-                    if channel_id and self.channel_match(
-                            channel_id,
-                            filters['names'],
-                            filters['blacklist'],
+                    if channel_id and function_cache.run(
+                            self.channel_match,
+                            function_cache.ONE_MONTH,
+                            _refresh=refresh_feed,
+                            identifier=channel_id,
+                            identifiers=filters['names'],
+                            exclude=filters['blacklist'],
                     ):
                         all_items[item_id] = feed_items
                 else:
