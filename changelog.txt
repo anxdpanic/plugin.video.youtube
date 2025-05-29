@@ -1,5 +1,6 @@
-## v7.2.0.2
+## v7.2.0.3
 ### Fixed
+- Fix performance regression with channel filters
 - Fix regression preventing video playback from Kodi Info dialog #1184
 - Fix exception in youtube.helper.v3.response_to_items when using Kodi 18 (Python 2) #1188
 - Fix exception in YouTubeRequestClient.json_traverse when using Kodi 18 (Python 2) #1187
