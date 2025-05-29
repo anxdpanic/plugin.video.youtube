@@ -209,7 +209,7 @@ class Storage(object):
     def __enter__(self):
         self._lock.acquire()
         if not self._db or not self._cursor:
-            self._open()
+            return self._open()
         return self._db, self._cursor
 
     def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
@@ -242,10 +242,10 @@ class Storage(object):
                     time.sleep(0.1)
                 else:
                     Logger.log_error(msg)
-                    return False
+                    return None, None
 
         else:
-            return False
+            return None, None
 
         cursor = db.cursor()
         cursor.arraysize = 100
@@ -277,11 +277,12 @@ class Storage(object):
             transaction_begin = len(sql_script) + 1
             sql_script.extend(('BEGIN;', 'COMMIT;', 'VACUUM;'))
             sql_script[transaction_begin:transaction_begin] = statements
-        self._execute(cursor, '\n'.join(sql_script), script=True)
+            self._execute(cursor, '\n'.join(sql_script), script=True)
 
         self._base._table_updated = True
         self._db = db
         self._cursor = cursor
+        return db, cursor
 
     def _close(self):
         if self._cursor:
@@ -296,6 +297,9 @@ class Storage(object):
 
     @staticmethod
     def _execute(cursor, query, values=None, many=False, script=False):
+        if not cursor:
+            Logger.log_error('SQLStorage._execute - Database not available')
+            return []
         if values is None:
             values = ()
         """
