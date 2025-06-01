@@ -188,7 +188,13 @@ class XbmcPlugin(AbstractPlugin):
             else:
                 result, options = provider.navigate(context)
                 if ui.get_property(REROUTE_PATH):
-                    return
+                    xbmcplugin.endOfDirectory(
+                        handle,
+                        succeeded=False,
+                        updateListing=True,
+                        cacheToDisc=False,
+                    )
+                    return False
         except KodionException as exc:
             result = None
             options = {}

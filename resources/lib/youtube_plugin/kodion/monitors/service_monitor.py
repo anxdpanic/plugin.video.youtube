@@ -116,11 +116,17 @@ class ServiceMonitor(xbmc.Monitor):
         return value
 
     def refresh_container(self, force=False):
-        self.set_property(REFRESH_CONTAINER)
-        if force or self.is_plugin_container(check_all=True):
+        if force:
+            self.set_property(REFRESH_CONTAINER)
             xbmc.executebuiltin('Container.Refresh')
         else:
-            self.refresh = True
+            container = self.is_plugin_container()
+            if all(container.values()):
+                self.set_property(REFRESH_CONTAINER)
+                xbmc.executebuiltin('Container.Refresh')
+            elif container['is_loaded']:
+                self.log.debug('Plugin window not active - deferring refresh')
+                self.refresh = True
 
     def onNotification(self, sender, method, data):
         if sender == 'xbmc':
