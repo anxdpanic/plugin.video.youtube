@@ -976,13 +976,15 @@ class YouTube(LoginClient):
 
     def get_channels_by_identifiers(self, identifiers, **kwargs):
         function_cache = self._context.get_function_cache()
-        refresh = self._context.refresh_requested()
+        if self._context.refresh_requested():
+            max_age = function_cache.ONE_DAY
+        else:
+            max_age = function_cache.ONE_MONTH
 
         return {
             function_cache.run(
                 self.get_channel_by_identifier,
-                function_cache.ONE_MONTH,
-                _refresh=refresh,
+                max_age,
                 identifier=identifier,
                 **kwargs
             )
@@ -994,13 +996,17 @@ class YouTube(LoginClient):
             return False
 
         function_cache = self._context.get_function_cache()
-        refresh = self._context.refresh_requested()
+        if self._context.refresh_requested():
+            max_age = function_cache.ONE_DAY
+            refresh = True
+        else:
+            max_age = function_cache.ONE_MONTH
+            refresh = False
         result = False
 
         channel_id = function_cache.run(
             self.get_channel_by_identifier,
-            function_cache.ONE_MONTH,
-            _refresh=refresh,
+            max_age,
             identifier=identifier,
         )
         if channel_id:
