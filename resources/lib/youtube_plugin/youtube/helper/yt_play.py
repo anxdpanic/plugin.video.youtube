@@ -108,8 +108,7 @@ def _play_stream(provider, context):
         ui.show_notification(context.localize('error.rtmpe_not_supported'))
         return False
 
-    play_suggested = settings.get_bool('youtube.suggested_videos')
-    if play_suggested and not screensaver:
+    if not screensaver and settings.get_bool(settings.PLAY_SUGGESTED):
         utils.add_related_video_to_playlist(provider,
                                             context,
                                             client,

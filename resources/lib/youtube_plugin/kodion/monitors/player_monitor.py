@@ -247,7 +247,7 @@ class PlayerMonitorThread(threading.Thread):
 
         if refresh_only:
             pass
-        elif settings.get_bool('youtube.playlist.watchlater.autoremove', True):
+        elif settings.get_bool(settings.WATCH_LATER_REMOVE, True):
             watch_later_id = logged_in and access_manager.get_watch_later_id()
             if watch_later_id:
                 playlist_item_id = client.get_playlist_item_id_of_video_id(
@@ -273,8 +273,8 @@ class PlayerMonitorThread(threading.Thread):
                 client.add_video_to_playlist(history_id, video_id)
 
             # rate video
-            if (settings.get_bool('youtube.post.play.rate') and
-                    (settings.get_bool('youtube.post.play.rate.playlists')
+            if (settings.get_bool(settings.RATE_VIDEOS) and
+                    (settings.get_bool(settings.RATE_PLAYLISTS)
                      or xbmc.PlayList(xbmc.PLAYLIST_VIDEO).size() < 2)):
                 json_data = client.get_video_rating(video_id)
                 if json_data:
@@ -289,7 +289,7 @@ class PlayerMonitorThread(threading.Thread):
                             current_rating=rating,
                         )
 
-        if settings.get_bool('youtube.post.play.refresh'):
+        if settings.get_bool(settings.PLAY_REFRESH):
             context.send_notification(REFRESH_CONTAINER)
 
         self.end()
