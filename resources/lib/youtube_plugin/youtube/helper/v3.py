@@ -619,6 +619,7 @@ def response_to_items(provider,
     page_token = None
     remaining = items_per_page
     post_fill_attempts = 5
+    post_filled = False
     filtered = 0
 
     filtered_items = []
@@ -725,7 +726,13 @@ def response_to_items(provider,
             if exclude_next:
                 exclude_current.extend(exclude_next)
 
-            if remaining <= 0 or not post_filler or post_fill_attempts <= 0:
+            if remaining > 0:
+                if post_filled:
+                    current_page += 1
+            else:
+                break
+
+            if not post_filler or post_fill_attempts <= 0:
                 break
 
             if hasattr(post_filler, 'func'):
@@ -740,7 +747,7 @@ def response_to_items(provider,
             if not _json_data:
                 break
             json_data = _json_data
-            current_page += 1
+            post_filled = True
         next_page = current_page + 1
 
         items = filtered_items
