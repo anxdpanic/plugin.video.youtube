@@ -1285,7 +1285,7 @@ class Provider(AbstractProvider):
             video_name = to_unicode(video_name)
             if not ui.on_yes_no_input(
                     localize('content.remove'),
-                    localize('content.remove.check') % video_name,
+                    localize('content.remove.check.x') % video_name,
             ):
                 return False, {provider.FALLBACK: False}
 
@@ -1293,7 +1293,7 @@ class Provider(AbstractProvider):
             ui.refresh_container()
 
             ui.show_notification(
-                localize('removed') % video_name,
+                localize('removed.x') % video_name,
                 time_ms=2500,
                 audible=False,
             )
@@ -1862,10 +1862,8 @@ class Provider(AbstractProvider):
         localize = context.localize
 
         if command == 'clear':
-            if not ui.on_yes_no_input(
-                    context.localize('bookmarks.clear'),
-                    localize('bookmarks.clear.check')
-            ):
+            if not ui.on_yes_no_input(localize('bookmarks.clear'),
+                                      localize('bookmarks.clear.check')):
                 return False, {provider.FALLBACK: False}
 
             context.get_bookmarks_list().clear()
@@ -1898,7 +1896,7 @@ class Provider(AbstractProvider):
             bookmark_name = to_unicode(bookmark_name)
             if not ui.on_yes_no_input(
                     localize('content.remove'),
-                    localize('content.remove.check') % bookmark_name,
+                    localize('content.remove.check.x') % bookmark_name,
             ):
                 return False, {provider.FALLBACK: False}
 
@@ -1906,7 +1904,7 @@ class Provider(AbstractProvider):
             ui.refresh_container()
 
             ui.show_notification(
-                localize('removed') % bookmark_name,
+                localize('removed.x') % bookmark_name,
                 time_ms=2500,
                 audible=False,
             )
@@ -2000,7 +1998,7 @@ class Provider(AbstractProvider):
             video_name = to_unicode(video_name)
             if not ui.on_yes_no_input(
                     localize('content.remove'),
-                    localize('content.remove.check') % video_name,
+                    localize('content.remove.check.x') % video_name,
             ):
                 return False, {provider.FALLBACK: False}
 
@@ -2008,7 +2006,7 @@ class Provider(AbstractProvider):
             ui.refresh_container()
 
             ui.show_notification(
-                localize('removed') % video_name,
+                localize('removed.x') % video_name,
                 time_ms=2500,
                 audible=False,
             )

@@ -30,6 +30,7 @@ from ...constants import (
     PLAY_TIMESHIFT,
     PLAY_WITH,
     SUBSCRIPTION_ID,
+    VALUE_TO_STR,
     VIDEO_ID,
 )
 from ...utils import current_system_version, datetime_parser, redact_ip_in_uri
@@ -434,7 +435,7 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
             'offscreen': True,
         }
         props = {
-            'isPlayable': str(media_item.playable).lower(),
+            'isPlayable': VALUE_TO_STR[media_item.playable],
             'playlist_type_hint': (
                 xbmc.PLAYLIST_MUSIC
                 if isinstance(media_item, AudioItem) else
@@ -615,7 +616,7 @@ def image_listitem(context, image_item, show_fanart=None, **_kwargs):
         'offscreen': True,
     }
     props = {
-        'isPlayable': str(image_item.playable).lower(),
+        'isPlayable': VALUE_TO_STR[image_item.playable],
         'ForceResolvePlugin': 'true',
     }
 
@@ -650,7 +651,7 @@ def uri_listitem(context, uri_item, **_kwargs):
         'offscreen': True,
     }
     props = {
-        'isPlayable': str(uri_item.playable).lower(),
+        'isPlayable': VALUE_TO_STR[uri_item.playable],
         'ForceResolvePlugin': 'true',
     }
 
@@ -677,7 +678,7 @@ def media_listitem(context,
         'offscreen': True,
     }
     props = {
-        'isPlayable': str(media_item.playable).lower(),
+        'isPlayable': VALUE_TO_STR[media_item.playable],
         'ForceResolvePlugin': 'true',
         'playlist_type_hint': (
             xbmc.PLAYLIST_MUSIC

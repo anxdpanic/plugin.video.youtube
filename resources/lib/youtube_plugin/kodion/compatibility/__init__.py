@@ -9,6 +9,7 @@
 
 __all__ = (
     'BaseHTTPRequestHandler',
+    'StringIO',
     'TCPServer',
     'ThreadingMixIn',
     'available_cpu_count',
@@ -40,6 +41,7 @@ __all__ = (
 try:
     from html import unescape
     from http.server import BaseHTTPRequestHandler
+    from io import StringIO
     from socketserver import TCPServer, ThreadingMixIn
     from urllib.parse import (
         parse_qs,
@@ -85,6 +87,7 @@ try:
 except ImportError:
     from BaseHTTPServer import BaseHTTPRequestHandler
     from contextlib import contextmanager
+    from io import StringIO
     from SocketServer import TCPServer, ThreadingMixIn
     from urllib import (
         quote as _quote,

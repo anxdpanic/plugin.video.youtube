@@ -289,7 +289,7 @@ class AbstractContext(object):
     def reload_api_store(self):
         raise NotImplementedError()
 
-    def get_playlist_player(self):
+    def get_playlist_player(self, playlist_type=None):
         raise NotImplementedError()
 
     def get_ui(self):

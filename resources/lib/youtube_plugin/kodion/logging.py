@@ -15,12 +15,7 @@ from os.path import normcase
 from sys import exc_info as sys_exc_info
 from traceback import extract_stack, format_list
 
-try:
-    from io import StringIO
-except ImportError:
-    from StringIO import StringIO
-
-from .compatibility import string_type, xbmc
+from .compatibility import StringIO, string_type, xbmc
 from .constants import ADDON_ID
 
 

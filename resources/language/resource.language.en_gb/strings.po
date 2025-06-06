@@ -694,7 +694,7 @@ msgid "Strict"
 msgstr ""
 
 msgctxt "#30597"
-msgid "Updated: %s"
+msgid ""
 msgstr ""
 
 msgctxt "#30598"

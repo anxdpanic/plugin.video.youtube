@@ -36,7 +36,7 @@ def process_language(context, step, steps, **_kwargs):
                 step=step,
                 steps=steps,
             ),
-            (localize('setup_wizard.prompt')
+            (localize('setup_wizard.prompt.x')
              % localize('setup_wizard.prompt.locale'))
     ):
         context.execute(
@@ -60,7 +60,7 @@ def process_geo_location(context, step, steps, **_kwargs):
                 step=step,
                 steps=steps,
             ),
-            (localize('setup_wizard.prompt')
+            (localize('setup_wizard.prompt.x')
              % localize('setup_wizard.prompt.my_location'))
     ):
         context.execute(
@@ -86,7 +86,7 @@ def process_default_settings(context, step, steps, **_kwargs):
                 step=step,
                 steps=steps,
             ),
-            (localize('setup_wizard.prompt')
+            (localize('setup_wizard.prompt.x')
              % localize('setup_wizard.prompt.settings.defaults'))
     ):
         settings.use_isa(True)
@@ -146,7 +146,7 @@ def process_list_detail_settings(context, step, steps, **_kwargs):
                 step=step,
                 steps=steps,
             ),
-            (localize('setup_wizard.prompt')
+            (localize('setup_wizard.prompt.x')
              % localize('setup_wizard.prompt.settings.list_details'))
     ):
         settings.show_detailed_description(False)
@@ -170,7 +170,7 @@ def process_performance_settings(context, step, steps, **_kwargs):
                 step=step,
                 steps=steps,
             ),
-            (localize('setup_wizard.prompt')
+            (localize('setup_wizard.prompt.x')
              % localize('setup_wizard.prompt.settings.performance'))
     ):
         device_types = {
@@ -250,7 +250,7 @@ def process_subtitles(context, step, steps, **_kwargs):
                 step=step,
                 steps=steps,
             ),
-            (localize('setup_wizard.prompt')
+            (localize('setup_wizard.prompt.x')
              % localize('setup_wizard.prompt.subtitles'))
     ):
         context.execute(

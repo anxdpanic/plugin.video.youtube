@@ -41,6 +41,16 @@ VALUE_FROM_STR = {
     'True': True,
     'None': None,
     'null': None,
+    '': None,
+}
+
+VALUE_TO_STR = {
+    False: 'false',
+    True: 'true',
+    None: '',
+    -1: '',
+    0: 'false',
+    1: 'true',
 }
 
 # Flags
@@ -117,6 +127,7 @@ __all__ = (
 
     # Const values
     'VALUE_FROM_STR',
+    'VALUE_TO_STR',
 
     # Flags
     'ABORT_FLAG',

@@ -645,9 +645,7 @@ def response_to_items(provider,
                 break
 
             pre_filler = json_data.get('_pre_filler')
-            if not pre_filler:
-                pass
-            else:
+            if pre_filler:
                 if hasattr(pre_filler, 'func'):
                     _json_data = pre_fill(
                         filler=pre_filler,

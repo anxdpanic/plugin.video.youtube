@@ -48,16 +48,12 @@ class Profiler(object):
     )
 
     from . import logging as _logging
+    from .compatibility import StringIO as _StringIO
     from atexit import register as _atexit_register
     from cProfile import Profile as _Profile
     from functools import wraps as _wraps
     from pstats import Stats as _Stats
     from weakref import ref as _ref
-
-    try:
-        from io import StringIO as _StringIO
-    except ImportError:
-        from StringIO import StringIO as _StringIO
 
     _wraps = staticmethod(_wraps)
     log = _logging.getLogger(__name__)

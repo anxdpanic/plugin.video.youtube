@@ -119,7 +119,7 @@ def _config_actions(context, action, *_args):
             client_ip = get_client_ip_address(context)
             if client_ip:
                 ui.on_ok(context.get_name(),
-                         context.localize('client.ip') % client_ip)
+                         context.localize('client.ip.is.x') % client_ip)
             else:
                 ui.show_notification(context.localize('client.ip.failed'))
         else:
@@ -375,7 +375,7 @@ def _user_actions(context, action, params):
     def switch_to_user(user):
         access_manager.set_user(user, switch_to=True)
         ui.show_notification(
-            localize('user.changed') % access_manager.get_username(user),
+            localize('user.changed_to.x') % access_manager.get_username(user),
             localize('user.switch')
         )
 
@@ -398,7 +398,7 @@ def _user_actions(context, action, params):
         if user is not None:
             result = ui.on_yes_no_input(
                 localize('user.switch'),
-                localize('user.switch.now') % details.get('name')
+                localize('user.switch_to.x') % details.get('name')
             )
             if result:
                 switch_to_user(user)
@@ -413,7 +413,7 @@ def _user_actions(context, action, params):
         username = access_manager.get_username(user)
         if ui.on_remove_content(username):
             access_manager.remove_user(user)
-            ui.show_notification(localize('removed') % username,
+            ui.show_notification(localize('removed.x') % username,
                                  localize('remove'))
             if user == 0:
                 access_manager.add_user(username=localize('user.default'),
@@ -441,7 +441,7 @@ def _user_actions(context, action, params):
 
         if access_manager.set_username(user, new_username):
             ui.show_notification(
-                localize('renamed') % (old_username, new_username),
+                localize('renamed.x.y') % (old_username, new_username),
                 localize('rename')
             )
         reload = True

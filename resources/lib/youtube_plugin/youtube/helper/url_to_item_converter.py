@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from collections import deque
 from re import (
-    IGNORECASE as re_IGNORECASE,
+    IGNORECASE,
     compile as re_compile,
 )
 
@@ -27,7 +27,7 @@ from ...kodion.utils import duration_to_seconds
 class UrlToItemConverter(object):
     log = logging.getLogger(__name__)
 
-    RE_PATH_ID = re_compile(r'/[^/]*?[/@](?P<id>[^/?#]+)', re_IGNORECASE)
+    RE_PATH_ID = re_compile(r'/[^/]*?[/@](?P<id>[^/?#]+)', IGNORECASE)
     VALID_HOSTNAMES = {
         'youtube.com',
         'www.youtube.com',

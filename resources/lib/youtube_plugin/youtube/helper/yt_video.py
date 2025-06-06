@@ -20,13 +20,18 @@ def _process_rate_video(provider,
                         context,
                         re_match=None,
                         video_id=None,
-                        current_rating=None):
+                        current_rating=None,
+                        _ratings=('like', 'dislike', 'none')):
     listitem_path = context.get_listitem_info('FileNameAndPath')
-    ratings = ['like', 'dislike', 'none']
+
+    ui = context.get_ui()
+    localize = context.localize
 
     rating_param = context.get_param('rating', '')
     if rating_param:
-        rating_param = rating_param.lower() if rating_param.lower() in ratings else ''
+        rating_param = rating_param.lower()
+        if rating_param not in _ratings:
+            rating_param = ''
 
     if video_id is None:
         video_id = context.get_param('video_id')
@@ -55,12 +60,12 @@ def _process_rate_video(provider,
         if items:
             current_rating = items[0].get('rating', '')
 
-    rating_items = []
     if not rating_param:
-        for rating in ratings:
-            if rating != current_rating:
-                rating_items.append((context.localize('video.rate.%s' % rating), rating))
-        result = context.get_ui().on_select(context.localize('video.rate'), rating_items)
+        result = ui.on_select(localize('video.rate'), [
+            (localize('video.rate.%s' % rating), rating)
+            for rating in _ratings
+            if rating != current_rating
+        ])
     elif rating_param != current_rating:
         result = rating_param
     else:
@@ -74,19 +79,19 @@ def _process_rate_video(provider,
         if response:
             # this will be set if we are in the 'Liked Video' playlist
             if context.refresh_requested():
-                context.get_ui().refresh_container()
+                ui.refresh_container()
 
             if result == 'none':
-                notify_message = context.localize('unrated.video')
+                notify_message = localize('unrated.video')
             elif result == 'like':
-                notify_message = context.localize('liked.video')
+                notify_message = localize('liked.video')
             elif result == 'dislike':
-                notify_message = context.localize('disliked.video')
+                notify_message = localize('disliked.video')
         else:
-            notify_message = context.localize('failed')
+            notify_message = localize('failed')
 
         if notify_message:
-            context.get_ui().show_notification(
+            ui.show_notification(
                 message=notify_message,
                 time_ms=2500,
                 audible=False,

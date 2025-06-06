@@ -228,25 +228,29 @@ class XbmcPlugin(AbstractPlugin):
                     )
                 ]
 
-            force_resolve = provider.FORCE_RESOLVE
-            if not options.pop(force_resolve, False):
-                force_resolve = False
+            items = []
+            force_resolve = options.get(provider.FORCE_RESOLVE)
+            for item in result:
+                item_type = item.__class__.__name__
 
-            items = [
-                self._LIST_ITEM_MAP[item.__class__.__name__](
+                if force_resolve and item_type in self._PLAY_ITEM_MAP:
+                    force_resolve = False
+                    result = item
+
+                listitem_type = self._LIST_ITEM_MAP.get(item_type)
+                if (not listitem_type
+                        or (listitem_type == directory_listitem
+                            and not item.available)):
+                    continue
+
+                items.append(self._LIST_ITEM_MAP[item.__class__.__name__](
                     context,
                     item,
                     show_fanart=show_fanart,
                     focused=focused_video_id,
                     played=played_video_id,
-                )
-                for item in result
-                if self.classify_list_item(item, options, force_resolve)
-            ]
+                ))
             item_count = len(items)
-
-            if force_resolve:
-                result = options.get(force_resolve)
 
         if result and result.__class__.__name__ in self._PLAY_ITEM_MAP:
             if options.get(provider.FORCE_PLAY) or not result.playable:
@@ -475,14 +479,3 @@ class XbmcPlugin(AbstractPlugin):
 
         logging.debug('{action}: |{uri}|', action=log_action, uri=log_uri)
         return result, action
-
-    def classify_list_item(self, item, options, force_resolve):
-        item_type = item.__class__.__name__
-        listitem_type = self._LIST_ITEM_MAP.get(item_type)
-        if force_resolve and item_type in self._PLAY_ITEM_MAP:
-            options.setdefault(force_resolve, item)
-        if listitem_type:
-            if listitem_type == directory_listitem:
-                return item.available
-            return True
-        return False

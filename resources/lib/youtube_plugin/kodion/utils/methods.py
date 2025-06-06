@@ -109,7 +109,7 @@ def select_stream(context,
     stream_list.sort(key=_stream_sort, reverse=True)
     num_streams = len(stream_list)
     ask_for_quality = ask_for_quality and num_streams >= 1
-    logging.debug('%d available streams', num_streams)
+    logging.debug('%d available stream(s)', num_streams)
 
     for idx, stream in enumerate(stream_list):
         log_data = stream.copy()

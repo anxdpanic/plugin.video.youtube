@@ -407,10 +407,11 @@ class PlayerMonitor(xbmc.Player):
                                                 player_data))
 
     def onPlayBackEnded(self):
-        if not self._ui.busy_dialog_active():
-            self._ui.clear_property(BUSY_FLAG)
+        ui = self._ui
+        if not ui.busy_dialog_active():
+            ui.clear_property(BUSY_FLAG)
 
-        self._ui.pop_property(PLAY_WITH)
+        ui.pop_property(PLAY_WITH)
 
         self.stop_threads()
         self.cleanup_threads()

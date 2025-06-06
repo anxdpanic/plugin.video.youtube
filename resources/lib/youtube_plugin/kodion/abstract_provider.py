@@ -11,7 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from re import (
-    UNICODE as re_UNICODE,
+    UNICODE,
     compile as re_compile,
 )
 
@@ -123,7 +123,7 @@ class AbstractProvider(object):
                 if not callable(func):
                     return None
 
-            cls._dict_path[re_compile(re_path, re_UNICODE)] = func
+            cls._dict_path[re_compile(re_path, UNICODE)] = func
             return command
 
         if command:
@@ -148,7 +148,7 @@ class AbstractProvider(object):
         try:
             if wizard_steps and ui.on_yes_no_input(
                     ' - '.join((localize('youtube'), localize('setup_wizard'))),
-                    (localize('setup_wizard.prompt')
+                    (localize('setup_wizard.prompt.x')
                      % localize('setup_wizard.prompt.settings'))
             ):
                 for wizard_step in wizard_steps:
@@ -426,7 +426,7 @@ class AbstractProvider(object):
             query = to_unicode(params.get('q', ''))
             if not ui.on_yes_no_input(
                     localize('content.remove'),
-                    localize('content.remove.check') % query,
+                    localize('content.remove.check.x') % query,
             ):
                 return False, None
 
@@ -434,7 +434,7 @@ class AbstractProvider(object):
             ui.refresh_container()
 
             ui.show_notification(
-                localize('removed') % query,
+                localize('removed.x') % query,
                 time_ms=2500,
                 audible=False,
             )
@@ -454,7 +454,8 @@ class AbstractProvider(object):
         if command == 'clear':
             if not ui.on_yes_no_input(
                     localize('search.clear'),
-                    localize('content.clear.check') % localize('search.history')
+                    localize('content.clear.check.x')
+                    % localize('search.history')
             ):
                 return False, None
 

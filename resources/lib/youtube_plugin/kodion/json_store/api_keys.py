@@ -343,7 +343,8 @@ class APIKeyStore(JSONStore):
             updated_list.append(localize('api.secret'))
             log_list.append('client_secret')
         if updated_list:
-            ui.show_notification(localize('updated_') % ', '.join(updated_list))
+            ui.show_notification(localize('updated.x')
+                                 % ', '.join(updated_list))
         self.log.debug('Updated API details: %s', log_list)
 
         client_id = settings.api_id()

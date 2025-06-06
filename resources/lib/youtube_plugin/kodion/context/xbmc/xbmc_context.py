@@ -30,6 +30,7 @@ from ...constants import (
     CONTENT,
     PLAY_FORCE_AUDIO,
     SORT,
+    VALUE_FROM_STR,
     WAKEUP,
 )
 from ...json_store import APIKeyStore, AccessManager
@@ -85,7 +86,7 @@ class XbmcContext(AbstractContext):
         'are_you_sure': 750,
         'author': 21863,
         'bookmark': 30101,
-        'bookmark.channel': 30803,
+        'bookmark.x': 30803,
         'bookmark.created': 21362,
         'bookmark.remove': 20404,
         'bookmarks': 30100,
@@ -96,16 +97,16 @@ class XbmcContext(AbstractContext):
         'channel': 19029,
         'channels': 19019,
         'client.id.incorrect': 30649,
-        'client.ip': 30700,
+        'client.ip.is.x': 30700,
         'client.ip.failed': 30701,
         'client.secret.incorrect': 30650,
         'completed': 19256,
         'content.clear': 30120,
-        'content.clear.check': 30121,
+        'content.clear.check.x': 30121,
         'content.delete': 30114,
-        'content.delete.check': 30116,
+        'content.delete.check.x': 30116,
         'content.remove': 30115,
-        'content.remove.check': 30117,
+        'content.remove.check.x': 30117,
         'datetime.a_minute_ago': 30677,
         'datetime.airing_now': 30691,
         'datetime.airing_soon': 30693,
@@ -130,7 +131,7 @@ class XbmcContext(AbstractContext):
         'failed': 30576,
         'feeds': 30518,
         'filtered': 30105,
-        'go_to_channel': 30502,
+        'go_to.x': 30502,
         'history': 30509,
         'history.clear': 30609,
         'history.clear.check': 30610,
@@ -200,9 +201,9 @@ class XbmcContext(AbstractContext):
         'refresh.settings.check': 30818,
         'related_videos': 30514,
         'remove': 15015,
-        'removed': 30666,
+        'removed.x': 30666,
         'rename': 118,
-        'renamed': 30667,
+        'renamed.x.y': 30667,
         'reset.access_manager.check': 30581,
         'retry': 30612,
         'saved.playlists': 30611,
@@ -237,7 +238,7 @@ class XbmcContext(AbstractContext):
         'setup_wizard.capabilities.max': 30792,
         'setup_wizard.locale.language': 30524,
         'setup_wizard.locale.region': 30525,
-        'setup_wizard.prompt': 30030,
+        'setup_wizard.prompt.x': 30030,
         'setup_wizard.prompt.import_playback_history': 30778,
         'setup_wizard.prompt.import_search_history': 30779,
         'setup_wizard.prompt.locale': 30527,
@@ -273,7 +274,7 @@ class XbmcContext(AbstractContext):
         'stream.original': 30744,
         'stream.secondary': 30747,
         'subscribe': 30506,
-        'subscribe_to': 30517,
+        'subscribe_to.x': 30517,
         'subscribed.to.channel': 30719,
         'subscriptions': 30504,
         'subtitles.download': 30705,
@@ -281,7 +282,7 @@ class XbmcContext(AbstractContext):
         'subtitles.all': 30774,
         'subtitles.language': 21448,
         'subtitles.no_asr': 30602,
-        'subtitles.translation': 30775,
+        'subtitles.translation.x': 30775,
         'subtitles.with_fallback': 30601,
         'succeeded': 30575,
         'trending': 30513,
@@ -290,16 +291,16 @@ class XbmcContext(AbstractContext):
         'unsubscribed.from.channel': 30720,
         'untitled': 30707,
         'upcoming': 30766,
-        'updated_': 30597,
+        'updated.x': 30631,
         'uploads': 30726,
-        'user.changed': 30659,
+        'user.changed_to.x': 30659,
         'user.default': 571,
         'user.enter_name': 30658,
         'user.new': 30656,
         'user.remove': 30662,
         'user.rename': 30663,
         'user.switch': 30655,
-        'user.switch.now': 30665,
+        'user.switch_to.x': 30665,
         'user.unnamed': 30657,
         'video.add_to_playlist': 30520,
         'video.comments': 30732,
@@ -607,6 +608,8 @@ class XbmcContext(AbstractContext):
         if category_label:
             xbmcplugin.setPluginCategory(self._plugin_handle, category_label)
 
+        # Label mask token details:
+        # https://github.com/xbmc/xbmc/blob/master/xbmc/utils/LabelFormatter.cpp#L33-L105
         detailed_labels = self.get_settings().show_detailed_labels()
         if sub_type == 'history':
             self.add_sort_method(
@@ -848,8 +851,10 @@ class XbmcContext(AbstractContext):
             return False
 
     def abort_requested(self):
-        return self.get_ui().get_property(ABORT_FLAG,
-                                          stacklevel=3).lower() == 'true'
+        return VALUE_FROM_STR.get(
+            self.get_ui().get_property(ABORT_FLAG, stacklevel=3),
+            False,
+        )
 
     @staticmethod
     def get_infobool(name):

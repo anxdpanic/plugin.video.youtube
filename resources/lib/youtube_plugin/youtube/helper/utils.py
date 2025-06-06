@@ -860,7 +860,7 @@ def update_video_items(provider, context, video_id_dict,
         if datetime:
             media_item.set_added_utc(datetime)
             local_datetime = datetime_parser.utc_to_local(datetime)
-            # If item is in a playlist, then use data added to playlist rather
+            # If item is in a playlist, then use date added to playlist rather
             # than date that item was published to YouTube
             if not media_item.get_dateadded():
                 media_item.set_dateadded_from_datetime(local_datetime)
@@ -1282,10 +1282,12 @@ def add_related_video_to_playlist(provider, context, client, v3, video_id):
         try:
             next_item = next((
                 item for item in result_items
-                if item
-                   and not any((item.get_uri() == playlist_item.get('file')
-                                or item.get_name() == playlist_item.get('title')
-                                for playlist_item in playlist_items))
+                if (item
+                    and not any((
+                        item.get_uri() == playlist_item.get('file')
+                        or item.get_name() == playlist_item.get('title')
+                        for playlist_item in playlist_items
+                    )))
             ))
         except StopIteration:
             page_token = json_data.get('nextPageToken')

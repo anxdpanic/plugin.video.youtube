@@ -422,7 +422,7 @@ def watch_later_local_clear(context):
 
 def go_to_channel(context, channel_id, channel_name):
     return (
-        context.localize('go_to_channel') % context.get_ui().bold(channel_name),
+        context.localize('go_to.x') % context.get_ui().bold(channel_name),
         context.create_uri(
             (PATHS.ROUTE, PATHS.CHANNEL, channel_id,),
             run=True,
@@ -432,7 +432,7 @@ def go_to_channel(context, channel_id, channel_name):
 
 def subscribe_to_channel(context, channel_id, channel_name=''):
     return (
-        context.localize('subscribe_to') % context.get_ui().bold(channel_name)
+        context.localize('subscribe_to.x') % context.get_ui().bold(channel_name)
         if channel_name else
         context.localize('subscribe'),
         context.create_uri(
@@ -600,7 +600,7 @@ def bookmark_add(context, item):
 
 def bookmark_add_channel(context, channel_id, channel_name=''):
     return (
-        (context.localize('bookmark.channel') % (
+        (context.localize('bookmark.x') % (
             context.get_ui().bold(channel_name) if channel_name else
             context.localize('channel')
         )),

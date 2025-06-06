@@ -81,19 +81,19 @@ class XbmcContextUI(AbstractContextUI):
     def on_remove_content(self, name):
         return self.on_yes_no_input(
             self._context.localize('content.remove'),
-            self._context.localize('content.remove.check') % to_unicode(name),
+            self._context.localize('content.remove.check.x') % to_unicode(name),
         )
 
     def on_delete_content(self, name):
         return self.on_yes_no_input(
             self._context.localize('content.delete'),
-            self._context.localize('content.delete.check') % to_unicode(name),
+            self._context.localize('content.delete.check.x') % to_unicode(name),
         )
 
     def on_clear_content(self, name):
         return self.on_yes_no_input(
             self._context.localize('content.clear'),
-            self._context.localize('content.clear.check') % to_unicode(name),
+            self._context.localize('content.clear.check.x') % to_unicode(name),
         )
 
     def on_select(self, title, items=None, preselect=-1, use_details=False):
