@@ -11,7 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from . import logging
-from .constants import CHECK_SETTINGS
+from .constants import CHECK_SETTINGS, PATHS
 from .context import XbmcContext
 from .debug import Profiler
 from .plugin import XbmcPlugin
@@ -55,28 +55,36 @@ def run(context=_context,
         log.verbose_logging = False
         profiler.disable()
 
-    current_uri = context.get_uri()
-    current_path = context.get_path()
-    current_params = context.get_params()
+    current_path = context.get_path().rstrip('/')
+    current_params = context.get_original_params()
+    current_handle = context.get_handle()
     context.init()
-    new_uri = context.get_uri()
-    new_params = context.get_params()
+    new_path = context.get_path().rstrip('/')
+    new_params = context.get_original_params()
     new_handle = context.get_handle()
 
-    forced = (new_handle != -1
-              and ((current_uri == new_uri
-                    and current_path != '/'
-                    and current_params == new_params)
-                   or (current_uri != new_uri
-                       and current_path == '/'
-                       and not current_params)
-                   or (current_path == '/play/')))
+    forced = False
+    if new_handle != -1:
+        if current_path == PATHS.PLAY:
+            forced = True
+        elif current_path == new_path:
+            if current_path:
+                if current_params == new_params:
+                    forced = True
+        # The following conditions will be true in some forced refresh scenarios
+        # e.g. addon disabling/enabling, but will also be true for a number of
+        # non-forced refreshes such as when a new language invoker thread starts
+        # for a non-plugin context.
+        #     elif not current_params:
+        #         forced = True
+        # elif current_handle == -1 and not current_path and not current_params:
+        #     forced = True
     if forced:
         refresh = context.refresh_requested(force=True, off=True)
         if refresh:
             new_params['refresh'] = refresh
 
-    log_params = new_params.copy()
+    log_params = context.get_params().copy()
     for key in ('api_key', 'client_id', 'client_secret'):
         if key in log_params:
             log_params[key] = '<redacted>'
@@ -87,13 +95,15 @@ def run(context=_context,
               'Python: v{python}',
               'Handle: {handle}',
               'Path:   |{path}|',
-              'Params: |{params}|'),
+              'Params: |{params}|',
+              'Forced: |{forced}|'),
              version=context.get_version(),
              kodi=str(system_version),
              python=system_version.get_python_version(),
              handle=new_handle,
-             path=context.get_path(),
-             params=log_params)
+             path=new_path,
+             params=log_params,
+             forced=forced)
 
     plugin.run(provider, context, forced=forced)
 

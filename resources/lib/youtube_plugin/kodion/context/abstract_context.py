@@ -160,8 +160,10 @@ class AbstractContext(object):
         self._plugin_icon = None
         self._version = 'UNKNOWN'
 
+        self._param_string = ''
         self._params = params or {}
-        self.parse_params(self._params)
+        if params:
+            self.parse_params(params)
 
         self._uri = None
         self._path = path
@@ -407,6 +409,9 @@ class AbstractContext(object):
         self._path_parts = parts
         if kwargs.get('update_uri', True):
             self.update_uri()
+
+    def get_original_params(self):
+        return self._param_string
 
     def get_params(self):
         return self._params

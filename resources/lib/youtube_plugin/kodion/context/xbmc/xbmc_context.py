@@ -420,9 +420,10 @@ class XbmcContext(AbstractContext):
         self.set_path(urlsplit(uri).path, force=True, update_uri=False)
 
         # after that try to get the params
-        self._params = {}
         if num_args > 2:
             params = sys.argv[2][1:]
+            self._param_string = params
+            self._params = {}
             if params:
                 self.parse_params(
                     dict(parse_qsl(params, keep_blank_values=True))
