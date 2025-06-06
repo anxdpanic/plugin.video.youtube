@@ -445,6 +445,9 @@ def _process_my_subscriptions(provider,
             do_filter=filtered,
             feed_type=feed_type,
             refresh=refresh,
+            force_cache=(not refresh
+                         and refresh is not False
+                         and refresh is not None),
             progress_dialog=progress_dialog,
         )
         if not json_data:
@@ -456,7 +459,7 @@ def _process_my_subscriptions(provider,
             do_filter=filtered,
             feed_type=feed_type,
             refresh=refresh,
-            use_cache=True,
+            force_cache=True,
             progress_dialog=progress_dialog,
         )
         json_data['_post_filler'] = filler

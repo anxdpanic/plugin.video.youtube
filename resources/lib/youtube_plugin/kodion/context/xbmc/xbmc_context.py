@@ -958,10 +958,12 @@ class XbmcContext(AbstractContext):
     def refresh_requested(self, force=False, on=False, off=False, params=None):
         if params is None:
             params = self.get_params()
-        refresh = params.get('refresh', 0)
+        refresh = params.get('refresh')
         if not force:
-            return refresh > 0
+            return refresh and refresh > 0
 
+        if refresh is None:
+            refresh = 0
         if off:
             if refresh > 0:
                 refresh = -refresh

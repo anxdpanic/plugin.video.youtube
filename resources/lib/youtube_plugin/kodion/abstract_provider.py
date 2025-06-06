@@ -304,12 +304,12 @@ class AbstractProvider(object):
 
         container = None
         position = None
-        refresh = params.get('refresh', 0)
+        refresh = context.refresh_requested(params=params)
         if (refresh or (
                 params == current_params
                 and path.rstrip('/') == current_path.rstrip('/')
         )):
-            if refresh < 0:
+            if refresh and refresh < 0:
                 del params['refresh']
             else:
                 container = context.get_infolabel('System.CurrentControlId')

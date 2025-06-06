@@ -1970,7 +1970,7 @@ class YouTube(LoginClient):
                              do_filter=False,
                              feed_type='videos',
                              refresh=False,
-                             use_cache=True,
+                             force_cache=False,
                              progress_dialog=None,
                              **kwargs):
         """
@@ -2423,12 +2423,13 @@ class YouTube(LoginClient):
 
             def _get_channels(output,
                               _params=channel_params,
-                              _refresh=(refresh or not use_cache),
+                              _refresh=refresh,
+                              _force_cache=force_cache,
                               function_cache=function_cache):
                 json_data = function_cache.run(
                     self.api_request,
                     function_cache.ONE_HOUR
-                    if 'pageToken' in _params else
+                    if _force_cache or 'pageToken' in _params else
                     5 * function_cache.ONE_MINUTE,
                     _refresh=_refresh,
                     _process=_get_updated_subscriptions,
@@ -2465,11 +2466,14 @@ class YouTube(LoginClient):
             #
             # def _get_playlists(output,
             #                    _params=playlist_params,
-            #                    _refresh=(refresh or not use_cache),
+            #                    _refresh=refresh,
+            #                    _force_cache=force_cache,
             #                    function_cache=function_cache):
             #     json_data = function_cache.run(
             #         self.get_saved_playlists,
-            #         function_cache.ONE_HOUR,
+            #         function_cache.ONE_HOUR
+            #         if _force_cache or 'pageToken' in _params else
+            #         5 * function_cache.ONE_MINUTE,
             #         _refresh=_refresh,
             #         **kwargs
             #     )

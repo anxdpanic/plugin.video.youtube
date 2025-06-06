@@ -81,8 +81,7 @@ def run(context=_context,
         #     forced = True
     if forced:
         refresh = context.refresh_requested(force=True, off=True)
-        if refresh:
-            new_params['refresh'] = refresh
+        context.set_params(refresh=refresh if refresh else 0)
 
     log_params = context.get_params().copy()
     for key in ('api_key', 'client_id', 'client_secret'):
