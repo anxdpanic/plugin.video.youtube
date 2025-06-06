@@ -37,6 +37,7 @@ class BaseItem(object):
         self._uri = uri
         self._available = True
         self._callback = None
+        self._filter_reason = None
 
         self._image = ''
         if image:
@@ -61,11 +62,19 @@ class BaseItem(object):
         self._studios = None
 
     def __str__(self):
-        return ('{type}(name="{name}", uri="{uri}", image="{image}")'
-                .format(type=self.__class__.__name__,
-                        name=self._name,
-                        uri=self._uri,
-                        image=self._image))
+        return ('{type}'
+                '(name={name!r},'
+                ' uri={uri!r},'
+                ' available={available!r},'
+                ' added=\'{added!s}\','
+                ' filtered={filtered!r})').format(
+            type=self.__class__.__name__,
+            name=self._name,
+            uri=self._uri,
+            available=self._available,
+            added=self._added_utc,
+            filtered=self._filter_reason,
+        )
 
     def __repr__(self):
         return json.dumps(
@@ -342,6 +351,12 @@ class BaseItem(object):
 
     def get_track_number(self):
         return self._track_number
+
+    def set_filter_reason(self, reason):
+        self._filter_reason = reason
+
+    def get_filter_reason(self):
+        return self._filter_reason
 
 
 class _Encoder(json.JSONEncoder):

@@ -1318,22 +1318,36 @@ def filter_videos(items,
     accepted = []
     rejected = []
     for item in items:
-        if ((not item.callback or item.callback())
-                and (not callback or callback(item))
-                and (not custom or filter_parse(item, custom))
-                and (not item.playable or not (
-                        (exclude and item.video_id in exclude)
-                        or (not completed and item.completed)
-                        or (not live and item.live and not item.upcoming)
-                        or (not upcoming and item.upcoming)
-                        or (not premieres and item.upcoming and not item.live)
-                        or (not upcoming_live and item.upcoming and item.live)
-                        or (not vod and item.vod)
-                        or (not shorts and item.short)
-                ))):
-            accepted.append(item)
-        else:
+        rejected_reason = None
+        if item.callback and not item.callback():
+            rejected_reason = 'Item callback'
+        elif callback and not callback(item):
+            rejected_reason = 'Collection callback'
+        elif custom and not filter_parse(item, custom):
+            rejected_reason = 'Custom filter'
+        elif item.playable:
+            if exclude and item.video_id in exclude:
+                rejected_reason = 'Is excluded'
+            elif not completed and item.completed:
+                rejected_reason = 'Is completed'
+            elif not live and item.live and not item.upcoming:
+                rejected_reason = 'Is live'
+            elif not upcoming and item.upcoming:
+                rejected_reason = 'Is upcoming'
+            elif not premieres and item.upcoming and not item.live:
+                rejected_reason = 'Is premiere'
+            elif not upcoming_live and item.upcoming and item.live:
+                rejected_reason = 'Is upcoming live'
+            elif not vod and item.vod:
+                rejected_reason = 'Is VOD'
+            elif not shorts and item.short:
+                rejected_reason = 'Is short'
+
+        if rejected_reason:
+            item.set_filter_reason(rejected_reason)
             rejected.append(item)
+        else:
+            accepted.append(item)
     return accepted, rejected
 
 
