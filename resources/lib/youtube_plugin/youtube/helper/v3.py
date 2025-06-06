@@ -63,8 +63,7 @@ def _process_list_response(provider,
         log.warning('Items list is empty')
         return None
 
-    if video_id_dict is None:
-        video_id_dict = {}
+    _video_id_dict = {}
     if channel_id_dict is None:
         channel_id_dict = {}
     if playlist_id_dict is None:
@@ -380,14 +379,27 @@ def _process_list_response(provider,
                 position = len(items)
             item.set_track_number(position + 1)
             item_id = item.video_id
-            if item_id in video_id_dict:
-                if allow_duplicates:
-                    fifo_queue = video_id_dict[item_id]
+            if video_id_dict is None:
+                if item_id in _video_id_dict:
+                    if allow_duplicates:
+                        fifo_queue = _video_id_dict[item_id]
+                    else:
+                        continue
                 else:
-                    continue
+                    fifo_queue = deque()
+                    _video_id_dict[item_id] = fifo_queue
             else:
-                fifo_queue = deque()
-                video_id_dict[item_id] = fifo_queue
+                if item_id in video_id_dict:
+                    if allow_duplicates:
+                        fifo_queue = video_id_dict[item_id]
+                        _video_id_dict[item_id] = fifo_queue
+                    else:
+                        continue
+                else:
+                    fifo_queue = deque()
+                    _video_id_dict[item_id] = fifo_queue
+                    video_id_dict[item_id] = fifo_queue
+
             fifo_queue.appendleft(item)
 
         if '_callback' in yt_item:
@@ -405,7 +417,7 @@ def _process_list_response(provider,
         1: {
             'fetcher': resource_manager.get_videos,
             'args': (
-                video_id_dict,
+                _video_id_dict,
             ),
             'kwargs': {
                 'live_details': True,
@@ -418,7 +430,7 @@ def _process_list_response(provider,
             'upd_args': (
                 provider,
                 context,
-                video_id_dict,
+                _video_id_dict,
                 channel_items_dict,
             ),
             'upd_kwargs': {
@@ -526,7 +538,7 @@ def _process_list_response(provider,
     threads['loop'].set()
 
     if progress_dialog:
-        delta = (len(video_id_dict)
+        delta = (len(_video_id_dict)
                  + len(channel_id_dict)
                  + len(playlist_id_dict)
                  + len(subscription_id_dict))
@@ -678,7 +690,7 @@ def response_to_items(provider,
                 video_id_dict=video_id_dict,
                 channel_id_dict=channel_id_dict,
                 playlist_id_dict=playlist_id_dict,
-                subscription_id_dict=subscription_id_dict
+                subscription_id_dict=subscription_id_dict,
             )
             if result:
                 items, do_callbacks = result
