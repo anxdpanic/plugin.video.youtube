@@ -510,14 +510,10 @@ def _process_my_subscriptions(provider,
                 'live_folder': True,
                 'shorts': True,
             } if feed_type == 'live' else {
-                'live': False,
+                'live_folder': True,
                 'shorts': True,
-                'upcoming_live': False,
-            } if feed_type == 'shorts' else {
-                'live': False,
-                'shorts': True,
-                'upcoming_live': False,
-            }
+                'vod': True,
+            },
         ))
         return result, options
 

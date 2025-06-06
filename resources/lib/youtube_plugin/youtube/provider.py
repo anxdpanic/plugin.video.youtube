@@ -819,6 +819,10 @@ class Provider(AbstractProvider):
             result.extend(v3.response_to_items(
                 provider, context, json_data,
                 item_filter={
+                    'live_folder': True,
+                    'shorts': True,
+                    'vod': True,
+                } if filtered_uploads else {
                     'shorts': True,
                     'live': False,
                     'upcoming_live': False,
