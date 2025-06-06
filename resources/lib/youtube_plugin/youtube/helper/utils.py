@@ -1318,7 +1318,7 @@ def filter_videos(items,
     accepted = []
     rejected = []
     for item in items:
-        if ((not item.callback or item.callback(item))
+        if ((not item.callback or item.callback())
                 and (not callback or callback(item))
                 and (not custom or filter_parse(item, custom))
                 and (not item.playable or not (

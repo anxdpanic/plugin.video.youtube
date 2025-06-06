@@ -1751,10 +1751,10 @@ class Provider(AbstractProvider):
                     else:
                         return True
 
+                    new_item.callback = None
                     if new_item.available:
                         new_item.bookmark_id = _id
                         new_item.set_bookmark_timestamp(bookmark_timestamp)
-                        new_item.callback = None
                         bookmarks_list.update_item(
                             _id,
                             repr(new_item),

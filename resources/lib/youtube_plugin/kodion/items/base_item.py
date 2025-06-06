@@ -161,7 +161,7 @@ class BaseItem(object):
 
     @callback.setter
     def callback(self, value):
-        self._callback = value
+        self._callback = value.__get__(self) if callable(value) else None
 
     def set_image(self, image):
         if not image:
