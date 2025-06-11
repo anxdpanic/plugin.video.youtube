@@ -362,29 +362,43 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             params = path['params']
             original_path = params.pop('__path', empty)[0] or '/videoplayback'
             request_servers = params.pop('__host', empty)
-            stream_id = (params.pop('__id', empty)[0],
-                         params.get('itag', empty)[0])
-            ids = self.server_priority_list['stream_ids']
-            server_lists = self.server_priority_list['server_lists']
-            if stream_id in ids:
-                priority_list = server_lists[stream_id]['list']
-                if priority_list:
-                    request_servers.sort(
-                        key=partial(self._sort_servers,
-                                    _len=len(priority_list),
-                                    _index=priority_list.index),
-                        reverse=True,
-                    )
-            else:
-                ids.append(stream_id)
-                if len(ids) > 5:
-                    old_id = ids.popleft()
-                    del server_lists[old_id]
+            stream_id = params.pop('__id', empty)[0]
+            if original_path == '/videoplayback':
+                stream_id = (stream_id, params.get('itag', empty)[0])
+                stream_type = params.get('mime', empty)[0]
+                if stream_type:
+                    stream_type = stream_type.split('/')
+                else:
+                    stream_type = (None, None)
+                ids = self.server_priority_list['stream_ids']
+                server_lists = self.server_priority_list['server_lists']
+                if stream_id in ids:
+                    priority_list = server_lists[stream_id]['list']
+                    if priority_list:
+                        request_servers.sort(
+                            key=partial(self._sort_servers,
+                                        _len=len(priority_list),
+                                        _index=priority_list.index),
+                            reverse=True,
+                        )
+                else:
+                    ids.append(stream_id)
+                    if len(ids) > 5:
+                        old_id = ids.popleft()
+                        del server_lists[old_id]
+                    priority_list = []
+                    server_lists[stream_id] = {
+                        'started': False,
+                        'list': priority_list,
+                    }
+            elif original_path == '/api/timedtext':
+                stream_type = (params.get('type', empty)[0],
+                               params.get('fmt', empty)[0],
+                               params.get('kind', empty)[0])
                 priority_list = []
-                server_lists[stream_id] = {
-                    'started': False,
-                    'list': priority_list,
-                }
+            else:
+                stream_type = (None, None)
+                priority_list = []
 
             headers = params.pop('__headers', empty)[0]
             if headers:
@@ -502,6 +516,16 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                         continue
 
                     self.send_response(status)
+                    if status == 200:
+                        content = response.content
+                        response.headers['Content-Length'] = len(content)
+                        if 'Content-Encoding' in response.headers:
+                            del response.headers['Content-Encoding']
+                        if 'Transfer-Encoding' in response.headers:
+                            del response.headers['Transfer-Encoding']
+                        self.send_header('Connection', 'close')
+                    else:
+                        content = None
                     for header, value in response.headers.items():
                         self.send_header(header, value)
                     self.end_headers()
@@ -513,13 +537,16 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                         pass
                     if self._close_all or wfile.closed:
                         break
-                    wfile.write(
-                        response.raw.read(
-                            amt=None,
-                            decode_content=False,
-                            cache_content=False,
+                    if content:
+                        wfile.write(content)
+                    else:
+                        wfile.write(
+                            response.raw.read(
+                                amt=None,
+                                decode_content=False,
+                                cache_content=False,
+                            )
                         )
-                    )
                 break
 
         else:

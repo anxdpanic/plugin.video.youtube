@@ -64,18 +64,29 @@ class Subtitles(object):
     BASE_PATH = make_dirs(TEMP_PATH)
 
     FORMATS = {
-        '_default': None,
+        # '_default': None,
+        # '_fallback': None,
+        'srt': {
+            # 'mime_type': 'application/x-subrip',
+            # Fake mimetype to allow ISA to decode as WebVTT
+            'mime_type': 'text/vtt',
+            'extension': 'srt',
+            # Fake @codecs to allow ISA to decode as WebVTT
+            'codec': 'wvtt',
+        },
         'vtt': {
             'mime_type': 'text/vtt',
             'extension': 'vtt',
+            'codec': 'wvtt',
         },
         'ttml': {
             'mime_type': 'application/ttml+xml',
             'extension': 'ttml',
+            'codec': 'ttml',
         },
     }
 
-    def __init__(self, context, video_id):
+    def __init__(self, context, video_id, use_mpd=None):
         self.video_id = video_id
         self._context = context
 
@@ -88,13 +99,32 @@ class Subtitles(object):
         settings = context.get_settings()
         self.pre_download = settings.subtitle_download()
         self.sub_selection = settings.get_subtitle_selection()
+        stream_features = settings.stream_features()
+        if use_mpd is None:
+            use_mpd = settings.use_mpd_videos()
 
-        if (not self.pre_download
-                and settings.use_mpd_videos()
-                and context.inputstream_adaptive_capabilities('ttml')):
-            self.FORMATS['_default'] = 'ttml'
+        use_isa = not self.pre_download and use_mpd
+        self.use_isa = use_isa
+        if use_isa:
+            if ('ttml' in stream_features
+                    and context.inputstream_adaptive_capabilities('ttml')):
+                self.FORMATS['_default'] = 'ttml'
+                self.FORMATS['_fallback'] = 'ttml'
+            if context.inputstream_adaptive_capabilities('vtt'):
+                if 'vtt' in stream_features:
+                    self.FORMATS.setdefault('_default', 'vtt')
+                    self.FORMATS['_fallback'] = 'vtt'
+                else:
+                    self.FORMATS.setdefault('_default', 'srt')
+                    self.FORMATS['_fallback'] = 'srt'
         else:
-            self.FORMATS['_default'] = 'vtt'
+            if ('vtt' in stream_features
+                    and context.get_system_version().compatible(20)):
+                self.FORMATS['_default'] = 'vtt'
+                self.FORMATS['_fallback'] = 'vtt'
+            else:
+                self.FORMATS['_default'] = 'srt'
+                self.FORMATS['_fallback'] = 'srt'
 
         kodi_sub_lang = context.get_subtitle_language()
         plugin_lang = settings.get_language()
@@ -259,7 +289,7 @@ class Subtitles(object):
                 track_key = '_'.join((track_lang, track_kind))
             else:
                 track_key = track_lang
-            url, mime_type = self._get_url(track=track, lang=track_lang)
+            url, sub_format = self._get_url(track=track, lang=track_lang)
             if url:
                 subtitles[track_key] = {
                     'default': track_lang in preferred_lang,
@@ -267,9 +297,12 @@ class Subtitles(object):
                     'kind': track_kind,
                     'lang': track_lang,
                     'language': track_language,
-                    'mime_type': mime_type,
+                    'mime_type': sub_format['mime_type'],
+                    'codec': sub_format['codec'],
                     'url': url,
                 }
+        if subtitles and self.use_isa:
+            subtitles['_headers'] = self.headers
         return subtitles
 
     def get_all(self):
@@ -282,7 +315,7 @@ class Subtitles(object):
             track_lang = track.get('languageCode')
             track_kind = track.get('kind')
             track_language = self._get_language_name(track)
-            url, mime_type = self._get_url(track=track)
+            url, sub_format = self._get_url(track=track)
             if url:
                 if track_kind:
                     track_key = '_'.join((track_lang, track_kind))
@@ -294,33 +327,35 @@ class Subtitles(object):
                     'kind': track_kind,
                     'lang': track_lang,
                     'language': track_language,
-                    'mime_type': mime_type,
+                    'mime_type': sub_format['mime_type'],
+                    'codec': sub_format['codec'],
                     'url': url,
                 }
 
-        base_track = self.defaults['base']
+        base = self.defaults['base']
         base_lang = self.defaults['base_lang']
-        if not base_track:
-            return subtitles
+        if base:
+            for track in self.translation_langs:
+                track_lang = track.get('languageCode')
+                if not track_lang or track_lang in subtitles:
+                    continue
+                track_language = self._get_language_name(track)
+                url, sub_format = self._get_url(track=base, lang=track_lang)
+                if url:
+                    track_key = '_'.join((base_lang, track_lang))
+                    subtitles[track_key] = {
+                        'default': track_lang in preferred_lang,
+                        'original': track_lang == original_lang,
+                        'kind': 'translation',
+                        'lang': track_lang,
+                        'language': track_language,
+                        'mime_type': sub_format['mime_type'],
+                        'codec': sub_format['codec'],
+                        'url': url,
+                    }
 
-        for track in self.translation_langs:
-            track_lang = track.get('languageCode')
-            if not track_lang or track_lang in subtitles:
-                continue
-            track_language = self._get_language_name(track)
-            url, mime_type = self._get_url(track=base_track, lang=track_lang)
-            if url:
-                track_key = '_'.join((base_lang, track_lang))
-                subtitles[track_key] = {
-                    'default': track_lang in preferred_lang,
-                    'original': track_lang == original_lang,
-                    'kind': 'translation',
-                    'lang': track_lang,
-                    'language': track_language,
-                    'mime_type': mime_type,
-                    'url': url,
-                }
-
+        if subtitles and self.use_isa:
+            subtitles['_headers'] = self.headers
         return subtitles
 
     def _prompt(self):
@@ -360,23 +395,31 @@ class Subtitles(object):
 
             lang, language = choice
             self.log.debug('Selected: |%s|', lang)
-            url, mime_type = self._get_url(track=track, lang=lang)
+            url, sub_format = self._get_url(track=track, lang=lang)
             if url:
-                return {
+                subtitle = {
                     lang: {
                         'default': True,
                         'original': lang == self.defaults['original_lang'],
                         'kind': track_kind,
                         'lang': lang,
                         'language': language,
-                        'mime_type': mime_type,
+                        'mime_type': sub_format['mime_type'],
+                        'codec': sub_format['codec'],
                         'url': url,
                     },
                 }
+                if self.use_isa:
+                    subtitle['_headers'] = self.headers
+                return subtitle
         return None
 
     def _get_url(self, track, lang=None):
-        sub_format = self.FORMATS['_default']
+        sub_format = self.FORMATS.get('_default')
+        if not sub_format:
+            self.log.error_trace('Invalid subtitle options selected')
+            return None, None
+
         tlang = None
         base_lang = track.get('languageCode')
         kind = track.get('kind')
@@ -385,7 +428,7 @@ class Subtitles(object):
             lang = '-'.join((base_lang, tlang))
         elif kind == 'asr':
             lang = '-'.join((base_lang, kind))
-            sub_format = 'vtt'
+            sub_format = self.FORMATS['_fallback']
         else:
             lang = base_lang
 
@@ -406,7 +449,7 @@ class Subtitles(object):
                                 'File: {file}'),
                                lang=lang,
                                file=file_path)
-                return file_path, self.FORMATS[sub_format]['mime_type']
+                return file_path, self.FORMATS[sub_format]
 
         base_url = self._normalize_url(track.get('baseUrl'))
         if not base_url:
@@ -425,7 +468,7 @@ class Subtitles(object):
                        url=subtitle_url)
 
         if not download:
-            return subtitle_url, self.FORMATS[sub_format]['mime_type']
+            return subtitle_url, self.FORMATS[sub_format]
 
         response = BaseRequestsClass(context=self._context).request(
             subtitle_url,
@@ -449,7 +492,7 @@ class Subtitles(object):
                                lang=lang,
                                file=file_path)
         if success:
-            return file_path, self.FORMATS[sub_format]['mime_type']
+            return file_path, self.FORMATS[sub_format]
         return None, None
 
     def _get_track(self,

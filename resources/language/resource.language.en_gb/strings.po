@@ -1142,11 +1142,11 @@ msgid "Play audio only"
 msgstr ""
 
 msgctxt "#30709"
-msgid ""
+msgid "WebVTT subtitles"
 msgstr ""
 
 msgctxt "#30710"
-msgid ""
+msgid "TTML subtitles"
 msgstr ""
 
 msgctxt "#30711"

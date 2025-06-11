@@ -802,6 +802,8 @@ class XbmcContext(AbstractContext):
         'drm': loose_version('2.2.12'),
         'live': loose_version('2.0.12'),
         'timeshift': loose_version('2.5.2'),
+        # subtitles
+        'vtt': loose_version('2.3.8'),
         'ttml': loose_version('20.0.0'),
         # properties
         'config_prop': loose_version('21.4.11'),

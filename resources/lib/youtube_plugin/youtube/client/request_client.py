@@ -281,6 +281,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             },
             '_auth_required': True,
             '_auth_type': 'personal',
+            '_query_subtitles': True,
             'json': {
                 'context': {
                     'client': {
