@@ -263,7 +263,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                 self.send_header('Content-Length', str(file_size))
                 self.end_headers()
 
-                with open(file_path, 'rb', buffering=self.chunk_size) as f:
+                with open(file_path, mode='rb', buffering=self.chunk_size) as f:
                     while 1:
                         file_chunk = f.read()
                         if not file_chunk:

@@ -10,6 +10,18 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from atexit import register as atexit_register
+from cProfile import Profile
+from functools import wraps
+from os import times as os_times
+from pstats import Stats
+from sys import settrace
+from threading import Timer
+from weakref import ref
+
+from . import logging
+from .compatibility import StringIO
+
 
 def debug_here(host='localhost'):
     import os
@@ -32,6 +44,48 @@ def debug_here(host='localhost'):
     pydevd.settrace(host, stdoutToServer=True, stderrToServer=True)
 
 
+class ProfilerProxy(ref):
+    def __call__(self, *args, **kwargs):
+        return super(ProfilerProxy, self).__call__().__call__(
+            *args, **kwargs
+        )
+
+    def __enter__(self, *args, **kwargs):
+        return super(ProfilerProxy, self).__call__().__enter__(
+            *args, **kwargs
+        )
+
+    def __exit__(self, *args, **kwargs):
+        return super(ProfilerProxy, self).__call__().__exit__(
+            *args, **kwargs
+        )
+
+    def disable(self, *args, **kwargs):
+        return super(ProfilerProxy, self).__call__().disable(
+            *args, **kwargs
+        )
+
+    def enable(self, *args, **kwargs):
+        return super(ProfilerProxy, self).__call__().enable(
+            *args, **kwargs
+        )
+
+    def get_stats(self, *args, **kwargs):
+        return super(ProfilerProxy, self).__call__().get_stats(
+            *args, **kwargs
+        )
+
+    def print_stats(self, *args, **kwargs):
+        return super(ProfilerProxy, self).__call__().print_stats(
+            *args, **kwargs
+        )
+
+    def tear_down(self, *args, **kwargs):
+        return super(ProfilerProxy, self).__call__().tear_down(
+            *args, **kwargs
+        )
+
+
 class Profiler(object):
     """Class used to profile a block of code"""
 
@@ -47,58 +101,7 @@ class Profiler(object):
         'name',
     )
 
-    from . import logging as _logging
-    from .compatibility import StringIO as _StringIO
-    from atexit import register as _atexit_register
-    from cProfile import Profile as _Profile
-    from functools import wraps as _wraps
-    from pstats import Stats as _Stats
-    from weakref import ref as _ref
-
-    _wraps = staticmethod(_wraps)
-    log = _logging.getLogger(__name__)
-    del _logging
-
-    class Proxy(_ref):
-        def __call__(self, *args, **kwargs):
-            return super(Profiler.Proxy, self).__call__().__call__(
-                *args, **kwargs
-            )
-
-        def __enter__(self, *args, **kwargs):
-            return super(Profiler.Proxy, self).__call__().__enter__(
-                *args, **kwargs
-            )
-
-        def __exit__(self, *args, **kwargs):
-            return super(Profiler.Proxy, self).__call__().__exit__(
-                *args, **kwargs
-            )
-
-        def disable(self, *args, **kwargs):
-            return super(Profiler.Proxy, self).__call__().disable(
-                *args, **kwargs
-            )
-
-        def enable(self, *args, **kwargs):
-            return super(Profiler.Proxy, self).__call__().enable(
-                *args, **kwargs
-            )
-
-        def get_stats(self, *args, **kwargs):
-            return super(Profiler.Proxy, self).__call__().get_stats(
-                *args, **kwargs
-            )
-
-        def print_stats(self, *args, **kwargs):
-            return super(Profiler.Proxy, self).__call__().print_stats(
-                *args, **kwargs
-            )
-
-        def tear_down(self, *args, **kwargs):
-            return super(Profiler.Proxy, self).__call__().tear_down(
-                *args, **kwargs
-            )
+    log = logging.getLogger(__name__)
 
     _instances = set()
 
@@ -107,7 +110,7 @@ class Profiler(object):
         cls._instances.add(self)
         if not kwargs.get('enabled') or kwargs.get('lazy'):
             self.__init__(*args, **kwargs)
-            return cls.Proxy(self)
+            return ProfilerProxy(self)
         return self
 
     def __init__(self,
@@ -131,7 +134,7 @@ class Profiler(object):
         if enabled and not lazy:
             self._create_profiler()
 
-        self._atexit_register(self.tear_down)
+        atexit_register(self.tear_down)
 
     def __enter__(self):
         if not self._enabled:
@@ -156,7 +159,7 @@ class Profiler(object):
             self.name = name
             return self
 
-        @self.__class__._wraps(func)  # pylint: disable=protected-access
+        @wraps(func)
         def wrapper(*args, **kwargs):
             """Wrapper to:
                1) create a new Profiler instance;
@@ -209,16 +212,14 @@ class Profiler(object):
 
     def _create_profiler(self):
         if self._timer:
-            self._profiler = self._Profile(timer=self._timer)
+            self._profiler = Profile(timer=self._timer)
         else:
-            self._profiler = self._Profile()
+            self._profiler = Profile()
         self._profiler.enable()
 
     @classmethod
     def wait_timer(cls):
-        from os import times
-
-        times_result = times()
+        times_result = os_times()
         return times_result.elapsed - (times_result.system + times_result.user)
 
     def disable(self):
@@ -243,9 +244,9 @@ class Profiler(object):
 
         self.disable()
 
-        output_stream = self._StringIO()
+        output_stream = StringIO()
         try:
-            stats = self._Stats(
+            stats = Stats(
                 self._profiler,
                 stream=output_stream
             )
@@ -282,30 +283,24 @@ class Profiler(object):
 
 
 class ExecTimeout(object):
-    from functools import wraps as _wraps
-    from sys import settrace as _settrace
-    from threading import Timer as _Timer
-
-    _wraps = staticmethod(_wraps)
-
     def __init__(self, seconds, callback=None):
         self._interval = seconds
         self._timed_out = False
         self._callback = callback if callable(callback) else None
 
     def __call__(self, function):
-        @self._wraps(function)
+        @wraps(function)
         def wrapper(*args, **kwargs):
-            timer = self._Timer(self._interval, self.set_timed_out)
+            timer = Timer(self._interval, self.set_timed_out)
             timer.daemon = True
 
-            self._settrace(self.timeout_trace)
+            settrace(self.timeout_trace)
             timer.start()
             try:
                 return function(*args, **kwargs)
             finally:
                 timer.cancel()
-                self._settrace(None)
+                settrace(None)
                 if self._callback:
                     self._callback()
 
@@ -315,7 +310,7 @@ class ExecTimeout(object):
         if event == 'call':
             return self.timeout_trace
         elif event == 'line' and self._timed_out:
-            raise TimeoutError('Python execution timed out')
+            raise RuntimeError('Python execution timed out')
         return self.timeout_trace
 
     def set_timed_out(self):

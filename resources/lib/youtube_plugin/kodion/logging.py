@@ -15,7 +15,7 @@ from os.path import normcase
 from sys import exc_info as sys_exc_info
 from traceback import extract_stack, format_list
 
-from .compatibility import StringIO, string_type, xbmc
+from .compatibility import StringIO, string_type, to_str, xbmc
 from .constants import ADDON_ID
 
 
@@ -36,6 +36,22 @@ __all__ = (
 
 
 class RecordFormatter(logging.Formatter):
+    def formatMessage(self, record):
+        try:
+            return self._style.format(record)
+        except AttributeError:
+            try:
+                return self._fmt % record.__dict__
+            except UnicodeDecodeError as e:
+                try:
+                    record.name = record.name.decode('utf-8')
+                    return self._fmt % record.__dict__
+                except UnicodeDecodeError:
+                    raise e
+
+    def formatStack(self, stack_info):
+        return stack_info
+
     def format(self, record):
         record.message = record.getMessage()
         if self.usesTime():
@@ -87,13 +103,11 @@ class Handler(logging.Handler):
         logging.CRITICAL: xbmc.LOGFATAL,
     }
     STANDARD_FORMATTER = RecordFormatter(
-        fmt='[{addon_id}] {module}:{lineno}({funcName}) - {message}',
-        style='{',
+        fmt='[%(addon_id)s] %(module)s:%(lineno)d(%(funcName)s) - %(message)s',
     )
     DEBUG_FORMATTER = RecordFormatter(
-        fmt='[{addon_id}] {module}, line {lineno}, in {funcName}'
-            '\n\t{message}',
-        style='{',
+        fmt='[%(addon_id)s] %(module)s, line %(lineno)d, in %(funcName)s'
+            '\n\t%(message)s',
     )
 
     _stack_info = False
@@ -125,6 +139,22 @@ class Handler(logging.Handler):
         type(self)._stack_info = value
 
 
+class LogRecord(logging.LogRecord):
+    def __init__(self, name, level, pathname, lineno, msg, args, exc_info,
+                 func=None, **kwargs):
+        stack_info = kwargs.pop('sinfo', None)
+        super(LogRecord, self).__init__(name,
+                                        level,
+                                        pathname,
+                                        lineno,
+                                        msg,
+                                        args,
+                                        exc_info,
+                                        func=func,
+                                        **kwargs)
+        self.stack_info = stack_info
+
+
 class KodiLogger(logging.Logger):
     _verbose_logging = False
     _stack_info = False
@@ -144,7 +174,7 @@ class KodiLogger(logging.Logger):
              stacklevel=1,
              **kwargs):
         if isinstance(msg, (list, tuple)):
-            msg = '\n\t'.join(map(str, msg))
+            msg = '\n\t'.join(map(to_str, msg))
         if kwargs:
             msg = MessageFormatter(msg, *args, **kwargs)
             args = ()
@@ -207,47 +237,55 @@ class KodiLogger(logging.Logger):
                 target_frame_code.co_name,
                 stack_info)
 
-    def exception(self, msg, *args,
-                  exc_info=True,
-                  stack_info=True,
-                  stacklevel=1,
-                  **kwargs):
+    def makeRecord(self, name, level, fn, lno, msg, args, exc_info,
+                   func=None, extra=None, sinfo=None):
+        rv = LogRecord(name,
+                       level,
+                       fn,
+                       lno,
+                       msg,
+                       args,
+                       exc_info,
+                       func=func,
+                       sinfo=sinfo)
+        if extra is not None:
+            for key in extra:
+                if (key in ["message", "asctime"]) or (key in rv.__dict__):
+                    raise KeyError("Attempt to overwrite %r in LogRecord" % key)
+                rv.__dict__[key] = extra[key]
+        return rv
+
+    def exception(self, msg, *args, **kwargs):
         if self.isEnabledFor(ERROR):
             self._log(
                 ERROR,
                 msg,
                 args,
-                exc_info=exc_info,
-                stack_info=stack_info,
-                stacklevel=stacklevel,
+                exc_info=kwargs.pop('exc_info', True),
+                stack_info=kwargs.pop('stack_info', True),
+                stacklevel=kwargs.pop('stacklevel', 1),
                 **kwargs
             )
 
-    def error_trace(self, msg, *args,
-                    stack_info=True,
-                    stacklevel=1,
-                    **kwargs):
+    def error_trace(self, msg, *args, **kwargs):
         if self.isEnabledFor(ERROR):
             self._log(
                 ERROR,
                 msg,
                 args,
-                stack_info=stack_info,
-                stacklevel=stacklevel,
+                stack_info=kwargs.pop('stack_info', True),
+                stacklevel=kwargs.pop('stacklevel', 1),
                 **kwargs
             )
 
-    def debug_trace(self, msg, *args,
-                    stack_info=True,
-                    stacklevel=1,
-                    **kwargs):
+    def debug_trace(self, msg, *args, **kwargs):
         if self.isEnabledFor(DEBUG):
             self._log(
                 DEBUG,
                 msg,
                 args,
-                stack_info=stack_info,
-                stacklevel=stacklevel,
+                stack_info=kwargs.pop('stack_info', True),
+                stacklevel=kwargs.pop('stacklevel', 1),
                 **kwargs
             )
 
@@ -331,38 +369,28 @@ INFO = logging.INFO
 DEBUG = logging.DEBUG
 
 
-def exception(msg, *args,
-              exc_info=True,
-              stack_info=True,
-              stacklevel=1,
-              **kwargs):
+def exception(msg, *args, **kwargs):
     root.error(msg,
                *args,
-               exc_info=exc_info,
-               stack_info=stack_info,
-               stacklevel=stacklevel,
+               exc_info=kwargs.pop('exc_info', True),
+               stack_info=kwargs.pop('stack_info', True),
+               stacklevel=kwargs.pop('stacklevel', 1),
                **kwargs)
 
 
-def error_trace(msg, *args,
-                stack_info=True,
-                stacklevel=1,
-                **kwargs):
+def error_trace(msg, *args, **kwargs):
     root.error(msg,
                *args,
-               stack_info=stack_info,
-               stacklevel=stacklevel,
+               stack_info=kwargs.pop('stack_info', True),
+               stacklevel=kwargs.pop('stacklevel', 1),
                **kwargs)
 
 
-def debug_trace(msg, *args,
-                stack_info=True,
-                stacklevel=1,
-                **kwargs):
+def debug_trace(msg, *args, **kwargs):
     root.debug(msg,
                *args,
-               stack_info=stack_info,
-               stacklevel=stacklevel,
+               stack_info=kwargs.pop('stack_info', True),
+               stacklevel=kwargs.pop('stacklevel', 1),
                **kwargs)
 
 

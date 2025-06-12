@@ -86,9 +86,8 @@ try:
 # Compatibility shims for Kodi v18 and Python v2.7
 except ImportError:
     from BaseHTTPServer import BaseHTTPRequestHandler
-    from contextlib import contextmanager
-    from io import StringIO
     from SocketServer import TCPServer, ThreadingMixIn
+    from StringIO import StringIO as _StringIO
     from urllib import (
         quote as _quote,
         quote_plus as _quote_plus,
@@ -143,21 +142,23 @@ except ImportError:
         }, *args, **kwargs)
 
 
-    _File = xbmcvfs.File
+    class StringIO(_StringIO):
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            self.close()
 
 
-    @contextmanager
-    def _file_closer(*args, **kwargs):
-        file = None
-        try:
-            file = _File(*args, **kwargs)
-            yield file
-        finally:
-            if file:
-                file.close()
+    class File(xbmcvfs.File):
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            self.close()
 
 
-    xbmcvfs.File = _file_closer
+    xbmcvfs.File = File
     xbmcvfs.translatePath = xbmc.translatePath
 
     range_type = (xrange, list)
@@ -193,15 +194,14 @@ else:
     def datetime_infolabel(datetime_obj, str_format='%Y-%m-%d %H:%M:%S'):
         return datetime_obj.strftime(str_format)
 
-
-_cpu_count = _sched_get_affinity = None
 try:
-    from os import sched_getaffinity as _sched_getaffinity
+    from os import sched_getaffinity as _sched_get_affinity
 except ImportError:
+    _sched_get_affinity = None
     try:
         from multiprocessing import cpu_count as _cpu_count
     except ImportError:
-        pass
+        _cpu_count = None
 
 
 def available_cpu_count():
