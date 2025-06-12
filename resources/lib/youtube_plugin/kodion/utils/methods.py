@@ -16,7 +16,7 @@ import shutil
 from base64 import urlsafe_b64decode
 from datetime import timedelta
 from math import floor, log
-from re import compile as re_compile
+from re import MULTILINE, compile as re_compile
 
 from .. import logging
 from ..compatibility import (
@@ -34,6 +34,7 @@ from ..compatibility import (
 __all__ = (
     'duration_to_seconds',
     'find_video_id',
+    'fix_subtitle_stream',
     'friendly_number',
     'get_kodi_setting_bool',
     'get_kodi_setting_value',
@@ -236,6 +237,32 @@ def seconds_to_duration(seconds):
     return str(timedelta(seconds=seconds))
 
 
+def timedelta_to_timestamp(delta, offset=None, multiplier=1.0):
+    if isinstance(delta, timedelta):
+        pass
+    elif isinstance(delta, (list, tuple)) and len(delta) == 3:
+        delta = timedelta(hours=int(delta[0]),
+                          minutes=int(delta[1]),
+                          seconds=float(delta[2]))
+    else:
+        return None
+
+    if offset is not None:
+        if isinstance(offset, timedelta):
+            delta += offset
+        elif isinstance(offset, (list, tuple)) and len(offset) == 3:
+            delta += timedelta(hours=int(offset[0]),
+                               minutes=int(offset[1]),
+                               seconds=float(offset[2]))
+        elif isinstance(offset, dict):
+            delta += timedelta(**offset)
+
+    total_seconds = delta.total_seconds() * multiplier
+    hrs, rem = divmod(total_seconds, 3600)
+    mins, secs = divmod(rem, 60)
+    return '{0:02.0f}:{1:02.0f}:{2:06.3f}'.format(hrs, mins, secs)
+
+
 def merge_dicts(item1, item2, templates=None, compare_str=False, _=Ellipsis):
     if not isinstance(item1, dict) or not isinstance(item2, dict):
         if (compare_str
@@ -395,3 +422,83 @@ def parse_and_redact_uri(uri, redact_only=False):
     if redact_only:
         return log_uri
     return parts, params, log_uri, log_params
+
+
+def _srt_to_vtt(content,
+                srt_re=re_compile(
+                    br'\d+[\r\n]'
+                    br'(?P<start>\d+:\d+:\d+,\d+) --> '
+                    br'(?P<end>\d+:\d+:\d+,\d+)[\r\n]'
+                    br'(?P<text>.+)(?=[\r\n]{2,})',
+                    flags=MULTILINE,
+                )):
+    subtitle_iter = srt_re.finditer(content)
+    try:
+        subtitle = next(subtitle_iter).groupdict()
+        start = subtitle['start'].replace(b',', b'.')
+        end = subtitle['end'].replace(b',', b'.')
+        text = subtitle['text']
+    except StopIteration:
+        return content
+    next_subtitle = next_start = next_end = next_text = None
+    output = [b'WEBVTT\n\n']
+    while 1:
+        if next_start and next_end:
+            start = next_start
+            end = next_end
+        if next_subtitle:
+            subtitle = next_subtitle
+            text = next_text
+        elif not subtitle:
+            break
+
+        try:
+            next_subtitle = next(subtitle_iter).groupdict()
+            next_start = next_subtitle['start'].replace(b',', b'.')
+            next_end = next_subtitle['end'].replace(b',', b'.')
+            next_text = next_subtitle['text']
+        except StopIteration:
+            if subtitle == next_subtitle:
+                break
+            next_subtitle = None
+
+        if next_subtitle and end > next_start:
+            if end > next_end:
+                fill_start, fill_end = next_start, next_end
+                end, next_start, next_end = fill_start, fill_end, end
+                next_subtitle = None
+            else:
+                fill_start, fill_end = next_start, end
+                end, next_start = fill_start, fill_end
+                subtitle = None
+            output.append(b'%s --> %s\n%s\n\n'
+                          b'%s --> %s\n%s\n%s\n\n'
+                          % (
+                              start, end, text,
+                              fill_start, fill_end, text, next_text,
+                          ))
+        elif end > start:
+            output.append(b'%s --> %s\n%s\n\n' % (start, end, text))
+    return b''.join(output)
+
+
+def fix_subtitle_stream(stream_type,
+                        content,
+                        vtt_re=re_compile(
+                            br'(\d+:\d+:\d+\.\d+ --> \d+:\d+:\d+\.\d+)'
+                            br'(?: (?:'
+                            br'align:start'
+                            br'|position:0%'
+                            br'|position:63%'
+                            br'|line:0%'
+                            br'))+'
+                        ),
+                        vtt_repl=br'\1'):
+    content_type, sub_format, sub_type = stream_type
+    if content_type != 'track':
+        pass
+    elif sub_format == 'vtt':
+        content = vtt_re.sub(vtt_repl, content)
+    elif sub_format == 'srt':
+        content = _srt_to_vtt(content)
+    return content

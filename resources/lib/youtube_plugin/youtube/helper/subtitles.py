@@ -460,7 +460,8 @@ class Subtitles(object):
             base_url,
             ('type', 'track'),
             ('fmt', sub_format),
-            ('tlang', tlang) if tlang else (None, None),
+            ('tlang', tlang),
+            ('xosf', None),
         )
         self.log.debug(('Found new subtitle for: |{lang}|',
                         'URL: {url}'),
@@ -586,8 +587,14 @@ class Subtitles(object):
         query_params = parse_qs(components.query)
 
         for name, value in pairs:
-            if name:
+            if not name:
+                continue
+            if isinstance(value, (list, tuple)):
+                query_params[name] = value
+            elif value is not None:
                 query_params[name] = [value]
+            elif name in query_params:
+                del query_params[name]
 
         return components._replace(
             query=urlencode(query_params, doseq=True)

@@ -40,7 +40,7 @@ from ..constants import (
     PATHS,
     TEMP_PATH,
 )
-from ..utils import parse_and_redact_uri, wait
+from ..utils import fix_subtitle_stream, parse_and_redact_uri, wait
 
 
 class HTTPServer(ThreadingMixIn, TCPServer):
@@ -518,6 +518,8 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                     self.send_response(status)
                     if status == 200:
                         content = response.content
+                        if stream_type[0] == 'track':
+                            content = fix_subtitle_stream(stream_type, content)
                         response.headers['Content-Length'] = len(content)
                         if 'Content-Encoding' in response.headers:
                             del response.headers['Content-Encoding']
