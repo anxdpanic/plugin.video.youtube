@@ -370,7 +370,8 @@ class Provider(AbstractProvider):
         resource_manager = provider.get_resource_manager(context)
         playlists = resource_manager.get_related_playlists(channel_id)
         uploads = playlists.get('uploads') if playlists else None
-        if uploads and uploads.startswith('UU'):
+        if (params.get('page', 1) == 1 and not params.get('hide_folders')
+                and uploads and uploads.startswith('UU')):
             result = [
                 {
                     'kind': 'youtube#playlist',
