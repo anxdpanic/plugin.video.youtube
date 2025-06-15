@@ -614,7 +614,7 @@ msgid "Failed"
 msgstr ""
 
 msgctxt "#30577"
-msgid ""
+msgid "Smallest (4:3)"
 msgstr ""
 
 msgctxt "#30578"
@@ -674,11 +674,11 @@ msgid "Thumbnail size"
 msgstr ""
 
 msgctxt "#30592"
-msgid "Medium (16:9)"
+msgid "Small (16:9)"
 msgstr ""
 
 msgctxt "#30593"
-msgid "High (4:3)"
+msgid "Medium (4:3)"
 msgstr ""
 
 msgctxt "#30594"
@@ -698,7 +698,7 @@ msgid ""
 msgstr ""
 
 msgctxt "#30598"
-msgid ""
+msgid "Large (4:3)"
 msgstr ""
 
 msgctxt "#30599"
@@ -706,7 +706,7 @@ msgid "Failed to enable personal API keys. Missing: %s"
 msgstr ""
 
 msgctxt "#30600"
-msgid ""
+msgid "Largest (16:9)"
 msgstr ""
 
 msgctxt "#30601"

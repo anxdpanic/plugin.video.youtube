@@ -1835,6 +1835,7 @@ class StreamInfo(YouTubeRequestClient):
                     'url': thumb['url'].format(video_id, thumb_suffix),
                     'size': thumb['size'],
                     'ratio': thumb['ratio'],
+                    'unverified': True,
                 }
                 for thumb_type, thumb in THUMB_TYPES.items()
             },

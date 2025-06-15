@@ -583,6 +583,8 @@ def update_video_items(provider, context, video_id_dict,
     shorts_duration = settings.shorts_duration()
     subtitles_prompt = settings.get_subtitle_selection() == 1
     thumb_size = settings.get_thumbnail_size()
+    get_better_thumbs = (settings.get_int(settings.THUMB_SIZE)
+                         == settings.THUMB_SIZE_BEST)
     thumb_stamp = get_thumb_timestamp()
     use_play_data = settings.use_local_history()
 
@@ -872,10 +874,15 @@ def update_video_items(provider, context, video_id_dict,
 
         # try to find a better resolution for the image
         image = media_item.get_image()
-        if not image or image.startswith('Default'):
+        if (not image
+                or get_better_thumbs
+                or image.startswith('Default')):
             image = get_thumbnail(thumb_size, snippet.get('thumbnails'))
-        if image and image.endswith('_live.jpg'):
-            image = ''.join((image, '?ct=', thumb_stamp))
+        if image and media_item.live:
+            if '?' in image:
+                image = ''.join((image, '&ct=', thumb_stamp))
+            elif image.endswith(('_live.jpg', '_live.webp')):
+                image = ''.join((image, '?ct=', thumb_stamp))
         media_item.set_image(image)
 
         # update channel mapping
@@ -1053,7 +1060,10 @@ def update_play_info(provider,
                               meta_data.get('thumbnails'))
         if image:
             if media_item.live:
-                image = ''.join((image, '?ct=', get_thumb_timestamp()))
+                if '?' in image:
+                    image = ''.join((image, '&ct=', get_thumb_timestamp()))
+                elif image.endswith(('_live.jpg', '_live.webp')):
+                    image = ''.join((image, '?ct=', get_thumb_timestamp()))
             media_item.set_image(image)
 
     if 'headers' in video_stream:
@@ -1144,6 +1154,7 @@ def update_channel_info(provider,
 
 THUMB_TYPES = {
     'default': {
+        'filename': 'default',
         'url': 'https://i.ytimg.com/vi/{0}/default{1}.jpg',
         'width': 120,
         'height': 90,
@@ -1151,6 +1162,7 @@ THUMB_TYPES = {
         'ratio': 120 / 90,  # 4:3
     },
     'medium': {
+        'filename': 'mqdefault',
         'url': 'https://i.ytimg.com/vi/{0}/mqdefault{1}.jpg',
         'width': 320,
         'height': 180,
@@ -1158,6 +1170,7 @@ THUMB_TYPES = {
         'ratio': 320 / 180,  # 16:9
     },
     'high': {
+        'filename': 'hqdefault',
         'url': 'https://i.ytimg.com/vi/{0}/hqdefault{1}.jpg',
         'width': 480,
         'height': 360,
@@ -1165,6 +1178,7 @@ THUMB_TYPES = {
         'ratio': 480 / 360,  # 4:3
     },
     'standard': {
+        'filename': 'sddefault',
         'url': 'https://i.ytimg.com/vi/{0}/sddefault{1}.jpg',
         'width': 640,
         'height': 480,
@@ -1172,6 +1186,7 @@ THUMB_TYPES = {
         'ratio': 640 / 480,  # 4:3
     },
     '720': {
+        'filename': 'hq720',
         'url': 'https://i.ytimg.com/vi/{0}/hq720{1}.jpg',
         'width': 1280,
         'height': 720,
@@ -1179,16 +1194,16 @@ THUMB_TYPES = {
         'ratio': 1280 / 720,  # 16:9
     },
     'oar': {
+        'filename': 'oardefault',
         'url': 'https://i.ytimg.com/vi/{0}/oardefault{1}.jpg',
         'size': 0,
         'ratio': 0,
     },
     'maxres': {
+        'filename': 'maxresdefault',
         'url': 'https://i.ytimg.com/vi/{0}/maxresdefault{1}.jpg',
-        'width': 1920,
-        'height': 1080,
-        'size': 1920 * 1080,
-        'ratio': 1920 / 1080,  # 16:9
+        'size': 0,
+        'ratio': 0,
     },
 }
 
@@ -1219,10 +1234,11 @@ def get_thumbnail(thumb_size, thumbnails, default_thumb=None):
             size = thumb['size']
             ratio = thumb['ratio']
         else:
-            return False, False
+            return False, False, False
         return (
             ratio_limit and ratio_limit * 0.9 <= ratio <= ratio_limit * 1.1,
-            size <= size_limit and size if size_limit else size
+            not thumb.get('unverified', False),
+            size <= size_limit and size if size_limit else size,
         )
 
     thumbnail = sorted(thumbnails.items() if is_dict else thumbnails,

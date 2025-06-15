@@ -863,9 +863,12 @@
                     <default>1</default>  <!-- High (4:3) -->
                     <constraints>
                         <options>
-                            <option label="30592">0</option>  <!-- Medium (16:9) -->
-                            <option label="30593">1</option>  <!-- High (4:3) -->
-                            <option label="20049">2</option>  <!-- Best available -->
+                            <option label="30577">3</option>  <!-- Smallest (4:3) (default) -->
+                            <option label="30592">0</option>  <!-- Small (16:9) (mqdefault) -->
+                            <option label="30593">1</option>  <!-- Medium (4:3) (hqdefault) -->
+                            <option label="30598">4</option>  <!-- Large (4:3) (sddefault) -->
+                            <option label="30600">5</option>  <!-- Largest (16:9) (hq720) -->
+                            <option label="20049">2</option>  <!-- Best available (maxresdefault) -->
                         </options>
                     </constraints>
                     <control format="string" type="spinner"/>

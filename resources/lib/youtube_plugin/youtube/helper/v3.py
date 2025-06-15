@@ -12,6 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import threading
 from collections import deque
+from re import compile as re_compile
 
 from .utils import (
     THUMB_TYPES,
@@ -90,6 +91,7 @@ def _process_list_response(provider,
     }
 
     settings = context.get_settings()
+    thumb_re = re_compile(r'[^/._]+?(?=(?:_live)?\.(?:jpg|webp))')
     thumb_size = settings.get_thumbnail_size()
     fanart_type = params.get('fanart_type')
     if fanart_type is None:
@@ -124,11 +126,42 @@ def _process_list_response(provider,
 
             thumbnails = snippet.get('thumbnails')
             if not thumbnails:
+                pass
+            elif isinstance(thumbnails, list):
+                _url = thumbnails[0].get('url')
+                thumbnails.extend([
+                    {
+                        'url': (thumb_re.sub(thumb['filename'], _url, count=1)
+                                if _url else
+                                thumb['url'].format(item_id, '')),
+                        'size': thumb['size'],
+                        'ratio': thumb['ratio'],
+                        'unverified': True,
+                    }
+                    for thumb in THUMB_TYPES.values()
+                ])
+            elif isinstance(thumbnails, dict):
+                _url = next(iter(thumbnails.values())).get('url')
+                for thumb_type, thumb in THUMB_TYPES.items():
+                    if thumb_type in thumbnails:
+                        continue
+                    thumbnails[thumb_type] = {
+                        'url': (thumb_re.sub(thumb['filename'], _url, count=1)
+                                if _url else
+                                thumb['url'].format(item_id, '')),
+                        'size': thumb['size'],
+                        'ratio': thumb['ratio'],
+                        'unverified': True,
+                    }
+            else:
+                thumbnails = None
+            if not thumbnails:
                 thumbnails = {
                     thumb_type: {
                         'url': thumb['url'].format(item_id, ''),
                         'size': thumb['size'],
                         'ratio': thumb['ratio'],
+                        'unverified': True,
                     }
                     for thumb_type, thumb in THUMB_TYPES.items()
                 }

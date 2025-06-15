@@ -187,13 +187,25 @@ class AbstractSettings(object):
         return self.set_bool(SETTINGS.SUBTITLE_DOWNLOAD, value, echo_level=3)
 
     _THUMB_SIZES = {
-        0: {  # Medium (16:9)
+        3: {  # default (4:3)
+            'size': 120 * 90,
+            'ratio': 120 / 90,
+        },
+        0: {  # mqdefault (16:9)
             'size': 320 * 180,
             'ratio': 320 / 180,
         },
-        1: {  # High (4:3)
+        1: {  # hqdefault (4:3)
             'size': 480 * 360,
             'ratio': 480 / 360,
+        },
+        4: {  # sddefault (4:3)
+            'size': 640 * 480,
+            'ratio': 640 / 480,
+        },
+        5: {  # hq720 (16:9)
+            'size': 1280 * 720,
+            'ratio': 1280 / 720,
         },
         2: {  # Best available
             'size': 0,
