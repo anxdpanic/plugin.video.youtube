@@ -442,7 +442,7 @@ class XbmcPlugin(AbstractPlugin):
 
         elif context.is_plugin_path(uri, PATHS.PLAY):
             parts, params, log_uri, _ = parse_and_redact_uri(uri)
-            if params.get('action') == 'list':
+            if params.get('action', [None])[0] == 'list':
                 log_action = 'Redirecting to'
                 action = context.create_uri(
                     (PATHS.ROUTE, parts.path.rstrip('/')),

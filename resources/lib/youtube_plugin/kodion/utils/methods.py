@@ -414,7 +414,11 @@ def parse_and_redact_uri(uri, redact_only=False):
             params['__headers'] = [urlsafe_b64decode(headers).decode('utf-8')]
         log_params = redact_params(params)
         log_uri = urlunsplit((
-            parts.scheme, parts.netloc, parts.path, urlencode(log_params), '',
+            parts.scheme,
+            parts.netloc,
+            parts.path,
+            urlencode(log_params, doseq=True),
+            '',
         ))
     else:
         params = log_params = None
