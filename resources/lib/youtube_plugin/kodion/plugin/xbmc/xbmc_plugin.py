@@ -24,6 +24,7 @@ from ...constants import (
     PLAYER_VIDEO_ID,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
+    PLAY_CANCELLED,
     PLAY_FORCED,
     PLAY_FORCE_AUDIO,
     PLUGIN_SLEEPING,
@@ -214,6 +215,10 @@ class XbmcPlugin(AbstractPlugin):
             focused_video_id = None
             played_video_id = None
 
+        play_cancelled = ui.pop_property(PLAY_CANCELLED)
+        if play_cancelled:
+            result = None
+
         items = isinstance(result, (list, tuple))
         item_count = 0
         if items:
@@ -298,7 +303,9 @@ class XbmcPlugin(AbstractPlugin):
                 if fallback:
                     _post_run_action = None
 
-                    if context.is_plugin_folder():
+                    if play_cancelled:
+                        _, _post_run_action = self.uri_action(context, uri)
+                    elif context.is_plugin_folder():
                         if context.is_plugin_path(
                                 uri, PATHS.PLAY
                         ):

@@ -82,6 +82,7 @@ SERVER_WAKEUP = 'server_wakeup'
 WAKEUP = 'wakeup'
 
 # Play options
+PLAY_CANCELLED = 'play_cancelled'
 PLAY_FORCE_AUDIO = 'audio_only'
 PLAY_FORCED = 'play_forced'
 PLAY_PROMPT_QUALITY = 'ask_for_quality'
@@ -158,6 +159,7 @@ __all__ = (
     'WAKEUP',
 
     # Play options
+    'PLAY_CANCELLED',
     'PLAY_FORCE_AUDIO',
     'PLAY_FORCED',
     'PLAY_PROMPT_QUALITY',

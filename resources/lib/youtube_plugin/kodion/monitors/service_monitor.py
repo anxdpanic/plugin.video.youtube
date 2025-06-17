@@ -21,6 +21,7 @@ from ..constants import (
     PATHS,
     PLAYBACK_STOPPED,
     PLAYER_VIDEO_ID,
+    PLAY_CANCELLED,
     PLAY_FORCED,
     PLUGIN_WAKEUP,
     REFRESH_CONTAINER,
@@ -168,16 +169,28 @@ class ServiceMonitor(xbmc.Monitor):
 
                 data = json.loads(data)
                 position = data.get('position', 0)
-                item_path = context.get_infolabel(
-                    'Player.position({0}).FilenameAndPath'.format(position)
-                )
+                playlist_player = context.get_playlist_player()
+                items = playlist_player.get_items()
+                item_uri = items[position]['file'] if items else ''
 
-                if context.is_plugin_path(item_path):
-                    if not context.is_plugin_path(item_path, PATHS.PLAY):
+                if context.is_plugin_path(item_uri):
+                    path, params = context.parse_uri(item_uri)
+                    if path.rstrip('/') != PATHS.PLAY:
                         self.log.warning(('Playlist.OnAdd item is not playable',
-                                          'Path: %s'),
-                                         item_path)
+                                          'Path:   {path}',
+                                          'Params: {params}'),
+                                         path=path,
+                                         params=params)
                         self.set_property(PLAY_FORCED)
+                    elif params.get('action') == 'list':
+                        playlist_player.stop()
+                        playlist_player.clear()
+                        self.log.warning(('Playlist.OnAdd item is a listing',
+                                          'Path:   {path}',
+                                          'Params: {params}'),
+                                         path=path,
+                                         params=params)
+                        self.set_property(PLAY_CANCELLED)
 
             return
 
