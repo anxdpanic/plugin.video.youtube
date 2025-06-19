@@ -453,6 +453,10 @@ class XbmcBusyDialog(object):
 
     def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
         self.close()
+        if exc_val:
+            logging.exception('Error',
+                              exc_info=(exc_type, exc_val, exc_tb),
+                              stacklevel=2)
 
     @staticmethod
     def close():
