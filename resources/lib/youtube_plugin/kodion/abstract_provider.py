@@ -322,70 +322,66 @@ class AbstractProvider(object):
 
         ui = context.get_ui()
         result = None
-        try:
-            if window_cache:
-                function_cache = context.get_function_cache()
-                with ui.on_busy():
-                    result, options = function_cache.run(
-                        self.navigate,
-                        _refresh=True,
-                        _scope=function_cache.SCOPE_NONE,
-                        context=context.clone(path, params),
-                    )
-        except Exception:
-            self.log.exception('Error')
-        finally:
-            uri = context.create_uri(path, params)
-            if result or not window_cache:
-                self.log.debug(('Success',
-                                'URI:      {uri}',
-                                'Cache:    |{window_cache}|',
-                                'Fallback: |{window_fallback}|',
-                                'Replace:  |{window_replace}|',
-                                'Return:   |{window_return}|'),
-                               uri=uri,
-                               window_cache=window_cache,
-                               window_fallback=window_fallback,
-                               window_replace=window_replace,
-                               window_return=window_return)
-            else:
+        uri = context.create_uri(path, params)
+        if window_cache:
+            function_cache = context.get_function_cache()
+            with ui.on_busy():
+                result, options = function_cache.run(
+                    self.navigate,
+                    _refresh=True,
+                    _scope=function_cache.SCOPE_NONE,
+                    context=context.clone(path, params),
+                )
+            if not result:
                 self.log.debug(('No results', 'URI: %s'), uri)
                 return False
 
-            reroute_path = ui.get_property(REROUTE_PATH)
-            if reroute_path:
-                return True
+        self.log.debug(('Success',
+                        'URI:      {uri}',
+                        'Cache:    |{window_cache}|',
+                        'Fallback: |{window_fallback}|',
+                        'Replace:  |{window_replace}|',
+                        'Return:   |{window_return}|'),
+                       uri=uri,
+                       window_cache=window_cache,
+                       window_fallback=window_fallback,
+                       window_replace=window_replace,
+                       window_return=window_return)
 
-            if window_cache:
-                ui.set_property(REROUTE_PATH, path)
-                if container and position:
-                    ui.set_property(CONTAINER_ID, container)
-                    ui.set_property(CONTAINER_POSITION, position)
+        reroute_path = ui.get_property(REROUTE_PATH)
+        if reroute_path:
+            return True
 
-            action = ''.join((
-                'ReplaceWindow' if window_replace else 'ActivateWindow',
-                '(Videos,',
-                uri,
-                ',return)' if window_return else ')',
-            ))
+        if window_cache:
+            ui.set_property(REROUTE_PATH, path)
+            if container and position:
+                ui.set_property(CONTAINER_ID, container)
+                ui.set_property(CONTAINER_POSITION, position)
 
-            timeout = 30
-            while ui.busy_dialog_active():
-                timeout -= 1
-                if timeout < 0:
-                    self.log.warning('Multiple busy dialogs active'
-                                     ' - Rerouting workaround')
-                    return UriItem('command://{0}'.format(action))
-                context.sleep(1)
-            else:
-                context.execute(
-                    action,
-                    # wait=True,
-                    # wait_for=(REROUTE_PATH if window_cache else None),
-                    # wait_for_set=False,
-                    # block_ui=True,
-                )
-                return True
+        action = ''.join((
+            'ReplaceWindow' if window_replace else 'ActivateWindow',
+            '(Videos,',
+            uri,
+            ',return)' if window_return else ')',
+        ))
+
+        timeout = 30
+        while ui.busy_dialog_active():
+            timeout -= 1
+            if timeout < 0:
+                self.log.warning('Multiple busy dialogs active'
+                                 ' - Rerouting workaround')
+                return UriItem('command://{0}'.format(action))
+            context.sleep(1)
+        else:
+            context.execute(
+                action,
+                # wait=True,
+                # wait_for=(REROUTE_PATH if window_cache else None),
+                # wait_for_set=False,
+                # block_ui=True,
+            )
+            return True
 
     @staticmethod
     def on_bookmarks(provider, context, re_match):
