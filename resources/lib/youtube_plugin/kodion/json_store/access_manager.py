@@ -10,11 +10,11 @@
 
 import time
 import uuid
-from hashlib import md5
 
 from .json_store import JSONStore
 from ..compatibility import string_type
 from ..constants import ADDON_ID
+from ..utils import generate_hash
 
 
 class AccessManager(JSONStore):
@@ -569,7 +569,7 @@ class AccessManager(JSONStore):
                      client_secret,
                      update_hash=True):
         last_hash = self.get_last_key_hash(addon_id)
-        current_hash = self.calc_key_hash(api_key, client_id, client_secret)
+        current_hash = generate_hash(api_key, client_id, client_secret)
 
         keys_changed = False
         if not last_hash and current_hash:
@@ -581,7 +581,3 @@ class AccessManager(JSONStore):
                 self.set_last_key_hash(current_hash, addon_id)
             keys_changed = True
         return keys_changed
-
-    @staticmethod
-    def calc_key_hash(key, id, secret, **_kwargs):
-        return md5(''.join((key, id, secret)).encode('utf-8')).hexdigest()

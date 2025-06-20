@@ -12,7 +12,6 @@ from __future__ import absolute_import, division, unicode_literals
 
 import json
 from datetime import date, datetime
-from hashlib import md5
 
 from .menu_items import separator
 from ..compatibility import (
@@ -24,6 +23,7 @@ from ..compatibility import (
     urlsplit,
 )
 from ..constants import MEDIA_PATH
+from ..utils import generate_hash
 
 
 class BaseItem(object):
@@ -88,7 +88,7 @@ class BaseItem(object):
         Returns a unique id of the item.
         :return: unique id of the item.
         """
-        return md5(''.join((self._name, self._uri)).encode('utf-8')).hexdigest()
+        return generate_hash(self._name, self._uri)
 
     def parse_item_ids_from_uri(self):
         if not self._uri:

@@ -15,6 +15,7 @@ import os
 import shutil
 from base64 import urlsafe_b64decode
 from datetime import timedelta
+from hashlib import md5
 from math import floor, log
 from re import MULTILINE, compile as re_compile
 
@@ -506,3 +507,7 @@ def fix_subtitle_stream(stream_type,
     elif sub_format == 'srt':
         content = _srt_to_vtt(content)
     return content
+
+
+def generate_hash(*args, iter=None):
+    return md5(''.join(map(str, args or iter)).encode('utf-8')).hexdigest()

@@ -11,10 +11,10 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from functools import partial
-from hashlib import md5
 from itertools import chain
 
 from .storage import Storage
+from ..utils import generate_hash
 
 
 class FunctionCache(Storage):
@@ -78,7 +78,7 @@ class FunctionCache(Storage):
                 partial_func.args,
                 partial_func.keywords.items(),
             )
-        return md5(','.join(map(str, signature)).encode('utf-8')).hexdigest()
+        return generate_hash(iter=signature)
 
     def get_result(self, func, *args, **kwargs):
         partial_func = partial(func, *args, **kwargs)
