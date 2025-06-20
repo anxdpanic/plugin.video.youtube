@@ -808,23 +808,19 @@ class StreamInfo(YouTubeRequestClient):
         self._auth_client = {}
         self._client_groups = {
             'custom': clients if clients else (),
-            # Access "premium" streams, HLS and DASH
-            # Limited video stream availability
-            'default': (
+            'auth_required_limited_content': (
                 'ios_youtube_tv',
-                'ios',
-            ),
-            # Will play most videos with subtitles at full resolution with HDR
-            # Some restricted videos require additional requests for subtitles
-            # Limited audio stream availability with some clients
-            'mpd': (
-                'android_vr',
                 'android_youtube_tv',
             ),
-            # Progressive streams
-            # Limited video and audio stream availability
+            'auth_disabled_kids': (
+                'ios',
+            ),
+            'auth_enabled_no_kids': (
+                'android_vr',
+            ),
+            'mpd': (
+            ),
             'ask': (
-                # 'media_connect_frontend',
             ),
         }
 
@@ -1594,6 +1590,7 @@ class StreamInfo(YouTubeRequestClient):
         }
         skip_reasons = {
             'latest version',
+            'error code: 6',
         }
         retry_reasons = {
             'try again later',
@@ -1619,7 +1616,7 @@ class StreamInfo(YouTubeRequestClient):
         for name, clients in self._client_groups.items():
             if not clients:
                 continue
-            if name == 'mpd' and not (use_mpd or use_remote_history):
+            if name == 'mpd' and not use_mpd:
                 continue
             if name == 'ask' and use_mpd and not ask_for_quality:
                 continue
@@ -1704,20 +1701,22 @@ class StreamInfo(YouTubeRequestClient):
                                          auth=_has_auth)
                         compare_reason = _reason.lower()
                         if any(why in compare_reason for why in reauth_reasons):
-                            if client_data.get('_auth_required'):
+                            if _client.get('_auth_required') == 'ignore_fail':
+                                continue
+                            elif client_data.get('_auth_required'):
                                 restart = False
                                 abort = True
                             elif restart is None and has_access_token:
                                 client_data['_auth_required'] = True
                                 restart = True
                             break
-                        if any(why in compare_reason for why in retry_reasons):
-                            continue
-                        if any(why in compare_reason for why in skip_reasons):
-                            break
                         if any(why in compare_reason for why in abort_reasons):
                             abort = True
                             break
+                        if any(why in compare_reason for why in skip_reasons):
+                            break
+                        if any(why in compare_reason for why in retry_reasons):
+                            continue
                     else:
                         self.log.debug(('Unknown playabilityStatus in response',
                                         'playabilityStatus: %s'),
