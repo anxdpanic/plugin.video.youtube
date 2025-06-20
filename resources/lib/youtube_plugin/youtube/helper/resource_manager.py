@@ -17,9 +17,10 @@ from ...kodion import logging
 class ResourceManager(object):
     log = logging.getLogger(__name__)
 
-    def __init__(self, provider, context, progress_dialog=None):
+    def __init__(self, provider, context, logged_in, progress_dialog=None):
         self._provider = provider
         self._context = context
+        self._logged_in = logged_in
         self._progress_dialog = progress_dialog
 
         self.new_data = {}
@@ -34,8 +35,8 @@ class ResourceManager(object):
         self._channel_fanart = fanart_type == settings.FANART_CHANNEL
         self._thumb_size = settings.get_thumbnail_size()
 
-    def context_changed(self, context):
-        return self._context != context
+    def context_changed(self, context, logged_in):
+        return self._context != context or self._logged_in != logged_in
 
     def update_progress_dialog(self, progress_dialog):
         old_progress_dialog = self._progress_dialog
@@ -85,7 +86,10 @@ class ResourceManager(object):
         if refresh or not ids:
             result = {}
         else:
-            result = data_cache.get_items(ids, data_cache.ONE_DAY)
+            result = data_cache.get_items(
+                ids,
+                data_cache.ONE_DAY if self._logged_in else None,
+            )
         to_update = [id_ for id_ in ids
                      if id_ not in result
                      or not result[id_]
@@ -159,7 +163,10 @@ class ResourceManager(object):
                     or result[id_].get('_partial')]
         if to_check:
             data_cache = context.get_data_cache()
-            result.update(data_cache.get_items(to_check, data_cache.ONE_MONTH))
+            result.update(data_cache.get_items(
+                to_check,
+                data_cache.ONE_MONTH if self._logged_in else None,
+            ))
         to_update = [id_ for id_ in ids
                      if id_ not in result
                      or not result[id_]
@@ -251,7 +258,10 @@ class ResourceManager(object):
             result = {}
         else:
             data_cache = context.get_data_cache()
-            result = data_cache.get_items(ids, data_cache.ONE_DAY)
+            result = data_cache.get_items(
+                ids,
+                data_cache.ONE_DAY if self._logged_in else None,
+            )
         to_update = [id_ for id_ in ids
                      if id_ not in result
                      or not result[id_]
@@ -345,8 +355,11 @@ class ResourceManager(object):
                 else:
                     batch = data_cache.get_item(
                         '{0},{1}'.format(*batch_id),
-                        data_cache.ONE_HOUR if page_token
-                        else data_cache.ONE_MINUTE * 5
+                        None
+                        if not self._logged_in else
+                        data_cache.ONE_HOUR
+                        if page_token else
+                        data_cache.ONE_MINUTE * 5,
                     )
                 if not batch:
                     to_update.append(batch_id)
@@ -467,7 +480,10 @@ class ResourceManager(object):
             result = {}
         else:
             data_cache = context.get_data_cache()
-            result = data_cache.get_items(ids, data_cache.ONE_MONTH)
+            result = data_cache.get_items(
+                ids,
+                data_cache.ONE_MONTH if self._logged_in else None,
+            )
         to_update = [id_ for id_ in ids
                      if id_
                      and (id_ not in result

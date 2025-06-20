@@ -302,9 +302,13 @@ class Provider(AbstractProvider):
 
     def get_resource_manager(self, context, progress_dialog=None):
         resource_manager = self._resource_manager
-        if not resource_manager or resource_manager.context_changed(context):
+        logged_in = self.is_logged_in()
+        if not resource_manager or resource_manager.context_changed(
+                context, logged_in
+        ):
             new_resource_manager = ResourceManager(proxy(self),
                                                    context,
+                                                   logged_in,
                                                    progress_dialog)
             if not resource_manager:
                 self._resource_manager = new_resource_manager
