@@ -88,7 +88,7 @@ class AbstractProvider(object):
         self.register_path(r''.join((
             '^',
             PATHS.BOOKMARKS,
-            '/(?P<command>add|clear|list|play|remove)/?$'
+            '/(?P<command>add|add_custom|clear|edit|list|play|remove)/?$'
         )), self.on_bookmarks)
 
         self.register_path(r''.join((

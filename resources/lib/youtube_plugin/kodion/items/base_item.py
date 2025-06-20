@@ -38,6 +38,7 @@ class BaseItem(object):
         self._available = True
         self._callback = None
         self._filter_reason = None
+        self._special_sort = None
 
         self._image = ''
         if image:
@@ -357,6 +358,12 @@ class BaseItem(object):
 
     def get_filter_reason(self):
         return self._filter_reason
+
+    def set_special_sort(self, position):
+        self._special_sort = position
+
+    def get_special_sort(self):
+        return self._special_sort
 
 
 class _Encoder(json.JSONEncoder):

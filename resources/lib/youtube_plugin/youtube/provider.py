@@ -48,6 +48,7 @@ from ..kodion.items import (
     menu_items,
 )
 from ..kodion.utils import strip_html_from_text, to_unicode
+from ..kodion.utils.datetime_parser import now
 
 
 class Provider(AbstractProvider):
@@ -1740,6 +1741,9 @@ class Provider(AbstractProvider):
         if not command:
             return False, None
 
+        ui = context.get_ui()
+        localize = context.localize
+
         if command in {'list', 'play'}:
             bookmarks_list = context.get_bookmarks_list()
             items = bookmarks_list.get_items()
@@ -1747,8 +1751,21 @@ class Provider(AbstractProvider):
                 return True, None
 
             v3_response = {
-                'kind': 'youtube#pluginListResponse',
-                'items': []
+                'kind': 'plugin#pluginListResponse',
+                'items': [
+                    {
+                        'kind': 'plugin#pluginItem',
+                        '_params': {
+                            'name': localize('bookmarks.add'),
+                            'uri': context.create_uri(
+                                (PATHS.BOOKMARKS, 'add_custom',),
+                            ),
+                            'image': '{media}/bookmarks.png',
+                            'action': True,
+                            'special_sort': 'top',
+                        },
+                    },
+                ],
             }
 
             def _update_bookmark(context, _id, old_item):
@@ -1784,6 +1801,9 @@ class Provider(AbstractProvider):
 
             for item_id, item in items.items():
                 callback = _update_bookmark(context, item_id, item)
+                item_params = None
+                can_edit = False
+                item_uri = None
                 if isinstance(item, float):
                     kind = 'youtube#channel'
                     yt_id = item_id
@@ -1791,10 +1811,26 @@ class Provider(AbstractProvider):
                     partial_result = True
                 elif isinstance(item, BaseItem):
                     partial_result = False
+                    item_name = item.get_name()
 
                     if isinstance(item, VideoItem):
                         kind = 'youtube#video'
                         yt_id = item.video_id
+                    elif getattr(item, 'is_action', bool)():
+                        kind = 'plugin#pluginItem'
+                        yt_id = False
+                        can_edit = True
+                        item_uri = item.get_uri()
+                        item_params = {
+                            'name': item_name,
+                            'uri': item_uri,
+                            'image': '{media}/bookmarks.png',
+                            'plot': item_uri,
+                            'action': True,
+                            'special_sort': False,
+                            'date_time': item.get_date(),
+                            'category_label': '__inherit__',
+                        }
                     else:
                         yt_id = getattr(item, 'playlist_id', None)
                         if yt_id:
@@ -1802,14 +1838,13 @@ class Provider(AbstractProvider):
                         else:
                             kind = 'youtube#channel'
                             yt_id = getattr(item, 'channel_id', None)
-                    item_name = item.get_name()
                 else:
                     kind = None
                     yt_id = None
                     item_name = ''
                     partial_result = False
 
-                if not yt_id:
+                if yt_id is None:
                     if isinstance(item, BaseItem):
                         item_ids = item.parse_item_ids_from_uri()
                         to_delete = False
@@ -1836,6 +1871,9 @@ class Provider(AbstractProvider):
                     '_partial': partial_result,
                     '_context_menu': {
                         'context_menu': (
+                            menu_items.bookmark_edit(
+                                context, item_id, item_name, item_uri
+                            ) if can_edit else None,
                             menu_items.bookmark_remove(
                                 context, item_id, item_name
                             ),
@@ -1848,6 +1886,8 @@ class Provider(AbstractProvider):
                 }
                 if callback:
                     item['_callback'] = callback
+                if item_params:
+                    item['_params'] = item_params
                 v3_response['items'].append(item)
 
             bookmarks = v3.response_to_items(provider, context, v3_response)
@@ -1867,9 +1907,6 @@ class Provider(AbstractProvider):
             }
             return bookmarks, options
 
-        ui = context.get_ui()
-        localize = context.localize
-
         if command == 'clear':
             if not ui.on_yes_no_input(localize('bookmarks.clear'),
                                       localize('bookmarks.clear.check')):
@@ -1886,6 +1923,45 @@ class Provider(AbstractProvider):
             return True
 
         item_id = params.get('item_id')
+
+        if command in {'add_custom', 'edit'}:
+            results = ui.on_keyboard_input(localize('bookmarks.edit.name'),
+                                           params.get('item_name', ''))
+            if not results[0]:
+                return False
+            item_name = results[1]
+
+            results = ui.on_keyboard_input(localize('bookmarks.edit.uri'),
+                                           params.get('uri', ''))
+            if not results[0]:
+                return False
+            item_uri = results[1]
+            if not context.is_plugin_path(item_uri):
+                return False
+
+            item = DirectoryItem(name=item_name,
+                                 uri=item_uri,
+                                 image='{media}/bookmarks.png',
+                                 plot=item_uri,
+                                 action=True,
+                                 special_sort=False,
+                                 date_time=now(),
+                                 category_label='__inherit__')
+            if item_id:
+                context.get_bookmarks_list().update_item(item_id, repr(item))
+            else:
+                context.get_bookmarks_list().add_item(item.get_id(), repr(item))
+            ui.refresh_container()
+
+            ui.show_notification(
+                localize('updated.x') % item_name
+                if item_id else
+                localize('bookmark.created'),
+                time_ms=2500,
+                audible=False,
+            )
+            return True
+
         if not item_id:
             return False
 

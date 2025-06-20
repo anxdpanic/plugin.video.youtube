@@ -22,6 +22,8 @@ class DirectoryItem(BaseItem):
                  fanart=None,
                  plot=None,
                  action=False,
+                 special_sort=None,
+                 date_time=None,
                  category_label=None,
                  channel_id=None,
                  playlist_id=None,
@@ -36,6 +38,10 @@ class DirectoryItem(BaseItem):
         self._playlist_id = playlist_id
         self._subscription_id = subscription_id
         self._next_page = False
+        if special_sort is not None:
+            self.set_special_sort(special_sort)
+        if date_time is not None:
+            self.set_date_from_datetime(date_time=date_time)
 
     def set_name(self, name, category_label=None):
         name = super(DirectoryItem, self).set_name(name)

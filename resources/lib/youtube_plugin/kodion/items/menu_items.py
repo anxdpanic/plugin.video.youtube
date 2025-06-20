@@ -615,6 +615,21 @@ def bookmark_add_channel(context, channel_id, channel_name=''):
     )
 
 
+def bookmark_edit(context, item_id, item_name, item_uri):
+    return (
+        context.localize('edit.x') % context.localize('bookmark'),
+        context.create_uri(
+            (PATHS.BOOKMARKS, 'edit',),
+            {
+                'item_id': item_id,
+                'item_name': item_name,
+                'uri': item_uri,
+            },
+            run=True,
+        ),
+    )
+
+
 def bookmark_remove(context, item_id, item_name=''):
     return (
         context.localize('bookmark.remove'),

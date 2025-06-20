@@ -220,11 +220,11 @@ msgid "Watch Later"
 msgstr ""
 
 msgctxt "#30108"
-msgid ""
+msgid "Enter the name of the bookmark"
 msgstr ""
 
 msgctxt "#30109"
-msgid ""
+msgid "Enter a valid plugin URL for the bookmark"
 msgstr ""
 
 msgctxt "#30110"
@@ -310,7 +310,7 @@ msgid ""
 msgstr ""
 
 msgctxt "#30501"
-msgid ""
+msgid "Edit %s"
 msgstr ""
 
 msgctxt "#30502"

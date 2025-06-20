@@ -551,7 +551,11 @@ def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
     if directory_item.next_page:
         props['specialSort'] = 'bottom'
     else:
-        special_sort = 'top'
+        special_sort = directory_item.get_special_sort()
+        if special_sort is None:
+            special_sort = 'top'
+        elif special_sort is False:
+            special_sort = None
 
         prop_value = directory_item.subscription_id
         if prop_value:
