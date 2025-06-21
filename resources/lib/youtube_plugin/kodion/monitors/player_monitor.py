@@ -22,6 +22,7 @@ from ..constants import (
     PLAYER_DATA,
     PLAY_WITH,
     REFRESH_CONTAINER,
+    TRAKT_PAUSE_FLAG,
 )
 
 
@@ -412,6 +413,7 @@ class PlayerMonitor(xbmc.Player):
             ui.clear_property(BUSY_FLAG)
 
         ui.pop_property(PLAY_WITH)
+        ui.clear_property(TRAKT_PAUSE_FLAG, raw=True)
 
         self.stop_threads()
         self.cleanup_threads()

@@ -32,6 +32,7 @@ from ...constants import (
     REFRESH_CONTAINER,
     RELOAD_ACCESS_MANAGER,
     REROUTE_PATH,
+    TRAKT_PAUSE_FLAG,
     VIDEO_ID,
     WINDOW_FALLBACK,
     WINDOW_REPLACE,
@@ -292,6 +293,7 @@ class XbmcPlugin(AbstractPlugin):
             succeeded = bool(result)
             if not succeeded:
                 ui.clear_property(BUSY_FLAG)
+                ui.clear_property(TRAKT_PAUSE_FLAG, raw=True)
                 for param in FORCE_PLAY_PARAMS:
                     ui.clear_property(param)
 

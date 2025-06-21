@@ -31,6 +31,7 @@ from ...kodion.constants import (
     PLAY_STRM,
     PLAY_WITH,
     SERVER_WAKEUP,
+    TRAKT_PAUSE_FLAG,
 )
 from ...kodion.items import AudioItem, UriItem, VideoItem
 from ...kodion.network import get_connect_address
@@ -171,6 +172,7 @@ def _play_stream(provider, context):
     }
 
     ui.set_property(PLAYER_DATA, json.dumps(playback_data, ensure_ascii=False))
+    ui.set_property(TRAKT_PAUSE_FLAG, raw=True)
     context.send_notification(PLAYBACK_INIT, playback_data)
     return media_item
 

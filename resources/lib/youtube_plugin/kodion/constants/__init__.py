@@ -57,6 +57,7 @@ VALUE_TO_STR = {
 ABORT_FLAG = 'abort_requested'
 BUSY_FLAG = 'busy'
 WAIT_END_FLAG = 'builtin_completed'
+TRAKT_PAUSE_FLAG = 'script.trakt.paused'
 
 # ListItem Properties
 CHANNEL_ID = 'channel_id'
@@ -133,6 +134,7 @@ __all__ = (
     # Flags
     'ABORT_FLAG',
     'BUSY_FLAG',
+    'TRAKT_PAUSE_FLAG',
     'WAIT_END_FLAG',
 
     # ListItem properties
