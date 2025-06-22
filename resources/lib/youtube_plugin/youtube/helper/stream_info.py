@@ -2163,11 +2163,17 @@ class StreamInfo(YouTubeRequestClient):
                     else:
                         compare_width = width
                         compare_height = height
+                    compare_ratio = width / height
 
                     bound = None
                     for quality in qualities:
-                        if compare_width > quality['width']:
-                            if bound:
+                        if compare_width >= quality['width']:
+                            # Bounds are defined using a 16:9 aspect ratio
+                            # If stream aspect ratio is approximately 16:9 then
+                            # simply use current quality without testing bounds
+                            if compare_ratio > 1.69:  # 1.69 ~= 0.95 * 16 / 9
+                                bound = quality
+                            elif bound:
                                 if compare_height >= bound['min_height']:
                                     quality = bound
                                 elif compare_height < quality['min_height']:
