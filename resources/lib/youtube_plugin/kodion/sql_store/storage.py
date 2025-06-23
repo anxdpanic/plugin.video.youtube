@@ -152,6 +152,12 @@ class Storage(object):
             '  ) <= {{0}}'
             ' );'
         ),
+        'refresh': (
+            'UPDATE'
+            ' {table}'
+            ' SET timestamp = ?'
+            ' WHERE key = ?;'
+        ),
         'remove': (
             'DELETE'
             ' FROM {table}'
@@ -438,6 +444,11 @@ class Storage(object):
                 self._execute(cursor, optimize_query)
             self._execute(cursor, query, many=(not flatten), values=values)
         self._optimize_file_size()
+
+    def _refresh(self, item_id, timestamp=None):
+        values = (timestamp or since_epoch(), to_str(item_id))
+        with self._lock, self as (db, cursor), db:
+            self._execute(cursor, self._sql['refresh'], values=values)
 
     def _update(self, item_id, item, timestamp=None):
         values = self._encode(item_id, item, timestamp, for_update=True)
