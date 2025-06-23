@@ -96,6 +96,12 @@ class Storage(object):
             ' ORDER BY {order_col} DESC'
             ' LIMIT {{0}};'
         ),
+        'get_by_key_excluding': (
+            'SELECT *'
+            ' FROM {table}'
+            ' WHERE key in ({{0}})'
+            ' AND key not in ({{1}});'
+        ),
         'get_many': (
             'SELECT *'
             ' FROM {table}'
@@ -498,7 +504,7 @@ class Storage(object):
 
     def _get_by_ids(self, item_ids=None, oldest_first=True, limit=-1,
                     wildcard=False, seconds=None, process=None,
-                    as_dict=False, values_only=True):
+                    as_dict=False, values_only=True, excluding=None):
         if not item_ids:
             if oldest_first:
                 query = self._sql['get_many']
@@ -512,9 +518,17 @@ class Storage(object):
                 query = self._sql['get_by_key_like_desc']
             query = query.format(limit)
         else:
-            num_ids = len(item_ids)
-            query = self._sql['get_by_key'].format('?,' * (num_ids - 1) + '?')
-            item_ids = tuple(item_ids)
+            if excluding:
+                query = self._sql['get_by_key_excluding'].format(
+                    '?,' * (len(item_ids) - 1) + '?',
+                    '?,' * (len(excluding) - 1) + '?',
+                )
+                item_ids = tuple(item_ids) + tuple(excluding)
+            else:
+                query = self._sql['get_by_key'].format(
+                    '?,' * (len(item_ids) - 1) + '?'
+                )
+                item_ids = tuple(item_ids)
 
         epoch = since_epoch()
         cut_off = epoch - seconds if seconds else 0
