@@ -496,7 +496,12 @@ class Storage(object):
             return to_str(key), timestamp, blob, size
         return timestamp, blob, size
 
-    def _get(self, item_id, process=None, seconds=None, as_dict=False):
+    def _get(self,
+             item_id,
+             process=None,
+             seconds=None,
+             as_dict=False,
+             with_timestamp=False):
         with self._lock, self as (db, cursor), db:
             result = self._execute(cursor, self._sql['get'], [to_str(item_id)])
             item = result.fetchone() if result else None
@@ -505,11 +510,14 @@ class Storage(object):
         cut_off = since_epoch() - seconds if seconds else 0
         if not cut_off or item[1] >= cut_off:
             if as_dict:
-                return {
+                output = {
                     'item_id': item_id,
                     'age': since_epoch() - item[1],
                     'value': self._decode(item[2], process, item),
                 }
+                if with_timestamp:
+                    output['timestamp'] = item[1]
+                return output
             return self._decode(item[2], process, item)
         return None
 
