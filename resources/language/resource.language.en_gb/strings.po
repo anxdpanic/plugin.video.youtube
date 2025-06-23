@@ -153,7 +153,7 @@ msgid "Configure %s?"
 msgstr ""
 
 msgctxt "#30031"
-msgid ""
+msgid "Requests cache size (MB)"
 msgstr ""
 
 msgctxt "#30032"
@@ -390,15 +390,15 @@ msgid "Add to..."
 msgstr ""
 
 msgctxt "#30521"
-msgid ""
+msgid "Delete requests cache database"
 msgstr ""
 
 msgctxt "#30522"
-msgid ""
+msgid "Clear requests cache"
 msgstr ""
 
 msgctxt "#30523"
-msgid ""
+msgid "requests cache"
 msgstr ""
 
 msgctxt "#30524"

@@ -11,14 +11,16 @@ from __future__ import absolute_import, division, unicode_literals
 
 import atexit
 import socket
+import time
 
-from requests import Session
+from requests import Request, Session
 from requests.adapters import HTTPAdapter, Retry
 from requests.exceptions import InvalidJSONError, RequestException, URLRequired
 from requests.utils import DEFAULT_CA_BUNDLE_PATH, extract_zipped_paths
 from urllib3.util.ssl_ import create_urllib3_context
 
 from .. import logging
+from ..utils import generate_hash
 
 
 __all__ = (
@@ -83,6 +85,8 @@ class BaseRequestsClass(object):
     _timeout = (9.5, 27)
     _proxy = None
     _default_exc = (RequestException,)
+
+    METHODS_TO_CACHE = {'GET', 'HEAD'}
 
     def __init__(self,
                  context=None,
@@ -150,6 +154,7 @@ class BaseRequestsClass(object):
                 error_title=None,
                 error_info=None,
                 raise_exc=False,
+                cache=True,
                 **kwargs):
         if timeout is None:
             timeout = self._timeout
@@ -162,6 +167,65 @@ class BaseRequestsClass(object):
         stacklevel = kwargs.pop('stacklevel', 2)
 
         response = None
+        request_id = None
+        cached_response = None
+        etag = None
+        timestamp = None
+
+        if url:
+            prepared_request = Request(
+                method=method,
+                url=url,
+                headers=headers,
+                files=files,
+                data=data,
+                json=json,
+                params=params,
+                auth=auth,
+                cookies=cookies,
+                hooks=hooks,
+            ).prepare()
+
+        if cache:
+            if prepared_request:
+                method = prepared_request.method
+                if method in self.METHODS_TO_CACHE:
+                    headers = prepared_request.headers
+                    request_id = generate_hash(
+                        method,
+                        prepared_request.url,
+                        headers,
+                        prepared_request.body,
+                    )
+
+            if request_id:
+                cache = self._context.get_requests_cache()
+                cached_request = cache.get(request_id)
+            else:
+                cache = False
+                cached_request = None
+
+            if cached_request:
+                etag, cached_response = cached_request['value']
+                if cached_response is not None:
+                    if etag:
+                        # Etag is meant to be enclosed in double quotes, but the
+                        # Google servers don't seem to support this
+                        headers['If-None-Match'] = '"{0}", {0}'.format(etag)
+                    timestamp = time.strftime(
+                        '%a, %d %b %Y %H:%M:%S GMT',
+                        time.gmtime(cached_request['timestamp']),
+                    )
+                    headers['If-Modified-Since'] = timestamp
+                    self.log.debug(('Cached response',
+                                    'Request ID: {request_id}',
+                                    'Etag:       {etag}',
+                                    'Modified:   {timestamp}'),
+                                   request_id=request_id,
+                                   etag=etag,
+                                   timestamp=timestamp,
+                                   stacklevel=stacklevel)
+
         try:
             if prepared_request:
                 response = self._session.send(
@@ -173,38 +237,25 @@ class BaseRequestsClass(object):
                     timeout=timeout,
                     allow_redirects=allow_redirects,
                 )
-            elif url:
-                response = self._session.request(
-                    method=method,
-                    url=url,
-                    params=params,
-                    data=data,
-                    headers=headers,
-                    cookies=cookies,
-                    files=files,
-                    auth=auth,
-                    timeout=timeout,
-                    allow_redirects=allow_redirects,
-                    proxies=proxies,
-                    hooks=hooks,
-                    stream=stream,
-                    verify=verify,
-                    cert=cert,
-                    json=json,
-                )
             else:
                 raise URLRequired()
 
-            if not getattr(response, 'status_code', None):
+            status_code = getattr(response, 'status_code', None)
+            if not status_code:
                 raise self._default_exc[0](response=response)
 
-            if response_hook:
-                if response_hook_kwargs is None:
-                    response_hook_kwargs = {}
-                response_hook_kwargs['response'] = response
-                response = response_hook(**response_hook_kwargs)
-            else:
-                response.raise_for_status()
+            if cached_response is None or status_code != 304:
+                timestamp = response.headers.get('Date')
+                if response_hook:
+                    if response_hook_kwargs is None:
+                        response_hook_kwargs = {}
+                    response_hook_kwargs['response'] = response
+                    etag, response = response_hook(**response_hook_kwargs)
+                else:
+                    etag = None
+                    response.raise_for_status()
+                # Only clear cached response if there was no error response
+                cached_response = None
 
         except self._default_exc as exc:
             exc_response = exc.response or response
@@ -271,5 +322,28 @@ class BaseRequestsClass(object):
                     raise_exc.__cause__ = exc
                     raise raise_exc
                 raise exc
+
+        if cache:
+            if cached_response is not None:
+                self.log.debug(('Using cached response',
+                                'Request ID: {request_id}',
+                                'Etag:       {etag}',
+                                'Modified:   {timestamp}'),
+                               request_id=request_id,
+                               etag=etag,
+                               timestamp=timestamp,
+                               stacklevel=stacklevel)
+                cache.set(request_id)
+                response = cached_response
+            else:
+                self.log.debug(('Saving response to cache',
+                                'Request ID: {request_id}',
+                                'Etag:       {etag}',
+                                'Modified:   {timestamp}'),
+                               request_id=request_id,
+                               etag=etag,
+                               timestamp=timestamp,
+                               stacklevel=stacklevel)
+                cache.set(request_id, response, etag)
 
         return response

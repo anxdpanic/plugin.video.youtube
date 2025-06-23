@@ -457,7 +457,8 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                         method='GET',
                         headers=headers,
                         allow_redirects=False,
-                        stream=True
+                        stream=True,
+                        cache=False,
                 ) as response:
                     if response is None:
                         status = -1
@@ -485,6 +486,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                                 prepared_request=request,
                                 allow_redirects=False,
                                 stream=True,
+                                cache=False,
                             )
                             if response is None:
                                 break
@@ -624,7 +626,8 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                                              method='POST',
                                              headers=li_headers,
                                              data=post_data,
-                                             stream=True)
+                                             stream=True,
+                                             cache=False)
             if response is None:
                 self.send_error(500)
                 return
@@ -956,7 +959,7 @@ def httpd_status(context, address=None):
     ))
     if not RequestHandler.requests:
         RequestHandler.requests = BaseRequestsClass(context=context)
-    response = RequestHandler.requests.request(url)
+    response = RequestHandler.requests.request(url, cache=False)
     if response is None:
         result = None
     else:
@@ -983,7 +986,7 @@ def get_client_ip_address(context):
     ))
     if not RequestHandler.requests:
         RequestHandler.requests = BaseRequestsClass(context=context)
-    response = RequestHandler.requests.request(url)
+    response = RequestHandler.requests.request(url, cache=False)
     if response is not None and response.status_code == 200:
         response_json = response.json()
         if response_json:

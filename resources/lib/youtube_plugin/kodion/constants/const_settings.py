@@ -119,6 +119,7 @@ WATCH_LATER_REMOVE = 'youtube.playlist.watchlater.autoremove'  # (bool)
 VERIFY_SSL = 'requests.ssl.verify'  # (bool)
 CONNECT_TIMEOUT = 'requests.timeout.connect'  # (int)
 READ_TIMEOUT = 'requests.timeout.read'  # (int)
+REQUESTS_CACHE_SIZE = 'requests.cache.size'  # (int)
 
 PROXY_SOURCE = 'requests.proxy.source'  # (int)
 PROXY_ENABLED = 'requests.proxy.enabled'  # (bool)

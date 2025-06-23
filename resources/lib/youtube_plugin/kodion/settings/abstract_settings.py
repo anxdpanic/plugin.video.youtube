@@ -256,6 +256,12 @@ class AbstractSettings(object):
         read_timout = self.get_int(SETTINGS.READ_TIMEOUT, 27, echo_level=3)
         return connect_timeout, read_timout
 
+    def requests_cache_size(self, value=None):
+        if value is not None:
+            self.set_int(SETTINGS.REQUESTS_CACHE_SIZE, value, echo_level=3)
+            return value
+        return self.get_int(SETTINGS.REQUESTS_CACHE_SIZE, 20, echo_level=3)
+
     _PROXY_TYPE_SCHEME = {
         0: 'http',
         1: 'socks4',

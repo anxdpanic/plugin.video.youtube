@@ -840,7 +840,7 @@ class StreamInfo(YouTubeRequestClient):
             kwargs.setdefault('raise_exc', True)
             raise InvalidJSON(exc, **kwargs)
         response.raise_for_status()
-        return json_data
+        return json_data.get('etag'), json_data
 
     @staticmethod
     def _response_hook_text(**kwargs):
@@ -849,7 +849,7 @@ class StreamInfo(YouTubeRequestClient):
         result = response and response.text
         if not result:
             raise YouTubeException('Empty response text', **kwargs)
-        return result
+        return None, result
 
     @staticmethod
     def _error_hook(**kwargs):

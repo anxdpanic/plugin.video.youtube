@@ -42,6 +42,7 @@ from ..sql_store import (
     FeedHistory,
     FunctionCache,
     PlaybackHistory,
+    RequestCache,
     SearchHistory,
     WatchLaterList,
 )
@@ -151,6 +152,7 @@ class AbstractContext(object):
         self._feed_history = None
         self._function_cache = None
         self._playback_history = None
+        self._requests_cache = None
         self._search_history = None
         self._watch_later_list = None
 
@@ -235,6 +237,18 @@ class AbstractContext(object):
             )
             self._function_cache = function_cache
         return function_cache
+
+    def get_requests_cache(self):
+        uuid = self.get_uuid()
+        requests_cache = self._requests_cache
+        if not requests_cache or requests_cache.uuid != uuid:
+            filepath = (self.get_data_path(), uuid, 'requests_cache.sqlite')
+            requests_cache = RequestCache(
+                filepath,
+                max_file_size_mb=self.get_settings().requests_cache_size(),
+            )
+            self._requests_cache = requests_cache
+        return requests_cache
 
     def get_search_history(self):
         uuid = self.get_uuid()

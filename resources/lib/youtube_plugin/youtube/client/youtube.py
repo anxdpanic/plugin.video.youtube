@@ -2823,7 +2823,7 @@ class YouTube(LoginClient):
                            stacklevel=4)
 
         if response.status_code == 204 and 'no_content' in kwargs:
-            return True
+            return None, True
 
         try:
             json_data = response.json()
@@ -2838,7 +2838,7 @@ class YouTube(LoginClient):
                                    **kwargs)
 
         response.raise_for_status()
-        return json_data
+        return json_data.get('etag'), json_data
 
     def _error_hook(self, **kwargs):
         exc = kwargs['exc']

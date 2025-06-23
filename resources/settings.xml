@@ -1003,6 +1003,18 @@
                         <formatlabel>14045</formatlabel>
                     </control>
                 </setting>
+                <setting id="requests.cache.size" type="integer" label="30031" help="">
+                    <level>0</level>
+                    <default>20</default>
+                    <constraints>
+                        <minimum>5</minimum>
+                        <step>1</step>
+                        <maximum>100</maximum>
+                    </constraints>
+                    <control format="integer" type="slider">
+                        <popup>false</popup>
+                    </control>
+                </setting>
                 <setting id="requests.proxy.source" type="integer" label="713" help="36380">
                     <level>0</level>
                     <default>1</default>  <!-- Kodi proxy -->
@@ -1192,6 +1204,14 @@
                     <data>RunScript($ID,maintenance/clear?target=data_cache)</data>
                     <control format="action" type="button"/>
                 </setting>
+                <setting id="kodion.maintain.clear.requests_cache" type="action" label="30522" help="">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <data>RunScript($ID,maintenance/clear?target=requests_cache)</data>
+                    <control format="action" type="button"/>
+                </setting>
                 <setting id="kodion.maintain.clear.search_history" type="action" label="30556" help="">
                     <level>0</level>
                     <constraints>
@@ -1248,6 +1268,14 @@
                         <allowempty>true</allowempty>
                     </constraints>
                     <data>RunScript($ID,maintenance/delete?target=data_cache)</data>
+                    <control format="action" type="button"/>
+                </setting>
+                <setting id="kodion.maintain.delete.requests_cache" type="action" label="30521" help="">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <data>RunScript($ID,maintenance/delete?target=requests_cache)</data>
                     <control format="action" type="button"/>
                 </setting>
                 <setting id="kodion.maintain.delete.search_history" type="action" label="30554" help="">

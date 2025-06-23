@@ -91,7 +91,7 @@ class LoginClient(YouTubeRequestClient):
         except ValueError as exc:
             raise InvalidJSON(exc, response=response)
         response.raise_for_status()
-        return json_data
+        return json_data.get('etag'), json_data
 
     @staticmethod
     def _error_hook(**kwargs):

@@ -12,6 +12,7 @@ from .data_cache import DataCache
 from .feed_history import FeedHistory
 from .function_cache import FunctionCache
 from .playback_history import PlaybackHistory
+from .request_cache import RequestCache
 from .search_history import SearchHistory
 from .watch_later_list import WatchLaterList
 
@@ -22,6 +23,7 @@ __all__ = (
     'FeedHistory',
     'FunctionCache',
     'PlaybackHistory',
+    'RequestCache',
     'SearchHistory',
     'WatchLaterList',
 )

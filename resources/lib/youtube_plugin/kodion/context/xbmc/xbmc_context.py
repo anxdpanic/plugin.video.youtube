@@ -167,6 +167,7 @@ class XbmcContext(AbstractContext):
         'maintenance.feed_history': 30814,
         'maintenance.function_cache': 30557,
         'maintenance.playback_history': 30673,
+        'maintenance.requests_cache': 30523,
         'maintenance.search_history': 30558,
         'maintenance.watch_later': 30782,
         'my_channel': 30507,
@@ -697,6 +698,7 @@ class XbmcContext(AbstractContext):
         new_context._feed_history = self._feed_history
         new_context._function_cache = self._function_cache
         new_context._playback_history = self._playback_history
+        new_context._requests_cache = self._requests_cache
         new_context._search_history = self._search_history
         new_context._watch_later_list = self._watch_later_list
 
