@@ -528,27 +528,33 @@ class YouTube(LoginClient):
 
         # Related videos are retrieved for the following num_items from history
         num_items = 10
-        local_history = self._context.get_settings().use_local_history()
-        history_id = self._context.get_access_manager().get_watch_history_id()
-        if not history_id:
-            if local_history:
-                history = self._context.get_playback_history()
-                video_ids = history.get_items(limit=num_items)
-            else:
-                return payload
-        else:
-            history = self.get_playlist_items(history_id, max_results=num_items)
-            if history and 'items' in history:
-                history_items = history['items'] or []
-                video_ids = []
-            else:
-                return payload
+        video_ids = []
 
-            for item in history_items:
-                try:
-                    video_ids.append(item['snippet']['resourceId']['videoId'])
-                except KeyError:
-                    continue
+        history_id = self._context.get_access_manager().get_watch_history_id()
+        if history_id:
+            history = self.get_playlist_items(history_id,
+                                              max_results=num_items,
+                                              mine=True)
+            history_items = history and history.get('items')
+            if history_items:
+                for item in history_items:
+                    try:
+                        video_id = item['snippet']['resourceId']['videoId']
+                    except KeyError:
+                        continue
+                    video_ids.append(video_id)
+
+        remaining_items = num_items - len(video_ids)
+        local_history = self._context.get_settings().use_local_history()
+        if local_history and remaining_items:
+            history = self._context.get_playback_history()
+            history_items = history.get_items(limit=remaining_items,
+                                              excluding=video_ids)
+            if history_items:
+                video_ids.extend(history_items)
+
+        if not video_ids:
+            return payload
 
         # Fetch existing list of items, if any
         data_cache = self._context.get_data_cache()
