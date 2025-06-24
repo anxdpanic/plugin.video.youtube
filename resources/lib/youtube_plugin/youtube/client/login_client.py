@@ -46,13 +46,12 @@ class LoginClient(YouTubeRequestClient):
 
     _config = {}
     _config_tv = {}
-    _access_token = ''
-    _access_token_tv = ''
+    _access_tokens = {}
 
     def __init__(self,
                  configs=None,
-                 access_token='',
-                 access_token_tv='',
+                 access_token=None,
+                 access_token_tv=None,
                  **kwargs):
         super(LoginClient, self).__init__(exc_type=LoginException, **kwargs)
         LoginClient.init(
@@ -64,19 +63,24 @@ class LoginClient(YouTubeRequestClient):
     @classmethod
     def init(cls,
              configs=None,
-             access_token='',
-             access_token_tv='',
+             access_token=None,
+             access_token_tv=None,
              **_kwargs):
-        if configs is None:
-            configs = {}
-        cls._config = configs.get('main') or {}
-        cls._config_tv = configs.get('youtube-tv') or {}
-        cls._access_token = access_token
-        cls._access_token_tv = access_token_tv
+        if configs is not None:
+            cls._config = configs.get('main') or {}
+            cls._config_tv = configs.get('youtube-tv') or {}
+        cls.set_access_token(personal=access_token, tv=access_token_tv)
 
     def reinit(self, **kwargs):
         super(LoginClient, self).reinit(**kwargs)
         LoginClient.init(**kwargs)
+
+    @classmethod
+    def set_access_token(cls, personal=None, tv=None):
+        if personal is not None:
+            cls._access_tokens['personal'] = personal
+        if tv is not None:
+            cls._access_tokens['tv'] = tv
 
     @staticmethod
     def _response_hook(**kwargs):
@@ -104,12 +108,6 @@ class LoginClient(YouTubeRequestClient):
                 and json_data.get('code') == 400):
             return None, None, None, json_data, InvalidGrant(json_data)
         return None, None, None, json_data, LoginException(json_data)
-
-    def set_access_token(self, personal=None, tv=None):
-        if personal is not None:
-            self._access_token = personal
-        if tv is not None:
-            self._access_token_tv = tv
 
     def revoke(self, refresh_token):
         # https://developers.google.com/youtube/v3/guides/auth/devices

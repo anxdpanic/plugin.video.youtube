@@ -16,11 +16,11 @@ from os import path as os_path
 from random import choice as random_choice
 from re import compile as re_compile
 
-from .ratebypass import ratebypass
-from .signature.cipher import Cipher
-from .subtitles import SUBTITLE_SELECTIONS, Subtitles
-from .utils import THUMB_TYPES
-from ..client.request_client import YouTubeRequestClient
+from .login_client import LoginClient
+from ..helper.ratebypass import ratebypass
+from ..helper.signature.cipher import Cipher
+from ..helper.subtitles import SUBTITLE_SELECTIONS, Subtitles
+from ..helper.utils import THUMB_TYPES
 from ..youtube_exceptions import InvalidJSON, YouTubeException
 from ...kodion import logging
 from ...kodion.compatibility import (
@@ -45,7 +45,7 @@ from ...kodion.utils import (
 from ...kodion.utils.datetime_parser import fromtimestamp
 
 
-class StreamInfo(YouTubeRequestClient):
+class PlayerClient(LoginClient):
     log = logging.getLogger(__name__)
 
     BASE_PATH = make_dirs(TEMP_PATH)
@@ -775,8 +775,6 @@ class StreamInfo(YouTubeRequestClient):
 
     def __init__(self,
                  context,
-                 access_token='',
-                 access_token_tv='',
                  clients=None,
                  ask_for_quality=False,
                  audio_only=False,
@@ -786,8 +784,6 @@ class StreamInfo(YouTubeRequestClient):
         self.yt_item = None
         self._context = context
 
-        self._access_token = access_token
-        self._access_token_tv = access_token_tv
         self._ask_for_quality = ask_for_quality
         self._audio_only = audio_only
         self._use_mpd = use_mpd
@@ -824,7 +820,7 @@ class StreamInfo(YouTubeRequestClient):
             )),
         )
 
-        super(StreamInfo, self).__init__(context=context, **kwargs)
+        super(PlayerClient, self).__init__(context=context, **kwargs)
 
     @staticmethod
     def _response_hook_json(**kwargs):
@@ -1599,7 +1595,7 @@ class StreamInfo(YouTubeRequestClient):
         }
         abort = False
 
-        has_access_token = bool(self._access_token or self._access_token_tv)
+        has_access_token = bool(self._access_tokens)
         client_data = {
             'json': {
                 'videoId': video_id,
@@ -1608,8 +1604,8 @@ class StreamInfo(YouTubeRequestClient):
             'method': 'POST',
             '_auth_required': False,
             '_auth_requested': 'personal' if use_remote_history else False,
-            '_access_token': self._access_token,
-            '_access_token_tv': self._access_token_tv,
+            '_access_token': self._access_tokens.get('personal'),
+            '_access_token_tv': self._access_tokens.get('tv'),
             '_visitor_data': None,
         }
 

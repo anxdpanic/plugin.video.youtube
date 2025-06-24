@@ -19,7 +19,7 @@ from random import randint
 from re import compile as re_compile
 
 from .login_client import LoginClient
-from ..helper.stream_info import StreamInfo
+from .player_client import PlayerClient
 from ..helper.utils import channel_filter_split
 from ..helper.v3 import pre_fill
 from ..youtube_exceptions import InvalidJSON, YouTubeException
@@ -102,16 +102,14 @@ class YouTube(LoginClient):
                          no_content=True,
                          do_auth=True)
 
-    def get_streams(self,
-                    context,
+    @staticmethod
+    def get_streams(context,
                     video_id,
                     ask_for_quality=False,
                     audio_only=False,
                     use_mpd=True):
-        return StreamInfo(
-            context,
-            access_token=self._access_token,
-            access_token_tv=self._access_token_tv,
+        return PlayerClient(
+            context=context,
             ask_for_quality=ask_for_quality,
             audio_only=audio_only,
             use_mpd=use_mpd,
@@ -2926,10 +2924,12 @@ class YouTube(LoginClient):
         if do_auth:
             client_data.setdefault('_auth_requested', True)
             # a config can decide if a token is allowed
-            if self._access_token and self._config.get('token-allowed', True):
-                client_data['_access_token'] = self._access_token
-            if self._access_token_tv:
-                client_data['_access_token_tv'] = self._access_token_tv
+            access_token = self._access_tokens.get('personal')
+            if access_token and self._config.get('token-allowed', True):
+                client_data['_access_token'] = access_token
+            access_token = self._access_tokens.get('tv')
+            if access_token:
+                client_data['_access_token_tv'] = access_token
 
         key = self._config.get('key')
         if key:
