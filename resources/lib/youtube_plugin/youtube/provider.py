@@ -113,6 +113,7 @@ class Provider(AbstractProvider):
         self._client = None
         if self._client:
             self._client.reinit(**kwargs)
+        self._logged_in = False
 
     def get_client(self, context):
         access_manager = context.get_access_manager()
