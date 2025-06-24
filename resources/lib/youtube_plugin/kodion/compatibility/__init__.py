@@ -16,6 +16,7 @@ __all__ = (
     'byte_string_type',
     'datetime_infolabel',
     'entity_escape',
+    'generate_hash',
     'parse_qs',
     'parse_qsl',
     'quote',
@@ -39,6 +40,7 @@ __all__ = (
 
 # Kodi v19+ and Python v3.x
 try:
+    from hashlib import md5
     from html import unescape
     from http.server import BaseHTTPRequestHandler
     from io import StringIO
@@ -83,8 +85,15 @@ try:
                       })):
         return text.translate(entities)
 
+
+    def generate_hash(*args, **kwargs):
+        return md5(''.join(
+            map(str, args or kwargs.get('iter'))
+        ).encode('utf-8')).hexdigest()
+
 # Compatibility shims for Kodi v18 and Python v2.7
 except ImportError:
+    from hashlib import md5
     from BaseHTTPServer import BaseHTTPRequestHandler
     from SocketServer import TCPServer, ThreadingMixIn
     from StringIO import StringIO as _StringIO
@@ -184,6 +193,12 @@ except ImportError:
         for key, value in entities.viewitems():
             text = text.replace(key, value)
         return text
+
+
+    def generate_hash(*args, **kwargs):
+        return md5(''.join(
+            map(to_str, args or kwargs.get('iter'))
+        )).hexdigest()
 
 # Kodi v20+
 if hasattr(xbmcgui.ListItem, 'setDateTime'):

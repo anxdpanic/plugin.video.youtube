@@ -15,13 +15,13 @@ import os
 import shutil
 from base64 import urlsafe_b64decode
 from datetime import timedelta
-from hashlib import md5
 from math import floor, log
 from re import MULTILINE, compile as re_compile
 
 from .. import logging
 from ..compatibility import (
     byte_string_type,
+    generate_hash,
     parse_qs,
     string_type,
     urlencode,
@@ -37,6 +37,7 @@ __all__ = (
     'find_video_id',
     'fix_subtitle_stream',
     'friendly_number',
+    'generate_hash',
     'get_kodi_setting_bool',
     'get_kodi_setting_value',
     'jsonrpc',
@@ -507,7 +508,3 @@ def fix_subtitle_stream(stream_type,
     elif sub_format == 'srt':
         content = _srt_to_vtt(content)
     return content
-
-
-def generate_hash(*args, iter=None):
-    return md5(''.join(map(str, args or iter)).encode('utf-8')).hexdigest()
