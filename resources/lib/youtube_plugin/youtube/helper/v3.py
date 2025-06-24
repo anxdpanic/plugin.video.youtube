@@ -691,15 +691,15 @@ def response_to_items(provider,
 
             pre_filler = json_data.get('_pre_filler')
             if pre_filler:
-                if hasattr(pre_filler, 'func'):
-                    _json_data = pre_fill(
-                        filler=pre_filler,
+                if hasattr(pre_filler, '__nowrap__'):
+                    _json_data = pre_filler(
                         json_data=json_data,
                         max_results=remaining,
                         exclude=None if allow_duplicates else exclude_current,
                     )
                 else:
-                    _json_data = pre_filler(
+                    _json_data = pre_fill(
+                        filler=pre_filler,
                         json_data=json_data,
                         max_results=remaining,
                         exclude=None if allow_duplicates else exclude_current,
@@ -775,13 +775,13 @@ def response_to_items(provider,
             if not post_filler or post_fill_attempts <= 0:
                 break
 
-            if hasattr(post_filler, 'func'):
-                _json_data = post_fill(
-                    filler=post_filler,
+            if hasattr(post_filler, '__nowrap__'):
+                _json_data = post_filler(
                     json_data=json_data,
                 )
             else:
-                _json_data = post_filler(
+                _json_data = post_fill(
+                    filler=post_filler,
                     json_data=json_data,
                 )
             if not _json_data:

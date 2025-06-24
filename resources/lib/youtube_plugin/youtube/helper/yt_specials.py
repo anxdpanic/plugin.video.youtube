@@ -147,25 +147,13 @@ def _process_recommendations(provider, context, client):
 
 
 def _process_trending(provider, context, client):
-    function_cache = context.get_function_cache()
-    refresh = context.refresh_requested()
-
-    json_data = function_cache.run(
-        client.get_trending_videos,
-        function_cache.ONE_HOUR,
-        _refresh=refresh,
+    json_data = client.get_trending_videos(
         page_token=context.get_param('page_token'),
     )
     if not json_data:
         return False, None
 
-    filler = partial(
-        function_cache.run,
-        client.get_trending_videos,
-        function_cache.ONE_HOUR,
-        _refresh=refresh,
-    )
-    json_data['_post_filler'] = filler
+    json_data['_post_filler'] = client.get_trending_videos
 
     result = v3.response_to_items(provider, context, json_data)
     options = {
@@ -427,7 +415,9 @@ def _process_my_subscriptions(provider,
                               client,
                               filtered=False,
                               feed_type=None,
-                              _feed_types={'videos', 'shorts', 'live'}):
+                              _feed_types=frozenset((
+                                      'videos', 'shorts', 'live'
+                              ))):
     logged_in = provider.is_logged_in()
     refresh = context.refresh_requested()
 
