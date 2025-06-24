@@ -252,7 +252,9 @@ class PlayerMonitorThread(threading.Thread):
             watch_later_id = logged_in and access_manager.get_watch_later_id()
             if watch_later_id:
                 playlist_item_id = client.get_playlist_item_id_of_video_id(
-                    playlist_id=watch_later_id, video_id=video_id
+                    playlist_id=watch_later_id,
+                    video_id=video_id,
+                    do_auth=True,
                 )
                 if playlist_item_id:
                     provider.on_playlist_x(

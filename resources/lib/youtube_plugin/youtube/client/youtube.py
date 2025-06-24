@@ -99,7 +99,8 @@ class YouTube(LoginClient):
         self.api_request(client='watch_history',
                          client_data=client_data,
                          params=params,
-                         no_content=True)
+                         no_content=True,
+                         do_auth=True)
 
     def get_streams(self,
                     context,
@@ -137,7 +138,6 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='i18nLanguages',
                                 params=params,
-                                no_login=True,
                                 **kwargs)
 
     def get_supported_regions(self, language=None, **kwargs):
@@ -152,7 +152,6 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='i18nRegions',
                                 params=params,
-                                no_login=True,
                                 **kwargs)
 
     def rename_playlist(self,
@@ -193,6 +192,7 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='videos/getRating',
                                 params=params,
+                                do_auth=True,
                                 **kwargs)
 
     def rate_video(self, video_id, rating='like', **kwargs):
@@ -207,6 +207,7 @@ class YouTube(LoginClient):
         return self.api_request(method='POST',
                                 path='videos/rate',
                                 params=params,
+                                do_auth=True,
                                 no_content=True,
                                 **kwargs)
 
@@ -325,7 +326,6 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='videos',
                                 params=params,
-                                no_login=True,
                                 **kwargs)
 
     def get_video_category(self, video_category_id, page_token='', **kwargs):
@@ -340,7 +340,6 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='videos',
                                 params=params,
-                                no_login=True,
                                 **kwargs)
 
     def get_video_categories(self, page_token='', **kwargs):
@@ -354,7 +353,6 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='videoCategories',
                                 params=params,
-                                no_login=True,
                                 **kwargs)
 
     def get_recommended_for_home_tv(self,
@@ -364,7 +362,7 @@ class YouTube(LoginClient):
         return self.get_browse_videos(
             browse_id='FEwhat_to_watch',
             client='tv',
-            no_login=False,
+            do_auth=True,
             json_path={
                 'items': (
                     'contents',
@@ -455,7 +453,7 @@ class YouTube(LoginClient):
         return self.get_browse_videos(
             browse_id='FEwhat_to_watch',
             client='android_vr',
-            no_login=False,
+            do_auth=True,
             json_path={
                 'items': (
                     'contents',
@@ -534,7 +532,7 @@ class YouTube(LoginClient):
         if history_id:
             history = self.get_playlist_items(history_id,
                                               max_results=num_items,
-                                              mine=True)
+                                              do_auth=True)
             history_items = history and history.get('items')
             if history_items:
                 for item in history_items:
@@ -823,7 +821,6 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='channelSections',
                                 params=params,
-                                no_login=True,
                                 **kwargs)
 
     def get_playlists_of_channel(self, channel_id, page_token='', **kwargs):
@@ -846,16 +843,17 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='playlists',
                                 params=params,
-                                no_login=True,
                                 **kwargs)
 
     def get_playlist_item_id_of_video_id(self,
                                          playlist_id,
                                          video_id,
+                                         do_auth=None,
                                          page_token=''):
         json_data = self.get_playlist_items(
             playlist_id=playlist_id,
             page_token=page_token,
+            do_auth=do_auth,
             max_results=self.max_results(),
         )
         if not json_data:
@@ -871,6 +869,7 @@ class YouTube(LoginClient):
             return self.get_playlist_item_id_of_video_id(
                 playlist_id=playlist_id,
                 video_id=video_id,
+                do_auth=do_auth,
                 page_token=next_page_token,
             )
         return None
@@ -878,6 +877,7 @@ class YouTube(LoginClient):
     def get_playlist_items(self,
                            playlist_id,
                            page_token='',
+                           do_auth=None,
                            max_results=None,
                            **kwargs):
         # prepare params
@@ -896,8 +896,7 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='playlistItems',
                                 params=params,
-                                no_login=(self._context.get_param('channel_id')
-                                          != 'mine'),
+                                do_auth=do_auth,
                                 **kwargs)
 
     def get_channel_by_identifier(self,
@@ -921,6 +920,7 @@ class YouTube(LoginClient):
         params = {'part': 'id'}
         if mine or identifier == 'mine':
             params['mine'] = True
+            mine = True
         elif id_re.match(identifier):
             if not verify_id:
                 return identifier
@@ -937,7 +937,7 @@ class YouTube(LoginClient):
             method='GET',
             path='channels',
             params=params,
-            no_login=True,
+            do_auth=True if mine else False,
             **kwargs
         )
         if as_json:
@@ -1059,7 +1059,6 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='channels',
                                 params=params,
-                                no_login=True,
                                 **kwargs)
 
     def get_disliked_videos(self, page_token='', **kwargs):
@@ -1077,6 +1076,7 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='videos',
                                 params=params,
+                                do_auth=True,
                                 **kwargs)
 
     def get_videos(self,
@@ -1112,7 +1112,6 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='videos',
                                 params=params,
-                                no_login=True,
                                 **kwargs)
 
     def get_playlists(self, playlist_id, max_results=None, **kwargs):
@@ -1132,7 +1131,6 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='playlists',
                                 params=params,
-                                no_login=True,
                                 **kwargs)
 
     def get_browse_videos(self,
@@ -1153,7 +1151,7 @@ class YouTube(LoginClient):
                           },
                           data=None,
                           client=None,
-                          no_login=True,
+                          do_auth=False,
                           visitor='',
                           page_token='',
                           click_tracking='',
@@ -1203,7 +1201,7 @@ class YouTube(LoginClient):
             path='browse',
             method='POST',
             post_data=post_data,
-            no_login=no_login,
+            do_auth=do_auth,
         )
         if not result:
             return {}
@@ -1368,7 +1366,6 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='search',
                                 params=params,
-                                no_login=True,
                                 **kwargs)
 
     def get_related_videos(self,
@@ -1401,7 +1398,7 @@ class YouTube(LoginClient):
                                   method='POST',
                                   path='next',
                                   post_data=post_data,
-                                  no_login=True)
+                                  do_auth=False)
         if not result:
             return None
 
@@ -1678,7 +1675,6 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='commentThreads',
                                 params=params,
-                                no_login=True,
                                 **kwargs)
 
     def get_child_comments(self,
@@ -1704,7 +1700,6 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='comments',
                                 params=params,
-                                no_login=True,
                                 **kwargs)
 
     def get_channel_videos(self, channel_id, page_token='', **kwargs):
@@ -1737,7 +1732,6 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='search',
                                 params=params,
-                                no_login=True,
                                 **kwargs)
 
     def search(self,
@@ -1856,7 +1850,6 @@ class YouTube(LoginClient):
         return self.api_request(method='GET',
                                 path='search',
                                 params=params,
-                                no_login=True,
                                 **kwargs)
 
     def search_with_params(self,
@@ -1963,7 +1956,6 @@ class YouTube(LoginClient):
                 self.api_request(method='GET',
                                  path='search',
                                  params=search_params,
-                                 no_login=True,
                                  **kwargs))
 
     def get_my_subscriptions(self,
@@ -2782,6 +2774,38 @@ class YouTube(LoginClient):
 
         return result
 
+    def _auth_required(self, params):
+        if params:
+            if params.get('mine') or params.get('forMine'):
+                return True
+            request_channel_id = params.get('channelId')
+            if request_channel_id == 'mine':
+                return True
+        else:
+            request_channel_id = None
+
+        context = self._context
+        uri_channel_id = context.get_param('channel_id')
+        if uri_channel_id == 'mine':
+            return True
+
+        channel_ids = (
+            uri_channel_id,
+            request_channel_id,
+        )
+        function_cache = context.get_function_cache()
+        my_channel_id = function_cache.run(
+            self.get_channel_by_identifier,
+            function_cache.ONE_MONTH,
+            _refresh=context.refresh_requested(),
+            identifier='mine',
+            do_search=False,
+            notify=False,
+        )
+        if my_channel_id and my_channel_id in channel_ids:
+            return True
+        return False
+
     def _response_hook(self, **kwargs):
         response = kwargs['response']
         if kwargs.get('extended_debug'):
@@ -2872,7 +2896,7 @@ class YouTube(LoginClient):
                     params=None,
                     post_data=None,
                     headers=None,
-                    no_login=False,
+                    do_auth=None,
                     **kwargs):
         if not client_data:
             client_data = {}
@@ -2887,16 +2911,19 @@ class YouTube(LoginClient):
             if post_data:
                 client_data['json'] = post_data
             clear_data = False
+            if do_auth is None:
+                do_auth = True
         else:
             clear_data = True
         if params:
-            if params.get('mine') or params.get('forMine'):
-                no_login = False
-                client_data.setdefault('_auth_required', True)
             client_data['params'] = params
 
+        if not do_auth and self._auth_required(params):
+            do_auth = True
+            client_data.setdefault('_auth_required', True)
+
         abort = False
-        if not no_login:
+        if do_auth:
             client_data.setdefault('_auth_requested', True)
             # a config can decide if a token is allowed
             if self._access_token and self._config.get('token-allowed', True):

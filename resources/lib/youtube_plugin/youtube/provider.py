@@ -360,17 +360,11 @@ class Provider(AbstractProvider):
         * CHANNEL_ID: YouTube Channel ID
         """
         channel_id = re_match.group('channel_id')
-
+        new_params = {
+            'channel_id': channel_id,
+        }
+        context.parse_params(new_params)
         params = context.get_params()
-        page_token = params.get('page_token', '')
-        incognito = params.get('incognito')
-        addon_id = params.get('addon_id')
-
-        new_params = {}
-        if incognito:
-            new_params['incognito'] = incognito
-        if addon_id:
-            new_params['addon_id'] = addon_id
 
         resource_manager = provider.get_resource_manager(context)
         playlists = resource_manager.get_related_playlists(channel_id)
@@ -419,7 +413,9 @@ class Provider(AbstractProvider):
         else:
             result = False
 
-        json_data = resource_manager.get_my_playlists(channel_id, page_token)
+        json_data = resource_manager.get_my_playlists(
+            channel_id, params.get('page_token', '')
+        )
         if not json_data:
             return False, None
 
@@ -572,14 +568,13 @@ class Provider(AbstractProvider):
                 playlist_id = playlists.get('uploads') if playlists else None
                 if playlist_id and playlist_id.startswith('UU'):
                     playlist_id = playlist_id.replace('UU', 'UUSH', 1)
-        if not playlist_id:
+        if not channel_id or not playlist_id:
             return False, None
 
         new_params = {
+            'channel_id': channel_id,
             'playlist_id': playlist_id,
         }
-        if channel_id:
-            new_params['channel_id'] = channel_id
         context.parse_params(new_params)
 
         batch_id = (playlist_id, context.get_param('page_token') or 0)
