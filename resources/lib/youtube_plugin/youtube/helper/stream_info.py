@@ -806,23 +806,23 @@ class StreamInfo(YouTubeRequestClient):
         self._cipher = None
 
         self._auth_client = {}
-        self._client_groups = {
-            'custom': clients if clients else (),
-            'auth_required_limited_content': (
+        self._client_groups = (
+            ('custom', clients if clients else ()),
+            ('auth_required_limited_content', (
                 'ios_youtube_tv',
                 'android_youtube_tv',
-            ),
-            'auth_disabled_kids': (
+            )),
+            ('auth_disabled_kids', (
                 'ios',
-            ),
-            'auth_enabled_no_kids': (
+            )),
+            ('auth_enabled_no_kids', (
                 'android_vr',
-            ),
-            'mpd': (
-            ),
-            'ask': (
-            ),
-        }
+            )),
+            ('mpd', (
+            )),
+            ('ask', (
+            )),
+        )
 
         super(StreamInfo, self).__init__(context=context, **kwargs)
 
@@ -1613,7 +1613,7 @@ class StreamInfo(YouTubeRequestClient):
             '_visitor_data': None,
         }
 
-        for name, clients in self._client_groups.items():
+        for name, clients in self._client_groups:
             if not clients:
                 continue
             if name == 'mpd' and not use_mpd:
