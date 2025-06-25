@@ -94,7 +94,7 @@ def process_default_settings(context, step, steps, **_kwargs):
         settings.stream_select(4 if settings.ask_for_video_quality() else 3)
         settings.set_subtitle_download(False)
         if context.get_system_version().compatible(21):
-            settings.live_stream_type(3)
+            settings.live_stream_type(2)
         else:
             settings.live_stream_type(1)
         if not xbmcvfs.exists('special://profile/playercorefactory.xml'):

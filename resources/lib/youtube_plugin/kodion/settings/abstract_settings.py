@@ -429,7 +429,7 @@ class AbstractSettings(object):
 
     def live_stream_type(self, value=None):
         if self.use_isa():
-            default = 3
+            default = 2
             setting = SETTINGS.LIVE_STREAMS + '.1'
         else:
             default = 1
