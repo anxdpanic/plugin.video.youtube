@@ -281,7 +281,7 @@ def update_channel_items(provider, context, channel_id_dict,
                 'https://www.youtube.com/',
                 channel_handle if channel_handle else
                 channel_id if channel_id.startswith('@') else
-                '/channel/' + channel_id,
+                'channel/' + channel_id,
             ))
         channel_item.set_plot(description)
 
