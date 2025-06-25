@@ -126,10 +126,8 @@ def process_default_settings(context, step, steps, **_kwargs):
                         break
                     context.sleep(5)
                 else:
-                    ui.show_notification(
-                        localize('httpd.connect.failed'),
-                        header=localize('httpd'),
-                    )
+                    ui.show_notification(localize('httpd.connect.failed'),
+                                         header=localize('httpd'))
                     settings.httpd_listen('0.0.0.0')
     return step
 

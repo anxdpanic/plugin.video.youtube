@@ -982,11 +982,11 @@ msgid "Play count minimum percent"
 msgstr ""
 
 msgctxt "#30669"
-msgid "Mark unwatched"
+msgid ""
 msgstr ""
 
 msgctxt "#30670"
-msgid "Mark watched"
+msgid ""
 msgstr ""
 
 msgctxt "#30671"
@@ -1002,7 +1002,7 @@ msgid "playback history"
 msgstr ""
 
 msgctxt "#30674"
-msgid "Reset resume point"
+msgid ""
 msgstr ""
 
 msgctxt "#30675"

@@ -341,9 +341,8 @@ def update_channel_items(provider, context, channel_id_dict,
 
         # update channel mapping
         if channel_items_dict is not None:
-            if channel_id not in channel_items_dict:
-                channel_items_dict[channel_id] = []
-            channel_items_dict[channel_id].append(channel_item)
+            channel_items = channel_items_dict.setdefault(channel_id, [])
+            channel_items.append(channel_item)
 
     if channel_items_dict:
         update_channel_info(provider,
@@ -476,9 +475,8 @@ def update_playlist_items(provider, context, playlist_id_dict,
         channel_id = snippet.get('channelId', '')
         playlist_item.channel_id = channel_id
         if channel_id and channel_items_dict is not None:
-            if channel_id not in channel_items_dict:
-                channel_items_dict[channel_id] = []
-            channel_items_dict[channel_id].append(playlist_item)
+            channel_items = channel_items_dict.setdefault(channel_id, [])
+            channel_items.append(playlist_item)
 
         # play all videos of the playlist
         context_menu = [
@@ -895,9 +893,8 @@ def update_video_items(provider, context, video_id_dict,
         channel_id = snippet.get('channelId', '')
         media_item.channel_id = channel_id
         if channel_id and channel_items_dict is not None:
-            if channel_id not in channel_items_dict:
-                channel_items_dict[channel_id] = []
-            channel_items_dict[channel_id].append(media_item)
+            channel_items = channel_items_dict.setdefault(channel_id, [])
+            channel_items.append(media_item)
 
         """
         Play all videos of the playlist.

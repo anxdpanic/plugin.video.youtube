@@ -708,11 +708,11 @@ def media_listitem(context,
     resume = True
     prop_value = media_item.video_id
     if prop_value:
-        if focused and prop_value == focused:
-            set_play_count = False
-            resume = False
-        if played and prop_value == played:
+        if prop_value == played:
             set_play_count = 'forced'
+            resume = False
+        elif prop_value == focused:
+            set_play_count = False
             resume = False
         props[VIDEO_ID] = prop_value
 
@@ -760,12 +760,20 @@ def media_listitem(context,
     if not set_play_count:
         video_id = media_item.video_id
         playback_history = context.get_playback_history()
-        playback_history.set_item(video_id, dict(
-            playback_history.get_item(video_id) or {},
-            play_count=int(not media_item.get_play_count()),
-            played_time=0.0,
-            played_percent=0,
-        ))
+        item_history = playback_history.get_item(video_id)
+        if item_history:
+            playback_history.update_item(video_id, dict(
+                item_history,
+                play_count=int(not media_item.get_play_count()),
+                played_time=0.0,
+                played_percent=0,
+            ))
+        else:
+            playback_history.set_item(video_id, {
+                'play_count': int(not media_item.get_play_count()),
+                'played_time': 0.0,
+                'played_percent': 0,
+            })
 
     context_menu = media_item.get_context_menu()
     if context_menu:

@@ -429,11 +429,9 @@ class AbstractProvider(object):
             search_history.del_item(query)
             ui.refresh_container()
 
-            ui.show_notification(
-                localize('removed.x') % query,
-                time_ms=2500,
-                audible=False,
-            )
+            ui.show_notification(localize('removed.x') % query,
+                                 time_ms=2500,
+                                 audible=False)
             return True, None
 
         if command == 'rename':
@@ -458,11 +456,9 @@ class AbstractProvider(object):
             search_history.clear()
             ui.refresh_container()
 
-            ui.show_notification(
-                localize('completed'),
-                time_ms=2500,
-                audible=False,
-            )
+            ui.show_notification(localize('completed'),
+                                 time_ms=2500,
+                                 audible=False)
             return True, None
 
         if command == 'links':

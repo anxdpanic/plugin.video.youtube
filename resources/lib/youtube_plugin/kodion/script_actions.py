@@ -376,10 +376,9 @@ def _user_actions(context, action, params):
 
     def switch_to_user(user):
         access_manager.set_user(user, switch_to=True)
-        ui.show_notification(
-            localize('user.changed_to.x') % access_manager.get_username(user),
-            localize('user.switch')
-        )
+        ui.show_notification(localize('user.changed_to.x')
+                             % access_manager.get_username(user),
+                             localize('user.switch'))
 
     if action == 'switch':
         result, user_index_map = select_user(localize('user.switch'),
@@ -442,10 +441,9 @@ def _user_actions(context, action, params):
             return False
 
         if access_manager.set_username(user, new_username):
-            ui.show_notification(
-                localize('renamed.x.y') % (old_username, new_username),
-                localize('rename')
-            )
+            ui.show_notification(localize('renamed.x.y')
+                                 % (old_username, new_username),
+                                 localize('rename'))
         reload = True
 
     if reload:
