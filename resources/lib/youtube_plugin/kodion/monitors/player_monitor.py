@@ -209,20 +209,29 @@ class PlayerMonitorThread(threading.Thread):
             client = provider.get_client(context)
             logged_in = provider.is_logged_in()
 
-        if self.progress >= settings.get_play_count_min_percent():
+        if self.video_status.get('live'):
             play_count += 1
-            self.current_time = 0
-            segment_end = self.total_time
-        else:
             segment_end = self.current_time
-            refresh_only = True
-
-        play_data = {
-            'play_count': play_count,
-            'total_time': self.total_time,
-            'played_time': self.current_time,
-            'played_percent': self.progress,
-        }
+            play_data = {
+                'play_count': play_count,
+                'total_time': 0,
+                'played_time': 0,
+                'played_percent': 0,
+            }
+        else:
+            if self.progress >= settings.get_play_count_min_percent():
+                play_count += 1
+                self.current_time = 0
+                segment_end = self.total_time
+            else:
+                segment_end = self.current_time
+                refresh_only = True
+            play_data = {
+                'play_count': play_count,
+                'total_time': self.total_time,
+                'played_time': self.current_time,
+                'played_percent': self.progress,
+            }
         self.player_data['play_data'] = play_data
 
         if logged_in and report_url:

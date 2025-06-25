@@ -709,22 +709,28 @@ def update_video_items(provider, context, video_id_dict,
             ):
                 continue
 
-        if media_item.live:
-            media_item.set_play_count(0)
-            use_play_data = False
-            play_data = None
-        elif play_data:
-            if 'play_count' in play_data:
-                media_item.set_play_count(play_data['play_count'])
+        if play_data:
+            if media_item.live:
+                if 'play_count' in play_data:
+                    media_item.set_play_count(play_data['play_count'])
 
-            if 'played_percent' in play_data:
-                media_item.set_start_percent(play_data['played_percent'])
+                if 'last_played' in play_data:
+                    media_item.set_last_played(play_data['last_played'])
 
-            if 'played_time' in play_data:
-                media_item.set_start_time(play_data['played_time'])
+                media_item.set_start_percent(0)
+                media_item.set_start_time(0)
+            else:
+                if 'play_count' in play_data:
+                    media_item.set_play_count(play_data['play_count'])
 
-            if 'last_played' in play_data:
-                media_item.set_last_played(play_data['last_played'])
+                if 'last_played' in play_data:
+                    media_item.set_last_played(play_data['last_played'])
+
+                if 'played_percent' in play_data:
+                    media_item.set_start_percent(play_data['played_percent'])
+
+                if 'played_time' in play_data:
+                    media_item.set_start_time(play_data['played_time'])
 
         if start_at:
             datetime = datetime_parser.parse(start_at)

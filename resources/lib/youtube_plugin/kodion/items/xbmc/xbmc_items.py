@@ -106,15 +106,13 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
                 info_labels['year'] = value
 
             resume_time = resume and item.get_start_time()
-            if resume_time:
+            if resume_time is not None:
                 properties['ResumeTime'] = str(resume_time)
             duration = item.get_duration()
-            if duration:
+            if duration > 0:
                 properties['TotalTime'] = str(duration)
                 if info_type == 'video':
                     list_item.addStreamInfo(info_type, {'duration': duration})
-
-            if duration is not None:
                 info_labels['duration'] = duration
 
         elif isinstance(item, DirectoryItem):
@@ -307,25 +305,26 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
         resume_time = resume and item.get_start_time()
         duration = item.get_duration()
         if info_type == 'video':
-            if resume_time and duration:
-                info_tag.setResumePoint(resume_time, float(duration))
-            elif resume_time:
-                info_tag.setResumePoint(resume_time)
-            if duration:
+            if resume_time is not None:
+                if duration > 0:
+                    info_tag.setResumePoint(resume_time, float(duration))
+                else:
+                    info_tag.setResumePoint(resume_time)
+            if duration > 0:
                 info_tag.addVideoStream(xbmc.VideoStreamDetail(
                     duration=duration,
                 ))
         elif info_type == 'music':
             # These properties are deprecated but there is no other way to set
             # these details for a ListItem with a MusicInfoTag
-            if resume_time:
+            if resume_time is not None:
                 properties['ResumeTime'] = str(resume_time)
-            if duration:
+            if duration > 0:
                 properties['TotalTime'] = str(duration)
 
         # duration: int
         # As seconds
-        if duration is not None:
+        if duration > 0:
             info_tag.setDuration(duration)
 
     elif isinstance(item, DirectoryItem):
