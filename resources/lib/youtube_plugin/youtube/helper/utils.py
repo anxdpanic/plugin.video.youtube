@@ -216,7 +216,15 @@ def update_channel_items(provider, context, channel_id_dict,
                 settings.subscriptions_filter()
             )
 
+    fanart_type = context.get_param('fanart_type')
+    if fanart_type is None:
+        fanart_type = settings.fanart_selection()
     thumb_size = settings.get_thumbnail_size()
+    thumb_fanart = (
+        settings.get_thumbnail_size(settings.THUMB_SIZE_BEST)
+        if fanart_type == settings.FANART_THUMBNAIL else
+        False
+    )
 
     for channel_id, yt_item in data.items():
         if not yt_item or 'snippet' not in yt_item:
@@ -293,9 +301,14 @@ def update_channel_items(provider, context, channel_id_dict,
             local_datetime = datetime_parser.utc_to_local(datetime)
             channel_item.set_date_from_datetime(local_datetime)
 
-        # image
+        # try to find a better resolution for the image
         image = get_thumbnail(thumb_size, snippet.get('thumbnails'))
         channel_item.set_image(image)
+
+        # try to find a better resolution for the fanart
+        if thumb_fanart:
+            fanart = get_thumbnail(thumb_fanart, snippet.get('thumbnails'))
+            channel_item.set_fanart(fanart)
 
         # - update context menu
         context_menu = []
@@ -371,9 +384,18 @@ def update_playlist_items(provider, context, playlist_id_dict,
     logged_in = provider.is_logged_in()
 
     settings = context.get_settings()
-    thumb_size = settings.get_thumbnail_size()
     show_details = settings.show_detailed_description()
     item_count_color = settings.get_label_color('itemCount')
+
+    fanart_type = context.get_param('fanart_type')
+    if fanart_type is None:
+        fanart_type = settings.fanart_selection()
+    thumb_size = settings.get_thumbnail_size()
+    thumb_fanart = (
+        settings.get_thumbnail_size(settings.THUMB_SIZE_BEST)
+        if fanart_type == settings.FANART_THUMBNAIL else
+        False
+    )
 
     localize = context.localize
     episode_count_label = localize('stats.itemCount')
@@ -468,8 +490,14 @@ def update_playlist_items(provider, context, playlist_id_dict,
             local_datetime = datetime_parser.utc_to_local(datetime)
             playlist_item.set_date_from_datetime(local_datetime)
 
+        # try to find a better resolution for the image
         image = get_thumbnail(thumb_size, snippet.get('thumbnails'))
         playlist_item.set_image(image)
+
+        # try to find a better resolution for the fanart
+        if thumb_fanart:
+            fanart = get_thumbnail(thumb_fanart, snippet.get('thumbnails'))
+            playlist_item.set_fanart(fanart)
 
         # update channel mapping
         channel_id = snippet.get('channelId', '')
@@ -580,11 +608,20 @@ def update_video_items(provider, context, video_id_dict,
     show_details = settings.show_detailed_description()
     shorts_duration = settings.shorts_duration()
     subtitles_prompt = settings.get_subtitle_selection() == 1
+    use_play_data = settings.use_local_history()
+
+    fanart_type = context.get_param('fanart_type')
+    if fanart_type is None:
+        fanart_type = settings.fanart_selection()
     thumb_size = settings.get_thumbnail_size()
     get_better_thumbs = (settings.get_int(settings.THUMB_SIZE)
                          == settings.THUMB_SIZE_BEST)
+    thumb_fanart = (
+        settings.get_thumbnail_size(settings.THUMB_SIZE_BEST)
+        if fanart_type == settings.FANART_THUMBNAIL else
+        False
+    )
     thumb_stamp = get_thumb_timestamp()
-    use_play_data = settings.use_local_history()
 
     localize = context.localize
     untitled = localize('untitled')
@@ -888,6 +925,16 @@ def update_video_items(provider, context, video_id_dict,
             elif image.endswith(('_live.jpg', '_live.webp')):
                 image = ''.join((image, '?ct=', thumb_stamp))
         media_item.set_image(image)
+
+        # try to find a better resolution for the fanart
+        if thumb_fanart:
+            fanart = get_thumbnail(thumb_fanart, snippet.get('thumbnails'))
+            if fanart and media_item.live:
+                if '?' in fanart:
+                    fanart = ''.join((fanart, '&ct=', thumb_stamp))
+                elif image.endswith(('_live.jpg', '_live.webp')):
+                    fanart = ''.join((fanart, '?ct=', thumb_stamp))
+            media_item.set_fanart(fanart)
 
         # update channel mapping
         channel_id = snippet.get('channelId', '')
