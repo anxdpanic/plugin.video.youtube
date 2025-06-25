@@ -210,7 +210,7 @@ class XbmcPlugin(AbstractPlugin):
                 focused_video_id = None
                 played_video_id = player_video_id
             else:
-                focused_video_id = ui.get_property(VIDEO_ID)
+                focused_video_id = None if route else ui.get_property(VIDEO_ID)
                 played_video_id = None
         else:
             focused_video_id = None
