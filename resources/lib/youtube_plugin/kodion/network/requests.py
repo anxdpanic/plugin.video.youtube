@@ -95,6 +95,7 @@ class BaseRequestsClass(object):
                  proxy_settings=None,
                  exc_type=None,
                  **_kwargs):
+        super(BaseRequestsClass, self).__init__()
         BaseRequestsClass.init(
             context=context,
             verify_ssl=verify_ssl,

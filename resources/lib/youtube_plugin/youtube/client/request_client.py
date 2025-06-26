@@ -126,7 +126,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'platform': 'TV',
             },
             '_auth_required': True,
-            '_auth_type': 'personal',
+            '_auth_type': 'user',
             '_query_subtitles': True,
             'json': {
                 'context': {
@@ -284,7 +284,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             # requests
             # '_auth_required': True,
             '_auth_required': 'ignore_fail',
-            '_auth_type': 'personal',
+            '_auth_type': 'user',
             '_query_subtitles': True,
             'json': {
                 'context': {
@@ -378,7 +378,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             },
         },
         'v3': {
-            '_auth_requested': 'personal',
+            '_auth_type': 'user',
             'url': 'https://www.googleapis.com/youtube/v3/{_endpoint}',
             'method': None,
             'headers': {
@@ -498,7 +498,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
         'watch_history': {
             '_auth_required': True,
-            '_auth_type': 'personal',
+            '_auth_type': 'user',
             '_video_id': None,
             'headers': {
                 'Host': 's.youtube.com',
@@ -706,7 +706,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             auth_required = client.get('_auth_required')
             auth_requested = client.get('_auth_requested')
             auth_type = client.get('_auth_type')
-            if auth_type == 'tv' and auth_requested != 'personal':
+            if auth_type == 'tv':
                 auth_token = client.get('_access_token_tv')
                 api_key = client.get('_api_key_tv')
             elif auth_type is not False:

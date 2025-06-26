@@ -40,13 +40,18 @@ class LoginClient(YouTubeRequestClient):
     TOKEN_TYPES = {
         0: 'tv',
         'tv': 'tv',
-        1: 'personal',
-        'personal': 'personal',
+        1: 'user',
+        'user': 'user',
     }
 
-    _config = {}
-    _config_tv = {}
-    _access_tokens = {}
+    _configs = {
+        'user': {},
+        'tv': {},
+    }
+    _access_tokens = {
+        'user': None,
+        'tv': None,
+    }
 
     def __init__(self,
                  configs=None,
@@ -67,8 +72,8 @@ class LoginClient(YouTubeRequestClient):
              access_token_tv=None,
              **_kwargs):
         if configs is not None:
-            cls._config = configs.get('main') or {}
-            cls._config_tv = configs.get('youtube-tv') or {}
+            cls._configs['user'] = configs.get('main') or {}
+            cls._configs['tv'] = configs.get('youtube-tv') or {}
         cls.set_access_token(personal=access_token, tv=access_token_tv)
 
     def reinit(self, **kwargs):
@@ -78,7 +83,7 @@ class LoginClient(YouTubeRequestClient):
     @classmethod
     def set_access_token(cls, personal=None, tv=None):
         if personal is not None:
-            cls._access_tokens['personal'] = personal
+            cls._access_tokens['user'] = personal
         if tv is not None:
             cls._access_tokens['tv'] = tv
 
@@ -132,12 +137,10 @@ class LoginClient(YouTubeRequestClient):
 
     def refresh_token(self, token_type, refresh_token=None):
         login_type = self.TOKEN_TYPES.get(token_type)
-        if login_type == 'tv':
-            client_id = self._config_tv.get('id')
-            client_secret = self._config_tv.get('secret')
-        elif login_type == 'personal':
-            client_id = self._config.get('id')
-            client_secret = self._config.get('secret')
+        config = self._configs.get(login_type)
+        if config:
+            client_id = config.get('id')
+            client_secret = config.get('secret')
         else:
             return None
         if not client_id or not client_secret or not refresh_token:
@@ -155,13 +158,12 @@ class LoginClient(YouTubeRequestClient):
                      'refresh_token': refresh_token,
                      'grant_type': 'refresh_token'}
 
-        config_type = self._get_config_type(client_id, client_secret)
         client_id.replace(self.DOMAIN_SUFFIX, '')
-        log_info = ('config_type:   |{config_type}|',
+        log_info = ('Login type:    |{login_type}|',
                     'client_id:     |{id_start}...{id_end}|',
                     'client_secret: |{secret_start}...{secret_end}|')
         log_params = {
-            'config_type': config_type,
+            'login_type': login_type,
             'id_start': '',
             'id_end': '',
             'secret_start': '',
@@ -191,12 +193,10 @@ class LoginClient(YouTubeRequestClient):
 
     def request_access_token(self, token_type, code=None):
         login_type = self.TOKEN_TYPES.get(token_type)
-        if login_type == 'tv':
-            client_id = self._config_tv.get('id')
-            client_secret = self._config_tv.get('secret')
-        elif login_type == 'personal':
-            client_id = self._config.get('id')
-            client_secret = self._config.get('secret')
+        config = self._configs.get(login_type)
+        if config:
+            client_id = config.get('id')
+            client_secret = config.get('secret')
         else:
             return None
         if not client_id or not client_secret or not code:
@@ -214,13 +214,12 @@ class LoginClient(YouTubeRequestClient):
                      'code': code,
                      'grant_type': 'http://oauth.net/grant_type/device/1.0'}
 
-        config_type = self._get_config_type(client_id, client_secret)
         client_id.replace(self.DOMAIN_SUFFIX, '')
-        log_info = ('config_type:   |{config_type}|',
+        log_info = ('Login type:    |{login_type}|',
                     'client_id:     |{id_start}...{id_end}|',
                     'client_secret: |{secret_start}...{secret_end}|')
         log_params = {
-            'config_type': config_type,
+            'login_type': login_type,
             'id_start': '',
             'id_end': '',
             'secret_start': '',
@@ -250,10 +249,9 @@ class LoginClient(YouTubeRequestClient):
 
     def request_device_and_user_code(self, token_type):
         login_type = self.TOKEN_TYPES.get(token_type)
-        if login_type == 'tv':
-            client_id = self._config_tv.get('id')
-        elif login_type == 'personal':
-            client_id = self._config.get('id')
+        config = self._configs.get(login_type)
+        if config:
+            client_id = config.get('id')
         else:
             return None
         if not client_id:
@@ -269,12 +267,11 @@ class LoginClient(YouTubeRequestClient):
         post_data = {'client_id': client_id,
                      'scope': 'https://www.googleapis.com/auth/youtube'}
 
-        config_type = self._get_config_type(client_id)
         client_id.replace(self.DOMAIN_SUFFIX, '')
-        log_info = ('config_type:   |{config_type}|',
+        log_info = ('Login type:    |{login_type}|',
                     'client_id:     |{id_start}...{id_end}|')
         log_params = {
-            'config_type': config_type,
+            'login_type': login_type,
             'id_start': '',
             'id_end': '',
         }
@@ -296,32 +293,3 @@ class LoginClient(YouTubeRequestClient):
             **log_params
         )
         return json_data
-
-    def _get_config_type(self, client_id, client_secret=None):
-        """used for logging"""
-        if client_secret is None:
-            config_id = self._config_tv.get('id')
-            using_conf_tv = config_id and client_id == config_id
-            config_id = self._config.get('id')
-            using_conf_main = config_id and client_id == config_id
-        else:
-            config_secret = self._config_tv.get('secret')
-            config_id = self._config_tv.get('id')
-            using_conf_tv = (
-                    config_secret and client_secret == config_secret
-                    and config_id and client_id == config_id
-            )
-            config_secret = self._config.get('secret')
-            config_id = self._config.get('id')
-            using_conf_main = (
-                    config_secret and client_secret == config_secret
-                    and config_id and client_id == config_id
-            )
-
-        if not using_conf_main and not using_conf_tv:
-            return 'None'
-        if using_conf_tv:
-            return 'YouTube-TV'
-        if using_conf_main:
-            return 'YouTube-Kodi'
-        return 'Unknown'

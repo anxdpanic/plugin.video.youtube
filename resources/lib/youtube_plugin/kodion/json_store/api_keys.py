@@ -31,7 +31,7 @@ class APIKeyStore(JSONStore):
         if 'keys' not in data:
             data = {
                 'keys': {
-                    'personal': {
+                    'user': {
                         'api_key': '',
                         'client_id': '',
                         'client_secret': '',
@@ -41,12 +41,12 @@ class APIKeyStore(JSONStore):
             }
         else:
             keys = data['keys'] or {}
-            if 'personal' not in keys:
-                keys['personal'] = {
+            if 'user' not in keys:
+                keys['user'] = keys.pop('personal', {
                     'api_key': '',
                     'client_id': '',
                     'client_secret': '',
-                }
+                })
             if 'developer' not in keys:
                 keys['developer'] = {}
             data['keys'] = keys
@@ -54,14 +54,14 @@ class APIKeyStore(JSONStore):
 
     @staticmethod
     def get_current_switch():
-        return 'own'
+        return 'user'
 
-    def has_own_api_keys(self):
+    def has_user_api_keys(self):
         api_data = self.get_data()
         try:
-            return (api_data['keys']['personal']['api_key']
-                    and api_data['keys']['personal']['client_id']
-                    and api_data['keys']['personal']['client_secret'])
+            return (api_data['keys']['user']['api_key']
+                    and api_data['keys']['user']['client_id']
+                    and api_data['keys']['user']['client_secret'])
         except KeyError:
             return False
 
@@ -75,10 +75,10 @@ class APIKeyStore(JSONStore):
             system = 'YouTube TV'
             key_set_details = key_sets[switch]
 
-        elif switch.startswith('own'):
+        elif switch.startswith('user'):
             decode = False
             system = 'All'
-            key_set_details = api_data['keys']['personal']
+            key_set_details = api_data['keys']['user']
 
         else:
             system = 'All'
@@ -105,9 +105,9 @@ class APIKeyStore(JSONStore):
 
     def get_key_set(self, switch):
         key_set = self.get_api_keys(switch)
-        if switch.startswith('own'):
+        if switch.startswith('user'):
             client_id = key_set['id'].replace(self.DOMAIN_SUFFIX, '')
-            if switch == 'own_old':
+            if switch == 'user_old':
                 client_id += self.DOMAIN_SUFFIX
             key_set['id'] = client_id
         return key_set
@@ -263,9 +263,9 @@ class APIKeyStore(JSONStore):
         update_settings_values = False
 
         saved_details = (
-            api_data['keys']['personal'].get('api_key', ''),
-            api_data['keys']['personal'].get('client_id', ''),
-            api_data['keys']['personal'].get('client_secret', ''),
+            api_data['keys']['user'].get('api_key', ''),
+            api_data['keys']['user'].get('client_id', ''),
+            api_data['keys']['user'].get('client_secret', ''),
         )
         if all(saved_details):
             update_settings_values = True
@@ -275,7 +275,7 @@ class APIKeyStore(JSONStore):
             stripped_details = self.strip_details(*saved_details)
             if all(stripped_details) and saved_details != stripped_details:
                 saved_details = stripped_details
-                api_data['keys']['personal'] = {
+                api_data['keys']['user'] = {
                     'api_key': saved_details[0],
                     'client_id': saved_details[1],
                     'client_secret': saved_details[2],
@@ -298,7 +298,7 @@ class APIKeyStore(JSONStore):
                 )
 
             if saved_details != setting_details:
-                api_data['keys']['personal'] = {
+                api_data['keys']['user'] = {
                     'api_key': setting_details[0],
                     'client_id': setting_details[1],
                     'client_secret': setting_details[2],

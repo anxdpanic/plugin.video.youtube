@@ -1602,12 +1602,17 @@ class PlayerClient(LoginClient):
             },
             'url': 'https://www.youtube.com/youtubei/v1/player',
             'method': 'POST',
-            '_auth_required': False,
-            '_auth_requested': 'personal' if use_remote_history else False,
-            '_access_token': self._access_tokens.get('personal'),
+            '_access_token': (
+                self._access_tokens.get('user')
+                if self._configs.get('user', {}).get('token-allowed', True) else
+                None
+            ),
             '_access_token_tv': self._access_tokens.get('tv'),
             '_visitor_data': None,
         }
+        if use_remote_history:
+            client_data['_auth_type'] = 'user'
+            client_data['_auth_requested'] = True
 
         for name, clients in self._client_groups:
             if not clients:

@@ -2916,26 +2916,27 @@ class YouTube(LoginClient):
         if params:
             client_data['params'] = params
 
-        if not do_auth and self._auth_required(params):
-            do_auth = True
-            client_data.setdefault('_auth_required', True)
-
         abort = False
+        do_auth = do_auth or self._auth_required(params)
         if do_auth:
-            client_data.setdefault('_auth_requested', True)
-            # a config can decide if a token is allowed
-            access_token = self._access_tokens.get('personal')
-            if access_token and self._config.get('token-allowed', True):
-                client_data['_access_token'] = access_token
-            access_token = self._access_tokens.get('tv')
-            if access_token:
-                client_data['_access_token_tv'] = access_token
+            client_data.setdefault('_auth_required', do_auth)
 
-        key = self._config.get('key')
+        # a config can decide if a token is allowed
+        config = self._configs.get('user', {})
+        access_token = (self._access_tokens.get('user')
+                        if config.get('token-allowed', True) else
+                        None)
+        if access_token:
+            client_data['_access_token'] = access_token
+        key = config.get('key')
         if key:
             client_data['_api_key'] = key
 
-        key = self._config_tv.get('key')
+        config = self._configs.get('tv', {})
+        access_token = self._access_tokens.get('tv')
+        if access_token:
+            client_data['_access_token_tv'] = access_token
+        key = config.get('key')
         if key:
             client_data['_api_key_tv'] = key
 

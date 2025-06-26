@@ -189,8 +189,8 @@ class Provider(AbstractProvider):
                 client_id=key_details['id'],
                 client_secret=key_details['secret'],
             )
-            if keys_changed and switch == 'own':
-                key_details = api_store.get_key_set('own_old')
+            if keys_changed and switch == 'user':
+                key_details = api_store.get_key_set('user_old')
                 keys_changed = access_manager.keys_changed(
                     addon_id=dev_id,
                     api_key=key_details['key'],
