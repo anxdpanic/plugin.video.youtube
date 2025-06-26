@@ -391,7 +391,7 @@ class XbmcContext(AbstractContext):
         'locationRadius',
         'maxResults',
         'order',
-        'pageToken'
+        'pageToken',
         'publishedAfter',
         'publishedBefore',
         'q',
