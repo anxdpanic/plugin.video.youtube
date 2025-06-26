@@ -167,7 +167,7 @@ class XbmcPlugin(AbstractPlugin):
             return succeeded
 
         if ui.get_property(PLUGIN_SLEEPING):
-            context.wakeup(PLUGIN_WAKEUP)
+            context.ipc_exec(PLUGIN_WAKEUP)
 
         if ui.pop_property(RELOAD_ACCESS_MANAGER):
             context.reload_access_manager()

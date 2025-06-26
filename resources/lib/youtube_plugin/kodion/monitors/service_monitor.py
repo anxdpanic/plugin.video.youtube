@@ -27,9 +27,10 @@ from ..constants import (
     REFRESH_CONTAINER,
     RELOAD_ACCESS_MANAGER,
     SERVER_WAKEUP,
-    WAKEUP,
+    SERVICE_IPC,
 )
 from ..network import get_connect_address, get_http_server, httpd_status
+from ..utils import jsonrpc
 
 
 class ServiceMonitor(xbmc.Monitor):
@@ -98,6 +99,15 @@ class ServiceMonitor(xbmc.Monitor):
             'is_loaded': is_plugin and not _bool('Container.IsUpdating'),
             'is_active': is_plugin and not _busy(),
         }
+
+    @staticmethod
+    def send_notification(method,
+                          data=True,
+                          sender='.'.join((ADDON_ID, 'service'))):
+        jsonrpc(method='JSONRPC.NotifyAll',
+                params={'sender': sender,
+                        'message': method,
+                        'data': data})
 
     def set_property(self,
                      property_id,
@@ -233,7 +243,7 @@ class ServiceMonitor(xbmc.Monitor):
 
         group, separator, event = method.partition('.')
 
-        if event == WAKEUP:
+        if event == SERVICE_IPC:
             if not isinstance(data, dict):
                 data = json.loads(data)
             if not data:
@@ -268,7 +278,7 @@ class ServiceMonitor(xbmc.Monitor):
 
             if data.get('response_required'):
                 data['response'] = response
-                self.set_property(WAKEUP, json.dumps(data, ensure_ascii=False))
+                self.send_notification(SERVICE_IPC, data)
 
         elif event == REFRESH_CONTAINER:
             self.refresh_container()

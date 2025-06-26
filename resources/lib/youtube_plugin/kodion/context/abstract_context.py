@@ -608,7 +608,7 @@ class AbstractContext(object):
     def tear_down(self):
         pass
 
-    def wakeup(self, target, timeout=None):
+    def ipc_exec(self, target, timeout=None, payload=None):
         raise NotImplementedError()
 
     @staticmethod

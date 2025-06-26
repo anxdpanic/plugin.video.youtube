@@ -74,7 +74,7 @@ def _play_stream(provider, context):
             audio_only = settings.audio_only()
         use_mpd = ((not is_external or settings.alternative_player_mpd())
                    and settings.use_mpd_videos()
-                   and context.wakeup(SERVER_WAKEUP, timeout=5))
+                   and context.ipc_exec(SERVER_WAKEUP, timeout=5))
 
         try:
             streams, yt_item = client.get_streams(

@@ -136,7 +136,7 @@ class AbstractProvider(object):
         ui = context.get_ui()
 
         settings_state = {'state': 'defer'}
-        context.wakeup(CHECK_SETTINGS, timeout=5, payload=settings_state)
+        context.ipc_exec(CHECK_SETTINGS, timeout=5, payload=settings_state)
 
         if last_run and last_run > 1:
             self.pre_run_wizard_step(provider=self, context=context)
@@ -163,7 +163,7 @@ class AbstractProvider(object):
             settings = context.get_settings(refresh=True)
             settings.setup_wizard_enabled(False)
             settings_state['state'] = 'process'
-            context.wakeup(CHECK_SETTINGS, timeout=5, payload=settings_state)
+            context.ipc_exec(CHECK_SETTINGS, timeout=5, payload=settings_state)
 
     @staticmethod
     def get_wizard_steps():

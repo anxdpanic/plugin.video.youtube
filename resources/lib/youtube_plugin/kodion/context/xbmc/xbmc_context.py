@@ -13,6 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 import atexit
 import json
 import sys
+from timeit import default_timer
 from weakref import proxy
 
 from ..abstract_context import AbstractContext
@@ -29,9 +30,9 @@ from ...constants import (
     ADDON_ID,
     CONTENT,
     PLAY_FORCE_AUDIO,
+    SERVICE_IPC,
     SORT,
     VALUE_FROM_STR,
-    WAKEUP,
 )
 from ...json_store import APIKeyStore, AccessManager
 from ...player import XbmcPlaylistPlayer
@@ -47,6 +48,45 @@ from ...utils import (
     to_unicode,
     wait,
 )
+
+
+class IPCMonitor(xbmc.Monitor):
+    EXPECTED_SENDER = '.'.join((ADDON_ID, 'service'))
+
+    def __init__(self, target, timeout):
+        super(IPCMonitor, self).__init__()
+        self.target = target
+        self.value = None
+        self.latency = None
+        self.received = False
+
+        wait_period = 0.1
+        elapsed = 0
+        self._start = default_timer()
+        while not self.received and not self.waitForAbort(wait_period):
+            if timeout:
+                elapsed += wait_period
+                if elapsed >= timeout:
+                    break
+
+    def onNotification(self, sender, method, data):
+        if sender != self.EXPECTED_SENDER:
+            return
+
+        group, separator, event = method.partition('.')
+
+        if event == SERVICE_IPC:
+            if not isinstance(data, dict):
+                data = json.loads(data)
+            if not data:
+                return
+
+            if self.target != data.get('target'):
+                return
+
+            self.value = data.get('response')
+            self.latency = 1000 * (default_timer() - self._start)
+            self.received = True
 
 
 class XbmcContext(AbstractContext):
@@ -773,9 +813,9 @@ class XbmcContext(AbstractContext):
             return False
 
     @staticmethod
-    def send_notification(method, data=True):
+    def send_notification(method, data=True, sender=ADDON_ID):
         jsonrpc(method='JSONRPC.NotifyAll',
-                params={'sender': ADDON_ID,
+                params={'sender': sender,
                         'message': method,
                         'data': data})
 
@@ -908,55 +948,40 @@ class XbmcContext(AbstractContext):
             except AttributeError:
                 pass
 
-    def wakeup(self, target, timeout=None, payload=None):
+    def ipc_exec(self, target, timeout=None, payload=None):
         data = {'target': target, 'response_required': bool(timeout)}
         if payload:
             data.update(payload)
-        self.send_notification(WAKEUP, data)
+        self.send_notification(SERVICE_IPC, data)
+
         if not timeout:
             return None
+        if timeout < 0:
+            timeout = None
 
-        pop_property = self.get_ui().pop_property
-        no_timeout = timeout < 0
-        remaining = timeout = timeout * 1000
-        wait_period_ms = 100
-        wait_period = wait_period_ms / 1000
-
-        while no_timeout or remaining > 0:
-            data = pop_property(WAKEUP)
-            if data:
-                data = json.loads(data)
-
-            if data:
-                response = data.get('response')
-                response_target = data.get('target') or 'Unknown'
-
-                if target == response_target:
-                    if response:
-                        self.log.debug('Wakeup |{target}| in {elapsed}ms',
-                                       target=response_target,
-                                       elapsed=(timeout - remaining))
-                    else:
-                        self.log.error('Wakeup |{target}| in {elapsed}ms'
-                                       ' - Failed',
-                                       target=response_target,
-                                       elapsed=(timeout - remaining))
-                    return response
-
-                self.log.error('Wakeup |{target}| in {elapsed}ms'
-                               ' - Expected |{actual}|',
-                               target=response_target,
-                               elapsed=(timeout - remaining),
-                               actual=target)
-                break
-
-            wait(wait_period)
-            remaining -= wait_period_ms
+        response = IPCMonitor(target, timeout)
+        if response.received:
+            value = response.value
+            if value:
+                self.log.debug(('Service IPC - Responded',
+                                'Procedure: |{target}|',
+                                'Latency:   {latency:.2f}ms'),
+                               target=target,
+                               latency=response.latency)
+            elif value is False:
+                self.log.error_trace(('Service IPC - Failed',
+                                      'Procedure: |{target}|',
+                                      'Latency:   {latency:.2f}ms'),
+                                     target=target,
+                                     latency=response.latency)
         else:
-            self.log.error('Wakeup |{target}| timed out in {elapsed}ms',
-                           target=target,
-                           elapsed=timeout)
-        return False
+            value = False
+            self.log.error_trace(('Service IPC - Timed out',
+                                  'Procedure: |{target}|',
+                                  'Timeout:   {timeout:.2f}s'),
+                                 target=target,
+                                 timeout=timeout)
+        return value
 
     def is_plugin_folder(self, folder_name=None):
         if folder_name is None:

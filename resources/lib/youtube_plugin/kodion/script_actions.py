@@ -114,7 +114,7 @@ def _config_actions(context, action, *_args):
             settings.httpd_listen(addresses[selected_address])
 
     elif action == 'show_client_ip':
-        context.wakeup(SERVER_WAKEUP, timeout=5)
+        context.ipc_exec(SERVER_WAKEUP, timeout=5)
         if httpd_status(context):
             client_ip = get_client_ip_address(context)
             if client_ip:

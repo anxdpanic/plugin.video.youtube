@@ -75,12 +75,12 @@ PLAYBACK_STARTED = 'playback_started'
 PLAYBACK_STOPPED = 'playback_stopped'
 REFRESH_CONTAINER = 'refresh_container'
 RELOAD_ACCESS_MANAGER = 'reload_access_manager'
+SERVICE_IPC = 'service_ipc'
 
 # Sleep/wakeup states
 PLUGIN_WAKEUP = 'plugin_wakeup'
 PLUGIN_SLEEPING = 'plugin_sleeping'
 SERVER_WAKEUP = 'server_wakeup'
-WAKEUP = 'wakeup'
 
 # Play options
 PLAY_CANCELLED = 'play_cancelled'
@@ -153,12 +153,12 @@ __all__ = (
     'PLAYBACK_STOPPED',
     'REFRESH_CONTAINER',
     'RELOAD_ACCESS_MANAGER',
+    'SERVICE_IPC',
 
     # Sleep/wakeup states
     'PLUGIN_SLEEPING',
     'PLUGIN_WAKEUP',
     'SERVER_WAKEUP',
-    'WAKEUP',
 
     # Play options
     'PLAY_CANCELLED',
