@@ -1622,14 +1622,17 @@ class PlayerClient(LoginClient):
             if name == 'ask' and use_mpd and not ask_for_quality:
                 continue
 
+            exclude_retry = set()
             restart = None
             while 1:
                 for _client_name in clients:
+                    if _client_name in exclude_retry:
+                        continue
                     _client = self.build_client(_client_name, client_data)
                     if _client:
                         _has_auth = _client.get('_has_auth', False)
                         if _has_auth:
-                            restart = False
+                            exclude_retry.add(_client_name)
                     else:
                         _has_auth = None
                         _result = None
