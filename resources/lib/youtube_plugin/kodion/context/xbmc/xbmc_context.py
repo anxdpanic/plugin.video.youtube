@@ -914,6 +914,10 @@ class XbmcContext(AbstractContext):
         return xbmc.getInfoLabel(name)
 
     @staticmethod
+    def get_listitem_bool(detail_name):
+        return xbmc.getCondVisibility('Container.ListItem(0).' + detail_name)
+
+    @staticmethod
     def get_listitem_property(detail_name):
         return xbmc.getInfoLabel('Container.ListItem(0).Property({0})'
                                  .format(detail_name))
