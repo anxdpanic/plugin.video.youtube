@@ -18,6 +18,7 @@ from ..constants import (
     ADDON_ID,
     CHECK_SETTINGS,
     CONTAINER_FOCUS,
+    MARK_AS_LABEL,
     PATHS,
     PLAYBACK_STOPPED,
     PLAYER_VIDEO_ID,
@@ -28,6 +29,8 @@ from ..constants import (
     RELOAD_ACCESS_MANAGER,
     SERVER_WAKEUP,
     SERVICE_IPC,
+    SYNC_LISTITEM,
+    VIDEO_ID,
 )
 from ..network import get_connect_address, get_http_server, httpd_status
 from ..utils import jsonrpc
@@ -302,6 +305,44 @@ class ServiceMonitor(xbmc.Monitor):
 
             if data.get('play_data', {}).get('play_count'):
                 self.set_property(PLAYER_VIDEO_ID, data.get('video_id'))
+
+        elif event == SYNC_LISTITEM:
+            video_ids = json.loads(data) if data else None
+            if not video_ids:
+                return
+
+            context = self._context
+            focused_video_id = context.get_listitem_property(VIDEO_ID)
+            if not focused_video_id:
+                return
+
+            playback_history = context.get_playback_history()
+            for video_id in video_ids:
+                if not video_id or video_id != focused_video_id:
+                    continue
+
+                play_count = context.get_listitem_info('PlayCount')
+                resumable = context.get_listitem_bool('IsResumable')
+
+                self.set_property(MARK_AS_LABEL,
+                                  context.localize('history.mark.unwatched')
+                                  if play_count else
+                                  context.localize('history.mark.watched'))
+
+                item_history = playback_history.get_item(video_id)
+                if item_history:
+                    item_history = dict(
+                        item_history,
+                        play_count=int(play_count) if play_count else 0,
+                    )
+                    if not resumable:
+                        item_history['played_time'] = 0
+                        item_history['played_percent'] = 0
+                    playback_history.update_item(video_id, item_history)
+                else:
+                    playback_history.set_item(video_id, {
+                        'play_count': int(play_count) if play_count else 0,
+                    })
 
     def onSettingsChanged(self, force=False):
         context = self._context

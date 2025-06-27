@@ -666,8 +666,7 @@ def uri_listitem(context, uri_item, **_kwargs):
 def media_listitem(context,
                    media_item,
                    show_fanart=None,
-                   focused=None,
-                   played=None,
+                   to_sync=None,
                    **_kwargs):
     uri = media_item.get_uri()
     logging.debug('Converting %s: |%s|',
@@ -708,13 +707,10 @@ def media_listitem(context,
     resume = True
     prop_value = media_item.video_id
     if prop_value:
-        if prop_value == played:
-            set_play_count = 'forced'
-            resume = False
-        elif prop_value == focused:
-            set_play_count = False
-            resume = False
         props[VIDEO_ID] = prop_value
+
+        if to_sync and prop_value in to_sync:
+            set_play_count = False
 
     # make channel_id property available for keymapping
     prop_value = media_item.channel_id
@@ -754,26 +750,8 @@ def media_listitem(context,
     set_info(list_item,
              media_item,
              props,
-             set_play_count=set_play_count and set_play_count != 'forced',
+             set_play_count=set_play_count,
              resume=resume)
-
-    if not set_play_count:
-        video_id = media_item.video_id
-        playback_history = context.get_playback_history()
-        item_history = playback_history.get_item(video_id)
-        if item_history:
-            playback_history.update_item(video_id, dict(
-                item_history,
-                play_count=int(not media_item.get_play_count()),
-                played_time=0.0,
-                played_percent=0,
-            ))
-        else:
-            playback_history.set_item(video_id, {
-                'play_count': int(not media_item.get_play_count()),
-                'played_time': 0.0,
-                'played_percent': 0,
-            })
 
     context_menu = media_item.get_context_menu()
     if context_menu:

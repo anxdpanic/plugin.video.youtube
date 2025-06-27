@@ -11,6 +11,8 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from ..constants import (
+    ADDON_ID,
+    MARK_AS_LABEL,
     PATHS,
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
@@ -540,6 +542,22 @@ def history_clear(context):
         context.localize('history.clear'),
         context.create_uri(
             (PATHS.HISTORY, 'clear',),
+            run=True,
+        ),
+    )
+
+
+def history_mark_as(context, video_id):
+    return (
+        '$INFO[Window(Home).Property({addon_id}-{label_property})]'.format(
+            addon_id=ADDON_ID,
+            label_property=MARK_AS_LABEL,
+        ),
+        context.create_uri(
+            (PATHS.HISTORY, 'mark_as',),
+            {
+                'video_id': video_id,
+            },
             run=True,
         ),
     )

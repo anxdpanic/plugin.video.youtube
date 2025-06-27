@@ -13,6 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from . import logging
 from .constants import (
     ABORT_FLAG,
+    MARK_AS_LABEL,
     PLUGIN_SLEEPING,
     TEMP_PATH,
     VIDEO_ID,
@@ -155,6 +156,10 @@ def run():
                     if video_id != new_video_id:
                         video_id = new_video_id
                         set_property(VIDEO_ID, video_id)
+                        set_property(MARK_AS_LABEL,
+                                     context.localize('history.mark.unwatched')
+                                     if get_listitem_info('PlayCount') else
+                                     context.localize('history.mark.watched'))
                 elif video_id and get_listitem_info('Label'):
                     video_id = None
                     clear_property(VIDEO_ID)

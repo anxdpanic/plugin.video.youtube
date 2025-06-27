@@ -100,7 +100,7 @@ class AbstractProvider(object):
         self.register_path(r''.join((
             '^',
             PATHS.HISTORY,
-            '/(?P<command>clear|list|mark_unwatched|mark_watched|play|remove|reset_resume)/?$'
+            '/(?P<command>clear|list|mark_as|mark_unwatched|mark_watched|play|remove|reset_resume)/?$'
         )), self.on_playback_history)
 
         self.register_path(r'(?P<path>.*\/)extrafanart\/([\?#].+)?$',

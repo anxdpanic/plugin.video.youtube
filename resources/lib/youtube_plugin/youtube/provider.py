@@ -1318,7 +1318,15 @@ class Provider(AbstractProvider):
                 'played_percent': 0
             }
 
-        if command == 'mark_unwatched':
+        if command == 'mark_as':
+            if context.get_listitem_info('PlayCount'):
+                play_data['play_count'] = 0
+                play_data['played_time'] = 0
+                play_data['played_percent'] = 0
+            else:
+                play_data['play_count'] = 1
+
+        elif command == 'mark_unwatched':
             if play_data.get('play_count', 0) > 0:
                 play_data['play_count'] = 0
                 play_data['played_time'] = 0

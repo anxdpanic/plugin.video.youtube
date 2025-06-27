@@ -1058,10 +1058,7 @@ def update_video_items(provider, context, video_id_dict,
 
         if use_play_data:
             context_menu.append(
-                menu_items.history_mark_unwatched(
-                    context, video_id
-                ) if play_data and play_data.get('play_count') else
-                menu_items.history_mark_watched(
+                menu_items.history_mark_as(
                     context, video_id
                 )
             )

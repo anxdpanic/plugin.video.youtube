@@ -76,6 +76,7 @@ PLAYBACK_STOPPED = 'playback_stopped'
 REFRESH_CONTAINER = 'refresh_container'
 RELOAD_ACCESS_MANAGER = 'reload_access_manager'
 SERVICE_IPC = 'service_ipc'
+SYNC_LISTITEM = 'sync_listitem'
 
 # Sleep/wakeup states
 PLUGIN_WAKEUP = 'plugin_wakeup'
@@ -106,6 +107,7 @@ CONTAINER_POSITION = 'container_position'
 DEVELOPER_CONFIGS = 'configs'
 LICENSE_TOKEN = 'license_token'
 LICENSE_URL = 'license_url'
+MARK_AS_LABEL = 'mark_as_label'
 PLAYER_DATA = 'player_json'
 PLAYER_VIDEO_ID = 'player_video_id'
 PLAYLIST_PATH = 'playlist_path'
@@ -154,6 +156,7 @@ __all__ = (
     'REFRESH_CONTAINER',
     'RELOAD_ACCESS_MANAGER',
     'SERVICE_IPC',
+    'SYNC_LISTITEM',
 
     # Sleep/wakeup states
     'PLUGIN_SLEEPING',
@@ -178,6 +181,7 @@ __all__ = (
     'DEVELOPER_CONFIGS',
     'LICENSE_TOKEN',
     'LICENSE_URL',
+    'MARK_AS_LABEL',
     'PLAYER_DATA',
     'PLAYER_VIDEO_ID',
     'PLAYLIST_PATH',

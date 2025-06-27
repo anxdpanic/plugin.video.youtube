@@ -33,6 +33,7 @@ from ...constants import (
     RELOAD_ACCESS_MANAGER,
     REROUTE_PATH,
     TRAKT_PAUSE_FLAG,
+    SYNC_LISTITEM,
     VIDEO_ID,
     WINDOW_FALLBACK,
     WINDOW_REPLACE,
@@ -215,6 +216,7 @@ class XbmcPlugin(AbstractPlugin):
         else:
             focused_video_id = None
             played_video_id = None
+        sync_items = (focused_video_id, played_video_id)
 
         play_cancelled = ui.pop_property(PLAY_CANCELLED)
         if play_cancelled:
@@ -253,8 +255,7 @@ class XbmcPlugin(AbstractPlugin):
                     context,
                     item,
                     show_fanart=show_fanart,
-                    focused=focused_video_id,
-                    played=played_video_id,
+                    to_sync=sync_items,
                 ))
             item_count = len(items)
 
@@ -363,6 +364,9 @@ class XbmcPlugin(AbstractPlugin):
             updateListing=update_listing,
             cacheToDisc=cache_to_disc,
         )
+
+        if any(sync_items):
+            context.send_notification(SYNC_LISTITEM, sync_items)
 
         container = ui.pop_property(CONTAINER_ID)
         position = ui.pop_property(CONTAINER_POSITION)
