@@ -69,6 +69,8 @@ VIDEO_ID = 'video_id'
 
 # Events
 CHECK_SETTINGS = 'check_settings'
+FILE_READ = 'file_read'
+FILE_WRITE = 'file_write'
 PLAYBACK_INIT = 'playback_init'
 PLAYBACK_FAILED = 'playback_failed'
 PLAYBACK_STARTED = 'playback_started'
@@ -149,6 +151,8 @@ __all__ = (
 
     # Events
     'CHECK_SETTINGS',
+    'FILE_READ',
+    'FILE_WRITE',
     'PLAYBACK_INIT',
     'PLAYBACK_FAILED',
     'PLAYBACK_STARTED',

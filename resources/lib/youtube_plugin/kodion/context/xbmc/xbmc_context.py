@@ -60,7 +60,7 @@ class IPCMonitor(xbmc.Monitor):
         self.latency = None
         self.received = False
 
-        wait_period = 0.1
+        wait_period = 0.01
         elapsed = 0
         self._start = default_timer()
         while not self.received and not self.waitForAbort(wait_period):

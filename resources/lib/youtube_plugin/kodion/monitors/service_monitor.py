@@ -10,7 +10,8 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import json
-import threading
+from io import open
+from threading import Event, Lock, Thread
 
 from .. import logging
 from ..compatibility import urlsplit, xbmc, xbmcgui
@@ -18,6 +19,8 @@ from ..constants import (
     ADDON_ID,
     CHECK_SETTINGS,
     CONTAINER_FOCUS,
+    FILE_READ,
+    FILE_WRITE,
     MARK_AS_LABEL,
     PATHS,
     PLAYBACK_STOPPED,
@@ -62,6 +65,8 @@ class ServiceMonitor(xbmc.Monitor):
         self.system_sleep = False
         self.refresh = False
         self.interrupt = False
+
+        self.file_access = {}
 
         self.onSettingsChanged(force=True)
 
@@ -276,6 +281,47 @@ class ServiceMonitor(xbmc.Monitor):
                     self.onSettingsChanged(force=True)
                 response = True
 
+            elif target in (FILE_READ, FILE_WRITE):
+                response = None
+                filepath = data.get('filepath')
+                if filepath:
+                    if filepath not in self.file_access:
+                        read_access = Event()
+                        read_access.set()
+                        write_access = Lock()
+                        self.file_access[filepath] = (read_access, write_access)
+                    else:
+                        read_access, write_access = self.file_access[filepath]
+
+                    if target == FILE_READ:
+                        try:
+                            with open(filepath, mode='r',
+                                      encoding='utf-8') as file:
+                                read_access.wait()
+                                self.set_property(
+                                    '-'.join((FILE_READ, filepath)),
+                                    file.read(),
+                                    log_value='<redacted>',
+                                )
+                                response = True
+                        except (IOError, OSError):
+                            response = False
+                    else:
+                        with write_access:
+                            read_access.clear()
+                            try:
+                                with open(filepath, mode='w',
+                                          encoding='utf-8') as file:
+                                    file.write(self.pop_property(
+                                        '-'.join((FILE_WRITE, filepath)),
+                                        log_value='<redacted>',
+                                    ))
+                                response = True
+                            except (IOError, OSError):
+                                response = False
+                            finally:
+                                read_access.set()
+
             else:
                 return
 
@@ -432,7 +478,7 @@ class ServiceMonitor(xbmc.Monitor):
             self._httpd_error = True
             return False
 
-        self.httpd_thread = threading.Thread(target=self.httpd.serve_forever)
+        self.httpd_thread = Thread(target=self.httpd.serve_forever)
         self.httpd_thread.daemon = True
         self.httpd_thread.start()
 
@@ -453,7 +499,7 @@ class ServiceMonitor(xbmc.Monitor):
                        port=self._old_httpd_port)
         self.httpd_address_sync()
 
-        shutdown_thread = threading.Thread(target=self.httpd.shutdown)
+        shutdown_thread = Thread(target=self.httpd.shutdown)
         shutdown_thread.daemon = True
         shutdown_thread.start()
 

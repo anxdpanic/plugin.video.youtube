@@ -23,8 +23,7 @@ class APIKeyStore(JSONStore):
     DOMAIN_SUFFIX = '.apps.googleusercontent.com'
 
     def __init__(self, context):
-        super(APIKeyStore, self).__init__('api_keys.json')
-        self._context = context
+        super(APIKeyStore, self).__init__('api_keys.json', context)
 
     def set_defaults(self, reset=False):
         data = {} if reset else self.get_data()

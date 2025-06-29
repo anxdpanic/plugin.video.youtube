@@ -36,8 +36,7 @@ class AccessManager(JSONStore):
     }
 
     def __init__(self, context):
-        super(AccessManager, self).__init__('access_manager.json')
-        self._context = context
+        super(AccessManager, self).__init__('access_manager.json', context)
         access_manager_data = self._data['access_manager']
         self._user = access_manager_data.get('current_user', 0)
         self._last_origin = access_manager_data.get('last_origin', ADDON_ID)
