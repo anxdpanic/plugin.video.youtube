@@ -188,7 +188,7 @@ def update_channel_items(provider, context, channel_id_dict,
         subscription_id_dict = {}
 
     client = provider.get_client(context)
-    logged_in = provider.is_logged_in()
+    logged_in = client.logged_in
 
     settings = context.get_settings()
     show_details = settings.show_detailed_description()
@@ -381,7 +381,7 @@ def update_playlist_items(provider, context, playlist_id_dict,
     access_manager = context.get_access_manager()
     custom_watch_later_id = access_manager.get_watch_later_id()
     custom_history_id = access_manager.get_watch_history_id()
-    logged_in = provider.is_logged_in()
+    logged_in = provider.get_client(context).logged_in
 
     settings = context.get_settings()
     show_details = settings.show_detailed_description()
@@ -594,7 +594,7 @@ def update_video_items(provider, context, video_id_dict,
     if not data:
         return
 
-    logged_in = provider.is_logged_in()
+    logged_in = provider.get_client(context).logged_in
     if logged_in:
         watch_later_id = context.get_access_manager().get_watch_later_id()
     else:

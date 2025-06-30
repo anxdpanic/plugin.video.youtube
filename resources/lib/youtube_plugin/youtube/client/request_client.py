@@ -583,7 +583,7 @@ class YouTubeRequestClient(BaseRequestsClass):
 
     def reinit(self, **kwargs):
         super(YouTubeRequestClient, self).reinit(**kwargs)
-        YouTubeRequestClient.init(**kwargs)
+        self.__init__(**kwargs)
 
     def get_language(self):
         return self._language

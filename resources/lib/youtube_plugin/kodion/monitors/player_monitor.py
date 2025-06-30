@@ -100,7 +100,7 @@ class PlayerMonitorThread(threading.Thread):
             })
 
         client = provider.get_client(context)
-        logged_in = provider.is_logged_in()
+        logged_in = client.logged_in
         report_url = use_remote_history and playback_stats.get('playback_url')
         state = 'playing'
 
@@ -181,7 +181,7 @@ class PlayerMonitorThread(threading.Thread):
                     # only report state='paused' once
                     if state == 'playing' or last_state == 'playing':
                         client = provider.get_client(context)
-                        logged_in = provider.is_logged_in()
+                        logged_in = client.logged_in
 
                         if logged_in:
                             client.update_watch_history(
@@ -207,7 +207,7 @@ class PlayerMonitorThread(threading.Thread):
 
         if logged_in:
             client = provider.get_client(context)
-            logged_in = provider.is_logged_in()
+            logged_in = client.logged_in
 
         if self.video_status.get('live'):
             play_count += 1

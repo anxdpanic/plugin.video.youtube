@@ -20,8 +20,7 @@ def _process_add_video(provider, context, keymap_action=False):
     listitem_path = context.get_listitem_info('FileNameAndPath')
 
     client = provider.get_client(context)
-    logged_in = provider.is_logged_in()
-    if not logged_in:
+    if not client.logged_in:
         raise KodionException('Playlist/Add: not logged in')
 
     playlist_id = context.get_param('playlist_id', '')

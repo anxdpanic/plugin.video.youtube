@@ -94,7 +94,7 @@ def process(provider, context, re_match):
 
     # we need a login
     client = provider.get_client(context)
-    if not provider.is_logged_in():
+    if not client.logged_in:
         return UriItem(context.create_uri(('sign', 'in')))
 
     if command == 'list':

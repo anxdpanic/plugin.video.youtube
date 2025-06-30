@@ -133,7 +133,7 @@ class BaseRequestsClass(object):
                           proxy_settings)
 
     def reinit(self, **kwargs):
-        BaseRequestsClass.init(**kwargs)
+        self.__init__(**kwargs)
 
     def __enter__(self):
         return self

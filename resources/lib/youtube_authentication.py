@@ -44,10 +44,9 @@ def _auth(addon_id, mode=yt_login.SIGN_IN):
         logging.debug('Creating developer user: |%s|', addon_id)
 
     client = provider.get_client(context=context)
-    logged_in = provider.is_logged_in()
 
     if mode == yt_login.SIGN_IN:
-        if logged_in:
+        if client.logged_in:
             yt_login.process(yt_login.SIGN_OUT,
                              provider,
                              context,
@@ -59,8 +58,7 @@ def _auth(addon_id, mode=yt_login.SIGN_IN):
 
     yt_login.process(mode, provider, context, client=client, refresh=False)
 
-    _ = provider.get_client(context=context)
-    logged_in = provider.is_logged_in()
+    logged_in = provider.get_client(context=context).logged_in
     if mode == yt_login.SIGN_IN:
         return logged_in
     return not logged_in

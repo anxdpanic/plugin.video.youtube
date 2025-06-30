@@ -58,7 +58,6 @@ class Provider(AbstractProvider):
         super(Provider, self).__init__()
         self._resource_manager = None
         self._client = None
-        self._logged_in = False
 
         self.on_video_x = self.register_path(
             '^/video/(?P<command>[^/]+)/?$',
@@ -106,14 +105,12 @@ class Provider(AbstractProvider):
     def pre_run_wizard_step(provider, context):
         yt_setup_wizard.process_pre_run(context)
 
-    def is_logged_in(self):
-        return self._logged_in
-
     def reset_client(self, **kwargs):
-        self._client = None
         if self._client:
+            kwargs.setdefault('configs', {})
+            kwargs.setdefault('access_token', '')
+            kwargs.setdefault('access_token_tv', '')
             self._client.reinit(**kwargs)
-        self._logged_in = False
 
     def get_client(self, context):
         access_manager = context.get_access_manager()
@@ -122,13 +119,13 @@ class Provider(AbstractProvider):
 
         user = access_manager.get_current_user()
         api_last_origin = access_manager.get_last_origin()
-        configs = api_store.get_configs()
 
         client = self._client
         if not client or not client.initialised:
             synced = api_store.sync()
         else:
             synced = False
+        configs = api_store.get_configs()
 
         dev_id = context.get_param('addon_id')
         if not dev_id or dev_id == ADDON_ID:
@@ -224,7 +221,7 @@ class Provider(AbstractProvider):
         if num_access_tokens:
             if expired:
                 num_access_tokens = 0
-            elif self._logged_in:
+            elif client.logged_in:
                 self.log.info('User is logged in')
                 return client
 
@@ -290,28 +287,23 @@ class Provider(AbstractProvider):
                 access_tokens = access_manager.get_access_token()
 
             if num_access_tokens and access_tokens[1]:
-                self._logged_in = True
                 self.log.info('User is logged in')
-                client.set_access_token(
-                    personal=access_tokens[1],
-                    tv=access_tokens[0],
-                )
+                client.set_access_token(*access_tokens)
             else:
-                self._logged_in = False
                 self.log.info('User is not logged in')
-                client.set_access_token(personal='', tv='')
+                client.set_access_token(tv='', user='')
 
         return client
 
     def get_resource_manager(self, context, progress_dialog=None):
         resource_manager = self._resource_manager
-        logged_in = self.is_logged_in()
+        client = self.get_client(context)
         if not resource_manager or resource_manager.context_changed(
-                context, logged_in
+                context, client
         ):
             new_resource_manager = ResourceManager(proxy(self),
                                                    context,
-                                                   logged_in,
+                                                   client,
                                                    progress_dialog)
             if not resource_manager:
                 self._resource_manager = new_resource_manager
@@ -908,7 +900,7 @@ class Provider(AbstractProvider):
         mode = re_match.group('mode')
         client = provider.get_client(context)
         if mode == yt_login.SIGN_IN:
-            if provider.is_logged_in():
+            if client.logged_in:
                 yt_login.process(yt_login.SIGN_OUT,
                                  provider,
                                  context,
@@ -1352,8 +1344,7 @@ class Provider(AbstractProvider):
         settings_bool = settings.get_bool
         bold = context.get_ui().bold
 
-        _ = provider.get_client(context)  # required for self.is_logged_in()
-        logged_in = provider.is_logged_in()
+        logged_in = provider.get_client(context).logged_in
         # _.get_my_playlists()
 
         result = []

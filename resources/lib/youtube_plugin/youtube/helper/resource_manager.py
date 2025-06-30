@@ -17,10 +17,10 @@ from ...kodion import logging
 class ResourceManager(object):
     log = logging.getLogger(__name__)
 
-    def __init__(self, provider, context, logged_in, progress_dialog=None):
+    def __init__(self, provider, context, client, progress_dialog=None):
         self._provider = provider
         self._context = context
-        self._logged_in = logged_in
+        self._client = client
         self._progress_dialog = progress_dialog
 
         self.new_data = {}
@@ -35,8 +35,8 @@ class ResourceManager(object):
         self._channel_fanart = fanart_type == settings.FANART_CHANNEL
         self._thumb_size = settings.get_thumbnail_size()
 
-    def context_changed(self, context, logged_in):
-        return self._context != context or self._logged_in != logged_in
+    def context_changed(self, context, client):
+        return self._context != context or self._client != client
 
     def update_progress_dialog(self, progress_dialog):
         old_progress_dialog = self._progress_dialog
@@ -57,7 +57,7 @@ class ResourceManager(object):
 
     def get_channels(self, ids, suppress_errors=False, defer_cache=False):
         context = self._context
-        client = self._provider.get_client(context)
+        client = self._client
         data_cache = context.get_data_cache()
         function_cache = context.get_function_cache()
         refresh = context.refresh_requested()
@@ -88,7 +88,7 @@ class ResourceManager(object):
         else:
             result = data_cache.get_items(
                 ids,
-                data_cache.ONE_DAY if self._logged_in else None,
+                data_cache.ONE_DAY if client.logged_in else None,
             )
         to_update = [id_ for id_ in ids
                      if id_ not in result
@@ -151,6 +151,7 @@ class ResourceManager(object):
                          suppress_errors=False,
                          defer_cache=False):
         context = self._context
+        client = self._client
         refresh = context.refresh_requested()
         if not refresh and channel_data:
             result = channel_data
@@ -165,7 +166,7 @@ class ResourceManager(object):
             data_cache = context.get_data_cache()
             result.update(data_cache.get_items(
                 to_check,
-                data_cache.ONE_MONTH if self._logged_in else None,
+                data_cache.ONE_MONTH if client.logged_in else None,
             ))
         to_update = [id_ for id_ in ids
                      if id_ not in result
@@ -184,7 +185,6 @@ class ResourceManager(object):
 
         if to_update:
             notify_and_raise = not suppress_errors
-            client = self._provider.get_client(context)
             new_data = [client.get_channels(list_of_50,
                                             max_results=50,
                                             notify=notify_and_raise,
@@ -252,6 +252,7 @@ class ResourceManager(object):
 
     def get_playlists(self, ids, suppress_errors=False, defer_cache=False):
         context = self._context
+        client = self._client
         ids = tuple(ids)
         refresh = context.refresh_requested()
         if refresh or not ids:
@@ -260,7 +261,7 @@ class ResourceManager(object):
             data_cache = context.get_data_cache()
             result = data_cache.get_items(
                 ids,
-                data_cache.ONE_DAY if self._logged_in else None,
+                data_cache.ONE_DAY if client.logged_in else None,
             )
         to_update = [id_ for id_ in ids
                      if id_ not in result
@@ -279,7 +280,6 @@ class ResourceManager(object):
 
         if to_update:
             notify_and_raise = not suppress_errors
-            client = self._provider.get_client(context)
             new_data = [client.get_playlists(list_of_50,
                                              max_results=50,
                                              notify=notify_and_raise,
@@ -327,6 +327,7 @@ class ResourceManager(object):
             return None
 
         context = self._context
+        client = self._client
         refresh = context.refresh_requested()
 
         if batch_id:
@@ -356,7 +357,7 @@ class ResourceManager(object):
                     batch = data_cache.get_item(
                         '{0},{1}'.format(*batch_id),
                         None
-                        if not self._logged_in else
+                        if not client.logged_in else
                         data_cache.ONE_HOUR
                         if page_token else
                         data_cache.ONE_MINUTE * 5,
@@ -379,7 +380,6 @@ class ResourceManager(object):
             if self._progress_dialog:
                 self._progress_dialog.update(steps=len(result) - len(to_update))
 
-        client = self._provider.get_client(context)
         new_data = {}
         insert_point = 0
         for playlist_id, page_token in to_update:
@@ -444,10 +444,7 @@ class ResourceManager(object):
         return item.get('contentDetails', {}).get('relatedPlaylists')
 
     def get_my_playlists(self, channel_id, page_token, defer_cache=False):
-        context = self._context
-        client = self._provider.get_client(context)
-
-        result = client.get_playlists_of_channel(channel_id, page_token)
+        result = self._client.get_playlists_of_channel(channel_id, page_token)
         if not result:
             return None
 
@@ -474,6 +471,7 @@ class ResourceManager(object):
                    defer_cache=False,
                    yt_items=None):
         context = self._context
+        client = self._client
         ids = tuple(ids)
         refresh = context.refresh_requested()
         if refresh or not ids:
@@ -482,7 +480,7 @@ class ResourceManager(object):
             data_cache = context.get_data_cache()
             result = data_cache.get_items(
                 ids,
-                data_cache.ONE_MONTH if self._logged_in else None,
+                data_cache.ONE_MONTH if client.logged_in else None,
             )
         to_update = [id_ for id_ in ids
                      if id_
@@ -502,7 +500,6 @@ class ResourceManager(object):
 
         if to_update:
             notify_and_raise = not suppress_errors
-            client = self._provider.get_client(context)
             new_data = [client.get_videos(list_of_50,
                                           live_details,
                                           max_results=50,

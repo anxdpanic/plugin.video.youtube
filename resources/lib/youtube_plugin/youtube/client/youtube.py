@@ -39,9 +39,9 @@ class YouTube(LoginClient):
     _max_results = 50
 
     def __init__(self, items_per_page=50, **kwargs):
+        self.channel_id = None
         super(YouTube, self).__init__(**kwargs)
         YouTube.init(items_per_page=items_per_page)
-        self.initialised = True
 
     @classmethod
     def init(cls, items_per_page=50, **_kwargs):
@@ -49,16 +49,23 @@ class YouTube(LoginClient):
 
     def reinit(self, **kwargs):
         super(YouTube, self).reinit(**kwargs)
-        YouTube.init(**kwargs)
-        self.initialised = bool(kwargs)
+        self.__init__(**kwargs)
 
-    @property
-    def initialised(self):
-        return self._initialised
-
-    @initialised.setter
-    def initialised(self, value):
-        self._initialised = value
+    def set_access_token(self, tv=None, user=None):
+        super(YouTube, self).set_access_token(tv=tv, user=user)
+        if self.logged_in:
+            context = self._context
+            function_cache = context.get_function_cache()
+            self.channel_id = function_cache.run(
+                self.get_channel_by_identifier,
+                function_cache.ONE_MONTH,
+                _refresh=context.refresh_requested(),
+                identifier='mine',
+                do_search=False,
+                notify=False,
+            )
+        else:
+            self.channel_id = None
 
     def max_results(self):
         return self._context.get_param('items_per_page') or self._max_results
@@ -1958,7 +1965,6 @@ class YouTube(LoginClient):
 
     def get_my_subscriptions(self,
                              page_token=1,
-                             logged_in=False,
                              do_filter=False,
                              feed_type='videos',
                              refresh=False,
@@ -2355,7 +2361,7 @@ class YouTube(LoginClient):
         }
 
         payloads = {}
-        if logged_in:
+        if self.logged_in:
             function_cache = context.get_function_cache()
 
             channel_params = {
@@ -2775,34 +2781,21 @@ class YouTube(LoginClient):
     def _auth_required(self, params):
         if params:
             if params.get('mine') or params.get('forMine'):
-                return True
+                return not self.logged_in, True
             request_channel_id = params.get('channelId')
             if request_channel_id == 'mine':
-                return True
+                return not self.logged_in, True
         else:
             request_channel_id = None
 
-        context = self._context
-        uri_channel_id = context.get_param('channel_id')
+        uri_channel_id = self._context.get_param('channel_id')
         if uri_channel_id == 'mine':
-            return True
+            return not self.logged_in, True
 
-        channel_ids = (
-            uri_channel_id,
-            request_channel_id,
-        )
-        function_cache = context.get_function_cache()
-        my_channel_id = function_cache.run(
-            self.get_channel_by_identifier,
-            function_cache.ONE_MONTH,
-            _refresh=context.refresh_requested(),
-            identifier='mine',
-            do_search=False,
-            notify=False,
-        )
-        if my_channel_id and my_channel_id in channel_ids:
-            return True
-        return False
+        channel_id = self.channel_id
+        if channel_id and channel_id in (uri_channel_id, request_channel_id):
+            return not self.logged_in, True
+        return False, False
 
     def _response_hook(self, **kwargs):
         response = kwargs['response']
@@ -2916,8 +2909,12 @@ class YouTube(LoginClient):
         if params:
             client_data['params'] = params
 
-        abort = False
-        do_auth = do_auth or self._auth_required(params)
+        if do_auth:
+            abort = not self.logged_in
+        elif do_auth is None:
+            abort, do_auth = self._auth_required(params)
+        else:
+            abort = False
         if do_auth:
             client_data.setdefault('_auth_required', do_auth)
 

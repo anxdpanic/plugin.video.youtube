@@ -52,6 +52,8 @@ class LoginClient(YouTubeRequestClient):
         'user': None,
         'tv': None,
     }
+    _initialised = False
+    _logged_in = False
 
     def __init__(self,
                  configs=None,
@@ -59,33 +61,43 @@ class LoginClient(YouTubeRequestClient):
                  access_token_tv=None,
                  **kwargs):
         super(LoginClient, self).__init__(exc_type=LoginException, **kwargs)
-        LoginClient.init(
-            configs=configs,
-            access_token=access_token,
-            access_token_tv=access_token_tv,
-        )
+        LoginClient.init(configs=configs)
+        self.set_access_token(tv=access_token_tv, user=access_token)
+        self.initialised = any(self._configs.values())
 
     @classmethod
-    def init(cls,
-             configs=None,
-             access_token=None,
-             access_token_tv=None,
-             **_kwargs):
+    def init(cls, configs=None, **_kwargs):
         if configs is not None:
-            cls._configs['user'] = configs.get('main') or {}
-            cls._configs['tv'] = configs.get('youtube-tv') or {}
-        cls.set_access_token(personal=access_token, tv=access_token_tv)
+            cls._configs['user'] = configs.get('main')
+            cls._configs['tv'] = configs.get('youtube-tv')
 
     def reinit(self, **kwargs):
         super(LoginClient, self).reinit(**kwargs)
-        LoginClient.init(**kwargs)
+        self.__init__(**kwargs)
 
-    @classmethod
-    def set_access_token(cls, personal=None, tv=None):
-        if personal is not None:
-            cls._access_tokens['user'] = personal
+    def set_access_token(self, tv=None, user=None):
+        cls = type(self)
         if tv is not None:
             cls._access_tokens['tv'] = tv
+        if user is not None:
+            cls._access_tokens['user'] = user
+        self.logged_in = any(self._access_tokens.values())
+
+    @property
+    def initialised(self):
+        return self._initialised
+
+    @initialised.setter
+    def initialised(self, value):
+        type(self)._initialised = value
+
+    @property
+    def logged_in(self):
+        return self._logged_in
+
+    @logged_in.setter
+    def logged_in(self, value):
+        type(self)._logged_in = value
 
     @staticmethod
     def _response_hook(**kwargs):

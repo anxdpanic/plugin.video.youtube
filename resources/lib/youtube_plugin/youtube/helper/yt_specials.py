@@ -418,7 +418,6 @@ def _process_my_subscriptions(provider,
                               _feed_types=frozenset((
                                       'videos', 'shorts', 'live'
                               ))):
-    logged_in = provider.is_logged_in()
     refresh = context.refresh_requested()
 
     if feed_type not in _feed_types:
@@ -431,7 +430,6 @@ def _process_my_subscriptions(provider,
     ) as progress_dialog:
         json_data = client.get_my_subscriptions(
             page_token=context.get_param('page', 1),
-            logged_in=logged_in,
             do_filter=filtered,
             feed_type=feed_type,
             refresh=refresh,
@@ -445,7 +443,6 @@ def _process_my_subscriptions(provider,
 
         filler = partial(
             client.get_my_subscriptions,
-            logged_in=logged_in,
             do_filter=filtered,
             feed_type=feed_type,
             refresh=refresh,
@@ -515,7 +512,6 @@ def process(provider, context, re_match=None, category=None, sub_category=None):
         if sub_category is None:
             sub_category = re_match.group('sub_category')
 
-    # required for provider.is_logged_in()
     client = provider.get_client(context)
 
     if category == 'related_videos':
@@ -540,7 +536,7 @@ def process(provider, context, re_match=None, category=None, sub_category=None):
         )
 
     if category == 'disliked_videos':
-        if provider.is_logged_in():
+        if client.logged_in:
             return _process_disliked_videos(provider, context, client)
         return UriItem(context.create_uri(('sign', 'in')))
 
