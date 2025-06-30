@@ -564,10 +564,13 @@ class ResourceManager(object):
                 self.new_data.update(data)
             return
 
-        flush = False
-        if not data:
-            data = self.new_data
+        if self.new_data:
             flush = True
+            if data:
+                self.new_data.update(data)
+            data = self.new_data
+        else:
+            flush = False
         if data:
             if self._incognito:
                 self.log.debugging and self.log.debug(
