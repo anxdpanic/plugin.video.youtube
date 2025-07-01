@@ -1370,7 +1370,7 @@ class YouTube(LoginClient):
             if click_tracking:
                 v3_response['clickTracking'] = click_tracking
 
-            page_token = self.json_traverse(
+            _page_token = self.json_traverse(
                 continuation,
                 json_path.get('page_token') or (
                     (
@@ -1384,8 +1384,8 @@ class YouTube(LoginClient):
                     ),
                 ),
             )
-            if page_token:
-                v3_response['nextPageToken'] = page_token
+            if _page_token and _page_token != page_token:
+                v3_response['nextPageToken'] = _page_token
 
             visitor = self.json_traverse(
                 result,
@@ -1398,7 +1398,6 @@ class YouTube(LoginClient):
                 v3_response['visitorData'] = visitor
         else:
             v3_response['visitorData'] = visitor
-            v3_response['nextPageToken'] = page_token
             v3_response['clickTracking'] = click_tracking
 
         v3_response['items'] = items
@@ -1712,23 +1711,24 @@ class YouTube(LoginClient):
                     })
 
         if retry:
-            page_token = ''
+            _page_token = ''
             click_tracking = ''
         else:
             continuation = related_videos[-1]
-            page_token = self.json_traverse(continuation, path=(
+            _page_token = self.json_traverse(continuation, path=(
                 'continuationCommand',
                 'token',
             ))
-            if page_token:
+            if _page_token and _page_token != page_token:
                 click_tracking = continuation.get('clickTrackingParams', '')
             else:
+                _page_token = ''
                 click_tracking = ''
 
         v3_response = {
             'kind': 'youtube#videoListResponse',
             'items': items or [],
-            'nextPageToken': page_token,
+            'nextPageToken': _page_token,
             'visitorData': self.json_traverse(result, path=(
                 'responseContext',
                 'visitorData',
