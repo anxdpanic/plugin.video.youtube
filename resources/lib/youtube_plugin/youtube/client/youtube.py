@@ -885,6 +885,86 @@ class YouTube(LoginClient):
                            do_auth=None,
                            max_results=None,
                            **kwargs):
+        if playlist_id.lower() in ('wl', 'll'):
+            return self.get_browse_videos(
+                browse_id='VL' + playlist_id.upper(),
+                client='tv',
+                do_auth=True,
+                page_token=page_token,
+                json_path={
+                    'items': (
+                        'contents',
+                        'tvBrowseRenderer',
+                        'content',
+                        'tvSurfaceContentRenderer',
+                        'content',
+                        'twoColumnRenderer',
+                        'rightColumn',
+                        'playlistVideoListRenderer',
+                        'contents',
+                    ),
+                    'video_id': (
+                        'tileRenderer',
+                        'onSelectCommand',
+                        'watchEndpoint',
+                        'videoId',
+                    ),
+                    'title': (
+                        'tileRenderer',
+                        'metadata',
+                        'tileMetadataRenderer',
+                        'title',
+                        'simpleText',
+                    ),
+                    'thumbnails': (
+                        'tileRenderer',
+                        'header',
+                        'tileHeaderRenderer',
+                        'thumbnail',
+                        'thumbnails',
+                    ),
+                    'channel_id': (
+                        'tileRenderer',
+                        'onLongPressCommand',
+                        'showMenuCommand',
+                        'menu',
+                        'menuRenderer',
+                        'items',
+                        -1,
+                        'menuNavigationItemRenderer',
+                        'navigationEndpoint',
+                        'browseEndpoint',
+                        'browseId',
+                    ),
+                    'continuation': (
+                        'contents',
+                        'tvBrowseRenderer',
+                        'content',
+                        'tvSurfaceContentRenderer',
+                        'content',
+                        'twoColumnRenderer',
+                        'rightColumn',
+                        'playlistVideoListRenderer',
+                        'continuations',
+                        0,
+                        'nextContinuationData',
+                    ),
+                    'continuation_items': (
+                        'continuationContents',
+                        'playlistVideoListContinuation',
+                        'contents',
+                    ),
+                    'continuation_continuation': (
+                        'continuationContents',
+                        'playlistVideoListContinuation',
+                        'continuations',
+                        0,
+                        'nextContinuationData',
+                    ),
+                },
+                **kwargs
+            )
+
         # prepare params
         params = {
             'part': 'snippet',

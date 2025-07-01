@@ -613,7 +613,10 @@ class Provider(AbstractProvider):
         new_params = {
             'playlist_id': playlist_id,
         }
-        channel_id = re_match.group('channel_id')
+        if playlist_id.lower() in ('wl', 'll'):
+            channel_id = 'mine'
+        else:
+            channel_id = re_match.group('channel_id')
         if channel_id:
             new_params['channel_id'] = channel_id
         context.parse_params(new_params)
