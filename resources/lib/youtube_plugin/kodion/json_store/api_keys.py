@@ -191,8 +191,8 @@ class APIKeyStore(JSONStore):
         if (not origin
                 or not key_details
                 or not required_details.issubset(key_details)):
-            self.log.error_trace(('Invalid developer config: |{config}|',
-                                  'Expected: |{{',
+            self.log.error_trace(('Invalid developer config: {config!r}',
+                                  'Expected: {{',
                                   '    "origin": ADDON_ID,',
                                   '    "main": {{',
                                   '        "system": SYSTEM_NAME,',
@@ -200,7 +200,7 @@ class APIKeyStore(JSONStore):
                                   '        "id": CLIENT_ID,',
                                   '        "secret": CLIENT_SECRET',
                                   '    }},',
-                                  '}}|'),
+                                  '}}'),
                                  config=config)
             return {}
 
@@ -210,8 +210,8 @@ class APIKeyStore(JSONStore):
                 key_details[key] = b64decode(key_details[key]).decode('utf-8')
 
         self.log.debug(('Using developer config',
-                        'Origin: |{origin}|',
-                        'System: |{system}|'),
+                        'Origin: {origin!r}',
+                        'System: {system!r}'),
                        origin=origin,
                        system=key_system)
 

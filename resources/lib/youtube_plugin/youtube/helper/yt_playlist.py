@@ -44,7 +44,7 @@ def _process_add_video(provider, context, keymap_action=False):
     json_data = client.add_video_to_playlist(playlist_id=playlist_id,
                                              video_id=video_id)
     if not json_data:
-        logging.debug('Playlist/Add: failed for playlist |{playlist_id}|'
+        logging.debug('Playlist/Add: failed for playlist {playlist_id!r}'
                       .format(playlist_id=playlist_id))
         return False
 
@@ -98,7 +98,7 @@ def _process_remove_video(provider,
         if len(video_params) != 1:
             if confirmed:
                 return False
-            raise KodionException('Playlist/Remove: missing parameters |{0}|'
+            raise KodionException('Playlist/Remove: missing parameters {0!r}'
                                   .format(video_params))
 
         video_params = (
@@ -108,7 +108,7 @@ def _process_remove_video(provider,
         if '' in video_params or len(video_params) != params_required:
             if confirmed:
                 return False
-            raise KodionException('Playlist/Remove: missing listitem info |{0}|'
+            raise KodionException('Playlist/Remove: missing listitem info {0!r}'
                                   .format(video_params))
 
         playlist_id = listitem_playlist_id
@@ -117,7 +117,7 @@ def _process_remove_video(provider,
         keymap_action = True
 
     if playlist_id.strip().lower() in {'wl', 'hl'}:
-        logging.debug('Playlist/Remove: failed for playlist |{playlist_id}|'
+        logging.debug('Playlist/Remove: failed for playlist {playlist_id!r}'
                       .format(playlist_id=playlist_id))
         return False
 
@@ -394,5 +394,5 @@ def process(provider,
     if command in {'set', 'remove'} and category == 'history':
         return _playlist_id_change(context, category, command)
 
-    raise KodionException('Unknown playlist category |{0}| or command |{1}|'
+    raise KodionException('Unknown playlist category {0!r} or command {1!r}'
                           .format(category, command))

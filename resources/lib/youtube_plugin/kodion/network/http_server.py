@@ -209,10 +209,10 @@ class RequestHandler(BaseHTTPRequestHandler, object):
 
         if not path['path'].startswith(PATHS.PING):
             self.log.debug(('{status}',
-                            'Method:      |{method}|',
-                            'Path:        |{path[path]}|',
-                            'Params:      |{path[log_params]}|',
-                            'Address:     |{client_ip}|',
+                            'Method:      {method!r}',
+                            'Path:        {path[path]!r}',
+                            'Params:      {path[log_params]!r}',
+                            'Address:     {client_ip!r}',
                             'Whitelisted: {is_whitelisted}',
                             'Local range: {is_local}'),
                            status=('Allowed' if ip_allowed else 'Blocked'),
@@ -270,7 +270,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                             break
                         self.wfile.write(file_chunk)
             except IOError:
-                response = ('File Not Found: |{uri}| -> |{file_path}|'
+                response = ('File Not Found: {uri!r} -> {file_path!r}'
                             .format(uri=path['log_uri'], file_path=file_path))
                 self.send_error(404, response)
 
@@ -413,9 +413,9 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             stream_redirect = settings.httpd_stream_redirect()
 
             log_msg = ('Stream proxy response {success}',
-                       'Server: |{server}|',
-                       'Target: |{target}|',
-                       'Status: |{status} {reason}|')
+                       'Server: {server!r}',
+                       'Target: {target!r}',
+                       'Status: {status} {reason}')
 
             response = None
             server = None
@@ -580,7 +580,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                 self.send_header('Content-Length', str(file_size))
                 self.end_headers()
             except IOError:
-                response = ('File Not Found: |{uri}| -> |{file_path}|'
+                response = ('File Not Found: {uri!r} -> {file_path!r}'
                             .format(uri=path['log_uri'], file_path=file_path))
                 self.send_error(404, response)
 
@@ -937,7 +937,7 @@ def get_http_server(address, port, context):
         return server
     except socket.error as exc:
         logging.exception(('Failed to start',
-                           'Address:  |{address}:{port}|'),
+                           'Address:  {address}:{port}'),
                           address=address,
                           port=port)
         xbmcgui.Dialog().notification(context.get_name(),
@@ -968,7 +968,7 @@ def httpd_status(context, address=None):
             return True
 
     logging.debug(('Ping',
-                   'Address:  |{netloc}|',
+                   'Address:  {netloc!r}',
                    'Response: {response}'),
                   netloc=netloc,
                   response=(result or 'failed'))

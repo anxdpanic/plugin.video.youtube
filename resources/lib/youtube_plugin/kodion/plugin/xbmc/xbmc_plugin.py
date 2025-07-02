@@ -490,5 +490,5 @@ class XbmcPlugin(AbstractPlugin):
             result = False
             return result, action
 
-        logging.debug('{action}: |{uri}|', action=log_action, uri=log_uri)
+        logging.debug('{action}: {uri!r}', action=log_action, uri=log_uri)
         return result, action

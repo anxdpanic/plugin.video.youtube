@@ -139,7 +139,7 @@ def parse(datetime_string):
             match['tzinfo'] = timezone.utc
         return datetime(**match)
 
-    raise KodionException('Could not parse |{datetime}| as ISO 8601'
+    raise KodionException('Could not parse {datetime!r} as ISO 8601'
                           .format(datetime=datetime_string))
 
 

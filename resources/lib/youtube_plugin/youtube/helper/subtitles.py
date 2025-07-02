@@ -223,7 +223,7 @@ class Subtitles(object):
         try:
             text = unescape(text)
         except Exception:
-            self.log.error('Failed: |%s|', text)
+            self.log.error('Failed: %r', text)
         return text
 
     def get_lang_details(self):
@@ -394,7 +394,7 @@ class Subtitles(object):
                 return False
 
             lang, language = choice
-            self.log.debug('Selected: |%s|', lang)
+            self.log.debug('Selected: %r', lang)
             url, sub_format = self._get_url(track=track, lang=lang)
             if url:
                 subtitle = {
@@ -445,7 +445,7 @@ class Subtitles(object):
 
             file_path = os.path.join(self.BASE_PATH, filename)
             if xbmcvfs.exists(file_path):
-                self.log.debug(('Use existing subtitle for: |{lang}|',
+                self.log.debug(('Use existing subtitle for: {lang!r}',
                                 'File: {file}'),
                                lang=lang,
                                file=file_path)
@@ -453,7 +453,7 @@ class Subtitles(object):
 
         base_url = self._normalize_url(track.get('baseUrl'))
         if not base_url:
-            self.log.error_trace('No URL for: |%s|', lang)
+            self.log.error_trace('No URL for: %r', lang)
             return None, None
 
         subtitle_url = self._set_query_param(
@@ -463,7 +463,7 @@ class Subtitles(object):
             ('tlang', tlang),
             ('xosf', None),
         )
-        self.log.debug(('Found new subtitle for: |{lang}|',
+        self.log.debug(('Found new subtitle for: {lang!r}',
                         'URL: {url}'),
                        lang=lang,
                        url=subtitle_url)
@@ -474,7 +474,7 @@ class Subtitles(object):
         response = BaseRequestsClass(context=self._context).request(
             subtitle_url,
             headers=self.headers,
-            error_title='Failed to download subtitle for: |{sub_lang}|',
+            error_title='Failed to download subtitle for: {sub_lang!r}',
             sub_lang=lang,
         )
         response = response and response.text
@@ -488,7 +488,7 @@ class Subtitles(object):
             with xbmcvfs.File(file_path, 'w') as sub_file:
                 success = sub_file.write(output)
         except (IOError, OSError):
-            self.log.exception(('Write failed for: |{lang}|',
+            self.log.exception(('Write failed for: {lang!r}',
                                 'File: {file}'),
                                lang=lang,
                                file=file_path)
@@ -545,7 +545,7 @@ class Subtitles(object):
         if sel_track:
             return sel_track, sel_lang, sel_language, sel_kind
 
-        self.log.debug('No subtitle for: |%s|', lang)
+        self.log.debug('No subtitle for: %r', lang)
         return None, None, None, None
 
     @staticmethod

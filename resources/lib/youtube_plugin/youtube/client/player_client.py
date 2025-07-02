@@ -862,18 +862,18 @@ class PlayerClient(LoginClient):
 
         if not json_data or 'error' not in json_data:
             info = (
-                'video_id: |{video_id}|',
-                'Client:   |{client_name}|',
-                'Auth:     |{has_auth}|',
+                'video_id: {video_id!r}',
+                'Client:   {client_name!r}',
+                'Auth:     {has_auth!r}',
             )
             return None, info, None, data, exception
 
         info = (
             'Reason:   {error_reason}',
             'Message:  {error_message}',
-            'video_id: |{video_id}|',
-            'Client:   |{client_name}|',
-            'Auth:     |{has_auth}|',
+            'video_id: {video_id!r}',
+            'Client:   {client_name!r}',
+            'Auth:     {has_auth!r}',
         )
         details = json_data['error']
         details = {
@@ -1370,7 +1370,7 @@ class PlayerClient(LoginClient):
             try:
                 signature = self._cipher.get_signature(encrypted_signature)
             except Exception:
-                self.log.exception(('Failed to extract URL', 'Signature: |%s|'),
+                self.log.exception(('Failed to extract URL', 'Signature: %r'),
                                    encrypted_signature)
                 self._cipher = False
                 return None
@@ -1695,9 +1695,9 @@ class PlayerClient(LoginClient):
                         self.log.warning(('Failed to retrieve video info',
                                           'Status:   {status}',
                                           'Reason:   {reason}',
-                                          'video_id: |{video_id}|',
-                                          'Client:   |{client}|',
-                                          'Auth:     |{auth}|'),
+                                          'video_id: {video_id!r}',
+                                          'Client:   {client!r}',
+                                          'Auth:     {auth!r}'),
                                          status=_status,
                                          reason=_reason or 'UNKNOWN',
                                          video_id=video_id,
@@ -1736,9 +1736,9 @@ class PlayerClient(LoginClient):
 
             if _status == 'OK':
                 self.log.debug(('Retrieved video info:',
-                                'video_id: |{video_id}|',
-                                'Client:   |{client}|',
-                                'Auth:     |{auth}|'),
+                                'video_id: {video_id!r}',
+                                'Client:   {client!r}',
+                                'Auth:     {auth!r}'),
                                video_id=video_id,
                                client=_client_name,
                                auth=_has_auth)

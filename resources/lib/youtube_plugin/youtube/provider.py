@@ -135,9 +135,9 @@ class Provider(AbstractProvider):
                 switch = api_store.get_current_switch()
                 key_details = api_store.get_key_set(switch)
                 self.log.debug(('Using personal API details',
-                                'Config:  |{config}|',
-                                'User #:  |{user}|',
-                                'Key set: |{switch}|'),
+                                'Config:  {config!r}',
+                                'User #:  {user!r}',
+                                'Key set: {switch!r}'),
                                config=configs['main']['system'],
                                user=user,
                                switch=switch)
@@ -152,9 +152,9 @@ class Provider(AbstractProvider):
                 configs['main'] = key_details
                 switch = 'developer'
                 self.log.debug(('Using developer provided API details',
-                                'Config:  |{config}|',
-                                'User #:  |{user}|',
-                                'Key set: |{switch}|'),
+                                'Config:  {config!r}',
+                                'User #:  {user!r}',
+                                'Key set: {switch!r}'),
                                config=key_details['system'],
                                user=user,
                                switch=switch)
@@ -162,9 +162,9 @@ class Provider(AbstractProvider):
                 key_details = configs['main']
                 switch = api_store.get_current_switch()
                 self.log.debug(('Using developer provided access tokens',
-                                'Config:  |{config}|',
-                                'User #:  |{user}|',
-                                'Key set: |{switch}|'),
+                                'Config:  {config!r}',
+                                'User #:  {user!r}',
+                                'Key set: {switch!r}'),
                                config=key_details['system'],
                                user=user,
                                switch=switch)
@@ -201,8 +201,8 @@ class Provider(AbstractProvider):
 
         if api_last_origin != origin:
             self.log.info(('API key origin changed - Resetting client',
-                           'Previous: |{old}|',
-                           'Current:  |{new}|'),
+                           'Previous: {old!r}',
+                           'Current:  {new!r}'),
                           old=api_last_origin,
                           new=origin)
             access_manager.set_last_origin(origin)

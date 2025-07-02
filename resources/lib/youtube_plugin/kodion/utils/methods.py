@@ -171,7 +171,7 @@ def make_dirs(path):
         os.makedirs(path)
     except OSError:
         if not xbmcvfs.exists(path):
-            logging.exception(('Failed', 'Path: |%s|'), path)
+            logging.exception(('Failed', 'Path: %r'), path)
             return False
     return path
 
@@ -187,7 +187,7 @@ def rm_dir(path):
     try:
         shutil.rmtree(path)
     except OSError:
-        logging.exception(('Failed', 'Path: |%s|'), path)
+        logging.exception(('Failed', 'Path: %r'), path)
     return not xbmcvfs.exists(path)
 
 
@@ -391,9 +391,9 @@ def redact_params(params):
             )
         elif param == 'location':
             log_value = (
-                ['|xx.xxxx,xx.xxxx|' for _ in value]
+                ['xx.xxxx,xx.xxxx' for _ in value]
                 if isinstance(value, (list, tuple)) else
-                '|xx.xxxx,xx.xxxx|'
+                'xx.xxxx,xx.xxxx'
             )
         elif param == '__headers':
             log_value = (

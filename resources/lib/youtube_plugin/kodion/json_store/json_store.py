@@ -90,7 +90,7 @@ class JSONStore(object):
                                stacklevel=stacklevel)
             return False
         except (TypeError, ValueError):
-            self.log.exception(('Invalid data', 'Data: %s'),
+            self.log.exception(('Invalid data', 'Data: %r'),
                                data,
                                stacklevel=stacklevel)
             self.set_defaults(reset=True)
@@ -132,7 +132,7 @@ class JSONStore(object):
                                filepath,
                                stacklevel=stacklevel)
         except (TypeError, ValueError):
-            self.log.exception(('Invalid data', 'Data: %s'),
+            self.log.exception(('Invalid data', 'Data: %r'),
                                data,
                                stacklevel=stacklevel)
 
@@ -146,7 +146,7 @@ class JSONStore(object):
                 object_pairs_hook=(self._process_data if process else None),
             )
         except (TypeError, ValueError) as exc:
-            self.log.exception(('Invalid data', 'Data: %s'),
+            self.log.exception(('Invalid data', 'Data: %r'),
                                data,
                                stacklevel=stacklevel)
             if fallback:
@@ -161,7 +161,7 @@ class JSONStore(object):
                 object_pairs_hook=(self._process_data if process else None),
             )
         except (TypeError, ValueError):
-            self.log.exception(('Invalid data', 'Data: %s'),
+            self.log.exception(('Invalid data', 'Data: %r'),
                                data,
                                stacklevel=stacklevel)
         return {}

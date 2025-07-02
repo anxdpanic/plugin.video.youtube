@@ -103,7 +103,7 @@ def _do_login(provider, context, client=None, **kwargs):
                         log_data['access_token'] = '<redacted>'
                     if 'refresh_token' in log_data:
                         log_data['refresh_token'] = '<redacted>'
-                    logging.debug('Requesting access token: |{%s}|', log_data)
+                    logging.debug('Requesting access token: %r', log_data)
 
                     if 'error' not in json_data:
                         access_token = json_data.get('access_token', '')
@@ -133,10 +133,10 @@ def _do_login(provider, context, client=None, **kwargs):
         finally:
             tokens[token_type] = new_token
             logging.debug(('YouTube Login:',
-                           'Type:          |{token}|',
-                           'Access token:  |{has_access_token}|',
-                           'Expires:       |{expiry}|',
-                           'Refresh token: |{has_refresh_token}|'),
+                           'Type:          {token!r}',
+                           'Access token:  {has_access_token!r}',
+                           'Expires:       {expiry!r}',
+                           'Refresh token: {has_refresh_token!r}'),
                           token=token,
                           has_access_token=bool(new_token[0]),
                           expiry=new_token[1],

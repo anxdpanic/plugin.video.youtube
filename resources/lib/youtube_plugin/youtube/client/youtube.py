@@ -1045,10 +1045,10 @@ class YouTube(LoginClient):
         except (IndexError, KeyError, TypeError):
             self.log.warning(('Channel ID not found',
                               'Data:        {data}',
-                              'Identifier:  |{identifier}|',
-                              'mine:        |{mine}|',
-                              'forHandle:   |{handle}|',
-                              'forUsername: |{username}|'),
+                              'Identifier:  {identifier!r}',
+                              'mine:        {mine!r}',
+                              'forHandle:   {handle!r}',
+                              'forUsername: {username!r}'),
                              data=json_data,
                              identifier=identifier,
                              mine=mine,
@@ -2921,15 +2921,15 @@ class YouTube(LoginClient):
         response = kwargs['response']
         if kwargs.get('extended_debug'):
             self.log.debug(('Request response',
-                            'Status:  |{response.status_code}|',
-                            'Headers: |{response.headers}|',
-                            'Content: |{response.text}|'),
+                            'Status:  {response.status_code!r}',
+                            'Headers: {response.headers!r}',
+                            'Content: {response.text}'),
                            response=response,
                            stacklevel=4)
         else:
             self.log.debug(('Request response',
-                            'Status:  |{response.status_code}|',
-                            'Headers: |{response.headers}|'),
+                            'Status:  {response.status_code!r}',
+                            'Headers: {response.headers!r}'),
                            response=response,
                            stacklevel=4)
 
@@ -3081,7 +3081,7 @@ class YouTube(LoginClient):
                     abort = True
 
             if 'location' in params:
-                log_params['location'] = '|xx.xxxx,xx.xxxx|'
+                log_params['location'] = 'xx.xxxx,xx.xxxx'
         else:
             log_params = None
 
@@ -3089,17 +3089,17 @@ class YouTube(LoginClient):
         if headers:
             log_headers = headers.copy()
             if 'Authorization' in log_headers:
-                log_headers['Authorization'] = '|logged in|'
+                log_headers['Authorization'] = '<redacted>'
         else:
             log_headers = None
 
         context = self._context
         self.log.debug(('{request_name} API request',
-                        'method:    |{method}|',
-                        'path:      |{path}|',
-                        'params:    |{params}|',
-                        'post_data: |{data}|',
-                        'headers:   |{headers}|'),
+                        'method:    {method!r}',
+                        'path:      {path!r}',
+                        'params:    {params!r}|',
+                        'post_data: {data!r}',
+                        'headers:   {headers!r}'),
                        request_name=client.get('_name'),
                        method=method,
                        path=path,

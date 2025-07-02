@@ -171,22 +171,24 @@ class LoginClient(YouTubeRequestClient):
                      'grant_type': 'refresh_token'}
 
         client_id.replace(self.DOMAIN_SUFFIX, '')
-        log_info = ('Login type:    |{login_type}|',
-                    'client_id:     |{id_start}...{id_end}|',
-                    'client_secret: |{secret_start}...{secret_end}|')
+        log_info = ('Login type:    {login_type!r}',
+                    'client_id:     {client_id!r}',
+                    'client_secret: {client_secret!r}')
         log_params = {
             'login_type': login_type,
-            'id_start': '',
-            'id_end': '',
-            'secret_start': '',
-            'secret_end': '',
+            'client_id': '...',
+            'client_secret': '...',
         }
         if len(client_id) > 11:
-            log_params['id_start'] = client_id[:3]
-            log_params['id_end'] = client_id[-5:]
+            log_params['client_id'] = '...'.join((
+                client_id[:3],
+                client_id[-5:],
+            ))
         if len(client_secret) > 9:
-            log_params['secret_start'] = client_secret[:3]
-            log_params['secret_end'] = client_secret[-3:]
+            log_params['client_secret'] = '...'.join((
+                client_secret[:3],
+                client_secret[-3:],
+            ))
         self.log.debug(('Refresh token:',) + log_info, **log_params)
 
         json_data = self.request(
@@ -227,22 +229,24 @@ class LoginClient(YouTubeRequestClient):
                      'grant_type': 'http://oauth.net/grant_type/device/1.0'}
 
         client_id.replace(self.DOMAIN_SUFFIX, '')
-        log_info = ('Login type:    |{login_type}|',
-                    'client_id:     |{id_start}...{id_end}|',
-                    'client_secret: |{secret_start}...{secret_end}|')
+        log_info = ('Login type:    {login_type!r}',
+                    'client_id:     {client_id!r}',
+                    'client_secret: {client_secret!r}')
         log_params = {
             'login_type': login_type,
-            'id_start': '',
-            'id_end': '',
-            'secret_start': '',
-            'secret_end': '',
+            'client_id': '...',
+            'client_secret': '...',
         }
         if len(client_id) > 11:
-            log_params['id_start'] = client_id[:3]
-            log_params['id_end'] = client_id[-5:]
+            log_params['client_id'] = '...'.join((
+                client_id[:3],
+                client_id[-5:],
+            ))
         if len(client_secret) > 9:
-            log_params['secret_start'] = client_secret[:3]
-            log_params['secret_end'] = client_secret[-3:]
+            log_params['client_secret'] = '...'.join((
+                client_secret[:3],
+                client_secret[-3:],
+            ))
         self.log.debug(('Access token request:',) + log_info, **log_params)
 
         json_data = self.request(
@@ -280,16 +284,17 @@ class LoginClient(YouTubeRequestClient):
                      'scope': 'https://www.googleapis.com/auth/youtube'}
 
         client_id.replace(self.DOMAIN_SUFFIX, '')
-        log_info = ('Login type:    |{login_type}|',
-                    'client_id:     |{id_start}...{id_end}|')
+        log_info = ('Login type:    {login_type!r}',
+                    'client_id:     {client_id!r}')
         log_params = {
             'login_type': login_type,
-            'id_start': '',
-            'id_end': '',
+            'client_id': '...',
         }
         if len(client_id) > 11:
-            log_params['id_start'] = client_id[:3]
-            log_params['id_end'] = client_id[-5:]
+            log_params['client_id'] = '...'.join((
+                client_id[:3],
+                client_id[-5:],
+            ))
         self.log.debug(('Device/user code request:',) + log_info, **log_params)
 
         json_data = self.request(

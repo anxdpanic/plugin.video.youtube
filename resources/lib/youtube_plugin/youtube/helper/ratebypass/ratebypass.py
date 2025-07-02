@@ -436,12 +436,13 @@ class CalculateN(object):
         try:
             throttling_array = self.get_throttling_function_array(
                 mutable_n_list,
-                self.throttling_function_code)
+                self.throttling_function_code
+            )
             for step in self.get_throttling_plan_gen(self.throttling_function_code):
                 curr_func = throttling_array[int(step[0])]
                 if not callable(curr_func):
                     logging.debug('%s is not callable', curr_func)
-                    logging.debug('Throttling array:\n{%s}\n', throttling_array)
+                    logging.debug(('Throttling array:', '%r'), throttling_array)
                     return None
 
                 first_arg = throttling_array[int(step[1])]

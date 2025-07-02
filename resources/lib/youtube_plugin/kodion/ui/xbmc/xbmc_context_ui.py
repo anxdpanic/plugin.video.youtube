@@ -170,7 +170,7 @@ class XbmcContextUI(AbstractContextUI):
                      stacklevel=2,
                      log_value=None,
                      raw=False):
-        self.log.debug_trace('Set property |{property_id}|: {value!r}',
+        self.log.debug_trace('Set property {property_id!r}: {value!r}',
                              property_id=property_id,
                              value=value if log_value is None else log_value,
                              stacklevel=stacklevel)
@@ -185,7 +185,7 @@ class XbmcContextUI(AbstractContextUI):
                      raw=False):
         _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
         value = xbmcgui.Window(10000).getProperty(_property_id)
-        self.log.debug_trace('Get property |{property_id}|: {value!r}',
+        self.log.debug_trace('Get property {property_id!r}: {value!r}',
                              property_id=property_id,
                              value=value if log_value is None else log_value,
                              stacklevel=stacklevel)
@@ -201,14 +201,14 @@ class XbmcContextUI(AbstractContextUI):
         value = window.getProperty(_property_id)
         if value:
             window.clearProperty(_property_id)
-        self.log.debug_trace('Pop property |{property_id}|: {value!r}',
+        self.log.debug_trace('Pop property {property_id!r}: {value!r}',
                              property_id=property_id,
                              value=value if log_value is None else log_value,
                              stacklevel=stacklevel)
         return value
 
     def clear_property(self, property_id, stacklevel=2, raw=False):
-        self.log.debug_trace('Clear property |{property_id}|',
+        self.log.debug_trace('Clear property {property_id!r}',
                              property_id=property_id,
                              stacklevel=stacklevel)
         _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))

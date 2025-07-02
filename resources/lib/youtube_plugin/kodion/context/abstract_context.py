@@ -496,13 +496,13 @@ class AbstractContext(object):
                     if not parsed_value:
                         raise ValueError
                 else:
-                    self.log.debug('Unknown parameter - |{param}: {value!r}|',
+                    self.log.debug('Unknown parameter - {param!r}: {value!r}',
                                    param=param,
                                    value=value)
                     to_delete.append(param)
                     continue
             except (TypeError, ValueError):
-                self.log.error('Invalid parameter value - |{param}: {value!r}|',
+                self.log.error('Invalid parameter value - {param!r}: {value!r}',
                                param=param,
                                value=value)
                 to_delete.append(param)

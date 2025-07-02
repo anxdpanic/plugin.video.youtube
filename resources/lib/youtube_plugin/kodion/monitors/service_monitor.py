@@ -123,7 +123,7 @@ class ServiceMonitor(xbmc.Monitor):
                      stacklevel=2,
                      log_value=None,
                      raw=False):
-        self.log.debug_trace('Set property |{property_id}|: {value!r}',
+        self.log.debug_trace('Set property {property_id!r}: {value!r}',
                              property_id=property_id,
                              value=value if log_value is None else log_value,
                              stacklevel=stacklevel)
@@ -138,7 +138,7 @@ class ServiceMonitor(xbmc.Monitor):
                      raw=False):
         _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
         value = xbmcgui.Window(10000).getProperty(_property_id)
-        self.log.debug_trace('Get property |{property_id}|: {value!r}',
+        self.log.debug_trace('Get property {property_id!r}: {value!r}',
                              property_id=property_id,
                              value=value if log_value is None else log_value,
                              stacklevel=stacklevel)
@@ -154,14 +154,14 @@ class ServiceMonitor(xbmc.Monitor):
         value = window.getProperty(_property_id)
         if value:
             window.clearProperty(_property_id)
-        self.log.debug_trace('Pop property |{property_id}|: {value!r}',
+        self.log.debug_trace('Pop property {property_id!r}: {value!r}',
                              property_id=property_id,
                              value=value if log_value is None else log_value,
                              stacklevel=stacklevel)
         return value
 
     def clear_property(self, property_id, stacklevel=2, raw=False):
-        self.log.debug_trace('Clear property |{property_id}|',
+        self.log.debug_trace('Clear property {property_id!r}',
                              property_id=property_id,
                              stacklevel=stacklevel)
         _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
@@ -467,7 +467,7 @@ class ServiceMonitor(xbmc.Monitor):
             return True
 
         context = self._context
-        self.log.debug('HTTPServer: Starting |{ip}:{port}|',
+        self.log.debug('HTTPServer: Starting {ip}:{port}',
                        ip=self._httpd_address,
                        port=self._httpd_port)
         self.httpd_address_sync()
@@ -483,7 +483,7 @@ class ServiceMonitor(xbmc.Monitor):
         self.httpd_thread.start()
 
         address = self.httpd.socket.getsockname()
-        self.log.debug('HTTPServer: Listening on |{address[0]}:{address[1]}|',
+        self.log.debug('HTTPServer: Listening on {address[0]}:{address[1]}',
                        address=address)
         self._httpd_error = False
         return True
@@ -494,7 +494,7 @@ class ServiceMonitor(xbmc.Monitor):
                     and (on_idle or self.system_idle)
                     and self.httpd_required(on_idle=True, player=player))):
             return
-        self.log.debug('HTTPServer: Shutting down |{ip}:{port}|',
+        self.log.debug('HTTPServer: Shutting down {ip}:{port}',
                        ip=self._old_httpd_address,
                        port=self._old_httpd_port)
         self.httpd_address_sync()
@@ -518,7 +518,7 @@ class ServiceMonitor(xbmc.Monitor):
 
     def restart_httpd(self):
         self.log.debug('HTTPServer: Restarting'
-                       ' |{old_ip}:{old_port}| > |{ip}:{port}|',
+                       ' {old_ip}:{old_port} > {ip}:{port}',
                        old_ip=self._old_httpd_address,
                        old_port=self._old_httpd_port,
                        ip=self._httpd_address,

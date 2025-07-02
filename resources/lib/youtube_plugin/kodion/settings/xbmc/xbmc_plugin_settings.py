@@ -156,7 +156,7 @@ class XbmcPluginSettings(AbstractSettings):
             value = default
 
         if echo_level and self._echo_level:
-            self.log.debug_trace('Get setting |{name}|:'
+            self.log.debug_trace('Get setting {name!r}:'
                                  ' {value!r} (bool, {state})',
                                  name=setting,
                                  value=value,
@@ -177,7 +177,7 @@ class XbmcPluginSettings(AbstractSettings):
             error = exc
 
         if echo_level and self._echo_level:
-            self.log.debug_trace('Set setting |{name}|:'
+            self.log.debug_trace('Set setting {name!r}:'
                                  ' {value!r} (bool, {state})',
                                  name=setting,
                                  value=value,
@@ -207,7 +207,7 @@ class XbmcPluginSettings(AbstractSettings):
             value = default
 
         if echo_level and self._echo_level:
-            self.log.debug_trace('Get setting |{name}|:'
+            self.log.debug_trace('Get setting {name!r}:'
                                  ' {value!r} (int, {state})',
                                  name=setting,
                                  value=value,
@@ -228,7 +228,7 @@ class XbmcPluginSettings(AbstractSettings):
             error = exc
 
         if echo_level and self._echo_level:
-            self.log.debug_trace('Set setting |{name}|:'
+            self.log.debug_trace('Set setting {name!r}:'
                                  ' {value!r} (int, {state})',
                                  name=setting,
                                  value=value,
@@ -260,7 +260,7 @@ class XbmcPluginSettings(AbstractSettings):
                              '...')
             else:
                 log_value = value
-            self.log.debug_trace('Get setting |{name}|:'
+            self.log.debug_trace('Get setting {name!r}:'
                                  ' {value!r} (str, {state})',
                                  name=setting,
                                  value=log_value,
@@ -293,7 +293,7 @@ class XbmcPluginSettings(AbstractSettings):
                              '...')
             else:
                 log_value = value
-            self.log.debug_trace('Set setting |{name}|:'
+            self.log.debug_trace('Set setting {name!r}:'
                                  ' {value!r} (str, {state})',
                                  name=setting,
                                  value=log_value,
@@ -315,7 +315,7 @@ class XbmcPluginSettings(AbstractSettings):
             value = default
 
         if echo_level and self._echo_level:
-            self.log.debug_trace('Get setting |{name}|:'
+            self.log.debug_trace('Get setting {name!r}:'
                                  ' {value!r} (list[str], {state})',
                                  name=setting,
                                  value=value,
@@ -336,7 +336,7 @@ class XbmcPluginSettings(AbstractSettings):
             error = exc
 
         if echo_level and self._echo_level:
-            self.log.debug_trace('Set setting |{name}|:'
+            self.log.debug_trace('Set setting {name!r}:'
                                  ' {value!r} (list[str], {state})',
                                  name=setting,
                                  value=value,

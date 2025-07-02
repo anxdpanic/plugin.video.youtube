@@ -33,7 +33,7 @@ def _auth(addon_id, mode=yt_login.SIGN_IN):
     :return: addon provider, context and client
     """
     if not addon_id or addon_id == ADDON_ID:
-        logging.error_trace('Invalid addon_id: |%s|', addon_id)
+        logging.error_trace('Invalid addon_id: %r', addon_id)
         return False
 
     provider = Provider()
@@ -41,7 +41,7 @@ def _auth(addon_id, mode=yt_login.SIGN_IN):
 
     access_manager = context.get_access_manager()
     if access_manager.add_new_developer(addon_id):
-        logging.debug('Creating developer user: |%s|', addon_id)
+        logging.debug('Creating developer user: %r', addon_id)
 
     client = provider.get_client(context=context)
 
@@ -54,7 +54,7 @@ def _auth(addon_id, mode=yt_login.SIGN_IN):
                              refresh=False)
             client = None
     elif mode != yt_login.SIGN_OUT:
-        raise Exception('Unknown mode: |%s|' % mode)
+        raise Exception('Unknown mode: %r' % mode)
 
     yt_login.process(mode, provider, context, client=client, refresh=False)
 
@@ -140,7 +140,7 @@ def reset_access_tokens(addon_id):
     :return:
     """
     if not addon_id or addon_id == ADDON_ID:
-        logging.error_trace('Invalid addon_id: |%s|', addon_id)
+        logging.error_trace('Invalid addon_id: %r', addon_id)
         return
 
     context = XbmcContext(params={'addon_id': addon_id})

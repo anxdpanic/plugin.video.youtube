@@ -612,7 +612,7 @@ class XbmcContext(AbstractContext):
 
     def localize(self, text_id, default_text=None):
         if default_text is None:
-            default_text = 'Undefined string ID: |{0}|'.format(text_id)
+            default_text = 'Undefined string ID: {0!r}'.format(text_id)
 
         if not isinstance(text_id, int):
             try:
@@ -644,7 +644,7 @@ class XbmcContext(AbstractContext):
         ui = self.get_ui()
 
         if content_type:
-            self.log.debug('Applying content-type: |{type}| for |{path}|',
+            self.log.debug('Applying content-type: {type!r} for {path!r}',
                            type=(sub_type or content_type),
                            path=self.get_path())
             xbmcplugin.setContent(self._plugin_handle, content_type)
@@ -968,20 +968,20 @@ class XbmcContext(AbstractContext):
             value = response.value
             if value:
                 self.log.debug(('Service IPC - Responded',
-                                'Procedure: |{target}|',
+                                'Procedure: {target!r}',
                                 'Latency:   {latency:.2f}ms'),
                                target=target,
                                latency=response.latency)
             elif value is False:
                 self.log.error_trace(('Service IPC - Failed',
-                                      'Procedure: |{target}|',
+                                      'Procedure: {target!r}',
                                       'Latency:   {latency:.2f}ms'),
                                      target=target,
                                      latency=response.latency)
         else:
             value = False
             self.log.error_trace(('Service IPC - Timed out',
-                                  'Procedure: |{target}|',
+                                  'Procedure: {target!r}',
                                   'Timeout:   {timeout:.2f}s'),
                                  target=target,
                                  timeout=timeout)

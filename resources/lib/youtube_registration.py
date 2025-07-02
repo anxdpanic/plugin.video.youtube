@@ -43,19 +43,19 @@ def register_api_keys(addon_id, api_key, client_id, client_secret):
     """
 
     if not addon_id or addon_id == ADDON_ID:
-        logging.error_trace('Invalid addon_id: |%s|', addon_id)
+        logging.error_trace('Invalid addon_id: %r', addon_id)
         return
 
     context = XbmcContext()
 
     access_manager = context.get_access_manager()
     if access_manager.add_new_developer(addon_id):
-        logging.debug('Creating developer user: |%s|', addon_id)
+        logging.debug('Creating developer user: %r', addon_id)
 
     api_store = context.get_api_store()
     if api_store.update_developer_config(
             addon_id, api_key, client_id, client_secret
     ):
-        logging.debug('Keys registered: |%s|', addon_id)
+        logging.debug('Keys registered: %r', addon_id)
     else:
-        logging.debug('No update performed: |%s|', addon_id)
+        logging.debug('No update performed: %r', addon_id)

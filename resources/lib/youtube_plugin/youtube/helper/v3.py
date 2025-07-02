@@ -106,7 +106,7 @@ def _process_list_response(provider,
     for yt_item in yt_items:
         kind, is_youtube, is_plugin, kind_type = _parse_kind(yt_item)
         if not (is_youtube or is_plugin) or not kind_type:
-            log.debug('Item discarded: |%s|', kind)
+            log.debug('Item discarded: %r', kind)
             continue
 
         item_params = yt_item.get('_params', {})
@@ -193,7 +193,7 @@ def _process_list_response(provider,
                     'position': 0,
                 }
             else:
-                log.debug('searchResult discarded: |%s|', kind)
+                log.debug('searchResult discarded: %r', kind)
                 continue
 
         if kind_type == 'video':
@@ -682,11 +682,11 @@ def response_to_items(provider,
         while 1:
             kind, is_youtube, is_plugin, kind_type = _parse_kind(json_data)
             if not is_youtube and not is_plugin:
-                log.debug(('Response discarded', 'Kind: |%s|'), kind)
+                log.debug(('Response discarded', 'Kind: %r'), kind)
                 break
 
             if kind_type not in _KNOWN_RESPONSE_KINDS:
-                log.error_trace(('Unknown kind', 'Kind: |%s|'), kind)
+                log.error_trace(('Unknown kind', 'Kind: %r'), kind)
                 break
 
             pre_filler = json_data.get('_pre_filler')

@@ -243,14 +243,14 @@ class UrlResolver(object):
             if not method:
                 continue
 
-            self.log.debug('Resolving |{uri}| using |{name} {method}|',
+            self.log.debug('Resolving {uri!r} using {name} {method}',
                            uri=resolved_url,
                            name=resolver_name,
                            method=method)
             resolved_url = resolver.resolve(resolved_url,
                                             url_components,
                                             method)
-            self.log.debug('Resolved to |%s|', resolved_url)
+            self.log.debug('Resolved to %r', resolved_url)
         return resolved_url
 
     def resolve(self, url):
