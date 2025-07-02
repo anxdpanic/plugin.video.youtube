@@ -155,7 +155,7 @@ class BaseRequestsClass(object):
                 error_title=None,
                 error_info=None,
                 raise_exc=False,
-                cache=True,
+                cache=None,
                 **kwargs):
         if timeout is None:
             timeout = self._timeout
@@ -187,10 +187,10 @@ class BaseRequestsClass(object):
                 hooks=hooks,
             ).prepare()
 
-        if cache:
+        if cache is not False:
             if prepared_request:
                 method = prepared_request.method
-                if method in self.METHODS_TO_CACHE:
+                if cache is True or method in self.METHODS_TO_CACHE:
                     headers = prepared_request.headers
                     request_id = generate_hash(
                         method,

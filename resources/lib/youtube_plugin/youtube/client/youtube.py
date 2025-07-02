@@ -2996,6 +2996,7 @@ class YouTube(LoginClient):
                     post_data=None,
                     headers=None,
                     do_auth=None,
+                    cache=None,
                     **kwargs):
         if not client_data:
             client_data = {}
@@ -3108,4 +3109,5 @@ class YouTube(LoginClient):
                             response_hook_kwargs=kwargs,
                             error_hook=self._error_hook,
                             stacklevel=3,
+                            cache=cache,
                             **client)
