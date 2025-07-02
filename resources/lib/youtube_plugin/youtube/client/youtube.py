@@ -361,13 +361,16 @@ class YouTube(LoginClient):
                                 **kwargs)
 
     def get_recommended_for_home_tv(self,
-                                    visitor='',
-                                    page_token='',
-                                    click_tracking=''):
+                                    page_token=None,
+                                    click_tracking=None,
+                                    visitor=None):
         return self.get_browse_videos(
             browse_id='FEwhat_to_watch',
             client='tv',
             do_auth=True,
+            page_token=page_token,
+            click_tracking=click_tracking,
+            visitor=visitor,
             json_path={
                 'items': (
                     'contents',
@@ -446,19 +449,19 @@ class YouTube(LoginClient):
                     'nextContinuationData',
                 ),
             },
-            visitor=visitor,
-            page_token=page_token,
-            click_tracking=click_tracking,
         )
 
     def get_recommended_for_home_vr(self,
-                                    visitor='',
-                                    page_token='',
-                                    click_tracking=''):
+                                    page_token=None,
+                                    click_tracking=None,
+                                    visitor=None):
         return self.get_browse_videos(
             browse_id='FEwhat_to_watch',
             client='android_vr',
             do_auth=True,
+            page_token=page_token,
+            click_tracking=click_tracking,
+            visitor=visitor,
             json_path={
                 'items': (
                     'contents',
@@ -511,9 +514,6 @@ class YouTube(LoginClient):
                     'nextContinuationData',
                 ),
             },
-            visitor=visitor,
-            page_token=page_token,
-            click_tracking=click_tracking,
         )
 
     def get_related_for_home(self, page_token='', refresh=False):
@@ -891,6 +891,7 @@ class YouTube(LoginClient):
                 client='tv',
                 do_auth=True,
                 page_token=page_token,
+                items_per_page=15,
                 json_path={
                     'items': (
                         'contents',
@@ -1237,9 +1238,10 @@ class YouTube(LoginClient):
                           data=None,
                           client=None,
                           do_auth=False,
-                          visitor='',
-                          page_token='',
-                          click_tracking='',
+                          page_token=None,
+                          click_tracking=None,
+                          visitor=None,
+                          items_per_page=None,
                           json_path=None):
         if channel_id:
             function_cache = self._context.get_function_cache()
@@ -1367,10 +1369,8 @@ class YouTube(LoginClient):
         )
         if continuation:
             click_tracking = continuation.get('clickTrackingParams')
-            if click_tracking:
-                v3_response['clickTracking'] = click_tracking
 
-            _page_token = self.json_traverse(
+            next_page_token = self.json_traverse(
                 continuation,
                 json_path.get('page_token') or (
                     (
@@ -1384,8 +1384,8 @@ class YouTube(LoginClient):
                     ),
                 ),
             )
-            if _page_token and _page_token != page_token:
-                v3_response['nextPageToken'] = _page_token
+            if next_page_token == page_token:
+                next_page_token = None
 
             visitor = self.json_traverse(
                 result,
@@ -1394,13 +1394,41 @@ class YouTube(LoginClient):
                     'visitorData',
                 ),
             ) or visitor
-            if visitor:
-                v3_response['visitorData'] = visitor
         else:
-            v3_response['visitorData'] = visitor
-            v3_response['clickTracking'] = click_tracking
+            next_page_token = None
 
+        if items_per_page:
+            max_results = self.max_results() - items_per_page
+            while next_page_token and len(items) <= max_results:
+                next_response = self.get_browse_videos(
+                    browse_id=browse_id,
+                    channel_id=channel_id,
+                    params=params,
+                    route=route,
+                    data=data,
+                    client=client,
+                    do_auth=do_auth,
+                    page_token=next_page_token,
+                    click_tracking=click_tracking,
+                    visitor=visitor,
+                    items_per_page=None,
+                    json_path=json_path,
+                )
+                if not next_response:
+                    break
+                next_items = next_response.get('items')
+                if next_items:
+                    items.extend(next_items)
+                next_page_token = next_response.get('nextPageToken')
+                click_tracking = next_response.get('clickTracking')
+                visitor = next_response.get('visitorData')
+
+        v3_response['nextPageToken'] = next_page_token
         v3_response['items'] = items
+        if click_tracking:
+            v3_response['clickTracking'] = click_tracking
+        if visitor:
+            v3_response['visitorData'] = visitor
         return v3_response
 
     def get_live_events(self,
@@ -1454,10 +1482,10 @@ class YouTube(LoginClient):
 
     def get_related_videos(self,
                            video_id,
-                           page_token='',
-                           retry=0,
-                           visitor=None,
+                           page_token=None,
                            click_tracking=None,
+                           visitor=None,
+                           retry=0,
                            **kwargs):
         post_data = {'videoId': video_id}
 
@@ -1711,24 +1739,24 @@ class YouTube(LoginClient):
                     })
 
         if retry:
-            _page_token = ''
-            click_tracking = ''
+            next_page_token = None
+            click_tracking = None
         else:
             continuation = related_videos[-1]
-            _page_token = self.json_traverse(continuation, path=(
+            next_page_token = self.json_traverse(continuation, path=(
                 'continuationCommand',
                 'token',
             ))
-            if _page_token and _page_token != page_token:
-                click_tracking = continuation.get('clickTrackingParams', '')
+            if next_page_token and next_page_token != page_token:
+                click_tracking = continuation.get('clickTrackingParams')
             else:
-                _page_token = ''
-                click_tracking = ''
+                next_page_token = None
+                click_tracking = None
 
         v3_response = {
             'kind': 'youtube#videoListResponse',
             'items': items or [],
-            'nextPageToken': _page_token,
+            'nextPageToken': next_page_token,
             'visitorData': self.json_traverse(result, path=(
                 'responseContext',
                 'visitorData',

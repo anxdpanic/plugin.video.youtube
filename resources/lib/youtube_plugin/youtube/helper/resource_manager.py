@@ -367,7 +367,7 @@ class ResourceManager(object):
                     break
                 result[batch_id] = batch
                 page_token = batch.get('nextPageToken') if fetch_next else None
-                if page_token is None:
+                if not page_token:
                     break
 
         if result:
@@ -394,7 +394,7 @@ class ResourceManager(object):
                 new_batch_ids.append(batch_id)
                 new_data[batch_id] = batch
                 page_token = batch.get('nextPageToken') if fetch_next else None
-                if page_token is None:
+                if not page_token:
                     break
 
             if new_batch_ids:
