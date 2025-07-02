@@ -704,9 +704,8 @@ def response_to_items(provider,
                         max_results=remaining,
                         exclude=None if allow_duplicates else exclude_current,
                     )
-                if not _json_data:
-                    break
-                json_data = _json_data
+                if _json_data:
+                    json_data = _json_data
 
             _item_filter = settings.item_filter(
                 update=(item_filter or json_data.get('_item_filter')),
@@ -848,14 +847,20 @@ def response_to_items(provider,
         else:
             return items
 
-    yt_visitor_data = json_data.get('visitorData')
-    if yt_visitor_data:
-        new_params['visitor'] = yt_visitor_data
-
-    if next_page and next_page > 1:
+    if next_page > 1:
+        yt_visitor_data = json_data.get('visitorData')
+        if yt_visitor_data:
+            new_params['visitor'] = yt_visitor_data
         yt_click_tracking = json_data.get('clickTracking')
         if yt_click_tracking:
             new_params['click_tracking'] = yt_click_tracking
+    else:
+        if 'exclude' in new_params:
+            del new_params['exclude']
+        if 'click_tracking' in new_params:
+            del new_params['click_tracking']
+        if 'visitor' in new_params:
+            del new_params['visitor']
 
     next_page_item = NextPageItem(context, new_params)
     items.append(next_page_item)
@@ -873,8 +878,12 @@ def _parse_kind(item):
 
 
 def pre_fill(filler, json_data, max_results, exclude=None):
-    page_token = json_data and json_data.get('nextPageToken')
+    if not json_data:
+        return None
+    page_token = json_data.get('nextPageToken')
     if not page_token:
+        json_data['_pre_filler'] = None
+        json_data['_post_filler'] = None
         return None
 
     items = json_data.get('items') or []
@@ -903,13 +912,13 @@ def pre_fill(filler, json_data, max_results, exclude=None):
             all_items.append(item)
             num_items += 1
         else:
-            page_token = json_data.get('nextPageToken') or page_token
             if num_items:
                 remaining -= num_items
-            elif page_token and pre_fill_attempts > 0:
+            else:
                 pre_fill_attempts -= 1
 
-        if remaining <= 0 or not page_token or pre_fill_attempts <= 0:
+        page_token = json_data.get('nextPageToken')
+        if not page_token or remaining <= 0 or pre_fill_attempts <= 0:
             break
 
         next_response = filler(
@@ -930,8 +939,12 @@ def pre_fill(filler, json_data, max_results, exclude=None):
 
 
 def post_fill(filler, json_data):
-    page_token = json_data and json_data.get('nextPageToken')
+    if not json_data:
+        return None
+    page_token = json_data.get('nextPageToken')
     if not page_token:
+        json_data['_pre_filler'] = None
+        json_data['_post_filler'] = None
         return None
 
     pre_filler = json_data.get('_pre_filler')
