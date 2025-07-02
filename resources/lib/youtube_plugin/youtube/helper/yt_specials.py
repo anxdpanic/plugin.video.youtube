@@ -505,6 +505,51 @@ def _process_my_subscriptions(provider,
         return result, options
 
 
+def _process_virtual_list(provider, context, client, playlist_id=None):
+    params = context.get_params()
+
+    playlist_id = playlist_id or params.get('playlist_id')
+    if not playlist_id:
+        return False, None
+    playlist_id = playlist_id.upper()
+    context.parse_params({
+        'channel_id': 'mine',
+        'playlist_id': playlist_id,
+    })
+    browse_id = 'VL' + playlist_id
+
+    json_data = client.get_virtual_list_items(
+        browse_id=browse_id,
+        visitor=params.get('visitor'),
+        page_token=params.get('page_token'),
+        click_tracking=params.get('click_tracking'),
+    )
+    if not json_data:
+        return False, None
+
+    filler = partial(
+        client.get_virtual_list_items,
+        browse_id=browse_id,
+    )
+    json_data['_pre_filler'] = filler
+    json_data['_post_filler'] = filler
+
+    result = v3.response_to_items(
+        provider,
+        context,
+        json_data,
+        allow_duplicates=False,
+    )
+    options = {
+        provider.CONTENT_TYPE: {
+            'content_type': CONTENT.VIDEO_CONTENT,
+            'sub_type': None,
+            'category_label': None,
+        },
+    }
+    return result, options
+
+
 def process(provider, context, re_match=None, category=None, sub_category=None):
     if re_match:
         if category is None:
@@ -563,5 +608,8 @@ def process(provider, context, re_match=None, category=None, sub_category=None):
 
     if category == 'saved_playlists':
         return _process_saved_playlists_tv(provider, context, client)
+
+    if category == 'playlist':
+        return _process_virtual_list(provider, context, client, sub_category)
 
     raise KodionException('YouTube special category "%s" not found' % category)

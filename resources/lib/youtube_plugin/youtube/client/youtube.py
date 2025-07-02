@@ -37,6 +37,7 @@ class YouTube(LoginClient):
     log = logging.getLogger(__name__)
 
     _max_results = 50
+    _VIRTUAL_LISTS = frozenset(('wl', 'll'))
 
     def __init__(self, items_per_page=50, **kwargs):
         self.channel_id = None
@@ -879,93 +880,103 @@ class YouTube(LoginClient):
             )
         return None
 
+    def get_virtual_list_items(self,
+                               playlist_id=None,
+                               browse_id=None,
+                               page_token=None,
+                               click_tracking=None,
+                               visitor=None):
+        return self.get_browse_videos(
+            browse_id=browse_id if browse_id else 'VL' + playlist_id.upper(),
+            client='tv',
+            do_auth=True,
+            page_token=page_token,
+            click_tracking=click_tracking,
+            visitor=visitor,
+            json_path={
+                'items': (
+                    'contents',
+                    'tvBrowseRenderer',
+                    'content',
+                    'tvSurfaceContentRenderer',
+                    'content',
+                    'twoColumnRenderer',
+                    'rightColumn',
+                    'playlistVideoListRenderer',
+                    'contents',
+                ),
+                'video_id': (
+                    'tileRenderer',
+                    'onSelectCommand',
+                    'watchEndpoint',
+                    'videoId',
+                ),
+                'title': (
+                    'tileRenderer',
+                    'metadata',
+                    'tileMetadataRenderer',
+                    'title',
+                    'simpleText',
+                ),
+                'thumbnails': (
+                    'tileRenderer',
+                    'header',
+                    'tileHeaderRenderer',
+                    'thumbnail',
+                    'thumbnails',
+                ),
+                'channel_id': (
+                    'tileRenderer',
+                    'onLongPressCommand',
+                    'showMenuCommand',
+                    'menu',
+                    'menuRenderer',
+                    'items',
+                    -1,
+                    'menuNavigationItemRenderer',
+                    'navigationEndpoint',
+                    'browseEndpoint',
+                    'browseId',
+                ),
+                'continuation': (
+                    'contents',
+                    'tvBrowseRenderer',
+                    'content',
+                    'tvSurfaceContentRenderer',
+                    'content',
+                    'twoColumnRenderer',
+                    'rightColumn',
+                    'playlistVideoListRenderer',
+                    'continuations',
+                    0,
+                    'nextContinuationData',
+                ),
+                'continuation_items': (
+                    'continuationContents',
+                    'playlistVideoListContinuation',
+                    'contents',
+                ),
+                'continuation_continuation': (
+                    'continuationContents',
+                    'playlistVideoListContinuation',
+                    'continuations',
+                    0,
+                    'nextContinuationData',
+                ),
+            },
+        )
+
     def get_playlist_items(self,
                            playlist_id,
                            page_token='',
                            do_auth=None,
                            max_results=None,
                            **kwargs):
-        if playlist_id.lower() in ('wl', 'll'):
-            return self.get_browse_videos(
-                browse_id='VL' + playlist_id.upper(),
-                client='tv',
-                do_auth=True,
+        if playlist_id and playlist_id.lower() in self._VIRTUAL_LISTS:
+            return self.get_virtual_list_items(
+                playlist_id=playlist_id,
                 page_token=page_token,
-                items_per_page=15,
-                json_path={
-                    'items': (
-                        'contents',
-                        'tvBrowseRenderer',
-                        'content',
-                        'tvSurfaceContentRenderer',
-                        'content',
-                        'twoColumnRenderer',
-                        'rightColumn',
-                        'playlistVideoListRenderer',
-                        'contents',
-                    ),
-                    'video_id': (
-                        'tileRenderer',
-                        'onSelectCommand',
-                        'watchEndpoint',
-                        'videoId',
-                    ),
-                    'title': (
-                        'tileRenderer',
-                        'metadata',
-                        'tileMetadataRenderer',
-                        'title',
-                        'simpleText',
-                    ),
-                    'thumbnails': (
-                        'tileRenderer',
-                        'header',
-                        'tileHeaderRenderer',
-                        'thumbnail',
-                        'thumbnails',
-                    ),
-                    'channel_id': (
-                        'tileRenderer',
-                        'onLongPressCommand',
-                        'showMenuCommand',
-                        'menu',
-                        'menuRenderer',
-                        'items',
-                        -1,
-                        'menuNavigationItemRenderer',
-                        'navigationEndpoint',
-                        'browseEndpoint',
-                        'browseId',
-                    ),
-                    'continuation': (
-                        'contents',
-                        'tvBrowseRenderer',
-                        'content',
-                        'tvSurfaceContentRenderer',
-                        'content',
-                        'twoColumnRenderer',
-                        'rightColumn',
-                        'playlistVideoListRenderer',
-                        'continuations',
-                        0,
-                        'nextContinuationData',
-                    ),
-                    'continuation_items': (
-                        'continuationContents',
-                        'playlistVideoListContinuation',
-                        'contents',
-                    ),
-                    'continuation_continuation': (
-                        'continuationContents',
-                        'playlistVideoListContinuation',
-                        'continuations',
-                        0,
-                        'nextContinuationData',
-                    ),
-                },
-                **kwargs
             )
-
         # prepare params
         params = {
             'part': 'snippet',
@@ -1289,6 +1300,7 @@ class YouTube(LoginClient):
             method='POST',
             post_data=post_data,
             do_auth=do_auth,
+            cache=True,
         )
         if not result:
             return {}

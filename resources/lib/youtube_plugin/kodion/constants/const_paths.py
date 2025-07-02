@@ -40,6 +40,7 @@ SUBSCRIPTIONS = '/subscriptions/list'
 TRENDING = '/special/popular_right_now'
 VIDEO_COMMENTS = '/special/parent_comments'
 VIDEO_COMMENTS_THREAD = '/special/child_comments'
+VIRTUAL_PLAYLIST = '/special/playlist'
 
 API = '/youtube/api'
 API_SUBMIT = '/youtube/api/submit'

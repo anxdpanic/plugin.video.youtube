@@ -613,10 +613,7 @@ class Provider(AbstractProvider):
         new_params = {
             'playlist_id': playlist_id,
         }
-        if playlist_id.lower() in ('wl', 'll'):
-            channel_id = 'mine'
-        else:
-            channel_id = re_match.group('channel_id')
+        channel_id = re_match.group('channel_id')
         if channel_id:
             new_params['channel_id'] = channel_id
         context.parse_params(new_params)
@@ -1471,7 +1468,9 @@ class Provider(AbstractProvider):
                 watch_later_item = DirectoryItem(
                     localize('watch_later'),
                     create_uri(
-                        (PATHS.CHANNEL, 'mine', 'playlist', watch_later_id,),
+                        (PATHS.VIRTUAL_PLAYLIST, watch_later_id)
+                        if watch_later_id.lower() == 'wl' else
+                        (PATHS.CHANNEL, 'mine', PATHS.PLAYLIST, watch_later_id)
                     ),
                     image='{media}/watch_later.png',
                 )
@@ -1521,9 +1520,7 @@ class Provider(AbstractProvider):
                 liked_list_id = playlists['likes'] or 'LL'
                 liked_videos_item = DirectoryItem(
                     localize('video.liked'),
-                    create_uri(
-                        (PATHS.CHANNEL, 'mine', 'playlist', liked_list_id,),
-                    ),
+                    create_uri((PATHS.VIRTUAL_PLAYLIST, liked_list_id)),
                     image='{media}/likes.png',
                 )
                 context_menu = [

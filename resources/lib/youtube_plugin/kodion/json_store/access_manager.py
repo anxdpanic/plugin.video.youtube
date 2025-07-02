@@ -319,16 +319,18 @@ class AccessManager(JSONStore):
         :return: the current users watch later playlist id
         """
         current_id = self.get_current_user_details().get('watch_later', '')
-        current_id = current_id.strip().lower()
+        current_id = current_id.strip()
+        current_id_lower = current_id.lower()
 
         settings = self._context.get_settings()
-        settings_id = settings.get_watch_later_playlist().lower()
+        settings_id = settings.get_watch_later_playlist()
+        settings_id_lower = settings_id.lower()
 
-        if settings_id == 'local':
+        if settings_id_lower == 'local':
             current_id = self.set_watch_later_id(None)
-        elif settings_id and settings_id != current_id:
+        elif settings_id and settings_id_lower != current_id_lower:
             current_id = self.set_watch_later_id(settings_id)
-        elif current_id == 'local':
+        elif current_id_lower == 'local':
             current_id = ''
 
         if settings_id:
