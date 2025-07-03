@@ -10,13 +10,15 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+import sys
+import threading
 from atexit import register as atexit_register
 from cProfile import Profile
 from functools import wraps
 from os import times as os_times
+from os.path import normcase
 from pstats import Stats
-from sys import settrace
-from threading import Timer
+from traceback import extract_stack, format_list
 from weakref import ref
 
 from . import logging
@@ -283,35 +285,83 @@ class Profiler(object):
 
 
 class ExecTimeout(object):
-    def __init__(self, seconds, callback=None):
+    log = logging.getLogger('__name__')
+    src_file = None
+
+    def __init__(self,
+                 seconds,
+                 trace_opcodes=False,
+                 trace_threads=False,
+                 skip_paths=('\\python\\lib\\',
+                             '\\logging.py',
+                             '\\addons\\script.'),
+                 callback=None):
         self._interval = seconds
         self._timed_out = False
+
+        self._trace_opcodes = trace_opcodes
+        self._trace_threads = trace_threads
+
+        self._skip_paths = skip_paths
+        self._last_event = (None, None, None)
+
         self._callback = callback if callable(callback) else None
 
     def __call__(self, function):
         @wraps(function)
         def wrapper(*args, **kwargs):
-            timer = Timer(self._interval, self.set_timed_out)
+            timer = threading.Timer(self._interval, self.set_timed_out)
             timer.daemon = True
 
-            settrace(self.timeout_trace)
+            if self._trace_threads:
+                threading.settrace(self.timeout_trace)
+            sys.settrace(self.timeout_trace)
             timer.start()
             try:
                 return function(*args, **kwargs)
             finally:
                 timer.cancel()
-                settrace(None)
+                if self._trace_threads:
+                    threading.settrace(None)
+                sys.settrace(None)
                 if self._callback:
                     self._callback()
 
         return wrapper
 
     def timeout_trace(self, frame, event, arg):
-        if event == 'call':
-            return self.timeout_trace
-        elif event == 'line' and self._timed_out:
-            raise RuntimeError('Python execution timed out')
+        if self._trace_opcodes and hasattr(frame, 'f_trace_opcodes'):
+            frame.f_trace_opcodes = True
+        if self._timed_out:
+            raise RuntimeError(self._get_msg())
+        else:
+            filename = normcase(frame.f_code.co_filename)
+            skip_event = (
+                    filename == self.src_file
+                    or (self._skip_paths
+                        and any(skip_path in filename
+                                for skip_path in self._skip_paths))
+            )
+            if not skip_event:
+                self._last_event = (event, frame, arg)
         return self.timeout_trace
 
     def set_timed_out(self):
+        self.log.error(self._get_msg())
         self._timed_out = True
+
+    def _get_msg(self):
+        event = self._last_event
+        stack_trace = '\t'.join(format_list(extract_stack(event[1])))
+        return (
+            'Python execution timed out'
+            '\n\tLast event: {event[0]}'
+            '\n\tFrame:      {event[1]!r}'
+            '\n\tArg:        {event[2]!r}'
+            '\n'
+            '\n\tStack (most recent call last):'
+            '\n\t{stack_trace}'
+        ).format(event=event, stack_trace=stack_trace)
+
+
+ExecTimeout.src_file = normcase(ExecTimeout.__init__.__code__.co_filename)
