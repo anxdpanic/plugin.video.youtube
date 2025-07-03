@@ -414,6 +414,8 @@ def _check_frame(frame, stacklevel):
     )
     if (ADDON_ID in filename and filename.endswith((
             'function_cache.py',
+            'abstract_settings.py',
+            'xbmc_items.py',
     ))):
         stacklevel += 1
     return stacklevel, is_internal

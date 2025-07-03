@@ -409,8 +409,7 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
     uri = media_item.get_uri()
     logging.debug('Converting %s: %r',
                   media_item.__class__.__name__,
-                  redact_ip_in_uri(uri),
-                  stacklevel=2)
+                  redact_ip_in_uri(uri))
 
     params = context.get_params()
     settings = context.get_settings()
@@ -535,7 +534,7 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
 
 def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
     uri = directory_item.get_uri()
-    logging.debug('Converting DirectoryItem: %r', uri, stacklevel=2)
+    logging.debug('Converting DirectoryItem: %r', uri)
 
     kwargs = {
         'label': directory_item.get_name(),
@@ -611,7 +610,7 @@ def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
 
 def image_listitem(context, image_item, show_fanart=None, **_kwargs):
     uri = image_item.get_uri()
-    logging.debug('Converting ImageItem: %r', uri, stacklevel=2)
+    logging.debug('Converting ImageItem: %r', uri)
 
     kwargs = {
         'label': image_item.get_name(),
@@ -646,7 +645,7 @@ def image_listitem(context, image_item, show_fanart=None, **_kwargs):
 
 def uri_listitem(context, uri_item, **_kwargs):
     uri = uri_item.get_uri()
-    logging.debug('Converting UriItem: %r', uri, stacklevel=2)
+    logging.debug('Converting UriItem: %r', uri)
 
     kwargs = {
         'label': uri_item.get_name(),
@@ -669,9 +668,7 @@ def media_listitem(context,
                    to_sync=None,
                    **_kwargs):
     uri = media_item.get_uri()
-    logging.debug('Converting %s: %r',
-                  media_item.__class__.__name__, uri,
-                  stacklevel=2)
+    logging.debug('Converting %s: %r', media_item.__class__.__name__, uri)
 
     kwargs = {
         'label': media_item.get_name(),
