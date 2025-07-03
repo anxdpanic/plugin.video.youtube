@@ -11,7 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import logging
-from os.path import normcase
+from os.path import normpath
 from sys import exc_info as sys_exc_info
 from traceback import extract_stack, format_list
 
@@ -402,13 +402,13 @@ def getLogger(name=None):
 
 
 _srcfiles = {
-    normcase(getLogger.__code__.co_filename),
-    normcase(logging.getLogger.__code__.co_filename),
+    normpath(getLogger.__code__.co_filename).lower(),
+    normpath(logging.getLogger.__code__.co_filename).lower(),
 }
 
 
 def check_frame(frame, stacklevel=None, skip_paths=None):
-    filename = normcase(frame.f_code.co_filename)
+    filename = normpath(frame.f_code.co_filename).lower()
     is_internal = (
             filename in _srcfiles
             or ('importlib' in filename and '_bootstrap' in filename)

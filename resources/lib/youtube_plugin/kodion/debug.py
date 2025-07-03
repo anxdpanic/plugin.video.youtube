@@ -16,7 +16,7 @@ from atexit import register as atexit_register
 from cProfile import Profile
 from functools import wraps
 from os import times as os_times
-from os.path import normcase
+from os.path import normpath
 from pstats import Stats
 from traceback import extract_stack, format_list
 from weakref import ref
@@ -335,7 +335,7 @@ class ExecTimeout(object):
         if self._timed_out:
             raise RuntimeError(self._get_msg())
         else:
-            filename = normcase(frame.f_code.co_filename)
+            filename = normpath(frame.f_code.co_filename).lower()
             skip_event = (
                     filename == self.src_file
                     or (self._skip_paths
@@ -364,4 +364,6 @@ class ExecTimeout(object):
         ).format(event=event, stack_trace=stack_trace)
 
 
-ExecTimeout.src_file = normcase(ExecTimeout.__init__.__code__.co_filename)
+ExecTimeout.src_file = normpath(
+    ExecTimeout.__init__.__code__.co_filename
+).lower()
