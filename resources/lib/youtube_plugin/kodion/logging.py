@@ -20,6 +20,7 @@ from .constants import ADDON_ID
 
 
 __all__ = (
+    'check_frame',
     'critical',
     'debug',
     'error',
@@ -213,7 +214,7 @@ class KodiLogger(logging.Logger):
             if next_frame is None:
                 break
             target_frame = next_frame
-            stacklevel, is_internal = _check_frame(target_frame, stacklevel)
+            stacklevel, is_internal = check_frame(target_frame, stacklevel)
             if is_internal:
                 continue
             if last_frame is None:
@@ -406,12 +407,17 @@ _srcfiles = {
 }
 
 
-def _check_frame(frame, stacklevel):
+def check_frame(frame, stacklevel=None, skip_paths=None):
     filename = normcase(frame.f_code.co_filename)
     is_internal = (
             filename in _srcfiles
             or ('importlib' in filename and '_bootstrap' in filename)
+            or (skip_paths
+                and any(skip_path in filename for skip_path in skip_paths))
     )
+    if stacklevel is None:
+        return is_internal
+
     if (ADDON_ID in filename and filename.endswith((
             'function_cache.py',
             'abstract_settings.py',
