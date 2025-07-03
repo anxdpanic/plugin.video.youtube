@@ -2668,13 +2668,14 @@ class YouTube(LoginClient):
             try:
                 pool_id = next(iterator)
             except StopIteration:
-                loop_enable.clear()
-                if not current_threads:
-                    break
+                if current_threads:
+                    loop_enable.clear()
                 for pool_id in completed:
                     del payloads[pool_id]
-                completed = []
                 remaining = payloads.keys()
+                if not remaining and not current_threads:
+                    break
+                completed = []
                 iterator = iter(payloads)
                 if progress_dialog:
                     progress_dialog.grow_total(

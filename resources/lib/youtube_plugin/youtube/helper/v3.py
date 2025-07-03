@@ -582,13 +582,13 @@ def _process_list_response(provider,
         try:
             resource_id = next(iterator)
         except StopIteration:
-            if remaining <= 0 and not threads['current']:
-                break
             if threads['current']:
                 threads['loop'].clear()
             for resource_id in completed:
                 del resources[resource_id]
             remaining = len(resources)
+            if remaining <= 0 and not threads['current']:
+                break
             deferred = len([
                 1 for resource in resources.values() if resource['defer']
             ])
