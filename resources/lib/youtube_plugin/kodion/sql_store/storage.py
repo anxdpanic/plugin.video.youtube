@@ -114,6 +114,17 @@ class Storage(object):
             ' ORDER BY {order_col} DESC'
             ' LIMIT {{0}};'
         ),
+        'get_total_data_size': (
+            'SELECT SUM(size)'
+            'FROM {table}'
+        ),
+        'get_database_size': (
+            'SELECT page_size * page_count'
+            ' FROM ('
+            '  pragma_page_count(),'
+            '  pragma_page_size()'
+            ');'
+        ),
         'has_old_table': (
             'SELECT EXISTS ('
             ' SELECT 1'
@@ -375,14 +386,21 @@ class Storage(object):
         if self._max_file_size_kb <= 0:
             return False
 
-        try:
-            file_size_kb = (os.path.getsize(self._filepath) // 1024)
-            if file_size_kb <= self._max_file_size_kb:
+        with self._lock, self as (db, cursor), db:
+            result = self._execute(cursor, self._sql['get_total_data_size'])
+
+        if result:
+            size_kb = result.fetchone()[0] // 1024
+        else:
+            try:
+                size_kb = (os.path.getsize(self._filepath) // 1024)
+            except OSError:
                 return False
-        except OSError:
+
+        if size_kb <= self._max_file_size_kb:
             return False
 
-        prune_size = 1024 * int(file_size_kb - self._max_file_size_kb / 2)
+        prune_size = 1024 * int(size_kb - self._max_file_size_kb / 2)
         query = self._sql['prune_by_size'].format(prune_size)
         if defer:
             return query
@@ -443,6 +461,7 @@ class Storage(object):
             if optimize_query:
                 self._execute(cursor, optimize_query)
             self._execute(cursor, query, many=(not flatten), values=values)
+            self._execute(cursor, 'COMMIT')
         self._optimize_file_size()
 
     def _refresh(self, item_id, timestamp=None):
