@@ -365,7 +365,7 @@ class YouTube(LoginClient):
                                     page_token=None,
                                     click_tracking=None,
                                     visitor=None):
-        return self.get_browse_videos(
+        return self.get_browse_items(
             browse_id='FEwhat_to_watch',
             client='tv',
             do_auth=True,
@@ -387,7 +387,7 @@ class YouTube(LoginClient):
                     'horizontalListRenderer',
                     'items',
                 ),
-                'video_id': (
+                'item_id': (
                     'tileRenderer',
                     'onSelectCommand',
                     'watchEndpoint',
@@ -456,7 +456,7 @@ class YouTube(LoginClient):
                                     page_token=None,
                                     click_tracking=None,
                                     visitor=None):
-        return self.get_browse_videos(
+        return self.get_browse_items(
             browse_id='FEwhat_to_watch',
             client='android_vr',
             do_auth=True,
@@ -886,7 +886,7 @@ class YouTube(LoginClient):
                                page_token=None,
                                click_tracking=None,
                                visitor=None):
-        return self.get_browse_videos(
+        return self.get_browse_items(
             browse_id=browse_id if browse_id else 'VL' + playlist_id.upper(),
             client='tv',
             do_auth=True,
@@ -905,7 +905,7 @@ class YouTube(LoginClient):
                     'playlistVideoListRenderer',
                     'contents',
                 ),
-                'video_id': (
+                'item_id': (
                     'tileRenderer',
                     'onSelectCommand',
                     'watchEndpoint',
@@ -1230,30 +1230,47 @@ class YouTube(LoginClient):
                                 params=params,
                                 **kwargs)
 
-    def get_browse_videos(self,
-                          browse_id=None,
-                          channel_id=None,
-                          params=None,
-                          route=None,
-                          _route={
-                              'featured': 'EghmZWF0dXJlZPIGBAoCMgA%3D',
-                              'videos': 'EgZ2aWRlb3PyBgQKAjoA',
-                              'shorts': 'EgZzaG9ydHPyBgUKA5oBAA%3D%3D',
-                              'streams': 'EgdzdHJlYW1z8gYECgJ6AA%3D%3D',
-                              'podcasts': 'Eghwb2RjYXN0c_IGBQoDugEA',
-                              'courses': 'Egdjb3Vyc2Vz8gYFCgPCAQA%3D',
-                              'playlists': 'EglwbGF5bGlzdHPyBgQKAkIA',
-                              'community': 'Egljb21tdW5pdHnyBgQKAkoA',
-                              'search': 'EgZzZWFyY2jyBgQKAloA',
-                          },
-                          data=None,
-                          client=None,
-                          do_auth=False,
-                          page_token=None,
-                          click_tracking=None,
-                          visitor=None,
-                          items_per_page=None,
-                          json_path=None):
+    def get_browse_items(self,
+                         browse_id=None,
+                         channel_id=None,
+                         params=None,
+                         route=None,
+                         _route={
+                             'featured': 'EghmZWF0dXJlZPIGBAoCMgA%3D',
+                             'videos': 'EgZ2aWRlb3PyBgQKAjoA',
+                             'shorts': 'EgZzaG9ydHPyBgUKA5oBAA%3D%3D',
+                             'streams': 'EgdzdHJlYW1z8gYECgJ6AA%3D%3D',
+                             'podcasts': 'Eghwb2RjYXN0c_IGBQoDugEA',
+                             'courses': 'Egdjb3Vyc2Vz8gYFCgPCAQA%3D',
+                             'playlists': 'EglwbGF5bGlzdHPyBgQKAkIA',
+                             'community': 'Egljb21tdW5pdHnyBgQKAkoA',
+                             'search': 'EgZzZWFyY2jyBgQKAloA',
+                         },
+                         response_type='videos',
+                         _response_types={
+                             'videos': (
+                                     'youtube#videoListResponse',
+                                     'youtube#video',
+                                     'videoId',
+                             ),
+                             'playlists': (
+                                     'youtube#playlistListResponse',
+                                     'youtube#playlist',
+                                     'contentId',
+                             )
+                         },
+                         data=None,
+                         client=None,
+                         do_auth=False,
+                         page_token=None,
+                         click_tracking=None,
+                         visitor=None,
+                         items_per_page=None,
+                         json_path=None):
+        response_type = _response_types.get(response_type)
+        if not response_type:
+            return None
+
         if channel_id:
             function_cache = self._context.get_function_cache()
             channel_id = function_cache.run(
@@ -1315,32 +1332,34 @@ class YouTube(LoginClient):
         if not item_path:
             return result
 
+        response_kind, item_kind, item_id_kind = response_type
+
         v3_response = {
-            'kind': 'youtube#videoListResponse',
+            'kind': response_kind,
             'items': None,
         }
 
         nodes = self.json_traverse(result, path=item_path, default=())
         items = []
-        for videos in nodes:
-            if not isinstance(videos, (list, tuple)):
-                videos = (videos,)
-            for video in videos:
-                if not video:
+        for content in nodes:
+            if not isinstance(content, (list, tuple)):
+                content = (content,)
+            for item in content:
+                if not item:
                     continue
-                video_id = self.json_traverse(
-                    video,
-                    json_path.get('video_id') or ('videoId',),
+                item_id = self.json_traverse(
+                    item,
+                    json_path.get('item_id') or (item_id_kind,),
                 )
-                if not video_id:
+                if not item_id:
                     continue
                 items.append({
-                    'kind': 'youtube#video',
-                    'id': video_id,
+                    'kind': item_kind,
+                    'id': item_id,
                     '_partial': True,
                     'snippet': {
                         'title': self.json_traverse(
-                            video,
+                            item,
                             json_path.get('title') or (
                                 (
                                     ('title', 'runs', 0, 'text'),
@@ -1349,14 +1368,14 @@ class YouTube(LoginClient):
                             ),
                         ),
                         'thumbnails': self.json_traverse(
-                            video,
+                            item,
                             json_path.get('thumbnails') or (
                                 'thumbnail',
                                 'thumbnails'
                             ),
                         ),
                         'channelId': channel_id or self.json_traverse(
-                            video,
+                            item,
                             json_path.get('channel_id') or (
                                 ('longBylineText', 'shortBylineText'),
                                 'runs',
@@ -1412,7 +1431,7 @@ class YouTube(LoginClient):
         if items_per_page:
             max_results = self.max_results() - items_per_page
             while next_page_token and len(items) <= max_results:
-                next_response = self.get_browse_videos(
+                next_response = self.get_browse_items(
                     browse_id=browse_id,
                     channel_id=channel_id,
                     params=params,

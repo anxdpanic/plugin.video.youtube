@@ -472,7 +472,7 @@ class Provider(AbstractProvider):
         if not json_data:
             return False, None
 
-        live_streams = provider.get_client(context).get_browse_videos(
+        live_streams = provider.get_client(context).get_browse_items(
             channel_id=channel_id,
             route='streams',
             json_path={
