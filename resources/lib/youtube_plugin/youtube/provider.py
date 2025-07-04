@@ -1611,14 +1611,13 @@ class Provider(AbstractProvider):
             result.append(playlists_item)
 
         # saved playlists
-        # TODO: re-enable once functionality is restored
-        # if logged_in and settings_bool(settings.SHOW_SAVED_PLAYLISTS, True):
-        #     playlists_item = DirectoryItem(
-        #         localize('saved.playlists'),
-        #         create_uri(('special', 'saved_playlists')),
-        #         image='{media}/playlist.png',
-        #     )
-        #     result.append(playlists_item)
+        if logged_in and settings_bool(settings.SHOW_SAVED_PLAYLISTS, True):
+            playlists_item = DirectoryItem(
+                localize('saved.playlists'),
+                create_uri(PATHS.SAVED_PLAYLISTS),
+                image='{media}/playlist.png',
+            )
+            result.append(playlists_item)
 
         # subscriptions
         if logged_in and settings_bool(settings.SHOW_SUBSCRIPTIONS, True):

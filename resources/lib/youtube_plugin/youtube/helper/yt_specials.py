@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from functools import partial
 
-from . import UrlResolver, UrlToItemConverter, tv, utils, v3
+from . import UrlResolver, UrlToItemConverter, utils, v3
 from ...kodion import KodionException, logging
 from ...kodion.constants import CONTENT, PATHS
 from ...kodion.items import DirectoryItem, UriItem
@@ -391,15 +391,27 @@ def _process_description_links(provider, context):
     return False, None
 
 
-def _process_saved_playlists_tv(provider, context, client):
+def _process_saved_playlists(provider, context, client):
+    params = context.get_params()
+
     json_data = client.get_saved_playlists(
-        page_token=context.get_param('next_page_token', 0),
-        offset=context.get_param('offset', 0)
+        page_token=params.get('page_token'),
+        click_tracking=params.get('click_tracking'),
+        visitor=params.get('visitor'),
     )
     if not json_data:
         return False, None
 
-    result = tv.saved_playlists_to_items(provider, context, json_data)
+    filler = client.get_saved_playlists
+    json_data['_pre_filler'] = filler
+    json_data['_post_filler'] = filler
+
+    result = v3.response_to_items(
+        provider,
+        context,
+        json_data,
+        allow_duplicates=False,
+    )
     options = {
         provider.CONTENT_TYPE: {
             'content_type': CONTENT.LIST_CONTENT,
@@ -607,7 +619,7 @@ def process(provider, context, re_match=None, category=None, sub_category=None):
         return _process_comments(provider, context, client)
 
     if category == 'saved_playlists':
-        return _process_saved_playlists_tv(provider, context, client)
+        return _process_saved_playlists(provider, context, client)
 
     if category == 'playlist':
         return _process_virtual_list(provider, context, client, sub_category)
