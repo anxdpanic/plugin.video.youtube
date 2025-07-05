@@ -259,7 +259,20 @@ class PlayerMonitorThread(threading.Thread):
             pass
         elif settings.get_bool(settings.WATCH_LATER_REMOVE, True):
             watch_later_id = logged_in and access_manager.get_watch_later_id()
-            if watch_later_id:
+            if not watch_later_id:
+                context.get_watch_later_list().del_item(video_id)
+            elif watch_later_id.lower() == 'wl':
+                provider.on_playlist_x(
+                    provider,
+                    context,
+                    command='remove',
+                    category='video',
+                    playlist_id=watch_later_id,
+                    video_id=video_id,
+                    video_name='',
+                    confirmed=True,
+                )
+            else:
                 playlist_item_id = client.get_playlist_item_id_of_video_id(
                     playlist_id=watch_later_id,
                     video_id=video_id,
@@ -276,8 +289,6 @@ class PlayerMonitorThread(threading.Thread):
                         video_name='',
                         confirmed=True,
                     )
-            else:
-                context.get_watch_later_list().del_item(video_id)
 
         if logged_in and not refresh_only:
             history_id = access_manager.get_watch_history_id()
