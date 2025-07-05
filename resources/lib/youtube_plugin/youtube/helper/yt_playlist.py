@@ -366,7 +366,7 @@ def _playlist_id_change(context, playlist, command):
                 type=playlist, command=command
             )) % playlist_name
     ):
-        if command == 'remove':
+        if command == 'unassign':
             playlist_id = None
         if playlist == 'watch_later':
             context.get_access_manager().set_watch_later_id(playlist_id)
@@ -388,26 +388,26 @@ def process(provider,
         if category is None:
             category = re_match.group('category')
 
-    if command == 'add' and category == 'video':
-        return _process_add_video(provider, context)
+    if category == 'video':
+        if command == 'add':
+            return _process_add_video(provider, context)
 
-    if command == 'remove' and category == 'video':
-        return _process_remove_video(provider, context, **kwargs)
+        if command == 'remove':
+            return _process_remove_video(provider, context, **kwargs)
 
-    if command == 'remove' and category == 'playlist':
-        return _process_remove_playlist(provider, context)
+    elif category == 'playlist':
+        if command == 'remove':
+            return _process_remove_playlist(provider, context)
 
-    if command == 'select' and category == 'playlist':
-        return _process_select_playlist(provider, context)
+        if command == 'select':
+            return _process_select_playlist(provider, context)
 
-    if command == 'rename' and category == 'playlist':
-        return _process_rename_playlist(provider, context)
+        if command == 'rename':
+            return _process_rename_playlist(provider, context)
 
-    if command in {'set', 'remove'} and category == 'watch_later':
-        return _playlist_id_change(context, category, command)
-
-    if command in {'set', 'remove'} and category == 'history':
-        return _playlist_id_change(context, category, command)
+    elif category in {'watch_later', 'history'}:
+        if command in {'assign', 'unassign'}:
+            return _playlist_id_change(context, category, command)
 
     raise KodionException('Unknown playlist category {0!r} or command {1!r}'
                           .format(category, command))

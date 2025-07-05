@@ -318,7 +318,7 @@ def update_channel_items(provider, context, channel_id_dict,
         if subscription_id:
             channel_item.subscription_id = subscription_id
             context_menu.append(
-                menu_items.unsubscribe_from_channel(
+                menu_items.channel_unsubscribe_from(
                     context, subscription_id=subscription_id
                 )
             )
@@ -326,7 +326,7 @@ def update_channel_items(provider, context, channel_id_dict,
         # -- subscribe to the channel
         if logged_in and not in_subscription_list:
             context_menu.append(
-                menu_items.subscribe_to_channel(
+                menu_items.channel_subscribe_to(
                     context, channel_id
                 )
             )
@@ -334,10 +334,10 @@ def update_channel_items(provider, context, channel_id_dict,
         # add/remove from filter list
         if filters_set is not None:
             context_menu.append(
-                menu_items.remove_my_subscriptions_filter(
+                menu_items.my_subscriptions_filter_remove(
                     context, channel_handle or channel_name
                 ) if client.channel_match(channel_id, filters_set) else
-                menu_items.add_my_subscriptions_filter(
+                menu_items.my_subscriptions_filter_add(
                     context, channel_handle or channel_name
                 )
             )
@@ -508,16 +508,16 @@ def update_playlist_items(provider, context, playlist_id_dict,
 
         # play all videos of the playlist
         context_menu = [
-            menu_items.play_playlist(
+            menu_items.playlist_play(
                 context, playlist_id
             ),
-            menu_items.play_playlist_recently_added(
+            menu_items.playlist_play_recently_added(
                 context, playlist_id
             ),
-            menu_items.view_playlist(
+            menu_items.playlist_view(
                 context, playlist_id
             ),
-            menu_items.shuffle_playlist(
+            menu_items.playlist_shuffle(
                 context, playlist_id
             ),
             separator,
@@ -530,34 +530,34 @@ def update_playlist_items(provider, context, playlist_id_dict,
             if in_my_playlists:
                 context_menu.extend((
                     # remove my playlist
-                    menu_items.delete_playlist(
+                    menu_items.playlist_delete(
                         context, playlist_id, title
                     ),
                     # rename playlist
-                    menu_items.rename_playlist(
+                    menu_items.playlist_rename(
                         context, playlist_id, title
                     ),
                     # remove as my custom watch later playlist
-                    menu_items.remove_as_watch_later(
+                    menu_items.watch_later_list_unassign(
                         context, playlist_id, title
                     ) if playlist_id == custom_watch_later_id else
                     # set as my custom watch later playlist
-                    menu_items.set_as_watch_later(
+                    menu_items.watch_later_list_assign(
                         context, playlist_id, title
                     ),
                     # remove as custom history playlist
-                    menu_items.remove_as_history(
+                    menu_items.history_list_unassign(
                         context, playlist_id, title
                     ) if playlist_id == custom_history_id else
                     # set as custom history playlist
-                    menu_items.set_as_history(
+                    menu_items.history_list_assign(
                         context, playlist_id, title
                     ),
                 ))
             else:
                 # subscribe to the channel via the playlist item
                 context_menu.append(
-                    menu_items.subscribe_to_channel(
+                    menu_items.channel_subscribe_to(
                         context, channel_id, channel_name
                     )
                 )
@@ -980,7 +980,7 @@ def update_video_items(provider, context, video_id_dict,
                     video_name=title,
                 )
                 if in_watched_later_list else
-                menu_items.remove_video_from_playlist(
+                menu_items.playlist_remove_from(
                     context,
                     playlist_id=item_playlist_id,
                     video_id=media_item.playlist_item_id or video_id,
@@ -993,27 +993,27 @@ def update_video_items(provider, context, video_id_dict,
 
         if available:
             context_menu.extend((
-                menu_items.play_video(context),
-                menu_items.play_with_subtitles(
+                menu_items.media_play(context),
+                menu_items.media_play_with_subtitles(
                     context, video_id
                 ) if not subtitles_prompt else None,
-                menu_items.play_audio_only(
+                menu_items.media_play_audio_only(
                     context, video_id
                 ) if not audio_only else None,
-                menu_items.play_ask_for_quality(
+                menu_items.media_play_ask_for_quality(
                     context, video_id
                 ) if not ask_quality else None,
-                menu_items.play_timeshift(
+                menu_items.media_play_timeshift(
                     context, video_id
                 ) if media_item.live else None,
                 # 'play with...' (external player)
-                menu_items.play_with(
+                menu_items.media_play_with(
                     context, video_id
                 ) if alternate_player else None,
-                menu_items.play_playlist_from(
+                menu_items.playlist_play_from(
                     context, item_playlist_id, video_id
                 ) if item_playlist_id else None,
-                menu_items.queue_video(context),
+                menu_items.media_queue(context),
             ))
 
         # add 'Watch Later' only if we are not in my 'Watch Later' list
@@ -1044,7 +1044,7 @@ def update_video_items(provider, context, video_id_dict,
             if context.create_path(PATHS.CHANNEL, channel_id) != path:
                 media_item.channel_id = channel_id
                 context_menu.append(
-                    menu_items.go_to_channel(
+                    menu_items.channel_go_to(
                         context, channel_id, channel_name
                     )
                 )
@@ -1052,11 +1052,11 @@ def update_video_items(provider, context, video_id_dict,
             if logged_in:
                 context_menu.append(
                     # unsubscribe from the channel of the video
-                    menu_items.unsubscribe_from_channel(
+                    menu_items.channel_unsubscribe_from(
                         context, channel_id=channel_id
                     ) if in_my_subscriptions_list else
                     # subscribe to the channel of the video
-                    menu_items.subscribe_to_channel(
+                    menu_items.channel_subscribe_to(
                         context, channel_id, channel_name
                     )
                 )
@@ -1090,8 +1090,8 @@ def update_video_items(provider, context, video_id_dict,
         # more...
         refresh = path.startswith((PATHS.LIKED_VIDEOS, PATHS.DISLIKED_VIDEOS))
         context_menu.extend((
-            menu_items.refresh(context),
-            menu_items.more_for_video(
+            menu_items.refresh_listing(context),
+            menu_items.video_more_for(
                 context,
                 video_id,
                 video_name=title,

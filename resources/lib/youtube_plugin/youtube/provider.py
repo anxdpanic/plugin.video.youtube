@@ -1404,7 +1404,7 @@ class Provider(AbstractProvider):
         if settings_bool(settings.SHOW_RELATED, True):
             if history_id or local_history:
                 related_item = DirectoryItem(
-                    localize('related_videos'),
+                    localize('video.related'),
                     create_uri(PATHS.RELATED_VIDEOS),
                     image='{media}/related_videos.png',
                 )
@@ -1475,16 +1475,16 @@ class Provider(AbstractProvider):
                     image='{media}/watch_later.png',
                 )
                 context_menu = [
-                    menu_items.play_playlist(
+                    menu_items.playlist_play(
                         context, watch_later_id
                     ),
-                    menu_items.play_playlist_recently_added(
+                    menu_items.playlist_play_recently_added(
                         context, watch_later_id
                     ),
-                    menu_items.view_playlist(
+                    menu_items.playlist_view(
                         context, watch_later_id
                     ),
-                    menu_items.shuffle_playlist(
+                    menu_items.playlist_shuffle(
                         context, watch_later_id
                     ),
                 ]
@@ -1499,11 +1499,11 @@ class Provider(AbstractProvider):
                 context_menu = [
                     menu_items.watch_later_local_clear(context),
                     menu_items.separator(),
-                    menu_items.play_all_from(
+                    menu_items.folder_play(
                         context,
                         path=PATHS.WATCH_LATER,
                     ),
-                    menu_items.play_all_from(
+                    menu_items.folder_play(
                         context,
                         path=PATHS.WATCH_LATER,
                         order='shuffle',
@@ -1524,16 +1524,16 @@ class Provider(AbstractProvider):
                     image='{media}/likes.png',
                 )
                 context_menu = [
-                    menu_items.play_playlist(
+                    menu_items.playlist_play(
                         context, liked_list_id
                     ),
-                    menu_items.play_playlist_recently_added(
+                    menu_items.playlist_play_recently_added(
                         context, liked_list_id
                     ),
-                    menu_items.view_playlist(
+                    menu_items.playlist_view(
                         context, liked_list_id
                     ),
-                    menu_items.shuffle_playlist(
+                    menu_items.playlist_shuffle(
                         context, liked_list_id
                     ),
                 ]
@@ -1560,16 +1560,16 @@ class Provider(AbstractProvider):
                     image='{media}/history.png',
                 )
                 context_menu = [
-                    menu_items.play_playlist(
+                    menu_items.playlist_play(
                         context, history_id
                     ),
-                    menu_items.play_playlist_recently_added(
+                    menu_items.playlist_play_recently_added(
                         context, history_id
                     ),
-                    menu_items.view_playlist(
+                    menu_items.playlist_view(
                         context, history_id
                     ),
-                    menu_items.shuffle_playlist(
+                    menu_items.playlist_shuffle(
                         context, history_id
                     ),
                 ]
@@ -1586,11 +1586,11 @@ class Provider(AbstractProvider):
                         context
                     ),
                     menu_items.separator(),
-                    menu_items.play_all_from(
+                    menu_items.folder_play(
                         context,
                         path=PATHS.HISTORY,
                     ),
-                    menu_items.play_all_from(
+                    menu_items.folder_play(
                         context,
                         path=PATHS.HISTORY,
                         order='shuffle',
@@ -1640,11 +1640,11 @@ class Provider(AbstractProvider):
                     context
                 ),
                 menu_items.separator(),
-                menu_items.play_all_from(
+                menu_items.folder_play(
                     context,
                     path=PATHS.BOOKMARKS,
                 ),
-                menu_items.play_all_from(
+                menu_items.folder_play(
                     context,
                     path=PATHS.BOOKMARKS,
                     order='shuffle',

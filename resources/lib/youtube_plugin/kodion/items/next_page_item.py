@@ -56,7 +56,7 @@ class NextPageItem(DirectoryItem):
         self.items_per_page = items_per_page
 
         context_menu = [
-            menu_items.refresh(context),
+            menu_items.refresh_listing(context),
             menu_items.goto_page(context, params) if can_jump else None,
             menu_items.goto_home(context),
             menu_items.goto_quick_search(context) if can_search else None,

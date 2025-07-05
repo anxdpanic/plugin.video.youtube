@@ -34,7 +34,7 @@ class CommandItem(DirectoryItem):
         )
 
         context_menu = [
-            menu_items.refresh(context),
+            menu_items.refresh_listing(context),
             menu_items.goto_home(context),
             menu_items.goto_quick_search(context),
         ]

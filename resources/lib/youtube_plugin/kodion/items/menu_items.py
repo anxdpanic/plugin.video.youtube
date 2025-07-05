@@ -23,7 +23,7 @@ from ..constants import (
 )
 
 
-def more_for_video(context,
+def video_more_for(context,
                    video_id,
                    video_name=None,
                    logged_in=False,
@@ -46,9 +46,9 @@ def more_for_video(context,
     )
 
 
-def related_videos(context, video_id):
+def video_related(context, video_id):
     return (
-        context.localize('related_videos'),
+        context.localize('video.related'),
         context.create_uri(
             (PATHS.ROUTE, PATHS.RELATED_VIDEOS,),
             {
@@ -73,7 +73,7 @@ def video_comments(context, video_id, video_name=None):
     )
 
 
-def content_from_description(context, video_id):
+def video_description_links(context, video_id):
     return (
         context.localize('video.description_links'),
         context.create_uri(
@@ -86,7 +86,7 @@ def content_from_description(context, video_id):
     )
 
 
-def play_with(context, video_id):
+def media_play_with(context, video_id):
     return (
         context.localize('video.play.with'),
         context.create_uri(
@@ -100,7 +100,7 @@ def play_with(context, video_id):
     )
 
 
-def refresh(context):
+def refresh_listing(context):
     return (
         context.localize('refresh'),
         context.create_uri(
@@ -112,7 +112,7 @@ def refresh(context):
     )
 
 
-def play_all_from(context, path, order='normal'):
+def folder_play(context, path, order='normal'):
     return (
         context.localize('playlist.play.shuffle')
         if order == 'shuffle' else
@@ -127,21 +127,21 @@ def play_all_from(context, path, order='normal'):
     )
 
 
-def play_video(context):
+def media_play(context):
     return (
         context.localize('video.play'),
         'Action(Play)'
     )
 
 
-def queue_video(context):
+def media_queue(context):
     return (
         context.localize('video.queue'),
         'Action(Queue)'
     )
 
 
-def play_playlist(context, playlist_id):
+def playlist_play(context, playlist_id):
     return (
         context.localize('playlist.play.all'),
         context.create_uri(
@@ -155,7 +155,7 @@ def play_playlist(context, playlist_id):
     )
 
 
-def play_playlist_from(context, playlist_id, video_id):
+def playlist_play_from(context, playlist_id, video_id):
     return (
         context.localize('playlist.play.from_here'),
         context.create_uri(
@@ -169,7 +169,7 @@ def play_playlist_from(context, playlist_id, video_id):
     )
 
 
-def play_playlist_recently_added(context, playlist_id):
+def playlist_play_recently_added(context, playlist_id):
     return (
         context.localize('playlist.play.recently_added'),
         context.create_uri(
@@ -183,7 +183,7 @@ def play_playlist_recently_added(context, playlist_id):
     )
 
 
-def view_playlist(context, playlist_id):
+def playlist_view(context, playlist_id):
     return (
         context.localize('playlist.view.all'),
         context.create_uri(
@@ -198,7 +198,7 @@ def view_playlist(context, playlist_id):
     )
 
 
-def shuffle_playlist(context, playlist_id):
+def playlist_shuffle(context, playlist_id):
     return (
         context.localize('playlist.play.shuffle'),
         context.create_uri(
@@ -213,7 +213,7 @@ def shuffle_playlist(context, playlist_id):
     )
 
 
-def add_video_to_playlist(context, video_id):
+def playlist_add_to(context, video_id):
     return (
         context.localize('video.add_to_playlist'),
         context.create_uri(
@@ -226,7 +226,7 @@ def add_video_to_playlist(context, video_id):
     )
 
 
-def remove_video_from_playlist(context, playlist_id, video_id, video_name):
+def playlist_remove_from(context, playlist_id, video_id, video_name):
     return (
         context.localize('remove'),
         context.create_uri(
@@ -243,7 +243,7 @@ def remove_video_from_playlist(context, playlist_id, video_id, video_name):
     )
 
 
-def rename_playlist(context, playlist_id, playlist_name):
+def playlist_rename(context, playlist_id, playlist_name):
     return (
         context.localize('rename'),
         context.create_uri(
@@ -257,7 +257,7 @@ def rename_playlist(context, playlist_id, playlist_name):
     )
 
 
-def delete_playlist(context, playlist_id, playlist_name):
+def playlist_delete(context, playlist_id, playlist_name):
     return (
         context.localize('delete'),
         context.create_uri(
@@ -271,11 +271,11 @@ def delete_playlist(context, playlist_id, playlist_name):
     )
 
 
-def remove_as_watch_later(context, playlist_id, playlist_name):
+def watch_later_list_unassign(context, playlist_id, playlist_name):
     return (
-        context.localize('watch_later.list.remove'),
+        context.localize('watch_later.list.unassign'),
         context.create_uri(
-            (PATHS.PLAYLIST, 'remove', 'watch_later',),
+            (PATHS.PLAYLIST, 'unassign', 'watch_later',),
             {
                 'playlist_id': playlist_id,
                 'item_name': playlist_name
@@ -285,11 +285,11 @@ def remove_as_watch_later(context, playlist_id, playlist_name):
     )
 
 
-def set_as_watch_later(context, playlist_id, playlist_name):
+def watch_later_list_assign(context, playlist_id, playlist_name):
     return (
-        context.localize('watch_later.list.set'),
+        context.localize('watch_later.list.assign'),
         context.create_uri(
-            (PATHS.PLAYLIST, 'set', 'watch_later',),
+            (PATHS.PLAYLIST, 'assign', 'watch_later',),
             {
                 'playlist_id': playlist_id,
                 'item_name': playlist_name
@@ -299,11 +299,11 @@ def set_as_watch_later(context, playlist_id, playlist_name):
     )
 
 
-def remove_as_history(context, playlist_id, playlist_name):
+def history_list_unassign(context, playlist_id, playlist_name):
     return (
-        context.localize('history.list.remove'),
+        context.localize('history.list.unassign'),
         context.create_uri(
-            (PATHS.PLAYLIST, 'remove', 'history',),
+            (PATHS.PLAYLIST, 'unassign', 'history',),
             {
                 'playlist_id': playlist_id,
                 'item_name': playlist_name
@@ -313,11 +313,11 @@ def remove_as_history(context, playlist_id, playlist_name):
     )
 
 
-def set_as_history(context, playlist_id, playlist_name):
+def history_list_assign(context, playlist_id, playlist_name):
     return (
-        context.localize('history.list.set'),
+        context.localize('history.list.assign'),
         context.create_uri(
-            (PATHS.PLAYLIST, 'set', 'history',),
+            (PATHS.PLAYLIST, 'assign', 'history',),
             {
                 'playlist_id': playlist_id,
                 'item_name': playlist_name
@@ -327,7 +327,7 @@ def set_as_history(context, playlist_id, playlist_name):
     )
 
 
-def remove_my_subscriptions_filter(context, channel_name):
+def my_subscriptions_filter_remove(context, channel_name):
     return (
         context.localize('my_subscriptions.filter.remove'),
         context.create_uri(
@@ -340,7 +340,7 @@ def remove_my_subscriptions_filter(context, channel_name):
     )
 
 
-def add_my_subscriptions_filter(context, channel_name):
+def my_subscriptions_filter_add(context, channel_name):
     return (
         context.localize('my_subscriptions.filter.add'),
         context.create_uri(
@@ -353,7 +353,7 @@ def add_my_subscriptions_filter(context, channel_name):
     )
 
 
-def rate_video(context, video_id, refresh=False):
+def video_rate(context, video_id, refresh=False):
     params = {
         'video_id': video_id,
     }
@@ -437,7 +437,7 @@ def watch_later_local_clear(context):
     )
 
 
-def go_to_channel(context, channel_id, channel_name):
+def channel_go_to(context, channel_id, channel_name):
     return (
         context.localize('go_to.x') % context.get_ui().bold(channel_name),
         context.create_uri(
@@ -447,7 +447,7 @@ def go_to_channel(context, channel_id, channel_name):
     )
 
 
-def subscribe_to_channel(context, channel_id, channel_name=''):
+def channel_subscribe_to(context, channel_id, channel_name=''):
     return (
         context.localize('subscribe_to.x') % context.get_ui().bold(channel_name)
         if channel_name else
@@ -462,7 +462,7 @@ def subscribe_to_channel(context, channel_id, channel_name=''):
     )
 
 
-def unsubscribe_from_channel(context, channel_id=None, subscription_id=None):
+def channel_unsubscribe_from(context, channel_id=None, subscription_id=None):
     return (
         context.localize('unsubscribe'),
         context.create_uri(
@@ -482,7 +482,7 @@ def unsubscribe_from_channel(context, channel_id=None, subscription_id=None):
     )
 
 
-def play_with_subtitles(context, video_id):
+def media_play_with_subtitles(context, video_id):
     return (
         context.localize('video.play.with_subtitles'),
         context.create_uri(
@@ -496,7 +496,7 @@ def play_with_subtitles(context, video_id):
     )
 
 
-def play_audio_only(context, video_id):
+def media_play_audio_only(context, video_id):
     return (
         context.localize('video.play.audio_only'),
         context.create_uri(
@@ -510,7 +510,7 @@ def play_audio_only(context, video_id):
     )
 
 
-def play_ask_for_quality(context, video_id):
+def media_play_ask_for_quality(context, video_id):
     return (
         context.localize('video.play.ask_for_quality'),
         context.create_uri(
@@ -524,7 +524,7 @@ def play_ask_for_quality(context, video_id):
     )
 
 
-def play_timeshift(context, video_id):
+def media_play_timeshift(context, video_id):
     return (
         context.localize('video.play.timeshift'),
         context.create_uri(
