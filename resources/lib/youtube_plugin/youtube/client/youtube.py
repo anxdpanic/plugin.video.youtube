@@ -218,6 +218,19 @@ class YouTube(LoginClient):
                                 **kwargs)
 
     def add_video_to_playlist(self, playlist_id, video_id, **kwargs):
+        if playlist_id and playlist_id.lower() in self._VIRTUAL_LISTS:
+            post_data = {
+                'playlistId': playlist_id.upper(),
+                'actions': [{
+                    'addedVideoId': video_id,
+                    # 'setVideoId': '',
+                    'action': 'ACTION_ADD_VIDEO',
+                }],
+            }
+            return self.api_request('tv', 'POST', path='browse/edit_playlist',
+                                    post_data=post_data,
+                                    do_auth=True,
+                                    **kwargs)
         params = {'part': 'snippet',
                   'mine': True}
         post_data = {'kind': 'youtube#playlistItem',

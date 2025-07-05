@@ -27,7 +27,10 @@ def _process_add_video(provider, context, keymap_action=False):
     if not playlist_id:
         raise KodionException('Playlist/Add: missing playlist_id')
 
-    if playlist_id.lower() == 'watch_later':
+    _playlist_id = playlist_id.lower()
+    if _playlist_id == 'wl':
+        notify_message = context.localize('watch_later.added_to')
+    elif _playlist_id == 'watch_later':
         playlist_id = context.get_access_manager().get_watch_later_id()
         notify_message = context.localize('watch_later.added_to')
     else:

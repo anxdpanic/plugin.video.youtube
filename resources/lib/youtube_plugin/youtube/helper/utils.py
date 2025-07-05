@@ -610,7 +610,8 @@ def update_video_items(provider, context, video_id_dict,
     subtitles_prompt = settings.get_subtitle_selection() == 1
     use_play_data = settings.use_local_history()
 
-    fanart_type = context.get_param('fanart_type')
+    params = context.get_params()
+    fanart_type = params.get('fanart_type')
     if fanart_type is None:
         fanart_type = settings.fanart_selection()
     thumb_size = settings.get_thumbnail_size()
@@ -629,26 +630,54 @@ def update_video_items(provider, context, video_id_dict,
     path = context.get_path()
     ui = context.get_ui()
 
+    playlist_id = None
+    playlist_channel_id = None
+
     if path.startswith(PATHS.MY_SUBSCRIPTIONS):
         in_bookmarks_list = False
         in_my_subscriptions_list = True
+        in_virtual_list = False
         in_watched_later_list = False
-        playlist_match = False
     elif path.startswith(PATHS.WATCH_LATER):
         in_bookmarks_list = False
         in_my_subscriptions_list = False
+        in_virtual_list = False
         in_watched_later_list = True
-        playlist_match = False
     elif path.startswith(PATHS.BOOKMARKS):
         in_bookmarks_list = True
         in_my_subscriptions_list = False
+        in_virtual_list = False
         in_watched_later_list = False
-        playlist_match = False
-    else:
+    elif path.startswith(PATHS.VIRTUAL_PLAYLIST):
+        playlist_id = params.get('playlist_id')
+        playlist_channel_id = 'mine'
+
         in_bookmarks_list = False
         in_my_subscriptions_list = False
-        in_watched_later_list = False
+        in_virtual_list = True
+        if playlist_id and playlist_id.lower() == watch_later_id.lower():
+            in_watched_later_list = True
+        else:
+            in_watched_later_list = False
+    else:
+        """
+                Play all videos of the playlist.
+
+                /channel/[CHANNEL_ID]/playlist/[PLAYLIST_ID]/
+                /playlist/[PLAYLIST_ID]/
+                """
         playlist_match = __RE_PLAYLIST.match(path)
+        if playlist_match:
+            playlist_id = playlist_match.group('playlist_id')
+            playlist_channel_id = playlist_match.group('channel_id')
+
+        in_bookmarks_list = False
+        in_my_subscriptions_list = False
+        in_virtual_list = False
+        if playlist_id and playlist_id.lower() == watch_later_id.lower():
+            in_watched_later_list = True
+        else:
+            in_watched_later_list = False
 
     media_items = None
     media_item = None
@@ -937,34 +966,23 @@ def update_video_items(provider, context, video_id_dict,
             media_item.set_fanart(fanart)
 
         # update channel mapping
-        channel_id = snippet.get('channelId', '')
+        channel_id = snippet.get('channelId') or playlist_channel_id
         media_item.channel_id = channel_id
         if channel_id and channel_items_dict is not None:
             channel_items = channel_items_dict.setdefault(channel_id, [])
             channel_items.append(media_item)
 
-        """
-        Play all videos of the playlist.
-
-        /channel/[CHANNEL_ID]/playlist/[PLAYLIST_ID]/
-        /playlist/[PLAYLIST_ID]/
-        """
-        playlist_channel_id = ''
-        if playlist_match:
-            playlist_id = playlist_match.group('playlist_id')
-            playlist_channel_id = playlist_match.group('channel_id')
-        else:
-            playlist_id = media_item.playlist_id
+        item_playlist_id = playlist_id or media_item.playlist_id
 
         # provide 'remove' in my playlists that have a real playlist_id
-        if (playlist_id
+        if (not in_virtual_list
+                and item_playlist_id
                 and logged_in
-                and playlist_channel_id == 'mine'
-                and playlist_id.strip().lower() not in {'wl', 'hl'}):
+                and playlist_channel_id == 'mine'):
             context_menu = [
                 menu_items.remove_video_from_playlist(
                     context,
-                    playlist_id=playlist_id,
+                    playlist_id=item_playlist_id,
                     video_id=media_item.playlist_item_id,
                     video_name=title,
                 ),
@@ -993,22 +1011,21 @@ def update_video_items(provider, context, video_id_dict,
                     context, video_id
                 ) if alternate_player else None,
                 menu_items.play_playlist_from(
-                    context, playlist_id, video_id
-                ) if playlist_id else None,
+                    context, item_playlist_id, video_id
+                ) if item_playlist_id else None,
                 menu_items.queue_video(context),
             ))
 
         # add 'Watch Later' only if we are not in my 'Watch Later' list
-        if not available:
+        if not available or in_watched_later_list:
             pass
         elif watch_later_id:
-            if not playlist_id or watch_later_id != playlist_id:
-                context_menu.append(
-                    menu_items.watch_later_add(
-                        context, watch_later_id, video_id
-                    )
+            context_menu.append(
+                menu_items.watch_later_add(
+                    context, video_id
                 )
-        elif not in_watched_later_list:
+            )
+        else:
             context_menu.append(
                 menu_items.watch_later_local_add(
                     context, media_item
