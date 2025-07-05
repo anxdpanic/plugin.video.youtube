@@ -119,10 +119,20 @@ def _process_remove_video(provider,
         video_name = listitem_video_name
         keymap_action = True
 
-    if playlist_id.strip().lower() in {'wl', 'hl'}:
-        logging.debug('Playlist/Remove: failed for playlist {playlist_id!r}'
-                      .format(playlist_id=playlist_id))
-        return False
+    if not playlist_id:
+        if confirmed:
+            return False
+        raise KodionException('Playlist/Remove: missing playlist ID')
+    elif playlist_id == 'watch_later':
+        playlist_id = context.get_access_manager().get_watch_later_id()
+    else:
+        _playlist_id = playlist_id.lower()
+        if _playlist_id == 'wl':
+            pass
+        elif _playlist_id == 'hl':
+            logging.debug('Playlist/Remove: failed for playlist {playlist_id!r}'
+                          .format(playlist_id=playlist_id))
+            return False
 
     if confirmed or context.get_ui().on_remove_content(video_name):
         success = provider.get_client(context).remove_video_from_playlist(

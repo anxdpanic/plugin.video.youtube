@@ -240,6 +240,18 @@ class YouTube(LoginClient):
                                    playlist_id,
                                    playlist_item_id,
                                    **kwargs):
+        if playlist_id and playlist_id.lower() in self._VIRTUAL_LISTS:
+            post_data = {
+                'playlistId': playlist_id.upper(),
+                'actions': [{
+                    'removedVideoId': playlist_item_id,
+                    'action': 'ACTION_REMOVE_VIDEO_BY_VIDEO_ID',
+                }],
+            }
+            return self.api_request('tv', 'POST', path='browse/edit_playlist',
+                                    post_data=post_data,
+                                    do_auth=True,
+                                    **kwargs)
         params = {'id': playlist_item_id}
         return self.api_request(method='DELETE', path='playlistItems',
                                 params=params,

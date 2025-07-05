@@ -384,6 +384,21 @@ def watch_later_add(context, video_id):
     )
 
 
+def watch_later_remove(context, video_id, video_name=''):
+    return (
+        context.localize('watch_later.remove'),
+        context.create_uri(
+            (PATHS.PLAYLIST, 'remove', 'video',),
+            {
+                'playlist_id': 'watch_later',
+                'video_id': video_id,
+                'item_name': video_name,
+            },
+            run=True,
+        ),
+    )
+
+
 def watch_later_local_add(context, item):
     return (
         context.localize('watch_later.add'),

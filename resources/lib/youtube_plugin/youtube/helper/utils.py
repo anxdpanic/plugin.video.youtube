@@ -636,17 +636,14 @@ def update_video_items(provider, context, video_id_dict,
     if path.startswith(PATHS.MY_SUBSCRIPTIONS):
         in_bookmarks_list = False
         in_my_subscriptions_list = True
-        in_virtual_list = False
         in_watched_later_list = False
     elif path.startswith(PATHS.WATCH_LATER):
         in_bookmarks_list = False
         in_my_subscriptions_list = False
-        in_virtual_list = False
         in_watched_later_list = True
     elif path.startswith(PATHS.BOOKMARKS):
         in_bookmarks_list = True
         in_my_subscriptions_list = False
-        in_virtual_list = False
         in_watched_later_list = False
     elif path.startswith(PATHS.VIRTUAL_PLAYLIST):
         playlist_id = params.get('playlist_id')
@@ -654,7 +651,6 @@ def update_video_items(provider, context, video_id_dict,
 
         in_bookmarks_list = False
         in_my_subscriptions_list = False
-        in_virtual_list = True
         if playlist_id and playlist_id.lower() == watch_later_id.lower():
             in_watched_later_list = True
         else:
@@ -673,7 +669,6 @@ def update_video_items(provider, context, video_id_dict,
 
         in_bookmarks_list = False
         in_my_subscriptions_list = False
-        in_virtual_list = False
         if playlist_id and playlist_id.lower() == watch_later_id.lower():
             in_watched_later_list = True
         else:
@@ -975,11 +970,16 @@ def update_video_items(provider, context, video_id_dict,
         item_playlist_id = playlist_id or media_item.playlist_id
 
         # provide 'remove' in my playlists that have a real playlist_id
-        if (not in_virtual_list
-                and item_playlist_id
+        if (item_playlist_id
                 and logged_in
                 and playlist_channel_id == 'mine'):
             context_menu = [
+                menu_items.watch_later_remove(
+                    context,
+                    video_id=video_id,
+                    video_name=title,
+                )
+                if in_watched_later_list else
                 menu_items.remove_video_from_playlist(
                     context,
                     playlist_id=item_playlist_id,
