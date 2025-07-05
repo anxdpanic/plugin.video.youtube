@@ -1314,28 +1314,6 @@ def get_thumbnail(thumb_size, thumbnails, default_thumb=None):
     return url or default_thumb
 
 
-def get_shelf_index_by_title(context, json_data, shelf_title):
-    shelf_index = None
-
-    contents = json_data.get('contents', {}).get('sectionListRenderer', {}).get('contents', [{}])
-    for idx, shelf in enumerate(contents):
-        title = shelf.get('shelfRenderer', {}).get('title', {}).get('runs', [{}])[0].get('text', '')
-        if title.lower() == shelf_title.lower():
-            shelf_index = idx
-            logging.debug('Found shelf index {index!r} for {title!r}',
-                          index=shelf_index,
-                          title=shelf_title)
-            break
-
-    if shelf_index is not None and 0 > shelf_index >= len(contents):
-        logging.debug('Shelf index {index!r} out of range (0-{range})',
-                      index=shelf_index,
-                      range=len(contents))
-        shelf_index = None
-
-    return shelf_index
-
-
 def add_related_video_to_playlist(provider, context, client, v3, video_id):
     playlist_player = context.get_playlist_player()
     if playlist_player.size() > 999:
