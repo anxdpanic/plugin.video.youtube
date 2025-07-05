@@ -983,7 +983,7 @@ def update_video_items(provider, context, video_id_dict,
                 menu_items.remove_video_from_playlist(
                     context,
                     playlist_id=item_playlist_id,
-                    video_id=media_item.playlist_item_id,
+                    video_id=media_item.playlist_item_id or video_id,
                     video_name=title,
                 ),
                 menu_items.separator(),
