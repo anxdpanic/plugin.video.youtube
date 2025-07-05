@@ -271,6 +271,34 @@ def playlist_delete(context, playlist_id, playlist_name):
     )
 
 
+def playlist_save_to_library(context, playlist_id):
+    return (
+        context.localize('save'),
+        context.create_uri(
+            (PATHS.PLAYLIST, 'like', 'playlist',),
+            {
+                'playlist_id': playlist_id,
+            },
+            run=True,
+        ),
+    )
+
+
+def playlist_remove_from_library(context, playlist_id, playlist_name):
+    return (
+        context.localize('remove'),
+        context.create_uri(
+            (PATHS.PLAYLIST, 'unlike', 'playlist',),
+            {
+                'playlist_id': playlist_id,
+                'item_name': playlist_name,
+                'reload_path': context.get_path(),
+            },
+            run=True,
+        ),
+    )
+
+
 def watch_later_list_unassign(context, playlist_id, playlist_name):
     return (
         context.localize('watch_later.list.unassign'),

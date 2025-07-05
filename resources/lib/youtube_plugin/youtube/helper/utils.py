@@ -411,12 +411,19 @@ def update_playlist_items(provider, context, playlist_id_dict,
     if path.startswith(PATHS.MY_PLAYLISTS):
         in_bookmarks_list = False
         in_my_playlists = True
+        in_saved_playlists = False
     elif path.startswith(PATHS.BOOKMARKS):
         in_bookmarks_list = True
         in_my_playlists = False
+        in_saved_playlists = False
+    elif path.startswith(PATHS.SAVED_PLAYLISTS):
+        in_bookmarks_list = False
+        in_my_playlists = False
+        in_saved_playlists = True
     else:
         in_bookmarks_list = False
         in_my_playlists = False
+        in_saved_playlists = False
 
     for playlist_id, yt_item in data.items():
         playlist_item = playlist_id_dict.get(playlist_id)
@@ -506,8 +513,48 @@ def update_playlist_items(provider, context, playlist_id_dict,
             channel_items = channel_items_dict.setdefault(channel_id, [])
             channel_items.append(playlist_item)
 
-        # play all videos of the playlist
-        context_menu = [
+        if in_my_playlists:
+            context_menu = [
+                # remove my playlist
+                menu_items.playlist_delete(
+                    context, playlist_id, title
+                ),
+                # rename playlist
+                menu_items.playlist_rename(
+                    context, playlist_id, title
+                ),
+                # remove as my custom watch later playlist
+                menu_items.watch_later_list_unassign(
+                    context, playlist_id, title
+                )
+                if playlist_id == custom_watch_later_id else
+                # set as my custom watch later playlist
+                menu_items.watch_later_list_assign(
+                    context, playlist_id, title
+                ),
+                # remove as custom history playlist
+                menu_items.history_list_unassign(
+                    context, playlist_id, title
+                )
+                if playlist_id == custom_history_id else
+                # set as custom history playlist
+                menu_items.history_list_assign(
+                    context, playlist_id, title
+                ),
+                separator,
+            ]
+        elif in_saved_playlists:
+            context_menu = [
+                menu_items.playlist_remove_from_library(
+                    context, playlist_id, title
+                ),
+                separator,
+            ]
+        else:
+            context_menu = []
+
+        context_menu.extend((
+            # play all videos of the playlist
             menu_items.playlist_play(
                 context, playlist_id
             ),
@@ -521,54 +568,34 @@ def update_playlist_items(provider, context, playlist_id_dict,
                 context, playlist_id
             ),
             separator,
+            menu_items.playlist_save_to_library(
+                context, playlist_id
+            )
+            if logged_in and not (in_my_playlists or in_saved_playlists) else
+            None,
             menu_items.bookmark_add(
                 context, playlist_item
-            ) if not in_bookmarks_list and not in_my_playlists else None,
-        ]
-
-        if logged_in:
-            if in_my_playlists:
-                context_menu.extend((
-                    # remove my playlist
-                    menu_items.playlist_delete(
-                        context, playlist_id, title
-                    ),
-                    # rename playlist
-                    menu_items.playlist_rename(
-                        context, playlist_id, title
-                    ),
-                    # remove as my custom watch later playlist
-                    menu_items.watch_later_list_unassign(
-                        context, playlist_id, title
-                    ) if playlist_id == custom_watch_later_id else
-                    # set as my custom watch later playlist
-                    menu_items.watch_later_list_assign(
-                        context, playlist_id, title
-                    ),
-                    # remove as custom history playlist
-                    menu_items.history_list_unassign(
-                        context, playlist_id, title
-                    ) if playlist_id == custom_history_id else
-                    # set as custom history playlist
-                    menu_items.history_list_assign(
-                        context, playlist_id, title
-                    ),
-                ))
-            else:
-                # subscribe to the channel via the playlist item
-                context_menu.append(
-                    menu_items.channel_subscribe_to(
-                        context, channel_id, channel_name
-                    )
-                )
-
-        if not in_bookmarks_list and not in_my_playlists:
-            context_menu.append(
-                # bookmark channel of the playlist
-                menu_items.bookmark_add_channel(
-                    context, channel_id, channel_name
-                )
             )
+            if not (in_my_playlists or in_bookmarks_list) else
+            None,
+            menu_items.channel_go_to(
+                context, channel_id, channel_name
+            )
+            if not in_my_playlists else
+            None,
+            # subscribe to the channel via the playlist item
+            menu_items.channel_subscribe_to(
+                context, channel_id, channel_name
+            )
+            if logged_in and not in_my_playlists else
+            None,
+            # bookmark channel of the playlist
+            menu_items.bookmark_add_channel(
+                context, channel_id, channel_name
+            )
+            if not in_my_playlists else
+            None,
+        ))
 
         if context_menu:
             playlist_item.add_context_menu(context_menu)

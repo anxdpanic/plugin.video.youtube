@@ -210,6 +210,29 @@ class YouTube(LoginClient):
                                 no_content=True,
                                 **kwargs)
 
+    def rate_playlist(self, playlist_id, rating='like', **kwargs):
+        if rating == 'like':
+            post_data = {
+                'status': 'LIKE',
+                'target': {
+                    'playlistId': playlist_id,
+                },
+            }
+            path = 'like/like'
+        else:
+            post_data = {
+                'status': 'INDIFFERENT',
+                'target': {
+                    'playlistId': playlist_id,
+                },
+            }
+            path = 'like/removelike'
+
+        return self.api_request('tv', 'POST', path=path,
+                                post_data=post_data,
+                                do_auth=True,
+                                **kwargs)
+
     def add_video_to_playlist(self, playlist_id, video_id, **kwargs):
         if playlist_id and playlist_id.lower() in self._VIRTUAL_LISTS:
             post_data = {

@@ -376,6 +376,91 @@ def _playlist_id_change(context, playlist, command):
     return False
 
 
+def _process_rate_playlist(provider,
+                           context,
+                           rating,
+                           playlist_id=None,
+                           playlist_name=None,
+                           confirmed=None):
+    container_uri = context.get_infolabel('Container.FolderPath')
+    listitem_path = context.get_listitem_info('FileNameAndPath')
+    listitem_playlist_id = context.get_listitem_property(PLAYLIST_ID)
+    listitem_playlist_name = context.get_listitem_info('Title')
+    keymap_action = False
+
+    params = context.get_params()
+    if playlist_id is None:
+        playlist_id = params.pop('playlist_id', None)
+    if playlist_name is None:
+        playlist_name = params.pop('item_name', listitem_playlist_name)
+    if confirmed is None:
+        confirmed = rating == 'like' or params.pop('confirmed', False)
+
+    ui = context.get_ui()
+    localize = context.localize
+
+    if not playlist_id and context.is_plugin_path(listitem_path):
+        playlist_id = parse_item_ids(listitem_path).get('playlist_id',
+                                                        listitem_playlist_id)
+        keymap_action = True
+
+    if not playlist_id:
+        raise KodionException('Playlist/Rate: missing playlist_id')
+
+    client = provider.get_client(context)
+    if rating == 'like':
+        success = client.rate_playlist(playlist_id, rating)
+    else:
+        if confirmed or context.get_ui().on_remove_content(playlist_name):
+            success = client.rate_playlist(playlist_id, rating)
+        else:
+            success = None
+
+    if success:
+        if rating == 'like':
+            notify_message = localize('saved')
+        else:
+            notify_message = localize('removed.name.x') % playlist_name
+        ui.show_notification(
+            message=notify_message,
+            time_ms=2500,
+            audible=False,
+        )
+
+        if not context.is_plugin_path(container_uri):
+            return True
+
+        if (not confirmed
+                and (keymap_action
+                     or playlist_id == listitem_playlist_id)):
+            ui.set_focus_next_item()
+
+        if context.get_path().startswith(PATHS.SAVED_PLAYLISTS):
+            path, params = context.parse_uri(container_uri)
+            if 'refresh' not in params:
+                params['refresh'] = True
+        else:
+            path = params.pop('reload_path', False if confirmed else None)
+
+        if path is not False:
+            provider.reroute(
+                context,
+                path=path,
+                params=params,
+            )
+        return True
+
+    elif success is False:
+        ui.show_notification(
+            message=localize('failed'),
+            time_ms=2500,
+            audible=False,
+        )
+        return False
+
+    return None
+
+
 def process(provider,
             context,
             re_match=None,
@@ -404,6 +489,9 @@ def process(provider,
 
         if command == 'rename':
             return _process_rename_playlist(provider, context)
+
+        if command in {'like', 'unlike'}:
+            return _process_rate_playlist(provider, context, command)
 
     elif category in {'watch_later', 'history'}:
         if command in {'assign', 'unassign'}:
