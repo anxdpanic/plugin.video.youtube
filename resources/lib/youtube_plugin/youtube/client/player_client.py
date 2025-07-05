@@ -1162,6 +1162,8 @@ class PlayerClient(LoginClient):
         else:
             selected_height = settings.fixed_video_quality()
 
+        itags = ('9995', '9996') if is_live else ('9993', '9994')
+
         for client_name, response in responses.items():
             url = response['hls_manifest']
             if not url:
@@ -1182,7 +1184,7 @@ class PlayerClient(LoginClient):
             if not result:
                 continue
 
-            for itag in ('9995', '9996') if is_live else ('9993', '9994'):
+            for itag in itags:
                 if itag in stream_list:
                     continue
 

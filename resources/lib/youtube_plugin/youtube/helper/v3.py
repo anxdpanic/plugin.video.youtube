@@ -445,6 +445,14 @@ def _process_list_response(provider,
     # for each video.
     channel_items_dict = {}
 
+    if progress_dialog:
+        delta = (len(_video_id_dict)
+                 + len(channel_id_dict)
+                 + len(playlist_id_dict)
+                 + len(subscription_id_dict))
+        progress_dialog.grow_total(delta=delta)
+        progress_dialog.update(steps=delta)
+
     resource_manager = provider.get_resource_manager(context, progress_dialog)
     resources = {
         1: {
@@ -555,11 +563,13 @@ def _process_list_response(provider,
         finally:
             resource['complete'] = True
             threads['current'].discard(resource['thread'])
-            threads['loop'].set()
+            threads['loop_enable'].set()
 
+    current_threads = set()
+    loop_enable = threading.Event()
     threads = {
-        'current': set(),
-        'loop': threading.Event(),
+        'current': current_threads,
+        'loop_enable': loop_enable,
     }
 
     remaining = len(resources)
@@ -568,26 +578,17 @@ def _process_list_response(provider,
     ])
     completed = []
     iterator = iter(resources)
-    threads['loop'].set()
-
-    if progress_dialog:
-        delta = (len(_video_id_dict)
-                 + len(channel_id_dict)
-                 + len(playlist_id_dict)
-                 + len(subscription_id_dict))
-        progress_dialog.grow_total(delta=delta)
-        progress_dialog.update(steps=delta)
-
-    while threads['loop'].wait():
+    loop_enable.set()
+    while loop_enable.wait():
         try:
             resource_id = next(iterator)
         except StopIteration:
-            if threads['current']:
-                threads['loop'].clear()
+            if current_threads:
+                loop_enable.clear()
             for resource_id in completed:
                 del resources[resource_id]
             remaining = len(resources)
-            if remaining <= 0 and not threads['current']:
+            if remaining <= 0 and not current_threads:
                 break
             deferred = len([
                 1 for resource in resources.values() if resource['defer']
@@ -618,7 +619,7 @@ def _process_list_response(provider,
 
             new_thread = threading.Thread(target=_fetch, args=(resource,))
             new_thread.daemon = True
-            threads['current'].add(new_thread)
+            current_threads.add(new_thread)
             resource['thread'] = new_thread
             new_thread.start()
 

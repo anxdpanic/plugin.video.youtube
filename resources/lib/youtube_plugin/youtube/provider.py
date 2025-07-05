@@ -1962,8 +1962,10 @@ class Provider(AbstractProvider):
 
         if command == 'add':
             item = params.get('item')
-            context.get_bookmarks_list().add_item(item_id, item)
+            if not item:
+                return False
 
+            context.get_bookmarks_list().add_item(item_id, item)
             ui.show_notification(
                 localize('bookmark.created'),
                 time_ms=2500,
@@ -2069,8 +2071,10 @@ class Provider(AbstractProvider):
 
         if command == 'add':
             item = params.get('item')
-            if item:
-                context.get_watch_later_list().add_item(video_id, item)
+            if not item:
+                return False
+
+            context.get_watch_later_list().add_item(video_id, item)
             return True
 
         if command == 'remove':

@@ -56,7 +56,7 @@ class AbstractContext(object):
     _addon = None
     _settings = None
 
-    _BOOL_PARAMS = {
+    _BOOL_PARAMS = frozenset((
         PLAY_FORCE_AUDIO,
         PLAY_PROMPT_SUBTITLES,
         PLAY_PROMPT_QUALITY,
@@ -83,8 +83,8 @@ class AbstractContext(object):
         WINDOW_FALLBACK,
         WINDOW_REPLACE,
         WINDOW_RETURN,
-    }
-    _INT_PARAMS = {
+    ))
+    _INT_PARAMS = frozenset((
         'fanart_type',
         'filtered',
         'items_per_page',
@@ -92,24 +92,24 @@ class AbstractContext(object):
         'next_page_token',
         'page',
         'refresh',
-    }
-    _INT_BOOL_PARAMS = {
+    ))
+    _INT_BOOL_PARAMS = frozenset((
         'refresh',
-    }
-    _FLOAT_PARAMS = {
+    ))
+    _FLOAT_PARAMS = frozenset((
         'end',
         'recent_days',
         'seek',
         'start',
-    }
-    _LIST_PARAMS = {
+    ))
+    _LIST_PARAMS = frozenset((
         'channel_ids',
         'exclude',
         'item_filter',
         'playlist_ids',
         'video_ids',
-    }
-    _STRING_PARAMS = {
+    ))
+    _STRING_PARAMS = frozenset((
         'api_key',
         'action',
         'addon_id',
@@ -136,10 +136,10 @@ class AbstractContext(object):
         'videoid',  # deprecated
         'video_id',
         'visitor',
-    }
-    _STRING_BOOL_PARAMS = {
+    ))
+    _STRING_BOOL_PARAMS = frozenset((
         'reload_path',
-    }
+    ))
     _NON_EMPTY_STRING_PARAMS = set()
 
     def __init__(self, path='/', params=None, plugin_id=''):

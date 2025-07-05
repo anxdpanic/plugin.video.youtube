@@ -439,10 +439,12 @@ class AbstractProvider(object):
             result, new_query = ui.on_keyboard_input(
                 localize('search.rename'), query
             )
-            if result:
-                search_history.del_item(query)
-                search_history.add_item(new_query)
-                ui.refresh_container()
+            if not result:
+                return False, None
+
+            search_history.del_item(query)
+            search_history.add_item(new_query)
+            ui.refresh_container()
             return True, None
 
         if command == 'clear':

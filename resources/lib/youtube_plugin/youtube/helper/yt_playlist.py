@@ -231,11 +231,13 @@ def _process_select_playlist(provider, context):
 
     while 1:
         current_page += 1
-        json_data = function_cache.run(client.get_playlists_of_channel,
-                                       function_cache.ONE_MINUTE // 3,
-                                       _refresh=context.refresh_requested(),
-                                       channel_id='mine',
-                                       page_token=page_token)
+        json_data = function_cache.run(
+            client.get_playlists_of_channel,
+            function_cache.ONE_MINUTE // 3,
+            _refresh=context.refresh_requested(),
+            channel_id='mine',
+            page_token=page_token,
+        )
         if not json_data:
             break
         playlists = json_data.get('items', [])

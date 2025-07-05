@@ -104,7 +104,7 @@ class YouTube(LoginClient):
         if state is not None:
             params['state'] = state
 
-        self.api_request(client='watch_history',
+        self.api_request('watch_history', 'GET',
                          client_data=client_data,
                          params=params,
                          no_content=True,
@@ -126,8 +126,7 @@ class YouTube(LoginClient):
     def remove_playlist(self, playlist_id, **kwargs):
         params = {'id': playlist_id,
                   'mine': True}
-        return self.api_request(method='DELETE',
-                                path='playlists',
+        return self.api_request(method='DELETE', path='playlists',
                                 params=params,
                                 no_content=True,
                                 **kwargs)
@@ -141,8 +140,7 @@ class YouTube(LoginClient):
                 self._language
             ),
         }
-        return self.api_request(method='GET',
-                                path='i18nLanguages',
+        return self.api_request(method='GET', path='i18nLanguages',
                                 params=params,
                                 **kwargs)
 
@@ -155,8 +153,7 @@ class YouTube(LoginClient):
                 self._language
             ),
         }
-        return self.api_request(method='GET',
-                                path='i18nRegions',
+        return self.api_request(method='GET', path='i18nRegions',
                                 params=params,
                                 **kwargs)
 
@@ -170,8 +167,7 @@ class YouTube(LoginClient):
                      'id': playlist_id,
                      'snippet': {'title': new_title},
                      'status': {'privacyStatus': privacy_status}}
-        return self.api_request(method='PUT',
-                                path='playlists',
+        return self.api_request(method='PUT', path='playlists',
                                 params=params,
                                 post_data=post_data,
                                 **kwargs)
@@ -181,8 +177,7 @@ class YouTube(LoginClient):
         post_data = {'kind': 'youtube#playlist',
                      'snippet': {'title': title},
                      'status': {'privacyStatus': privacy_status}}
-        return self.api_request(method='POST',
-                                path='playlists',
+        return self.api_request(method='POST', path='playlists',
                                 params=params,
                                 post_data=post_data,
                                 **kwargs)
@@ -195,8 +190,7 @@ class YouTube(LoginClient):
                 ','.join(video_id)
             ),
         }
-        return self.api_request(method='GET',
-                                path='videos/getRating',
+        return self.api_request(method='GET', path='videos/getRating',
                                 params=params,
                                 do_auth=True,
                                 **kwargs)
@@ -210,8 +204,7 @@ class YouTube(LoginClient):
         """
         params = {'id': video_id,
                   'rating': rating}
-        return self.api_request(method='POST',
-                                path='videos/rate',
+        return self.api_request(method='POST', path='videos/rate',
                                 params=params,
                                 do_auth=True,
                                 no_content=True,
@@ -237,8 +230,7 @@ class YouTube(LoginClient):
                      'snippet': {'playlistId': playlist_id,
                                  'resourceId': {'kind': 'youtube#video',
                                                 'videoId': video_id}}}
-        return self.api_request(method='POST',
-                                path='playlistItems',
+        return self.api_request(method='POST', path='playlistItems',
                                 params=params,
                                 post_data=post_data,
                                 **kwargs)
@@ -249,25 +241,21 @@ class YouTube(LoginClient):
                                    playlist_item_id,
                                    **kwargs):
         params = {'id': playlist_item_id}
-        return self.api_request(method='DELETE',
-                                path='playlistItems',
+        return self.api_request(method='DELETE', path='playlistItems',
                                 params=params,
                                 no_content=True,
                                 **kwargs)
 
     def unsubscribe(self, subscription_id, **kwargs):
         params = {'id': subscription_id}
-        return self.api_request(method='DELETE',
-                                path='subscriptions',
+        return self.api_request(method='DELETE', path='subscriptions',
                                 params=params,
                                 no_content=True,
                                 **kwargs)
 
     def unsubscribe_channel(self, channel_id, **kwargs):
         post_data = {'channelIds': [channel_id]}
-        return self.api_request(client='tv',
-                                method='POST',
-                                path='subscription/unsubscribe',
+        return self.api_request('tv', 'POST', path='subscription/unsubscribe',
                                 post_data=post_data,
                                 **kwargs)
 
@@ -276,8 +264,7 @@ class YouTube(LoginClient):
         post_data = {'kind': 'youtube#subscription',
                      'snippet': {'resourceId': {'kind': 'youtube#channel',
                                                 'channelId': channel_id}}}
-        return self.api_request(method='POST',
-                                path='subscriptions',
+        return self.api_request(method='POST', path='subscriptions',
                                 params=params,
                                 post_data=post_data,
                                 **kwargs)
@@ -303,8 +290,7 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.api_request(method='GET',
-                                path='subscriptions',
+        return self.api_request(method='GET', path='subscriptions',
                                 params=params,
                                 **kwargs)
 
@@ -316,8 +302,7 @@ class YouTube(LoginClient):
                   'hl': self._language}
         if page_token:
             params['pageToken'] = page_token
-        return self.api_request(method='GET',
-                                path='channels',
+        return self.api_request(method='GET', path='channels',
                                 params=params,
                                 **kwargs)
 
@@ -329,8 +314,7 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.api_request(method='GET',
-                                path='guideCategories',
+        return self.api_request(method='GET', path='guideCategories',
                                 params=params,
                                 **kwargs)
 
@@ -342,8 +326,7 @@ class YouTube(LoginClient):
                   'chart': 'mostPopular'}
         if page_token:
             params['pageToken'] = page_token
-        return self.api_request(method='GET',
-                                path='videos',
+        return self.api_request(method='GET', path='videos',
                                 params=params,
                                 **kwargs)
 
@@ -356,8 +339,7 @@ class YouTube(LoginClient):
                   'hl': self._language}
         if page_token:
             params['pageToken'] = page_token
-        return self.api_request(method='GET',
-                                path='videos',
+        return self.api_request(method='GET', path='videos',
                                 params=params,
                                 **kwargs)
 
@@ -369,8 +351,7 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.api_request(method='GET',
-                                path='videoCategories',
+        return self.api_request(method='GET', path='videoCategories',
                                 params=params,
                                 **kwargs)
 
@@ -817,8 +798,7 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.api_request(method='GET',
-                                path='activities',
+        return self.api_request(method='GET', path='activities',
                                 params=params,
                                 **kwargs)
 
@@ -837,8 +817,7 @@ class YouTube(LoginClient):
                 identifier=channel_id,
             )
             params['channelId'] = channel_id
-        return self.api_request(method='GET',
-                                path='channelSections',
+        return self.api_request(method='GET', path='channelSections',
                                 params=params,
                                 **kwargs)
 
@@ -859,8 +838,7 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.api_request(method='GET',
-                                path='playlists',
+        return self.api_request(method='GET', path='playlists',
                                 params=params,
                                 **kwargs)
 
@@ -1003,8 +981,7 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.api_request(method='GET',
-                                path='playlistItems',
+        return self.api_request(method='GET', path='playlistItems',
                                 params=params,
                                 do_auth=do_auth,
                                 **kwargs)
@@ -1043,13 +1020,10 @@ class YouTube(LoginClient):
             handle = True
             params['forHandle'] = identifier
 
-        json_data = self.api_request(
-            method='GET',
-            path='channels',
-            params=params,
-            do_auth=True if mine else False,
-            **kwargs
-        )
+        json_data = self.api_request(method='GET', path='channels',
+                                     params=params,
+                                     do_auth=True if mine else False,
+                                     **kwargs)
         if as_json:
             return json_data
 
@@ -1166,8 +1140,7 @@ class YouTube(LoginClient):
         else:
             params['id'] = ','.join(channel_id)
 
-        return self.api_request(method='GET',
-                                path='channels',
+        return self.api_request(method='GET', path='channels',
                                 params=params,
                                 **kwargs)
 
@@ -1183,8 +1156,7 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.api_request(method='GET',
-                                path='videos',
+        return self.api_request(method='GET', path='videos',
                                 params=params,
                                 do_auth=True,
                                 **kwargs)
@@ -1219,8 +1191,7 @@ class YouTube(LoginClient):
                 max_results
             ),
         }
-        return self.api_request(method='GET',
-                                path='videos',
+        return self.api_request(method='GET', path='videos',
                                 params=params,
                                 **kwargs)
 
@@ -1238,8 +1209,7 @@ class YouTube(LoginClient):
                 max_results
             ),
         }
-        return self.api_request(method='GET',
-                                path='playlists',
+        return self.api_request(method='GET', path='playlists',
                                 params=params,
                                 **kwargs)
 
@@ -1323,15 +1293,11 @@ class YouTube(LoginClient):
                 }
             post_data['context'] = context
 
-        result = self.api_request(
-            client=client or 'web',
-            url='https://www.youtube.com/youtubei/v1/{_endpoint}',
-            path='browse',
-            method='POST',
-            post_data=post_data,
-            do_auth=do_auth,
-            cache=True,
-        )
+        result = self.api_request(client or 'web', 'POST', path='browse',
+                                  url='https://www.youtube.com/youtubei/v1/{_endpoint}',
+                                  post_data=post_data,
+                                  do_auth=do_auth,
+                                  cache=True)
         if not result:
             return {}
 
@@ -1519,8 +1485,7 @@ class YouTube(LoginClient):
                 after
             )
 
-        return self.api_request(method='GET',
-                                path='search',
+        return self.api_request(method='GET', path='search',
                                 params=params,
                                 **kwargs)
 
@@ -1548,11 +1513,14 @@ class YouTube(LoginClient):
                 }
             post_data['context'] = context
 
-        result = self.api_request(client=('tv' if retry == 1 else
-                                          'tv_embed' if retry == 2 else
-                                          'v1'),
-                                  method='POST',
-                                  path='next',
+        related_client = (
+            'tv'
+            if retry == 1 else
+            'tv_embed'
+            if retry == 2 else
+            'v1'
+        )
+        result = self.api_request(related_client, 'POST', path='next',
                                   post_data=post_data,
                                   do_auth=False)
         if not result:
@@ -1829,8 +1797,7 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.api_request(method='GET',
-                                path='commentThreads',
+        return self.api_request(method='GET', path='commentThreads',
                                 params=params,
                                 **kwargs)
 
@@ -1854,8 +1821,7 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.api_request(method='GET',
-                                path='comments',
+        return self.api_request(method='GET', path='comments',
                                 params=params,
                                 **kwargs)
 
@@ -1886,8 +1852,7 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.api_request(method='GET',
-                                path='search',
+        return self.api_request(method='GET', path='search',
                                 params=params,
                                 **kwargs)
 
@@ -2004,8 +1969,7 @@ class YouTube(LoginClient):
                 params['locationRadius'] = settings.get_location_radius()
                 params['type'] = 'video'
 
-        return self.api_request(method='GET',
-                                path='search',
+        return self.api_request(method='GET', path='search',
                                 params=params,
                                 **kwargs)
 
@@ -2110,8 +2074,7 @@ class YouTube(LoginClient):
             search_params['type'] = 'video'
 
         return (params,
-                self.api_request(method='GET',
-                                 path='search',
+                self.api_request(method='GET', path='search',
                                  params=search_params,
                                  **kwargs))
 
@@ -2577,14 +2540,12 @@ class YouTube(LoginClient):
                               _force_cache=force_cache,
                               function_cache=function_cache):
                 json_data = function_cache.run(
-                    self.api_request,
-                    function_cache.ONE_HOUR
-                    if _force_cache or 'pageToken' in _params else
-                    5 * function_cache.ONE_MINUTE,
+                    self.api_request, method='GET', path='subscriptions',
+                    seconds=(function_cache.ONE_HOUR
+                             if _force_cache or 'pageToken' in _params else
+                             5 * function_cache.ONE_MINUTE),
                     _refresh=_refresh,
                     _process=_get_updated_subscriptions,
-                    method='GET',
-                    path='subscriptions',
                     params=_params,
                     **kwargs
                 )

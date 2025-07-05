@@ -11,7 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import time
-from datetime import date, datetime
+from datetime import date as dt_date, datetime as dt_datetime
 from math import log10
 from operator import (
     contains as op_contains,
@@ -1467,7 +1467,7 @@ def filter_parse(item,
                     input_2 = unquote(input_2[1:-1])
                     if input_1 is None:
                         input_1 = ''
-                    elif isinstance(input_1, (date, datetime)):
+                    elif isinstance(input_1, (dt_date, dt_datetime)):
                         input_2 = datetime_parser.parse(input_2)
                 else:
                     input_2 = float(input_2)
@@ -1513,12 +1513,12 @@ def channel_filter_split(filters_string):
     return filters_string, channel_filters, custom_filters
 
 
-def custom_filter_split(filter,
+def custom_filter_split(filter_string,
                         custom_filters,
                         criteria_re=re_compile(
                             r'{?{([^}]+)}{([^}]+)}{([^}]+)}}?'
                         )):
-    criteria = criteria_re.findall(filter)
+    criteria = criteria_re.findall(filter_string)
     if not criteria:
         return True
     custom_filters.append(criteria)
@@ -1527,12 +1527,10 @@ def custom_filter_split(filter,
 
 def update_duplicate_items(item,
                            duplicates,
-                           skip_keys=frozenset((
-                               '_bookmark_id',
-                               '_bookmark_timestamp',
-                               '_callback',
-                               '_track_number',
-                           )),
+                           skip_keys=frozenset(('_bookmark_id',
+                                                '_bookmark_timestamp',
+                                                '_callback',
+                                                '_track_number')),
                            skip_vals=(None, '', -1)):
     item = item.__dict__
     keys = frozenset(item.keys()).difference(skip_keys)

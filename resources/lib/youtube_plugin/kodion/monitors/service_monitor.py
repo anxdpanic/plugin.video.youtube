@@ -281,7 +281,7 @@ class ServiceMonitor(xbmc.Monitor):
                     self.onSettingsChanged(force=True)
                 response = True
 
-            elif target in (FILE_READ, FILE_WRITE):
+            elif target in {FILE_READ, FILE_WRITE}:
                 response = None
                 filepath = data.get('filepath')
                 if filepath:
