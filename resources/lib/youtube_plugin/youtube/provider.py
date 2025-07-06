@@ -47,7 +47,7 @@ from ..kodion.items import (
     VideoItem,
     menu_items,
 )
-from ..kodion.utils import strip_html_from_text, to_unicode
+from ..kodion.utils import parse_item_ids, strip_html_from_text, to_unicode
 from ..kodion.utils.datetime_parser import now
 
 
@@ -1840,24 +1840,30 @@ class Provider(AbstractProvider):
                     partial_result = False
 
                 if yt_id is None:
-                    if isinstance(item, BaseItem):
-                        item_ids = item.parse_item_ids_from_uri()
-                        to_delete = False
-                        for kind in ('video', 'playlist', 'channel'):
-                            yt_id = item_ids.get(kind + '_id')
-                            if not yt_id:
-                                continue
-                            if yt_id == 'None':
-                                to_delete = True
-                                continue
-                            kind = 'youtube#' + kind
-                            partial_result = True
-                            break
-                        else:
-                            if to_delete:
-                                bookmarks_list.del_item(item_id)
+                    item_uri = isinstance(item, BaseItem) and item.get_uri()
+                    if not item_uri:
+                        bookmarks_list.del_item(item_id)
+                        continue
+
+                    item_ids = parse_item_ids(item_uri)
+                    kind = None
+                    for _kind in ('video', 'playlist', 'channel'):
+                        id_type = _kind + '_id'
+                        yt_id = item_ids.get(id_type)
+                        if not yt_id or yt_id == 'None':
                             continue
+                        try:
+                            setattr(item, id_type, yt_id)
+                        except AttributeError:
+                            continue
+                        if kind:
+                            continue
+                        kind = 'youtube#' + _kind
+
+                    if kind:
+                        partial_result = True
                     else:
+                        bookmarks_list.del_item(item_id)
                         continue
 
                 item = {

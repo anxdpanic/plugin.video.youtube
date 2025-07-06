@@ -16,11 +16,9 @@ from datetime import date, datetime
 from .menu_items import separator
 from ..compatibility import (
     datetime_infolabel,
-    parse_qsl,
     string_type,
     to_str,
     unescape,
-    urlsplit,
 )
 from ..constants import MEDIA_PATH
 from ..utils import generate_hash
@@ -90,47 +88,6 @@ class BaseItem(object):
         :return: unique id of the item.
         """
         return generate_hash(self._name, self._uri)
-
-    def parse_item_ids_from_uri(self):
-        if not self._uri:
-            return None
-
-        item_ids = {}
-
-        uri = urlsplit(self._uri)
-        path = uri.path.rstrip('/')
-        params = dict(parse_qsl(uri.query))
-
-        video_id = params.get('video_id')
-        if video_id:
-            item_ids['video_id'] = video_id
-
-        channel_id = None
-        playlist_id = None
-
-        while path:
-            part, _, next_part = path.partition('/')
-            if not next_part:
-                break
-
-            if part == 'channel':
-                channel_id = next_part.partition('/')[0]
-            elif part == 'playlist':
-                playlist_id = next_part.partition('/')[0]
-            path = next_part
-
-        if channel_id:
-            item_ids['channel_id'] = channel_id
-        if playlist_id:
-            item_ids['playlist_id'] = playlist_id
-
-        for item_id, value in item_ids.items():
-            try:
-                setattr(self, item_id, value)
-            except AttributeError:
-                pass
-
-        return item_ids
 
     def set_name(self, name):
         try:

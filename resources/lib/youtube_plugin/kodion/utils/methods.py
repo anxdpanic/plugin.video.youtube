@@ -23,6 +23,7 @@ from ..compatibility import (
     byte_string_type,
     generate_hash,
     parse_qs,
+    parse_qsl,
     string_type,
     urlencode,
     urlsplit,
@@ -45,6 +46,7 @@ __all__ = (
     'make_dirs',
     'merge_dicts',
     'parse_and_redact_uri',
+    'parse_item_ids',
     'redact_auth_header',
     'redact_ip_in_uri',
     'redact_params',
@@ -199,6 +201,35 @@ def find_video_id(plugin_path,
     if match:
         return match.group('video_id')
     return ''
+
+
+def parse_item_ids(uri,
+                   _ids={'video': 'video_id',
+                         'channel': 'channel_id',
+                         'playlist': 'playlist_id'}):
+    item_ids = {}
+    uri = urlsplit(uri)
+
+    path = uri.path.rstrip('/')
+    while path:
+        id_type, _, next_part = path.partition('/')
+        if not next_part:
+            break
+
+        if id_type in _ids:
+            id_value = next_part.partition('/')[0]
+            if id_value:
+                item_ids[_ids[id_type]] = id_value
+
+        path = next_part
+
+    params = dict(parse_qsl(uri.query))
+    for id_type in _ids.values():
+        id_value = params.get(id_type)
+        if id_value:
+            item_ids[id_type] = id_value
+
+    return item_ids
 
 
 def friendly_number(value, precision=3, scale=('', 'K', 'M', 'B'), as_str=True):
