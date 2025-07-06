@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from ...kodion import KodionException
 from ...kodion.constants import PATHS
 from ...kodion.items import menu_items
-from ...kodion.utils import find_video_id
+from ...kodion.utils import parse_item_ids
 
 
 def _process_rate_video(provider,
@@ -40,8 +40,7 @@ def _process_rate_video(provider,
             video_id = re_match.group('video_id')
         except IndexError:
             if context.is_plugin_path(listitem_path, PATHS.PLAY):
-                video_id = find_video_id(listitem_path)
-
+                video_id = parse_item_ids(listitem_path).get('video_id')
             if not video_id:
                 raise KodionException('video/rate/: missing video_id')
 

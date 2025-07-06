@@ -35,7 +35,6 @@ from ..compatibility import (
 
 __all__ = (
     'duration_to_seconds',
-    'find_video_id',
     'fix_subtitle_stream',
     'friendly_number',
     'generate_hash',
@@ -191,16 +190,6 @@ def rm_dir(path):
     except OSError:
         logging.exception(('Failed', 'Path: %r'), path)
     return not xbmcvfs.exists(path)
-
-
-def find_video_id(plugin_path,
-                  video_id_re=re_compile(
-                      r'.*video_id=(?P<video_id>[a-zA-Z0-9_\-]{11}).*'
-                  )):
-    match = video_id_re.search(plugin_path)
-    if match:
-        return match.group('video_id')
-    return ''
 
 
 def parse_item_ids(uri,

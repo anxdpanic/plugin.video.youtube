@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from .utils import get_thumbnail
 from ...kodion import KodionException, logging
 from ...kodion.constants import CHANNEL_ID, PATHS, PLAYLISTITEM_ID, PLAYLIST_ID
-from ...kodion.utils import find_video_id
+from ...kodion.utils import parse_item_ids
 
 
 def _process_add_video(provider, context, keymap_action=False):
@@ -23,7 +23,7 @@ def _process_add_video(provider, context, keymap_action=False):
     if not client.logged_in:
         raise KodionException('Playlist/Add: not logged in')
 
-    playlist_id = context.get_param('playlist_id', '')
+    playlist_id = context.get_param('playlist_id')
     if not playlist_id:
         raise KodionException('Playlist/Add: missing playlist_id')
 
@@ -36,12 +36,13 @@ def _process_add_video(provider, context, keymap_action=False):
     else:
         notify_message = context.localize('playlist.added_to')
 
-    video_id = context.get_param('video_id', '')
+    video_id = context.get_param('video_id')
     if not video_id:
         if context.is_plugin_path(listitem_path, PATHS.PLAY):
-            video_id = find_video_id(listitem_path)
+            video_id = parse_item_ids(listitem_path).get('video_id')
+        if video_id:
             keymap_action = True
-        if not video_id:
+        else:
             raise KodionException('Playlist/Add: missing video_id')
 
     json_data = client.add_video_to_playlist(playlist_id=playlist_id,
@@ -210,9 +211,10 @@ def _process_select_playlist(provider, context):
     video_id = params.get('video_id', '')
     if not video_id:
         if context.is_plugin_path(listitem_path, PATHS.PLAY):
-            video_id = find_video_id(listitem_path)
+            item_ids = parse_item_ids(listitem_path)
+            video_id = item_ids.get('video_id')
             if video_id:
-                context.set_params(video_id=video_id)
+                context.set_params(**item_ids)
                 keymap_action = True
         if not video_id:
             raise KodionException('Playlist/Select: missing video_id')

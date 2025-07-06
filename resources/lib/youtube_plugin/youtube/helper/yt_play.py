@@ -35,11 +35,7 @@ from ...kodion.constants import (
 )
 from ...kodion.items import AudioItem, UriItem, VideoItem
 from ...kodion.network import get_connect_address
-from ...kodion.utils import (
-    datetime_parser,
-    find_video_id,
-    select_stream,
-)
+from ...kodion.utils import datetime_parser, parse_item_ids, select_stream
 
 
 def _play_stream(provider, context):
@@ -316,10 +312,9 @@ def process(provider, context, **_kwargs):
             .isdisjoint(param_keys)):
         listitem_path = context.get_listitem_info('FileNameAndPath')
         if context.is_plugin_path(listitem_path, PATHS.PLAY):
-            video_id = find_video_id(listitem_path)
-            if video_id:
-                context.set_params(video_id=video_id)
-                params['video_id'] = video_id
+            item_ids = parse_item_ids(listitem_path)
+            if 'video_id' in item_ids:
+                context.set_params(**item_ids)
             else:
                 return False
         else:
