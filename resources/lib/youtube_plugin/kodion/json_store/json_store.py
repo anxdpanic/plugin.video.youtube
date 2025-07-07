@@ -75,12 +75,18 @@ class JSONStore(object):
                     to_unicode(_data),
                     log_value='<redacted>',
                 )
-                if self._context.ipc_exec(
-                        FILE_WRITE,
-                        timeout=5,
-                        payload={'filepath': filepath},
-                ) is False:
+                response = self._context.ipc_exec(
+                    FILE_WRITE,
+                    timeout=5,
+                    payload={'filepath': filepath},
+                )
+                if response is False:
                     raise IOError
+                if response is None:
+                    self.log.debug(('Data unchanged', 'File: %s'),
+                                   filepath,
+                                   stacklevel=stacklevel)
+                    return None
             else:
                 with open(filepath, mode='w', encoding='utf-8') as file:
                     file.write(to_unicode(_data))
@@ -112,7 +118,7 @@ class JSONStore(object):
                         timeout=5,
                         payload={'filepath': filepath},
                 ):
-                    data = self._context.get_ui().pop_property(
+                    data = self._context.get_ui().get_property(
                         '-'.join((FILE_READ, filepath)),
                         log_value='<redacted>',
                     )

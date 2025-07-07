@@ -308,19 +308,22 @@ class ServiceMonitor(xbmc.Monitor):
                             response = False
                     else:
                         with write_access:
-                            read_access.clear()
-                            try:
-                                with open(filepath, mode='w',
-                                          encoding='utf-8') as file:
-                                    file.write(self.pop_property(
-                                        '-'.join((FILE_WRITE, filepath)),
-                                        log_value='<redacted>',
-                                    ))
-                                response = True
-                            except (IOError, OSError):
-                                response = False
-                            finally:
-                                read_access.set()
+                            content = self.pop_property(
+                                '-'.join((FILE_WRITE, filepath)),
+                                log_value='<redacted>',
+                            )
+                            response = None
+                            if content:
+                                read_access.clear()
+                                try:
+                                    with open(filepath, mode='w',
+                                              encoding='utf-8') as file:
+                                        file.write(content)
+                                    response = True
+                                except (IOError, OSError):
+                                    response = False
+                                finally:
+                                    read_access.set()
 
             else:
                 return

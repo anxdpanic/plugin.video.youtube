@@ -27,6 +27,7 @@ class APIKeyStore(JSONStore):
 
     def set_defaults(self, reset=False):
         data = {} if reset else self.get_data()
+
         if 'keys' not in data:
             data = {
                 'keys': {
@@ -49,6 +50,7 @@ class APIKeyStore(JSONStore):
             if 'developer' not in keys:
                 keys['developer'] = {}
             data['keys'] = keys
+
         self.save(data)
 
     @staticmethod
