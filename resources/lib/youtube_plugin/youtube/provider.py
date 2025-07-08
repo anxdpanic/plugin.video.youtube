@@ -2081,6 +2081,11 @@ class Provider(AbstractProvider):
                 return False
 
             context.get_watch_later_list().add_item(video_id, item)
+            ui.show_notification(
+                localize('watch_later.added_to'),
+                time_ms=2500,
+                audible=False,
+            )
             return True
 
         if command == 'remove':
