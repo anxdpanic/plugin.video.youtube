@@ -1555,7 +1555,9 @@ class Provider(AbstractProvider):
                 watch_history_item = DirectoryItem(
                     localize('history'),
                     create_uri(
-                        (PATHS.CHANNEL, 'mine', 'playlist', history_id,),
+                        PATHS.HISTORY_LIST
+                        if history_id.lower() == 'hl' else
+                        (PATHS.CHANNEL, 'mine', PATHS.PLAYLIST, history_id)
                     ),
                     image='{media}/history.png',
                 )

@@ -371,21 +371,24 @@ class AccessManager(JSONStore):
         Returns the current users watch history playlist id
         :return: the current users watch history playlist id
         """
-        current_id = (self.get_current_user_details().get('watch_history')
-                      or 'HL').strip()
+
+        current_id = self.get_current_user_details().get('watch_history', '')
+        current_id = current_id.strip()
+        current_id_lower = current_id.lower()
 
         settings = self._context.get_settings()
         settings_id = settings.get_history_playlist()
+        settings_id_lower = settings_id.lower()
 
-        if settings_id.lower() == 'hl':
+        if settings_id_lower == 'local':
             current_id = self.set_watch_history_id(None)
-        elif settings_id and settings_id != current_id:
+        elif settings_id and settings_id_lower != current_id_lower:
             current_id = self.set_watch_history_id(settings_id)
-        elif current_id:
-            if current_id.lower() == 'hl':
-                current_id = ''
-            elif settings_id:
-                settings.set_history_playlist('')
+        elif current_id_lower == 'local':
+            current_id = ''
+
+        if settings_id:
+            settings.set_history_playlist('')
 
         return current_id
 

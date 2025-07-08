@@ -592,6 +592,53 @@ def _process_virtual_list(provider, context, client, playlist_id=None):
     return result, options
 
 
+def _process_history_list(provider, context, client):
+    params = context.get_params()
+
+    context.parse_params({
+        'channel_id': 'mine',
+        'playlist_id': 'HL',
+    })
+    browse_id = 'FEhistory'
+
+    json_data = client.get_browse_items(
+        browse_id=browse_id,
+        client='tv',
+        do_auth=True,
+        visitor=params.get('visitor'),
+        page_token=params.get('page_token'),
+        click_tracking=params.get('click_tracking'),
+        json_path=client.JSON_PATHS['tv_grid'],
+    )
+    if not json_data:
+        return False, None
+
+    filler = partial(
+        client.get_browse_items,
+        browse_id=browse_id,
+        client='tv',
+        do_auth=True,
+        json_path=client.JSON_PATHS['tv_grid'],
+    )
+    json_data['_pre_filler'] = filler
+    json_data['_post_filler'] = filler
+
+    result = v3.response_to_items(
+        provider,
+        context,
+        json_data,
+        allow_duplicates=False,
+    )
+    options = {
+        provider.CONTENT_TYPE: {
+            'content_type': CONTENT.VIDEO_CONTENT,
+            'sub_type': None,
+            'category_label': None,
+        },
+    }
+    return result, options
+
+
 def process(provider, context, re_match=None, category=None, sub_category=None):
     if re_match:
         if category is None:
@@ -650,6 +697,9 @@ def process(provider, context, re_match=None, category=None, sub_category=None):
 
     if category == 'saved_playlists':
         return _process_saved_playlists(provider, context, client)
+
+    if category == 'history':
+        return _process_history_list(provider, context, client)
 
     if category == 'playlist':
         return _process_virtual_list(provider, context, client, sub_category)
