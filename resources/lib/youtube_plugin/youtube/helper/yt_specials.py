@@ -107,25 +107,37 @@ def _process_recommendations(provider, context, client):
     function_cache = context.get_function_cache()
     refresh = context.refresh_requested()
     params = context.get_params()
-    # source = client.get_recommended_for_home_tv
-    source = client.get_recommended_for_home_vr
+
+    browse_id = 'FEwhat_to_watch'
+    # browse_client = 'tv'
+    # browse_paths = client.JSON_PATHS['tv_shelf_horizontal']
+    browse_client = 'android_vr'
+    browse_paths = client.JSON_PATHS['vr_shelf']
 
     json_data = function_cache.run(
-        source,
+        client.get_browse_items,
         function_cache.ONE_HOUR,
         _refresh=refresh,
-        visitor=params.get('visitor'),
+        browse_id=browse_id,
+        client=browse_client,
+        do_auth=True,
         page_token=params.get('page_token'),
         click_tracking=params.get('click_tracking'),
+        visitor=params.get('visitor'),
+        json_path=browse_paths,
     )
     if not json_data:
         return False, None
 
     filler = partial(
         function_cache.run,
-        source,
+        client.get_browse_items,
         function_cache.ONE_HOUR,
         _refresh=refresh,
+        browse_id=browse_id,
+        client=browse_client,
+        do_auth=True,
+        json_path=browse_paths,
     )
     json_data['_pre_filler'] = filler
     json_data['_post_filler'] = filler
@@ -394,15 +406,27 @@ def _process_description_links(provider, context):
 def _process_saved_playlists(provider, context, client):
     params = context.get_params()
 
-    json_data = client.get_saved_playlists(
+    json_data = client.get_browse_items(
+        browse_id='FEplaylist_aggregation',
+        client='tv',
+        response_type='playlists',
+        do_auth=True,
         page_token=params.get('page_token'),
         click_tracking=params.get('click_tracking'),
         visitor=params.get('visitor'),
+        json_path=client.JSON_PATHS['tv_grid'],
     )
     if not json_data:
         return False, None
 
-    filler = client.get_saved_playlists
+    filler = partial(
+        client.get_browse_items,
+        browse_id='FEplaylist_aggregation',
+        client='tv',
+        response_type='playlists',
+        do_auth=True,
+        json_path=client.JSON_PATHS['tv_grid'],
+    )
     json_data['_pre_filler'] = filler
     json_data['_post_filler'] = filler
 
@@ -530,18 +554,24 @@ def _process_virtual_list(provider, context, client, playlist_id=None):
     })
     browse_id = 'VL' + playlist_id
 
-    json_data = client.get_virtual_list_items(
+    json_data = client.get_browse_items(
         browse_id=browse_id,
+        client='tv',
+        do_auth=True,
         visitor=params.get('visitor'),
         page_token=params.get('page_token'),
         click_tracking=params.get('click_tracking'),
+        json_path=client.JSON_PATHS['tv_playlist'],
     )
     if not json_data:
         return False, None
 
     filler = partial(
-        client.get_virtual_list_items,
+        client.get_browse_items,
         browse_id=browse_id,
+        client='tv',
+        do_auth=True,
+        json_path=client.JSON_PATHS['tv_playlist'],
     )
     json_data['_pre_filler'] = filler
     json_data['_post_filler'] = filler
