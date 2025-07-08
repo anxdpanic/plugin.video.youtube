@@ -1750,7 +1750,8 @@ class YouTube(LoginClient):
                             )),
                         },
                     })
-                elif content_type == 'LOCKUP_CONTENT_TYPE_PLAYLIST':
+                elif content_type in {'LOCKUP_CONTENT_TYPE_PLAYLIST',
+                                      'LOCKUP_CONTENT_TYPE_PODCAST'}:
                     items.append({
                         'kind': 'youtube#playlist',
                         'id': new_content_id,
