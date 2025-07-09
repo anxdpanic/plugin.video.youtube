@@ -213,7 +213,7 @@ def playlist_shuffle(context, playlist_id):
     )
 
 
-def playlist_add_to(context, video_id):
+def playlist_add_to_selected(context, video_id):
     return (
         context.localize('video.add_to_playlist'),
         context.create_uri(
@@ -566,7 +566,7 @@ def media_play_timeshift(context, video_id):
     )
 
 
-def history_remove(context, video_id, video_name=''):
+def history_local_remove(context, video_id, video_name=''):
     return (
         context.localize('history.remove'),
         context.create_uri(
@@ -580,7 +580,7 @@ def history_remove(context, video_id, video_name=''):
     )
 
 
-def history_clear(context):
+def history_local_clear(context):
     return (
         context.localize('history.clear'),
         context.create_uri(
@@ -590,7 +590,7 @@ def history_clear(context):
     )
 
 
-def history_mark_as(context, video_id):
+def history_local_mark_as(context, video_id):
     return (
         '$INFO[Window(Home).Property({addon_id}-{label_property})]'.format(
             addon_id=ADDON_ID,
@@ -606,7 +606,7 @@ def history_mark_as(context, video_id):
     )
 
 
-def history_mark_watched(context, video_id):
+def history_local_mark_watched(context, video_id):
     return (
         context.localize('history.mark.watched'),
         context.create_uri(
@@ -619,7 +619,7 @@ def history_mark_watched(context, video_id):
     )
 
 
-def history_mark_unwatched(context, video_id):
+def history_local_mark_unwatched(context, video_id):
     return (
         context.localize('history.mark.unwatched'),
         context.create_uri(
@@ -632,7 +632,7 @@ def history_mark_unwatched(context, video_id):
     )
 
 
-def history_reset_resume(context, video_id):
+def history_local_reset_resume(context, video_id):
     return (
         context.localize('history.reset.resume_point'),
         context.create_uri(

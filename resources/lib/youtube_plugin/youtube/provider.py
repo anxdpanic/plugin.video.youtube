@@ -1228,10 +1228,10 @@ class Provider(AbstractProvider):
                         '_partial': True,
                         '_context_menu': {
                             'context_menu': (
-                                menu_items.history_remove(
+                                menu_items.history_local_remove(
                                     context, video_id
                                 ),
-                                menu_items.history_clear(
+                                menu_items.history_local_clear(
                                     context
                                 ),
                             ),
@@ -1584,7 +1584,7 @@ class Provider(AbstractProvider):
                     image='{media}/history.png',
                 )
                 context_menu = [
-                    menu_items.history_clear(
+                    menu_items.history_local_clear(
                         context
                     ),
                     menu_items.separator(),

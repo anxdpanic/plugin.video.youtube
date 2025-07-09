@@ -1102,14 +1102,14 @@ def update_video_items(provider, context, video_id_dict,
 
         if use_play_data:
             context_menu.append(
-                menu_items.history_mark_as(
+                menu_items.history_local_mark_as(
                     context, video_id
                 )
             )
             if play_data and (play_data.get('played_percent', 0) > 0
                               or play_data.get('played_time', 0) > 0):
                 context_menu.append(
-                    menu_items.history_reset_resume(
+                    menu_items.history_local_reset_resume(
                         context, video_id
                     )
                 )

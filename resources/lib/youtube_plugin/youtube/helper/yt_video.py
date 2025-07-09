@@ -107,7 +107,7 @@ def _process_more_for_video(context):
         raise KodionException('video/more/: missing video_id')
 
     items = [
-        menu_items.playlist_add_to(context, video_id),
+        menu_items.playlist_add_to_selected(context, video_id),
         menu_items.video_related(context, video_id),
         menu_items.video_comments(context, video_id, params.get('item_name')),
         menu_items.video_description_links(context, video_id),
