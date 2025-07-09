@@ -38,6 +38,9 @@ from ...kodion.utils import (
 )
 
 
+# RegExp used to match plugin playlist paths of the form:
+# /channel/[CHANNEL_ID]/playlist/[PLAYLIST_ID]/
+# /playlist/[PLAYLIST_ID]/
 __RE_PLAYLIST = re_compile(
     r'^(/channel/(?P<channel_id>[^/]+))/playlist/(?P<playlist_id>[^/]+)/?$'
 )
@@ -379,9 +382,12 @@ def update_playlist_items(provider, context, playlist_id_dict,
         return
 
     access_manager = context.get_access_manager()
-    custom_watch_later_id = access_manager.get_watch_later_id()
     custom_history_id = access_manager.get_watch_history_id()
     logged_in = provider.get_client(context).logged_in
+    if logged_in:
+        watch_later_id = access_manager.get_watch_later_id()
+    else:
+        watch_later_id = ''
 
     settings = context.get_settings()
     show_details = settings.show_detailed_description()
@@ -407,23 +413,17 @@ def update_playlist_items(provider, context, playlist_id_dict,
     path = context.get_path()
     ui = context.get_ui()
 
+    in_bookmarks_list = False
+    in_my_playlists = False
+    in_saved_playlists = False
+
     # if the path directs to a playlist of our own, set channel id to 'mine'
     if path.startswith(PATHS.MY_PLAYLISTS):
-        in_bookmarks_list = False
         in_my_playlists = True
-        in_saved_playlists = False
     elif path.startswith(PATHS.BOOKMARKS):
         in_bookmarks_list = True
-        in_my_playlists = False
-        in_saved_playlists = False
     elif path.startswith(PATHS.SAVED_PLAYLISTS):
-        in_bookmarks_list = False
-        in_my_playlists = False
         in_saved_playlists = True
-    else:
-        in_bookmarks_list = False
-        in_my_playlists = False
-        in_saved_playlists = False
 
     for playlist_id, yt_item in data.items():
         playlist_item = playlist_id_dict.get(playlist_id)
@@ -527,7 +527,7 @@ def update_playlist_items(provider, context, playlist_id_dict,
                 menu_items.watch_later_list_unassign(
                     context, playlist_id, title
                 )
-                if playlist_id == custom_watch_later_id else
+                if playlist_id == watch_later_id else
                 # set as my custom watch later playlist
                 menu_items.watch_later_list_assign(
                     context, playlist_id, title
@@ -625,7 +625,7 @@ def update_video_items(provider, context, video_id_dict,
     if logged_in:
         watch_later_id = context.get_access_manager().get_watch_later_id()
     else:
-        watch_later_id = None
+        watch_later_id = ''
 
     settings = context.get_settings()
     alternate_player = settings.support_alternative_player()
@@ -660,46 +660,26 @@ def update_video_items(provider, context, video_id_dict,
     playlist_id = None
     playlist_channel_id = None
 
+    in_bookmarks_list = False
+    in_my_subscriptions_list = False
+    in_watch_later_list = False
+
     if path.startswith(PATHS.MY_SUBSCRIPTIONS):
-        in_bookmarks_list = False
         in_my_subscriptions_list = True
-        in_watched_later_list = False
     elif path.startswith(PATHS.WATCH_LATER):
-        in_bookmarks_list = False
-        in_my_subscriptions_list = False
-        in_watched_later_list = True
+        in_watch_later_list = True
     elif path.startswith(PATHS.BOOKMARKS):
         in_bookmarks_list = True
-        in_my_subscriptions_list = False
-        in_watched_later_list = False
     elif path.startswith(PATHS.VIRTUAL_PLAYLIST):
         playlist_id = params.get('playlist_id')
         playlist_channel_id = 'mine'
-
-        in_bookmarks_list = False
-        in_my_subscriptions_list = False
         if playlist_id and playlist_id.lower() == watch_later_id.lower():
-            in_watched_later_list = True
-        else:
-            in_watched_later_list = False
+            in_watch_later_list = True
     else:
-        """
-                Play all videos of the playlist.
-
-                /channel/[CHANNEL_ID]/playlist/[PLAYLIST_ID]/
-                /playlist/[PLAYLIST_ID]/
-                """
         playlist_match = __RE_PLAYLIST.match(path)
         if playlist_match:
             playlist_id = playlist_match.group('playlist_id')
             playlist_channel_id = playlist_match.group('channel_id')
-
-        in_bookmarks_list = False
-        in_my_subscriptions_list = False
-        if playlist_id and playlist_id.lower() == watch_later_id.lower():
-            in_watched_later_list = True
-        else:
-            in_watched_later_list = False
 
     media_items = None
     media_item = None
@@ -996,17 +976,11 @@ def update_video_items(provider, context, video_id_dict,
 
         item_playlist_id = playlist_id or media_item.playlist_id
 
-        # provide 'remove' in my playlists that have a real playlist_id
+        # provide 'remove' in own playlists or virtual lists
         if (item_playlist_id
                 and logged_in
                 and playlist_channel_id == 'mine'):
             context_menu = [
-                menu_items.watch_later_remove(
-                    context,
-                    video_id=video_id,
-                    video_name=title,
-                )
-                if in_watched_later_list else
                 menu_items.playlist_remove_from(
                     context,
                     playlist_id=item_playlist_id,
@@ -1044,12 +1018,12 @@ def update_video_items(provider, context, video_id_dict,
             ))
 
         # add 'Watch Later' only if we are not in my 'Watch Later' list
-        if not available or in_watched_later_list:
+        if not available or in_watch_later_list:
             pass
         elif watch_later_id:
             context_menu.append(
-                menu_items.watch_later_add(
-                    context, video_id
+                menu_items.playlist_add_to(
+                    context, video_id, watch_later_id
                 )
             )
         else:

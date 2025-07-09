@@ -37,7 +37,7 @@ class YouTube(LoginClient):
     log = logging.getLogger(__name__)
 
     _max_results = 50
-    _VIRTUAL_LISTS = frozenset(('wl', 'll'))
+    _VIRTUAL_LISTS = frozenset(('WL', 'LL', 'HL'))
     JSON_PATHS = {
         'tv_grid': {
             'items': (
@@ -508,28 +508,36 @@ class YouTube(LoginClient):
                                 **kwargs)
 
     def add_video_to_playlist(self, playlist_id, video_id, **kwargs):
-        if playlist_id and playlist_id.lower() in self._VIRTUAL_LISTS:
+        playlist_id_upper = playlist_id.upper()
+        if playlist_id_upper not in self._VIRTUAL_LISTS:
+            params = {'part': 'snippet',
+                      'mine': True}
+            post_data = {'kind': 'youtube#playlistItem',
+                         'snippet': {'playlistId': playlist_id,
+                                     'resourceId': {'kind': 'youtube#video',
+                                                    'videoId': video_id}}}
+            return self.api_request(method='POST', path='playlistItems',
+                                    params=params,
+                                    post_data=post_data,
+                                    **kwargs)
+
+        if playlist_id_upper == 'WL':
             post_data = {
-                'playlistId': playlist_id.upper(),
+                'playlistId': playlist_id_upper,
                 'actions': [{
                     'addedVideoId': video_id,
                     # 'setVideoId': '',
                     'action': 'ACTION_ADD_VIDEO',
                 }],
             }
-            return self.api_request('tv', 'POST', path='browse/edit_playlist',
-                                    post_data=post_data,
-                                    do_auth=True,
-                                    **kwargs)
-        params = {'part': 'snippet',
-                  'mine': True}
-        post_data = {'kind': 'youtube#playlistItem',
-                     'snippet': {'playlistId': playlist_id,
-                                 'resourceId': {'kind': 'youtube#video',
-                                                'videoId': video_id}}}
-        return self.api_request(method='POST', path='playlistItems',
-                                params=params,
+            path = 'browse/edit_playlist'
+
+        else:
+            return False
+
+        return self.api_request('tv', 'POST', path=path,
                                 post_data=post_data,
+                                do_auth=True,
                                 **kwargs)
 
     # noinspection PyUnusedLocal
@@ -537,34 +545,38 @@ class YouTube(LoginClient):
                                    playlist_id,
                                    playlist_item_id,
                                    **kwargs):
-        if playlist_id and playlist_id.lower() in self._VIRTUAL_LISTS:
-            playlist_id = playlist_id.upper()
-            if playlist_id == 'WL':
-                post_data = {
-                    'playlistId': playlist_id,
-                    'actions': [{
-                        'removedVideoId': playlist_item_id,
-                        'action': 'ACTION_REMOVE_VIDEO_BY_VIDEO_ID',
-                    }],
-                }
-                return self.api_request('tv', 'POST', path='browse/edit_playlist',
-                                        post_data=post_data,
-                                        do_auth=True,
-                                        **kwargs)
-            if playlist_id == 'LL':
-                post_data = {
-                    'target': {
-                        'videoId': playlist_item_id,
-                    },
-                }
-                return self.api_request('tv', 'POST', path='like/removelike',
-                                        post_data=post_data,
-                                        do_auth=True,
-                                        **kwargs)
-        params = {'id': playlist_item_id}
-        return self.api_request(method='DELETE', path='playlistItems',
-                                params=params,
-                                no_content=True,
+        playlist_id_upper = playlist_id.upper() if playlist_id else ''
+        if playlist_id_upper not in self._VIRTUAL_LISTS:
+            params = {'id': playlist_item_id}
+            return self.api_request(method='DELETE', path='playlistItems',
+                                    params=params,
+                                    no_content=True,
+                                    **kwargs)
+
+        if playlist_id_upper == 'WL':
+            post_data = {
+                'playlistId': playlist_id_upper,
+                'actions': [{
+                    'removedVideoId': playlist_item_id,
+                    'action': 'ACTION_REMOVE_VIDEO_BY_VIDEO_ID',
+                }],
+            }
+            path = 'browse/edit_playlist'
+
+        elif playlist_id_upper == 'LL':
+            post_data = {
+                'target': {
+                    'videoId': playlist_item_id,
+                },
+            }
+            path = 'like/removelike'
+
+        else:
+            return False
+
+        return self.api_request('tv', 'POST', path=path,
+                                post_data=post_data,
+                                do_auth=True,
                                 **kwargs)
 
     def unsubscribe(self, subscription_id, **kwargs):
@@ -1042,31 +1054,39 @@ class YouTube(LoginClient):
                            do_auth=None,
                            max_results=None,
                            **kwargs):
-        if playlist_id and playlist_id.lower() in self._VIRTUAL_LISTS:
-            return self.get_browse_items(
-                browse_id='VL' + playlist_id.upper(),
-                client='tv',
-                do_auth=True,
-                page_token=page_token,
-                json_path=self.JSON_PATHS['tv_playlist'],
-            )
-        # prepare params
-        params = {
-            'part': 'snippet',
-            'maxResults': (
-                self.max_results()
-                if max_results is None else
-                max_results
-            ),
-            'playlistId': playlist_id,
-        }
-        if page_token:
-            params['pageToken'] = page_token
+        playlist_id_upper = playlist_id.upper()
+        if playlist_id_upper not in self._VIRTUAL_LISTS:
+            params = {
+                'part': 'snippet',
+                'maxResults': (
+                    self.max_results()
+                    if max_results is None else
+                    max_results
+                ),
+                'playlistId': playlist_id,
+            }
+            if page_token:
+                params['pageToken'] = page_token
 
-        return self.api_request(method='GET', path='playlistItems',
-                                params=params,
-                                do_auth=do_auth,
-                                **kwargs)
+            return self.api_request(method='GET', path='playlistItems',
+                                    params=params,
+                                    do_auth=do_auth,
+                                    **kwargs)
+
+        if playlist_id_upper == 'HL':
+            browse_id = 'FEhistory'
+            json_path = self.JSON_PATHS['tv_grid']
+        else:
+            browse_id = 'VL' + playlist_id_upper
+            json_path = self.JSON_PATHS['tv_playlist']
+
+        return self.get_browse_items(
+            browse_id=browse_id,
+            client='tv',
+            do_auth=True,
+            page_token=page_token,
+            json_path=json_path,
+        )
 
     def get_channel_by_identifier(self,
                                   identifier,

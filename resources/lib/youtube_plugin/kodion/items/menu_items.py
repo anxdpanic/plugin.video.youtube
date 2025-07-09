@@ -213,6 +213,20 @@ def playlist_shuffle(context, playlist_id):
     )
 
 
+def playlist_add_to(context, video_id, playlist_id):
+    return (
+        context.localize('watch_later.add'),
+        context.create_uri(
+            (PATHS.PLAYLIST, 'add', 'video',),
+            {
+                'playlist_id': playlist_id,
+                'video_id': video_id,
+            },
+            run=True,
+        ),
+    )
+
+
 def playlist_add_to_selected(context, video_id):
     return (
         context.localize('video.add_to_playlist'),
@@ -393,35 +407,6 @@ def video_rate(context, video_id, refresh=False):
         context.create_uri(
             ('video', 'rate',),
             params,
-            run=True,
-        ),
-    )
-
-
-def watch_later_add(context, video_id):
-    return (
-        context.localize('watch_later.add'),
-        context.create_uri(
-            (PATHS.PLAYLIST, 'add', 'video',),
-            {
-                'playlist_id': 'watch_later',
-                'video_id': video_id,
-            },
-            run=True,
-        ),
-    )
-
-
-def watch_later_remove(context, video_id, video_name=''):
-    return (
-        context.localize('watch_later.remove'),
-        context.create_uri(
-            (PATHS.PLAYLIST, 'remove', 'video',),
-            {
-                'playlist_id': 'watch_later',
-                'video_id': video_id,
-                'item_name': video_name,
-            },
             run=True,
         ),
     )
