@@ -252,14 +252,14 @@ def _process_select_playlist(provider, context):
 
         items = []
         if current_page == 1:
-            # create playlist
+            # Create a new playlist
             items.append((
                 ui.bold(context.localize('playlist.create')), '',
                 'playlist.create',
                 default_thumb,
             ))
 
-            # add the 'Watch Later' playlist
+            # Add the 'Watch Later' playlist
             if watch_later_id:
                 items.append((
                     ui.bold(context.localize('watch_later')), '',
@@ -267,8 +267,9 @@ def _process_select_playlist(provider, context):
                     context.create_resource_path('media', 'watch_later.png')
                 ))
 
-            # add the 'History' playlist
-            if watch_history_id:
+            # Add the custom 'History' playlist
+            # Can't directly add items to the YouTube Watch History list
+            if watch_history_id and watch_history_id.upper() != 'HL':
                 items.append((
                     ui.bold(context.localize('history')), '',
                     watch_history_id,
@@ -315,7 +316,7 @@ def _process_select_playlist(provider, context):
             playlist_id = result
 
         if playlist_id:
-            new_params = dict(context.get_params(), playlist_id=playlist_id)
+            new_params = dict(params, playlist_id=playlist_id)
             new_context = context.clone(new_params=new_params)
             _process_add_video(provider, new_context, keymap_action)
         break

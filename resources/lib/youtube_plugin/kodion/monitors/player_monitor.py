@@ -292,7 +292,7 @@ class PlayerMonitorThread(threading.Thread):
 
         if logged_in and not refresh_only:
             history_id = access_manager.get_watch_history_id()
-            if history_id:
+            if history_id and history_id.lower() != 'hl':
                 client.add_video_to_playlist(history_id, video_id)
 
             # rate video

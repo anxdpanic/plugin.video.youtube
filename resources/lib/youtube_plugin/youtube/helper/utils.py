@@ -382,11 +382,12 @@ def update_playlist_items(provider, context, playlist_id_dict,
         return
 
     access_manager = context.get_access_manager()
-    custom_history_id = access_manager.get_watch_history_id()
     logged_in = provider.get_client(context).logged_in
     if logged_in:
+        history_id = access_manager.get_watch_history_id()
         watch_later_id = access_manager.get_watch_later_id()
     else:
+        history_id = ''
         watch_later_id = ''
 
     settings = context.get_settings()
@@ -536,7 +537,7 @@ def update_playlist_items(provider, context, playlist_id_dict,
                 menu_items.history_list_unassign(
                     context, playlist_id, title
                 )
-                if playlist_id == custom_history_id else
+                if playlist_id == history_id else
                 # set as custom history playlist
                 menu_items.history_list_assign(
                     context, playlist_id, title
@@ -662,6 +663,7 @@ def update_video_items(provider, context, video_id_dict,
 
     in_bookmarks_list = False
     in_my_subscriptions_list = False
+    in_watch_history_list = False
     in_watch_later_list = False
 
     if path.startswith(PATHS.MY_SUBSCRIPTIONS):
@@ -670,6 +672,10 @@ def update_video_items(provider, context, video_id_dict,
         in_watch_later_list = True
     elif path.startswith(PATHS.BOOKMARKS):
         in_bookmarks_list = True
+    elif path.startswith(PATHS.HISTORY_LIST):
+        playlist_id = params.get('playlist_id')
+        playlist_channel_id = 'mine'
+        in_watch_history_list = True
     elif path.startswith(PATHS.VIRTUAL_PLAYLIST):
         playlist_id = params.get('playlist_id')
         playlist_channel_id = 'mine'
@@ -976,8 +982,10 @@ def update_video_items(provider, context, video_id_dict,
 
         item_playlist_id = playlist_id or media_item.playlist_id
 
-        # provide 'remove' in own playlists or virtual lists
-        if (item_playlist_id
+        # Provide 'remove' in own playlists or virtual lists, except the
+        # YouTube Watch History list as that does not support direct edits
+        if (not in_watch_history_list
+                and item_playlist_id
                 and logged_in
                 and playlist_channel_id == 'mine'):
             context_menu = [
