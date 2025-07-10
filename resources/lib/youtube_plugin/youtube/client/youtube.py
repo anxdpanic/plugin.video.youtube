@@ -2888,7 +2888,7 @@ class YouTube(LoginClient):
             raise InvalidJSON(exc, **kwargs)
 
         if 'error' in json_data:
-            kwargs.setdefault('pass_data', True)
+            kwargs.setdefault('pass_data', False)
             raise YouTubeException('"error" in response JSON data',
                                    json_data=json_data,
                                    **kwargs)
@@ -3063,7 +3063,7 @@ class YouTube(LoginClient):
         if context.get_settings().log_level() & 2:
             kwargs.setdefault('extended_debug', True)
         return self.request(response_hook=self._response_hook,
-                            response_hook_kwargs=kwargs,
+                            event_hook_kwargs=kwargs,
                             error_hook=self._error_hook,
                             stacklevel=3,
                             cache=cache,

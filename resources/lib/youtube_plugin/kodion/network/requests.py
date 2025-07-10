@@ -150,8 +150,8 @@ class BaseRequestsClass(object):
                 # See _response_hook and _error_hook in login_client.py
                 # for example usage
                 response_hook=None,
-                response_hook_kwargs=None,
                 error_hook=None,
+                event_hook_kwargs=None,
                 error_title=None,
                 error_info=None,
                 raise_exc=False,
@@ -227,6 +227,9 @@ class BaseRequestsClass(object):
                                    timestamp=timestamp,
                                    stacklevel=stacklevel)
 
+        if event_hook_kwargs is None:
+            event_hook_kwargs = {}
+
         try:
             if prepared_request:
                 response = self._session.send(
@@ -248,10 +251,8 @@ class BaseRequestsClass(object):
             if cached_response is None or status_code != 304:
                 timestamp = response.headers.get('Date')
                 if response_hook:
-                    if response_hook_kwargs is None:
-                        response_hook_kwargs = {}
-                    response_hook_kwargs['response'] = response
-                    etag, response = response_hook(**response_hook_kwargs)
+                    event_hook_kwargs['response'] = response
+                    etag, response = response_hook(**event_hook_kwargs)
                 else:
                     etag = None
                     response.raise_for_status()
@@ -271,11 +272,12 @@ class BaseRequestsClass(object):
 
             log_msg = [
                 '{title}',
-                'URL:       {method} {url}',
-                'Status:    {response_status} - {response_reason}',
-                'Response:  {response_text}',
+                'URL:      {method} {url}',
+                'Status:   {response_status} - {response_reason}',
+                'Response: {response_text}',
             ]
 
+            kwargs.update(event_hook_kwargs)
             kwargs['exc'] = exc
             kwargs['response'] = exc_response
 
@@ -293,7 +295,8 @@ class BaseRequestsClass(object):
                     kwargs.update(_detail)
                 if _response is not None:
                     response = _response
-                    response_text = repr(_response)
+                    if response and not response_text:
+                        response_text = repr(_response)
                 if _exc is not None:
                     raise_exc = _exc
 
