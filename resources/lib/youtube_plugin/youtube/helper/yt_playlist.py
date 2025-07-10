@@ -38,21 +38,29 @@ def _process_add_video(provider, context, keymap_action=False):
         else:
             raise KodionException('Playlist/Add: missing video_id')
 
-    success = client.add_video_to_playlist(playlist_id=playlist_id,
-                                           video_id=video_id)
+    ui = context.get_ui()
+    localize = context.localize
+    success = client.add_video_to_playlist(playlist_id, video_id)
     if not success:
         logging.debug('Playlist/Add: failed for playlist {playlist_id!r}'
                       .format(playlist_id=playlist_id))
+        ui.show_notification(
+            message=(localize('failed.x')
+                     % localize('add.to.x')
+                     % localize('playlist')),
+            time_ms=2500,
+            audible=False,
+        )
         return False
 
-    context.get_ui().show_notification(
-        message=context.localize('added.to.x') % context.localize('playlist'),
+    ui.show_notification(
+        message=localize('added.to.x') % localize('playlist'),
         time_ms=2500,
         audible=False,
     )
 
     if keymap_action:
-        context.get_ui().set_focus_next_item()
+        ui.set_focus_next_item()
 
     data_cache = context.get_data_cache()
     playlist_cache = data_cache.get_item_like(','.join((playlist_id, '%')))
@@ -125,6 +133,7 @@ def _process_remove_video(provider,
         return False
 
     ui = context.get_ui()
+    localize = context.localize
     if confirmed or ui.on_remove_content(video_name):
         success = provider.get_client(context).remove_video_from_playlist(
             playlist_item_id=video_id,
@@ -132,15 +141,16 @@ def _process_remove_video(provider,
         )
         if not success:
             ui.show_notification(
-                message=context.localize('failed'),
+                message=(localize('failed.x')
+                         % localize('remove.from.x')
+                         % localize('playlist')),
                 time_ms=2500,
                 audible=False,
             )
             return False
 
         ui.show_notification(
-            message=(context.localize('removed.from.x')
-                     % context.localize('playlist')),
+            message=localize('removed.from.x') % localize('playlist'),
             time_ms=2500,
             audible=False,
         )
@@ -173,6 +183,7 @@ def _process_remove_playlist(provider, context):
 
     params = context.get_params()
     ui = context.get_ui()
+    localize = context.localize
 
     playlist_id = params.get('playlist_id', '')
     if not playlist_id:
@@ -183,9 +194,22 @@ def _process_remove_playlist(provider, context):
         raise KodionException('Playlist/Remove: missing playlist_name')
 
     if ui.on_delete_content(playlist_name):
-        json_data = provider.get_client(context).remove_playlist(playlist_id)
-        if not json_data:
+        success = provider.get_client(context).remove_playlist(playlist_id)
+        if not success:
+            ui.show_notification(
+                message=(localize('failed.x')
+                         % localize('remove.x')
+                         % localize('playlist')),
+                time_ms=2500,
+                audible=False,
+            )
             return False
+
+        ui.show_notification(
+            message=localize('removed.name.x') % playlist_name,
+            time_ms=2500,
+            audible=False,
+        )
 
         if channel_id:
             data_cache = context.get_data_cache()
@@ -326,22 +350,36 @@ def _process_select_playlist(provider, context):
 def _process_rename_playlist(provider, context):
     params = context.get_params()
     ui = context.get_ui()
+    localize = context.localize
 
     playlist_id = params.get('playlist_id', '')
     if not playlist_id:
         raise KodionException('Playlist/Rename: missing playlist_id')
 
     result, text = ui.on_keyboard_input(
-        context.localize('rename'), default=params.get('item_name', ''),
+        localize('rename'), default=params.get('item_name', ''),
     )
     if not result or not text:
         return False
 
-    json_data = provider.get_client(context).rename_playlist(
+    success = provider.get_client(context).rename_playlist(
         playlist_id=playlist_id, new_title=text,
     )
-    if not json_data:
+    if not success:
+        ui.show_notification(
+            message=(localize('failed.x')
+                     % localize('rename')
+                     % localize('playlist')),
+            time_ms=2500,
+            audible=False,
+        )
         return False
+
+    ui.show_notification(
+        message=localize('succeeded'),
+        time_ms=2500,
+        audible=False,
+    )
 
     data_cache = context.get_data_cache()
     data_cache.del_item(playlist_id)
@@ -407,21 +445,18 @@ def _process_rate_playlist(provider,
         raise KodionException('Playlist/Rate: missing playlist_id')
 
     client = provider.get_client(context)
-    if rating == 'like':
+    if (rating == 'like'
+            or confirmed
+            or context.get_ui().on_remove_content(playlist_name)):
         success = client.rate_playlist(playlist_id, rating)
     else:
-        if confirmed or context.get_ui().on_remove_content(playlist_name):
-            success = client.rate_playlist(playlist_id, rating)
-        else:
-            success = None
+        success = None
 
     if success:
-        if rating == 'like':
-            notify_message = localize('saved')
-        else:
-            notify_message = localize('removed.name.x') % playlist_name
         ui.show_notification(
-            message=notify_message,
+            message=(localize('saved')
+                     if rating == 'like' else
+                     localize('removed.name.x') % playlist_name),
             time_ms=2500,
             audible=False,
         )
@@ -451,7 +486,10 @@ def _process_rate_playlist(provider,
 
     elif success is False:
         ui.show_notification(
-            message=localize('failed'),
+            message=(localize('failed.x')
+                     % localize('save')
+                     if rating == 'like' else
+                     localize('remove')),
             time_ms=2500,
             audible=False,
         )

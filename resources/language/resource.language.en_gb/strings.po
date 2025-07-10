@@ -306,7 +306,7 @@ msgstr ""
 # empty strings from id 30206 to 30499
 
 msgctxt "#30500"
-msgid ""
+msgid "%s failed"
 msgstr ""
 
 msgctxt "#30501"
