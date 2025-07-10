@@ -1158,11 +1158,10 @@ class Provider(AbstractProvider):
             ])
         settings.subscriptions_filter(filter_list)
 
-        ui.show_notification(context.localize(
-            'my_subscriptions.filter.added'
-            if command == 'add' else
-            'my_subscriptions.filter.removed'
-        ))
+        ui.show_notification(context.localize('added.to.x'
+                                              if command == 'add' else
+                                              'removed.from.x')
+                             % context.localize('my_subscriptions.filtered'))
         return True, None
 
     @AbstractProvider.register_path(
@@ -1292,7 +1291,7 @@ class Provider(AbstractProvider):
             ui.refresh_container()
 
             ui.show_notification(
-                localize('removed.x') % video_name,
+                localize('removed.name.x') % video_name,
                 time_ms=2500,
                 audible=False,
             )
@@ -1994,7 +1993,7 @@ class Provider(AbstractProvider):
             ui.refresh_container()
 
             ui.show_notification(
-                localize('removed.x') % bookmark_name,
+                localize('removed.name.x') % bookmark_name,
                 time_ms=2500,
                 audible=False,
             )
@@ -2084,7 +2083,7 @@ class Provider(AbstractProvider):
 
             context.get_watch_later_list().add_item(video_id, item)
             ui.show_notification(
-                localize('watch_later.added_to'),
+                localize('added.to.x') % localize('watch_later'),
                 time_ms=2500,
                 audible=False,
             )
@@ -2103,7 +2102,7 @@ class Provider(AbstractProvider):
             ui.refresh_container()
 
             ui.show_notification(
-                localize('removed.x') % video_name,
+                localize('removed.name.x') % video_name,
                 time_ms=2500,
                 audible=False,
             )

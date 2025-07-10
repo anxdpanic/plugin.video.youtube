@@ -81,7 +81,7 @@ def _process_rate_video(provider,
                 ui.refresh_container()
 
             if result == 'none':
-                notify_message = localize('unrated.video')
+                notify_message = localize('removed.x') % localize('rating')
             elif result == 'like':
                 notify_message = localize('liked.video')
             elif result == 'dislike':

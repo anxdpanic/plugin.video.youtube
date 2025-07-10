@@ -429,7 +429,7 @@ class AbstractProvider(object):
             search_history.del_item(query)
             ui.refresh_container()
 
-            ui.show_notification(localize('removed.x') % query,
+            ui.show_notification(localize('removed.name.x') % query,
                                  time_ms=2500,
                                  audible=False)
             return True, None

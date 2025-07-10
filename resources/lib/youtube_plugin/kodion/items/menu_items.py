@@ -371,7 +371,8 @@ def history_list_assign(context, playlist_id, playlist_name):
 
 def my_subscriptions_filter_remove(context, channel_name):
     return (
-        context.localize('my_subscriptions.filter.remove'),
+        context.localize('remove.from.x')
+        % context.localize('my_subscriptions.filtered'),
         context.create_uri(
             ('my_subscriptions', 'filter', 'remove'),
             {
@@ -384,7 +385,8 @@ def my_subscriptions_filter_remove(context, channel_name):
 
 def my_subscriptions_filter_add(context, channel_name):
     return (
-        context.localize('my_subscriptions.filter.add'),
+        context.localize('add.to.x')
+        % context.localize('my_subscriptions.filtered'),
         context.create_uri(
             ('my_subscriptions', 'filter', 'add',),
             {

@@ -46,7 +46,7 @@ def _process_add_video(provider, context, keymap_action=False):
         return False
 
     context.get_ui().show_notification(
-        message=context.localize('playlist.added_to'),
+        message=context.localize('added.to.x') % context.localize('playlist'),
         time_ms=2500,
         audible=False,
     )
@@ -139,7 +139,8 @@ def _process_remove_video(provider,
             return False
 
         ui.show_notification(
-            message=context.localize('playlist.removed_from'),
+            message=(context.localize('removed.from.x')
+                     % context.localize('playlist')),
             time_ms=2500,
             audible=False,
         )

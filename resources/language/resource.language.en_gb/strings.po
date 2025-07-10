@@ -654,19 +654,19 @@ msgid "Blacklist"
 msgstr ""
 
 msgctxt "#30587"
-msgid "Add to My Subscriptions filter"
+msgid ""
 msgstr ""
 
 msgctxt "#30588"
-msgid "Remove from My Subscriptions filter"
+msgid ""
 msgstr ""
 
 msgctxt "#30589"
-msgid "Added to My Subscriptions filter"
+msgid ""
 msgstr ""
 
 msgctxt "#30590"
-msgid "Removed from My Subscriptions filter"
+msgid ""
 msgstr ""
 
 msgctxt "#30591"
@@ -758,19 +758,19 @@ msgid "Retry"
 msgstr ""
 
 msgctxt "#30613"
-msgid ""
+msgid "Add to %s"
 msgstr ""
 
 msgctxt "#30614"
-msgid ""
+msgid "Remove from %s"
 msgstr ""
 
 msgctxt "#30615"
-msgid ""
+msgid "Added to %s"
 msgstr ""
 
 msgctxt "#30616"
-msgid ""
+msgid "Removed from %s"
 msgstr ""
 
 msgctxt "#30617"
@@ -982,11 +982,11 @@ msgid "Play count minimum percent"
 msgstr ""
 
 msgctxt "#30669"
-msgid ""
+msgid "%s removed"
 msgstr ""
 
 msgctxt "#30670"
-msgid ""
+msgid "Added %s"
 msgstr ""
 
 msgctxt "#30671"
@@ -1158,15 +1158,15 @@ msgid "Rate videos in playlists"
 msgstr ""
 
 msgctxt "#30713"
-msgid "Added to Watch Later"
+msgid ""
 msgstr ""
 
 msgctxt "#30714"
-msgid "Added to playlist"
+msgid ""
 msgstr ""
 
 msgctxt "#30715"
-msgid "Removed from playlist"
+msgid ""
 msgstr ""
 
 msgctxt "#30716"
@@ -1178,7 +1178,7 @@ msgid "Disliked video"
 msgstr ""
 
 msgctxt "#30718"
-msgid "Rating removed"
+msgid ""
 msgstr ""
 
 msgctxt "#30719"
