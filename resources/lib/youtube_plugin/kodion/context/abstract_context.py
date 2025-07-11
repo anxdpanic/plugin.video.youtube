@@ -23,6 +23,8 @@ from ..compatibility import (
     urlsplit,
 )
 from ..constants import (
+    CONTEXT_MENU,
+    KEYMAP,
     PATHS,
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
@@ -57,6 +59,8 @@ class AbstractContext(object):
     _settings = None
 
     _BOOL_PARAMS = frozenset((
+        CONTEXT_MENU,
+        KEYMAP,
         PLAY_FORCE_AUDIO,
         PLAY_PROMPT_SUBTITLES,
         PLAY_PROMPT_QUALITY,

@@ -12,30 +12,42 @@ from __future__ import absolute_import, division, unicode_literals
 
 from .utils import get_thumbnail
 from ...kodion import KodionException, logging
-from ...kodion.constants import CHANNEL_ID, PATHS, PLAYLISTITEM_ID, PLAYLIST_ID
+from ...kodion.constants import (
+    CHANNEL_ID,
+    CONTEXT_MENU,
+    KEYMAP,
+    PATHS,
+    PLAYLISTITEM_ID,
+    PLAYLIST_ID, VIDEO_ID,
+)
 from ...kodion.utils import parse_item_ids
 
 
-def _process_add_video(provider, context, keymap_action=False):
+def _process_add_video(provider, context):
+    container_uri = context.get_infolabel('Container.FolderPath')
     listitem_path = context.get_listitem_info('FileNameAndPath')
+    listitem_video_id = context.get_listitem_property(VIDEO_ID)
+    if not context.is_plugin_path(container_uri):
+        listitem_path = ''
+        listitem_video_id = ''
 
     client = provider.get_client(context)
     if not client.logged_in:
         raise KodionException('Playlist/Add: not logged in')
 
-    playlist_id = context.get_param('playlist_id')
+    params = context.get_params()
+
+    playlist_id = params.get(PLAYLIST_ID)
     if not playlist_id:
         raise KodionException('Playlist/Add: missing playlist_id')
     elif playlist_id == 'watch_later':
         playlist_id = context.get_access_manager().get_watch_later_id()
 
-    video_id = context.get_param('video_id')
+    video_id = params.get(VIDEO_ID, listitem_video_id)
     if not video_id:
-        if context.is_plugin_path(listitem_path, PATHS.PLAY):
-            video_id = parse_item_ids(listitem_path).get('video_id')
-        if video_id:
-            keymap_action = True
-        else:
+        if context.is_plugin_path(listitem_path):
+            video_id = parse_item_ids(listitem_path).get(VIDEO_ID)
+        if not video_id:
             raise KodionException('Playlist/Add: missing video_id')
 
     ui = context.get_ui()
@@ -59,7 +71,7 @@ def _process_add_video(provider, context, keymap_action=False):
         audible=False,
     )
 
-    if keymap_action:
+    if params.get(KEYMAP) or not params.get(CONTEXT_MENU):
         ui.set_focus_next_item()
 
     data_cache = context.get_data_cache()
@@ -82,44 +94,25 @@ def _process_remove_video(provider,
     listitem_playlist_id = context.get_listitem_property(PLAYLIST_ID)
     listitem_video_id = context.get_listitem_property(PLAYLISTITEM_ID)
     listitem_video_name = context.get_listitem_info('Title')
-    keymap_action = False
+    if not context.is_plugin_path(container_uri):
+        listitem_playlist_id = ''
+        listitem_video_id = ''
+        listitem_video_name = ''
+
+    client = provider.get_client(context)
+    if not client.logged_in:
+        raise KodionException('Playlist/Remove: not logged in')
 
     params = context.get_params()
+
     if playlist_id is None:
-        playlist_id = params.pop('playlist_id', None)
+        playlist_id = params.pop(PLAYLIST_ID, listitem_playlist_id)
     if video_id is None:
-        video_id = params.pop('video_id', None)
+        video_id = params.pop(VIDEO_ID, listitem_video_id)
     if video_name is None:
-        video_name = params.pop('item_name', None)
+        video_name = params.pop('item_name', listitem_video_name)
     if confirmed is None:
         confirmed = params.pop('confirmed', False)
-
-    video_params = (
-        {playlist_id, video_id} if confirmed else
-        {playlist_id, video_id, video_name}
-    )
-    params_required = 2 if confirmed else 3
-    if None in video_params or len(video_params) != params_required:
-        if len(video_params) != 1:
-            if confirmed:
-                return False
-            raise KodionException('Playlist/Remove: missing parameters {0!r}'
-                                  .format(video_params))
-
-        video_params = (
-            {listitem_playlist_id, listitem_video_id} if confirmed else
-            {listitem_playlist_id, listitem_video_id, listitem_video_name}
-        )
-        if '' in video_params or len(video_params) != params_required:
-            if confirmed:
-                return False
-            raise KodionException('Playlist/Remove: missing listitem info {0!r}'
-                                  .format(video_params))
-
-        playlist_id = listitem_playlist_id
-        video_id = listitem_video_id
-        video_name = listitem_video_name
-        keymap_action = True
 
     if not playlist_id:
         if confirmed:
@@ -158,7 +151,7 @@ def _process_remove_video(provider,
         if not context.is_plugin_path(container_uri):
             return True
 
-        if (keymap_action or video_id == listitem_video_id) and not confirmed:
+        if params.get(KEYMAP) or not params.get(CONTEXT_MENU):
             ui.set_focus_next_item()
 
         if playlist_id in container_uri:
@@ -179,19 +172,26 @@ def _process_remove_video(provider,
 
 
 def _process_remove_playlist(provider, context):
+    container_uri = context.get_infolabel('Container.FolderPath')
     channel_id = context.get_listitem_property(CHANNEL_ID)
+    listitem_playlist_id = context.get_listitem_property(PLAYLIST_ID)
+    listitem_playlist_name = context.get_listitem_info('Title')
+    if not context.is_plugin_path(container_uri):
+        channel_id = ''
+        listitem_playlist_id = ''
+        listitem_playlist_name = ''
 
     params = context.get_params()
     ui = context.get_ui()
     localize = context.localize
 
-    playlist_id = params.get('playlist_id', '')
+    playlist_id = params.get(PLAYLIST_ID, listitem_playlist_id)
     if not playlist_id:
         raise KodionException('Playlist/Remove: missing playlist_id')
 
-    playlist_name = params.get('item_name', '')
+    playlist_name = params.get('item_name', listitem_playlist_name)
     if not playlist_name:
-        raise KodionException('Playlist/Remove: missing playlist_name')
+        raise KodionException('Playlist/Remove: missing item_name')
 
     if ui.on_delete_content(playlist_name):
         success = provider.get_client(context).remove_playlist(playlist_id)
@@ -219,23 +219,25 @@ def _process_remove_playlist(provider, context):
 
 
 def _process_select_playlist(provider, context):
-    # Get listitem path asap, relies on listitems focus
+    container_uri = context.get_infolabel('Container.FolderPath')
     listitem_path = context.get_listitem_info('FileNameAndPath')
+    listitem_video_id = context.get_listitem_property(VIDEO_ID)
+    if not context.is_plugin_path(container_uri):
+        listitem_path = ''
+        listitem_video_id = ''
 
     params = context.get_params()
     ui = context.get_ui()
-    keymap_action = False
     page_token = ''
     current_page = 0
 
-    video_id = params.get('video_id', '')
+    video_id = params.get(VIDEO_ID, listitem_video_id)
     if not video_id:
-        if context.is_plugin_path(listitem_path, PATHS.PLAY):
+        if context.is_plugin_path(listitem_path):
             item_ids = parse_item_ids(listitem_path)
-            video_id = item_ids.get('video_id')
+            video_id = item_ids.get(VIDEO_ID)
             if video_id:
                 context.set_params(**item_ids)
-                keymap_action = True
         if not video_id:
             raise KodionException('Playlist/Select: missing video_id')
 
@@ -343,21 +345,29 @@ def _process_select_playlist(provider, context):
         if playlist_id:
             new_params = dict(params, playlist_id=playlist_id)
             new_context = context.clone(new_params=new_params)
-            _process_add_video(provider, new_context, keymap_action)
+            _process_add_video(provider, new_context)
         break
 
 
 def _process_rename_playlist(provider, context):
+    container_uri = context.get_infolabel('Container.FolderPath')
+    listitem_playlist_id = context.get_listitem_property(PLAYLIST_ID)
+    listitem_playlist_name = context.get_listitem_info('Title')
+    if not context.is_plugin_path(container_uri):
+        listitem_playlist_id = ''
+        listitem_playlist_name = ''
+
     params = context.get_params()
     ui = context.get_ui()
     localize = context.localize
 
-    playlist_id = params.get('playlist_id', '')
+    playlist_id = params.get(PLAYLIST_ID, listitem_playlist_id)
     if not playlist_id:
         raise KodionException('Playlist/Rename: missing playlist_id')
 
     result, text = ui.on_keyboard_input(
-        localize('rename'), default=params.get('item_name', ''),
+        localize('rename'),
+        default=params.get('item_name', listitem_playlist_name),
     )
     if not result or not text:
         return False
@@ -388,13 +398,21 @@ def _process_rename_playlist(provider, context):
 
 
 def _playlist_id_change(context, playlist, command):
-    playlist_id = context.get_param('playlist_id', '')
+    container_uri = context.get_infolabel('Container.FolderPath')
+    listitem_playlist_id = context.get_listitem_property(PLAYLIST_ID)
+    listitem_playlist_name = context.get_listitem_info('Title')
+    if not context.is_plugin_path(container_uri):
+        listitem_playlist_id = ''
+        listitem_playlist_name = ''
+
+    playlist_id = context.get_param(PLAYLIST_ID, listitem_playlist_id)
     if not playlist_id:
         raise KodionException('{type}/{command}: missing playlist_id'
                               .format(type=playlist, command=command))
-    playlist_name = context.get_param('item_name', '')
+
+    playlist_name = context.get_param('item_name', listitem_playlist_name)
     if not playlist_name:
-        raise KodionException('{type}/{command}: missing playlist_name'
+        raise KodionException('{type}/{command}: missing item_name'
                               .format(type=playlist, command=command))
 
     if context.get_ui().on_yes_no_input(
@@ -423,11 +441,10 @@ def _process_rate_playlist(provider,
     listitem_path = context.get_listitem_info('FileNameAndPath')
     listitem_playlist_id = context.get_listitem_property(PLAYLIST_ID)
     listitem_playlist_name = context.get_listitem_info('Title')
-    keymap_action = False
 
     params = context.get_params()
     if playlist_id is None:
-        playlist_id = params.pop('playlist_id', None)
+        playlist_id = params.pop(PLAYLIST_ID, listitem_playlist_id)
     if playlist_name is None:
         playlist_name = params.pop('item_name', listitem_playlist_name)
     if confirmed is None:
@@ -436,13 +453,11 @@ def _process_rate_playlist(provider,
     ui = context.get_ui()
     localize = context.localize
 
-    if not playlist_id and context.is_plugin_path(listitem_path):
-        playlist_id = parse_item_ids(listitem_path).get('playlist_id',
-                                                        listitem_playlist_id)
-        keymap_action = True
-
     if not playlist_id:
-        raise KodionException('Playlist/Rate: missing playlist_id')
+        if context.is_plugin_path(listitem_path):
+            playlist_id = parse_item_ids(listitem_path).get(PLAYLIST_ID)
+        if not playlist_id:
+            raise KodionException('Playlist/Rate: missing playlist_id')
 
     client = provider.get_client(context)
     if (rating == 'like'
@@ -464,9 +479,7 @@ def _process_rate_playlist(provider,
         if not context.is_plugin_path(container_uri):
             return True
 
-        if (not confirmed
-                and (keymap_action
-                     or playlist_id == listitem_playlist_id)):
+        if params.get(KEYMAP) or not params.get(CONTEXT_MENU):
             ui.set_focus_next_item()
 
         if context.get_path().startswith(PATHS.SAVED_PLAYLISTS):
