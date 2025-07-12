@@ -332,11 +332,12 @@ class ResourceManager(object):
 
         context = self._context
         client = self._client
+        logged_in = client.logged_in
         refresh = context.refresh_requested()
 
         if batch_id:
             ids = [batch_id[0]]
-            page_token = batch_id[1]
+            page_token = batch_id[1] or page_token
             fetch_next = False
         elif page_token is None:
             fetch_next = True
@@ -360,16 +361,26 @@ class ResourceManager(object):
                 else:
                     batch = data_cache.get_item(
                         '{0},{1}'.format(*batch_id),
-                        None
-                        if not client.logged_in else
-                        data_cache.ONE_HOUR
-                        if page_token else
-                        data_cache.ONE_MINUTE * 5,
+                        as_dict=True,
                     )
                 if not batch:
                     to_update.append(batch_id)
                     break
-                result[batch_id] = batch
+                age = batch.get('age')
+                batch = batch.get('value')
+                if not logged_in:
+                    result[batch_id] = batch
+                elif page_token:
+                    if age <= data_cache.ONE_DAY:
+                        result[batch_id] = batch
+                    else:
+                        to_update.append(batch_id)
+                        break
+                else:
+                    if age <= data_cache.ONE_MINUTE * 5:
+                        result[batch_id] = batch
+                    else:
+                        to_update.append(batch_id)
                 page_token = batch.get('nextPageToken') if fetch_next else None
                 if not page_token:
                     break
@@ -392,6 +403,8 @@ class ResourceManager(object):
             insert_point = batch_ids.index(batch_id, insert_point)
             while 1:
                 batch_id = (playlist_id, page_token)
+                if batch_id in result:
+                    break
                 batch = client.get_playlist_items(*batch_id, **kwargs)
                 if not batch:
                     break
