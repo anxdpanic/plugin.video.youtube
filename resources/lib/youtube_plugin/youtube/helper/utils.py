@@ -672,15 +672,15 @@ def update_video_items(provider, context, video_id_dict,
         in_watch_later_list = True
     elif path.startswith(PATHS.BOOKMARKS):
         in_bookmarks_list = True
-    elif path.startswith(PATHS.HISTORY_LIST):
-        playlist_id = params.get('playlist_id')
-        playlist_channel_id = 'mine'
-        in_watch_history_list = True
     elif path.startswith(PATHS.VIRTUAL_PLAYLIST):
         playlist_id = params.get('playlist_id')
         playlist_channel_id = 'mine'
-        if playlist_id and playlist_id.lower() == watch_later_id.lower():
-            in_watch_later_list = True
+        if playlist_id:
+            playlist_id_upper = playlist_id.upper()
+            if playlist_id_upper == 'WL':
+                in_watch_later_list = True
+            elif playlist_id_upper == 'HL':
+                in_watch_history_list = True
     else:
         playlist_match = __RE_PLAYLIST.match(path)
         if playlist_match:

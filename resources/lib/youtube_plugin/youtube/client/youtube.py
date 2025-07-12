@@ -1511,6 +1511,8 @@ class YouTube(LoginClient):
             next_page_token = None
 
         if items_per_page:
+            if items_per_page is True:
+                items_per_page = len(items)
             max_results = self.max_results() - items_per_page
             while next_page_token and len(items) <= max_results:
                 next_response = self.get_browse_items(

@@ -1554,7 +1554,7 @@ class Provider(AbstractProvider):
                 watch_history_item = DirectoryItem(
                     localize('history'),
                     create_uri(
-                        PATHS.HISTORY_LIST
+                        (PATHS.VIRTUAL_PLAYLIST, history_id)
                         if history_id.lower() == 'hl' else
                         (PATHS.CHANNEL, 'mine', PATHS.PLAYLIST, history_id)
                     ),

@@ -41,7 +41,6 @@ TRENDING = '/special/popular_right_now'
 VIDEO_COMMENTS = '/special/parent_comments'
 VIDEO_COMMENTS_THREAD = '/special/child_comments'
 VIRTUAL_PLAYLIST = '/special/playlist'
-HISTORY_LIST = '/special/history'
 
 API = '/youtube/api'
 API_SUBMIT = '/youtube/api/submit'
