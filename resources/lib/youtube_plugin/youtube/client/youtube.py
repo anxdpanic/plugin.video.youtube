@@ -1086,6 +1086,7 @@ class YouTube(LoginClient):
             do_auth=True,
             page_token=page_token,
             json_path=json_path,
+            **kwargs
         )
 
     def get_channel_by_identifier(self,

@@ -322,7 +322,8 @@ class ResourceManager(object):
                            ids=None,
                            batch_id=None,
                            page_token=None,
-                           defer_cache=False):
+                           defer_cache=False,
+                           **kwargs):
         if not ids and not batch_id:
             return None
 
@@ -388,7 +389,7 @@ class ResourceManager(object):
             insert_point = batch_ids.index(batch_id, insert_point)
             while 1:
                 batch_id = (playlist_id, page_token)
-                batch = client.get_playlist_items(*batch_id)
+                batch = client.get_playlist_items(*batch_id, **kwargs)
                 if not batch:
                     break
                 new_batch_ids.append(batch_id)
