@@ -10,6 +10,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from itertools import chain
+
 from .utils import get_thumbnail
 from ...kodion import logging
 
@@ -323,6 +325,7 @@ class ResourceManager(object):
                            batch_id=None,
                            page_token=None,
                            defer_cache=False,
+                           flatten=False,
                            **kwargs):
         if not ids and not batch_id:
             return None
@@ -426,6 +429,14 @@ class ResourceManager(object):
 
         if not fetch_next:
             return result[batch_ids[0]]
+        if flatten:
+            items = chain.from_iterable(
+                batch.get('items', [])
+                for batch in result.values()
+            )
+            result = result[batch_ids[-1]]
+            result['items'] = list(items)
+            return result
         return result
 
     def get_related_playlists(self, channel_id, defer_cache=False):
