@@ -222,8 +222,7 @@ class ServiceMonitor(xbmc.Monitor):
                 data = json.loads(data)
                 position = data.get('position', 0)
                 playlist_player = context.get_playlist_player()
-                items = playlist_player.get_items()
-                item_uri = items[position]['file'] if items else ''
+                item_uri = playlist_player.get_item_path(position)
 
                 if context.is_plugin_path(item_uri):
                     path, params = context.parse_uri(item_uri)

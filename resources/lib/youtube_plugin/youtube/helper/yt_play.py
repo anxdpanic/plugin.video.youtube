@@ -349,16 +349,16 @@ def process(provider, context, **_kwargs):
             ))
 
         ui.set_property(BUSY_FLAG)
-        playlist_player = context.get_playlist_player()
-        position, _ = playlist_player.get_position()
-        items = playlist_player.get_items()
 
         media_item = _play_stream(provider, context)
         if media_item:
-            if position and items:
-                ui.set_property(PLAYLIST_PATH,
-                                items[position - 1]['file'])
-                ui.set_property(PLAYLIST_POSITION, str(position))
+            playlist_player = context.get_playlist_player()
+            position, _ = playlist_player.get_position()
+            if position:
+                item_uri = playlist_player.get_item_path(position - 1)
+                if item_uri:
+                    ui.set_property(PLAYLIST_PATH, item_uri)
+                    ui.set_property(PLAYLIST_POSITION, str(position))
         else:
             ui.clear_property(BUSY_FLAG)
             for param in force_play_params:

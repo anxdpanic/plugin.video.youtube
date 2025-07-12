@@ -17,6 +17,7 @@ from ... import logging
 from ...compatibility import xbmc
 from ...items import VideoItem, media_listitem
 from ...utils.methods import jsonrpc, wait
+from ...utils.system_version import current_system_version
 
 
 class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
@@ -160,13 +161,26 @@ class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
         cls.set_playlist_id(playlist_id)
         return playlist_id
 
-    def get_items(self, properties=None, dumps=False):
+    if current_system_version.compatible(19):
+        @staticmethod
+        def get_item_path(position, _label=xbmc.getInfoLabel):
+            return _label('Player.position(%d).FilenameAndPath' % position)
+    else:
+        def get_item_path(self, position):
+            item = self.get_items(start=position, end=position + 1)
+            return item[0]['file'] if item else ''
+
+    def get_items(self, properties=None, start=0, end=-1, dumps=False):
         if properties is None:
             properties = ('title', 'file')
         response = jsonrpc(method='Playlist.GetItems',
                            params={
                                'properties': properties,
                                'playlistid': self._playlist.getPlayListId(),
+                               'limits': {
+                                   'start': start,
+                                   'end': end,
+                               },
                            })
 
         try:
