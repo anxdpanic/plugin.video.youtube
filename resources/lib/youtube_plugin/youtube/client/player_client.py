@@ -1884,9 +1884,10 @@ class PlayerClient(LoginClient):
                 subtitles=subtitles,
                 responses=responses,
             )
-            if subs_data and (not use_mpd or subtitles.pre_download):
+            if subs_data and not subtitles.use_isa:
                 meta_info['subtitles'] = [
                     subtitle['url'] for subtitle in subs_data.values()
+                    if 'url' in subtitle
                 ]
                 subs_data = None
         else:
