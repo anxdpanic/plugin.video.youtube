@@ -117,7 +117,7 @@ class JSONStore(object):
                         FILE_READ,
                         timeout=5,
                         payload={'filepath': filepath},
-                ):
+                ) is not False:
                     data = self._context.get_ui().get_property(
                         '-'.join((FILE_READ, filepath)),
                         log_value='<redacted>',

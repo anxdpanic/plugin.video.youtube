@@ -982,7 +982,7 @@ class XbmcContext(AbstractContext):
                                      target=target,
                                      latency=response.latency)
         else:
-            value = False
+            value = None
             self.log.error_trace(('Service IPC - Timed out',
                                   'Procedure: {target!r}',
                                   'Timeout:   {timeout:.2f}s'),
