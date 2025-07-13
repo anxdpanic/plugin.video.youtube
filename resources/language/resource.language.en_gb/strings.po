@@ -1166,7 +1166,7 @@ msgid ""
 msgstr ""
 
 msgctxt "#30715"
-msgid ""
+msgid "Use YouTube internal list for Watch History?[CR][CR]Requires signing-in via the addon and activating history tracking on YouTube."
 msgstr ""
 
 msgctxt "#30716"
@@ -1178,7 +1178,7 @@ msgid "Disliked video"
 msgstr ""
 
 msgctxt "#30718"
-msgid ""
+msgid "Use YouTube internal list for Watch Later?[CR][CR]Requires signing-in via the addon."
 msgstr ""
 
 msgctxt "#30719"

@@ -291,6 +291,8 @@ class XbmcContext(AbstractContext):
         'setup_wizard.prompt.import_playback_history': 30778,
         'setup_wizard.prompt.import_search_history': 30779,
         'setup_wizard.prompt.locale': 30527,
+        'setup_wizard.prompt.migrate_watch_history': 30715,
+        'setup_wizard.prompt.migrate_watch_later': 30718,
         'setup_wizard.prompt.my_location': 30653,
         'setup_wizard.prompt.settings': 10004,
         'setup_wizard.prompt.settings.defaults': 30783,

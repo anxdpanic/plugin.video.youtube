@@ -389,6 +389,45 @@ def process_refresh_settings(context, step, steps, **_kwargs):
     return step
 
 
+def process_migrate_watch_history(context, step, steps, **_kwargs):
+    localize = context.localize
+    access_manager = context.get_access_manager()
+    watch_history_id = access_manager.get_watch_history_id().upper()
+
+    step += 1
+    if (watch_history_id != 'HL' and context.get_ui().on_yes_no_input(
+            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                youtube=localize('youtube'),
+                setup_wizard=localize('setup_wizard'),
+                step=step,
+                steps=steps,
+            ),
+            localize('setup_wizard.prompt.migrate_watch_history'),
+    )):
+        access_manager.set_watch_history_id('HL')
+        context.get_settings().use_remote_history(True)
+    return step
+
+
+def process_migrate_watch_later(context, step, steps, **_kwargs):
+    localize = context.localize
+    access_manager = context.get_access_manager()
+    watch_later_id = access_manager.get_watch_later_id().upper()
+
+    step += 1
+    if (watch_later_id != 'WL' and context.get_ui().on_yes_no_input(
+            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                youtube=localize('youtube'),
+                setup_wizard=localize('setup_wizard'),
+                step=step,
+                steps=steps,
+            ),
+            localize('setup_wizard.prompt.migrate_watch_later'),
+    )):
+        access_manager.set_watch_later_id('WL')
+    return step
+
+
 STEPS = [
     process_default_settings,
     process_performance_settings,
@@ -396,6 +435,8 @@ STEPS = [
     process_subtitles,
     process_old_search_db,
     process_old_history_db,
+    process_migrate_watch_history,
+    process_migrate_watch_later,
     process_geo_location,
     process_list_detail_settings,
     process_refresh_settings,

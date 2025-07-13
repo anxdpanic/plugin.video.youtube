@@ -540,7 +540,9 @@ class AbstractSettings(object):
     def use_local_history(self):
         return self.get_bool(SETTINGS.USE_LOCAL_HISTORY, False)
 
-    def use_remote_history(self):
+    def use_remote_history(self, value=None):
+        if value is not None:
+            return self.set_bool(SETTINGS.USE_REMOTE_HISTORY, value)
         return self.get_bool(SETTINGS.USE_REMOTE_HISTORY, False)
 
     # Selections based on max width and min height at common (utra-)wide aspect ratios
