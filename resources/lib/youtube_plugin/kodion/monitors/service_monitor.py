@@ -278,6 +278,8 @@ class ServiceMonitor(xbmc.Monitor):
                     self._settings_collect = True
                 elif state == 'process':
                     self.onSettingsChanged(force=True)
+                elif state == 'ignore':
+                    self._settings_collect = -1
                 response = True
 
             elif target in {FILE_READ, FILE_WRITE}:
@@ -401,6 +403,8 @@ class ServiceMonitor(xbmc.Monitor):
         else:
             self._settings_changes += 1
             if self._settings_collect:
+                if self._settings_collect == -1:
+                    self._settings_collect = False
                 return
 
             total = self._settings_changes
