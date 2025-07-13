@@ -102,10 +102,9 @@ def process_default_settings(context, step, steps, **_kwargs):
             settings.default_player_web_urls(False)
             settings.alternative_player_web_urls(False)
             settings.alternative_player_mpd(False)
-        if context.get_infobool('System.Platform.Linux'):
-            settings.httpd_sleep_allowed(False)
         if settings.cache_size() < 50:
             settings.cache_size(50)
+        settings.httpd_sleep_allowed(True)
         with ui.create_progress_dialog(
                 heading=localize('httpd'),
                 message=localize('httpd.connect.wait'),
