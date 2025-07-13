@@ -387,3 +387,16 @@ def process_refresh_settings(context, step, steps, **_kwargs):
             wait_for=WAIT_END_FLAG,
         )
     return step
+
+
+STEPS = [
+    process_default_settings,
+    process_performance_settings,
+    process_language,
+    process_subtitles,
+    process_old_search_db,
+    process_old_history_db,
+    process_geo_location,
+    process_list_detail_settings,
+    process_refresh_settings,
+]

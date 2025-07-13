@@ -88,18 +88,7 @@ class Provider(AbstractProvider):
 
     @staticmethod
     def get_wizard_steps():
-        steps = [
-            yt_setup_wizard.process_default_settings,
-            yt_setup_wizard.process_performance_settings,
-            yt_setup_wizard.process_language,
-            yt_setup_wizard.process_subtitles,
-            yt_setup_wizard.process_geo_location,
-            yt_setup_wizard.process_old_search_db,
-            yt_setup_wizard.process_old_history_db,
-            yt_setup_wizard.process_list_detail_settings,
-            yt_setup_wizard.process_refresh_settings,
-        ]
-        return steps
+        return yt_setup_wizard.STEPS
 
     @staticmethod
     def pre_run_wizard_step(provider, context):
