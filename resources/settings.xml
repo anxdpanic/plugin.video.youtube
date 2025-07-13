@@ -739,7 +739,7 @@
                 </setting>
                 <setting id="kodion.cache.size" type="integer" label="30024" help="">
                     <level>0</level>
-                    <default>20</default>
+                    <default>50</default>
                     <constraints>
                         <minimum>5</minimum>
                         <step>1</step>
