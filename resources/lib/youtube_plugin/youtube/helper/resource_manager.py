@@ -93,9 +93,10 @@ class ResourceManager(object):
                 data_cache.ONE_DAY if client.logged_in else None,
             )
         to_update = [id_ for id_ in ids
-                     if id_ not in result
-                     or not result[id_]
-                     or result[id_].get('_partial')]
+                     if id_
+                     and (id_ not in result
+                          or not result[id_]
+                          or result[id_].get('_partial'))]
 
         if result:
             self.log.debugging and self.log.debug(
@@ -161,9 +162,10 @@ class ResourceManager(object):
             result = {}
 
         to_check = [id_ for id_ in ids
-                    if id_ not in result
-                    or not result[id_]
-                    or result[id_].get('_partial')]
+                    if id_
+                    and (id_ not in result
+                         or not result[id_]
+                         or result[id_].get('_partial'))]
         if to_check:
             data_cache = context.get_data_cache()
             result.update(data_cache.get_items(
@@ -171,9 +173,10 @@ class ResourceManager(object):
                 data_cache.ONE_MONTH if client.logged_in else None,
             ))
         to_update = [id_ for id_ in ids
-                     if id_ not in result
-                     or not result[id_]
-                     or result[id_].get('_partial')]
+                     if id_
+                     and (id_ not in result
+                          or not result[id_]
+                          or result[id_].get('_partial'))]
 
         if result:
             self.log.debugging and self.log.debug(
@@ -266,9 +269,10 @@ class ResourceManager(object):
                 data_cache.ONE_DAY if client.logged_in else None,
             )
         to_update = [id_ for id_ in ids
-                     if id_ not in result
-                     or not result[id_]
-                     or result[id_].get('_partial')]
+                     if id_
+                     and (id_ not in result
+                          or not result[id_]
+                          or result[id_].get('_partial'))]
 
         if result:
             self.log.debugging and self.log.debug(
