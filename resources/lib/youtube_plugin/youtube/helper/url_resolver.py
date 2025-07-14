@@ -60,6 +60,7 @@ class YouTubeResolver(AbstractResolver):
     _RE_CLIP_DETAILS = re_compile(r'(<meta property="og:video:url" content="'
                                   r'(?P<video_url>[^"]+)'
                                   r'">)'
+                                  r'|(?P<is_clip>"clipConfig":\{)'
                                   r'|("startTimeMs":"(?P<start_time>\d+)")'
                                   r'|("endTimeMs":"(?P<end_time>\d+)")')
 
@@ -136,31 +137,36 @@ class YouTubeResolver(AbstractResolver):
 
         if path.startswith('/clip'):
             all_matches = self._RE_CLIP_DETAILS.finditer(response.text)
-            num_matched = 0
+            matched_state = 0
             url_components = params = start_time = end_time = None
             for matches in all_matches:
                 matches = matches.groupdict()
 
-                if not num_matched & 1:
+                if not matched_state & 1:
                     url = matches['video_url']
                     if url:
-                        num_matched += 1
+                        matched_state += 1
                         url_components = urlsplit(unescape(url))
                         params = dict(parse_qsl(url_components.query))
 
-                if not num_matched & 2:
-                    start_time = matches['start_time']
-                    if start_time:
-                        start_time = int(start_time) / 1000
-                        num_matched += 2
+                if not matched_state & 2:
+                    is_clip = matches['is_clip']
+                    if is_clip:
+                        matched_state += 2
+                else:
+                    if not matched_state & 4:
+                        start_time = matches['start_time']
+                        if start_time:
+                            start_time = int(start_time) / 1000
+                            matched_state += 4
 
-                if not num_matched & 4:
-                    end_time = matches['end_time']
-                    if end_time:
-                        end_time = int(end_time) / 1000
-                        num_matched += 4
+                    if not matched_state & 8:
+                        end_time = matches['end_time']
+                        if end_time:
+                            end_time = int(end_time) / 1000
+                            matched_state += 8
 
-                if num_matched != 7:
+                if matched_state != 15:
                     continue
 
                 params.update((
