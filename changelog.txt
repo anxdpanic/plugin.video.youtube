@@ -1,3 +1,19 @@
+## v7.3.0+alpha.2
+### Fixed
+- Fix clip start and end time parsing
+- Fix possible exception when fetching subtitles after http server fails to wakeup
+
+### Changed
+- Re-enable http server idle shutdown for all platforms
+- Update default cache size to 50 MiB
+- Enable caching of YouTube virtual lists #1220
+- Improve fetching of cached playlist items #1220
+- Allow for use of last known good value if JSON file read IPC timeout occurs #1220
+- Limit JSON-RPC usage when interacting with Kodi playlist #1220
+
+### New
+- Add Setup Wizard steps to change custom Watch History and Watch Later playlists to internal YouTube lists #1210
+
 ## v7.3.0+alpha.1
 ### Fixed
 - Improve concurrent JSON file IO operations #1218
