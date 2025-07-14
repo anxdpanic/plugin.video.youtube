@@ -29,7 +29,7 @@ from ...kodion.constants import (
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
     PLAY_STRM,
-    PLAY_WITH,
+    PLAY_USING,
     SERVER_WAKEUP,
     TRAKT_PAUSE_FLAG,
 )
@@ -53,7 +53,7 @@ def _play_stream(provider, context):
     screensaver = params.get('screensaver', False)
 
     audio_only = False
-    is_external = ui.get_property(PLAY_WITH)
+    is_external = ui.get_property(PLAY_USING)
     if ((is_external and settings.alternative_player_web_urls())
             or settings.default_player_web_urls()):
         stream = {

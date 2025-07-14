@@ -31,7 +31,7 @@ from ...kodion.constants import (
     PLAY_PROMPT_QUALITY,
     PLAY_PROMPT_SUBTITLES,
     PLAY_TIMESHIFT,
-    PLAY_WITH,
+    PLAY_USING,
 )
 from ...kodion.items import (
     CommandItem,
@@ -85,7 +85,7 @@ def _process_list_response(provider,
             PLAY_TIMESHIFT,
             PLAY_PROMPT_QUALITY,
             PLAY_PROMPT_SUBTITLES,
-            PLAY_WITH,
+            PLAY_USING,
         )
         if param in params
     }

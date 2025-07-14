@@ -28,7 +28,7 @@ from ...constants import (
     PLAY_COUNT,
     PLAY_STRM,
     PLAY_TIMESHIFT,
-    PLAY_WITH,
+    PLAY_USING,
     SUBSCRIPTION_ID,
     VALUE_TO_STR,
     VIDEO_ID,
@@ -415,7 +415,7 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
     settings = context.get_settings()
     ui = context.get_ui()
 
-    is_external = ui.get_property(PLAY_WITH)
+    is_external = ui.get_property(PLAY_USING)
     is_strm = params.get(PLAY_STRM)
     mime_type = None
 

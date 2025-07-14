@@ -366,7 +366,7 @@ class XbmcContext(AbstractContext):
         'video.play.ask_for_quality': 30730,
         'video.play.audio_only': 30708,
         'video.play.timeshift': 30819,
-        'video.play.with': 30540,
+        'video.play.using': 15213,
         'video.play.with_subtitles': 30702,
         'video.queue': 30511,
         'video.rate': 30528,

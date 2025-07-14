@@ -20,7 +20,7 @@ from ..constants import (
     PLAYBACK_STARTED,
     PLAYBACK_STOPPED,
     PLAYER_DATA,
-    PLAY_WITH,
+    PLAY_USING,
     REFRESH_CONTAINER,
     TRAKT_PAUSE_FLAG,
 )
@@ -392,13 +392,13 @@ class PlayerMonitor(xbmc.Player):
         if not self._ui.busy_dialog_active():
             self._ui.clear_property(BUSY_FLAG)
 
-        if self._ui.get_property(PLAY_WITH):
+        if self._ui.get_property(PLAY_USING):
             self._context.execute('Action(SwitchPlayer)')
             self._context.execute('Action(Stop)')
             return
 
     def onAVStarted(self):
-        if self._ui.get_property(PLAY_WITH):
+        if self._ui.get_property(PLAY_USING):
             return
 
         if not self._ui.busy_dialog_active():
@@ -434,7 +434,7 @@ class PlayerMonitor(xbmc.Player):
         if not ui.busy_dialog_active():
             ui.clear_property(BUSY_FLAG)
 
-        ui.pop_property(PLAY_WITH)
+        ui.pop_property(PLAY_USING)
         ui.clear_property(TRAKT_PAUSE_FLAG, raw=True)
 
         self.stop_threads()

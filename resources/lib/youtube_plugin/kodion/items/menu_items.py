@@ -21,7 +21,7 @@ from ..constants import (
     PLAY_PROMPT_QUALITY,
     PLAY_PROMPT_SUBTITLES,
     PLAY_TIMESHIFT,
-    PLAY_WITH,
+    PLAY_USING,
     SUBSCRIPTION_ID,
     VIDEO_ID,
     WINDOW_RETURN,
@@ -99,15 +99,15 @@ def video_description_links(context, video_id):
     )
 
 
-def media_play_with(context, video_id):
+def media_play_using(context, video_id):
     return (
-        context.localize('video.play.with'),
+        context.localize('video.play.using'),
         context_menu_uri(
             context,
             (PATHS.PLAY,),
             {
                 VIDEO_ID: video_id,
-                PLAY_WITH: True,
+                PLAY_USING: True,
             },
         ),
     )

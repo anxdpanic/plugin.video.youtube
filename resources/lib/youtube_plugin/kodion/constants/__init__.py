@@ -95,13 +95,13 @@ PLAY_PROMPT_QUALITY = 'ask_for_quality'
 PLAY_PROMPT_SUBTITLES = 'prompt_for_subtitles'
 PLAY_STRM = 'strm'
 PLAY_TIMESHIFT = 'timeshift'
-PLAY_WITH = 'play_with'
+PLAY_USING = 'play_using'
 FORCE_PLAY_PARAMS = frozenset((
     PLAY_FORCE_AUDIO,
     PLAY_TIMESHIFT,
     PLAY_PROMPT_QUALITY,
     PLAY_PROMPT_SUBTITLES,
-    PLAY_WITH,
+    PLAY_USING,
 ))
 
 # Stored data
@@ -179,7 +179,7 @@ __all__ = (
     'PLAY_PROMPT_SUBTITLES',
     'PLAY_STRM',
     'PLAY_TIMESHIFT',
-    'PLAY_WITH',
+    'PLAY_USING',
     'FORCE_PLAY_PARAMS',
 
     # Stored data

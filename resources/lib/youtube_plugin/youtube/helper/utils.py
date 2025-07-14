@@ -1016,7 +1016,7 @@ def update_video_items(provider, context, video_id_dict,
                     context, video_id
                 ) if media_item.live else None,
                 # 'play with...' (external player)
-                menu_items.media_play_with(
+                menu_items.media_play_using(
                     context, video_id
                 ) if alternate_player else None,
                 menu_items.playlist_play_from(
