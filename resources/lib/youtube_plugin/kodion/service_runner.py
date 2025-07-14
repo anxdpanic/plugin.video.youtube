@@ -135,8 +135,7 @@ def run():
                 monitor.interrupt = True
 
             if monitor.refresh and all(container.values()):
-                monitor.refresh_container(force=True)
-                monitor.refresh = False
+                monitor.refresh_container(deferred=True)
                 break
 
             if monitor.interrupt:

@@ -18,6 +18,7 @@ from ..compatibility import urlsplit, xbmc, xbmcgui
 from ..constants import (
     ADDON_ID,
     BOOL_FROM_STR,
+    BUSY_FLAG,
     CHECK_SETTINGS,
     CONTAINER_FOCUS,
     FILE_READ,
@@ -173,16 +174,19 @@ class ServiceMonitor(xbmc.Monitor):
         xbmcgui.Window(10000).clearProperty(_property_id)
         return None
 
-    def refresh_container(self, force=False):
-        if force:
-            self.set_property(REFRESH_CONTAINER)
-            xbmc.executebuiltin('Container.Refresh')
+    def refresh_container(self, deferred=False):
+        if deferred:
+            self.refresh = False
+            if self.get_property(REFRESH_CONTAINER) == BUSY_FLAG:
+                self.set_property(REFRESH_CONTAINER)
+                xbmc.executebuiltin('Container.Refresh')
         else:
             container = self.is_plugin_container()
             if all(container.values()):
                 self.set_property(REFRESH_CONTAINER)
                 xbmc.executebuiltin('Container.Refresh')
             elif container['is_loaded']:
+                self.set_property(REFRESH_CONTAINER, BUSY_FLAG)
                 self.log.debug('Plugin window not active - deferring refresh')
                 self.refresh = True
 

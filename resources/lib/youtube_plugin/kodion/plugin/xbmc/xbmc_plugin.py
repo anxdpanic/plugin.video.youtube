@@ -205,7 +205,7 @@ class XbmcPlugin(AbstractPlugin):
                 logging.exception('Error')
                 ui.on_ok('Error in ContentProvider', exc.__str__())
 
-        if not ui.pop_property(REFRESH_CONTAINER) and forced:
+        if not ui.pop_property(REFRESH_CONTAINER, as_bool=True) and forced:
             player_video_id = ui.pop_property(PLAYER_VIDEO_ID)
             if player_video_id:
                 focused_video_id = None
