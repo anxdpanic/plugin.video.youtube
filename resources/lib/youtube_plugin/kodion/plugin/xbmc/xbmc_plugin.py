@@ -32,8 +32,8 @@ from ...constants import (
     REFRESH_CONTAINER,
     RELOAD_ACCESS_MANAGER,
     REROUTE_PATH,
-    TRAKT_PAUSE_FLAG,
     SYNC_LISTITEM,
+    TRAKT_PAUSE_FLAG,
     VIDEO_ID,
     WINDOW_FALLBACK,
     WINDOW_REPLACE,
@@ -78,6 +78,9 @@ class XbmcPlugin(AbstractPlugin):
         handle = context.get_handle()
         ui = context.get_ui()
 
+        uri = context.get_uri()
+        path = context.get_path().rstrip('/')
+
         route = ui.pop_property(REROUTE_PATH)
         post_run_action = None
         succeeded = False
@@ -90,11 +93,9 @@ class XbmcPlugin(AbstractPlugin):
             else:
                 break
 
-            uri = context.get_uri()
             playlist_player = context.get_playlist_player()
             position, remaining = playlist_player.get_position()
-            playing = (playlist_player.is_playing()
-                       and context.is_plugin_path(uri, PATHS.PLAY))
+            playing = path == PATHS.PLAY and playlist_player.is_playing()
 
             if playing:
                 items = playlist_player.get_items()
@@ -222,9 +223,10 @@ class XbmcPlugin(AbstractPlugin):
         if play_cancelled:
             result = None
 
-        items = isinstance(result, (list, tuple))
-        item_count = 0
-        if items:
+        force_resolve = options.get(provider.FORCE_RESOLVE)
+        result_item = None
+        items = None
+        if isinstance(result, (list, tuple)):
             if not result:
                 result = [
                     CommandItem(
@@ -237,13 +239,13 @@ class XbmcPlugin(AbstractPlugin):
                 ]
 
             items = []
-            force_resolve = options.get(provider.FORCE_RESOLVE)
             for item in result:
                 item_type = item.__class__.__name__
 
-                if force_resolve and item_type in self._PLAY_ITEM_MAP:
-                    force_resolve = False
-                    result = item
+                if (force_resolve
+                        and not result_item
+                        and item_type in self._PLAY_ITEM_MAP):
+                    result_item = item
 
                 listitem_type = self._LIST_ITEM_MAP.get(item_type)
                 if (not listitem_type
@@ -251,38 +253,23 @@ class XbmcPlugin(AbstractPlugin):
                             and not item.available)):
                     continue
 
-                items.append(self._LIST_ITEM_MAP[item.__class__.__name__](
+                items.append(listitem_type(
                     context,
                     item,
                     show_fanart=show_fanart,
                     to_sync=sync_items,
                 ))
-            item_count = len(items)
+        else:
+            result_item = result
 
-        if result and result.__class__.__name__ in self._PLAY_ITEM_MAP:
-            if options.get(provider.FORCE_PLAY) or not result.playable:
-                result, post_run_action = self.uri_action(
-                    context,
-                    result.get_uri()
-                )
-            else:
-                item = self._PLAY_ITEM_MAP[result.__class__.__name__](
-                    context,
-                    result,
-                    show_fanart=show_fanart,
-                )
-                xbmcplugin.setResolvedUrl(
-                    handle, succeeded=True, listitem=item
-                )
-
-        if item_count:
+        if items:
             content_type = options.get(provider.CONTENT_TYPE)
             if content_type:
                 context.apply_content(**content_type)
             else:
                 context.apply_content()
             succeeded = xbmcplugin.addDirectoryItems(
-                handle, items, item_count
+                handle, items, len(items)
             )
             cache_to_disc = options.get(provider.CACHE_TO_DISC, True)
             update_listing = options.get(provider.UPDATE_LISTING, False)
@@ -292,67 +279,87 @@ class XbmcPlugin(AbstractPlugin):
                 ui.clear_property(provider.FALLBACK)
         else:
             succeeded = bool(result)
-            if not succeeded:
-                ui.clear_property(BUSY_FLAG)
-                ui.clear_property(TRAKT_PAUSE_FLAG, raw=True)
-                for param in FORCE_PLAY_PARAMS:
-                    ui.clear_property(param)
-
-                uri = context.get_uri()
-                fallback = options.get(provider.FALLBACK, True)
-                if isinstance(fallback, string_type) and fallback != uri:
-                    context.parse_uri(fallback, update=True)
-                    return self.run(provider, context, forced=forced)
-                if fallback:
-                    _post_run_action = None
-
-                    if play_cancelled:
-                        _, _post_run_action = self.uri_action(context, uri)
-                    elif context.is_plugin_folder():
-                        if context.is_plugin_path(
-                                uri, PATHS.PLAY
-                        ):
-                            context.send_notification(
-                                PLAYBACK_FAILED,
-                                {'video_id': context.get_param('video_id')},
-                            )
-                            # None of the following will actually prevent the
-                            # playback attempt from occurring
-                            item = xbmcgui.ListItem(path=uri, offscreen=True)
-                            item.setContentLookup(False)
-                            props = {
-                                'isPlayable': 'false',
-                                'ForceResolvePlugin': 'true',
-                            }
-                            item.setProperties(props)
-                            xbmcplugin.setResolvedUrl(
-                                handle,
-                                succeeded=False,
-                                listitem=item,
-                            )
-                        elif context.is_plugin_path(
-                                context.get_infolabel('Container.FolderPath')
-                        ):
-                            _, _post_run_action = self.uri_action(
-                                context,
-                                context.get_parent_uri(params={
-                                    WINDOW_FALLBACK: True,
-                                    WINDOW_REPLACE: True,
-                                    WINDOW_RETURN: False,
-                                }),
-                            )
-                        else:
-                            _, _post_run_action = self.uri_action(
-                                context,
-                                'command://Action(Back)',
-                            )
-                    if post_run_action and _post_run_action:
-                        post_run_action = (post_run_action, _post_run_action)
-                    else:
-                        post_run_action = _post_run_action
-
             cache_to_disc = options.get(provider.CACHE_TO_DISC, False)
             update_listing = options.get(provider.UPDATE_LISTING, True)
+
+        if result_item:
+            item_type = result_item.__class__.__name__
+            if item_type in self._PLAY_ITEM_MAP:
+                if path != PATHS.PLAY and not forced:
+                    force_play = True
+                else:
+                    force_play = options.get(provider.FORCE_PLAY)
+
+                if force_play or not result_item.playable:
+                    result_item, post_run_action = self.uri_action(
+                        context,
+                        result_item.get_uri()
+                    )
+                else:
+                    item = self._PLAY_ITEM_MAP[item_type](
+                        context,
+                        result_item,
+                        show_fanart=show_fanart,
+                    )
+                    xbmcplugin.setResolvedUrl(
+                        handle, succeeded=True, listitem=item
+                    )
+        elif not items:
+            ui.clear_property(BUSY_FLAG)
+            ui.clear_property(TRAKT_PAUSE_FLAG, raw=True)
+            for param in FORCE_PLAY_PARAMS:
+                ui.clear_property(param)
+
+            fallback = options.get(provider.FALLBACK, True)
+            if isinstance(fallback, string_type) and fallback != uri:
+                context.parse_uri(fallback, update=True)
+                return self.run(provider, context, forced=forced)
+            if fallback:
+                _post_run_action = None
+
+                if play_cancelled:
+                    _, _post_run_action = self.uri_action(context, uri)
+                elif path == PATHS.PLAY:
+                    context.send_notification(
+                        PLAYBACK_FAILED,
+                        {'video_id': context.get_param('video_id')},
+                    )
+                    # None of the following will actually prevent the
+                    # playback attempt from occurring
+                    item = xbmcgui.ListItem(path=uri, offscreen=True)
+                    item.setContentLookup(False)
+                    props = {
+                        'isPlayable': 'false',
+                        'ForceResolvePlugin': 'true',
+                    }
+                    item.setProperties(props)
+                    xbmcplugin.setResolvedUrl(
+                        handle,
+                        succeeded=False,
+                        listitem=item,
+                    )
+                # elif context.is_plugin_folder():
+                else:
+                    if context.is_plugin_path(
+                            context.get_infolabel('Container.FolderPath')
+                    ):
+                        _, _post_run_action = self.uri_action(
+                            context,
+                            context.get_parent_uri(params={
+                                WINDOW_FALLBACK: True,
+                                WINDOW_REPLACE: True,
+                                WINDOW_RETURN: False,
+                            }),
+                        )
+                    else:
+                        _, _post_run_action = self.uri_action(
+                            context,
+                            'command://Action(Back)',
+                        )
+                if post_run_action and _post_run_action:
+                    post_run_action = (post_run_action, _post_run_action)
+                else:
+                    post_run_action = _post_run_action
 
         if ui.pop_property(PLAY_FORCED):
             context.set_path(PATHS.PLAY)

@@ -23,6 +23,7 @@ from ... import logging
 from ...compatibility import to_str, xbmc, xbmcgui
 from ...constants import (
     CHANNEL_ID,
+    PATHS,
     PLAYLISTITEM_ID,
     PLAYLIST_ID,
     PLAY_COUNT,
@@ -407,7 +408,7 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
 
 def playback_item(context, media_item, show_fanart=None, **_kwargs):
     uri = media_item.get_uri()
-    logging.debug('Converting %s: %r',
+    logging.debug('Converting %s for playback: %r',
                   media_item.__class__.__name__,
                   redact_ip_in_uri(uri))
 
@@ -534,7 +535,15 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
 
 def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
     uri = directory_item.get_uri()
-    logging.debug('Converting DirectoryItem: %r', uri)
+    is_action = directory_item.is_action()
+    if not is_action:
+        path, params = context.parse_uri(uri)
+        if path.rstrip('/') == PATHS.PLAY and params.get('action') != 'list':
+            is_action = True
+    if is_action:
+        logging.debug('Converting DirectoryItem action: %r', uri)
+    else:
+        logging.debug('Converting DirectoryItem: %r', uri)
 
     kwargs = {
         'label': directory_item.get_name(),
@@ -588,24 +597,11 @@ def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
 
     set_info(list_item, directory_item, props)
 
-    """
-    ListItems that do not open a lower level list should have the isFolder
-    parameter of the xbmcplugin.addDirectoryItem set to False, however this
-    now appears to mark the ListItem as playable, even if the IsPlayable
-    property is not set or set to "false".
-    Set isFolder to True as a workaround, regardless of whether the ListItem
-    is actually a folder.
-    """
-    # Workaround:
-    # is_folder = True
-    # Test correctly setting isFolder:
-    is_folder = not directory_item.is_action()
-
     context_menu = directory_item.get_context_menu()
     if context_menu is not None:
         list_item.addContextMenuItems(context_menu)
 
-    return uri, list_item, is_folder
+    return uri, list_item, not is_action
 
 
 def image_listitem(context, image_item, show_fanart=None, **_kwargs):
