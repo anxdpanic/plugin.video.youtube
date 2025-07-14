@@ -1785,101 +1785,113 @@ class Provider(AbstractProvider):
                 return _update
 
             for item_id, item in items.items():
-                callback = _update_bookmark(context, item_id, item)
-                item_params = None
-                can_edit = False
+                item_name = ''
                 item_uri = None
-                if isinstance(item, float):
-                    kind = 'youtube#channel'
-                    yt_id = item_id
-                    item_name = ''
-                    partial_result = True
-                elif isinstance(item, BaseItem):
-                    partial_result = False
+                kind = None
+                yt_id = None
+                partial_result = False
+                can_edit = False
+                item_params = None
+
+                while not kind:
+                    if isinstance(item, float):
+                        kind = 'youtube#channel'
+                        yt_id = item_id
+                        partial_result = True
+                        continue
+
+                    if not isinstance(item, BaseItem):
+                        break
                     item_name = item.get_name()
 
                     if isinstance(item, VideoItem):
                         kind = 'youtube#video'
                         yt_id = item.video_id
-                    elif getattr(item, 'is_action', bool)():
+                        continue
+
+                    yt_id = getattr(item, 'playlist_id', None)
+                    if yt_id:
+                        kind = 'youtube#playlist'
+                        continue
+
+                    yt_id = getattr(item, 'channel_id', None)
+                    if yt_id:
+                        kind = 'youtube#channel'
+                        continue
+
+                    item_uri = item.get_uri()
+                    if not item_uri:
+                        break
+
+                    bookmark_id = getattr(item, 'bookmark_id', None)
+                    if bookmark_id:
                         kind = 'plugin#pluginItem'
                         yt_id = False
                         can_edit = True
-                        item_uri = item.get_uri()
                         item_params = {
                             'name': item_name,
                             'uri': item_uri,
                             'image': '{media}/bookmarks.png',
                             'plot': item_uri,
-                            'action': True,
+                            'action': getattr(item, 'is_action', bool)(),
                             'special_sort': False,
                             'date_time': item.get_date(),
                             'category_label': '__inherit__',
                         }
-                    else:
-                        yt_id = getattr(item, 'playlist_id', None)
-                        if yt_id:
-                            kind = 'youtube#playlist'
-                        else:
-                            kind = 'youtube#channel'
-                            yt_id = getattr(item, 'channel_id', None)
-                else:
-                    kind = None
-                    yt_id = None
-                    item_name = ''
-                    partial_result = False
-
-                if yt_id is None:
-                    item_uri = isinstance(item, BaseItem) and item.get_uri()
-                    if not item_uri:
-                        bookmarks_list.del_item(item_id)
                         continue
 
                     item_ids = parse_item_ids(item_uri)
-                    kind = None
                     for _kind in ('video', 'playlist', 'channel'):
                         id_type = _kind + '_id'
-                        yt_id = item_ids.get(id_type)
-                        if not yt_id or yt_id == 'None':
+                        _yt_id = item_ids.get(id_type)
+                        if not _yt_id or _yt_id == 'None':
                             continue
                         try:
-                            setattr(item, id_type, yt_id)
+                            setattr(item, id_type, _yt_id)
                         except AttributeError:
                             continue
                         if kind:
                             continue
+                        yt_id = _yt_id
                         kind = 'youtube#' + _kind
 
                     if kind:
                         partial_result = True
-                    else:
-                        bookmarks_list.del_item(item_id)
                         continue
 
-                item = {
-                    'kind': kind,
-                    'id': yt_id,
-                    '_partial': partial_result,
-                    '_context_menu': {
-                        'context_menu': (
-                            menu_items.bookmark_edit(
-                                context, item_id, item_name, item_uri
-                            ) if can_edit else None,
-                            menu_items.bookmark_remove(
-                                context, item_id, item_name
+                    break
+                else:
+                    item = {
+                        'kind': kind,
+                        'id': yt_id,
+                        '_partial': partial_result,
+                        '_context_menu': {
+                            'context_menu': (
+                                menu_items.bookmark_edit(
+                                    context, item_id, item_name, item_uri
+                                ) if can_edit else None,
+                                menu_items.bookmark_remove(
+                                    context, item_id, item_name
+                                ),
+                                menu_items.bookmarks_clear(
+                                    context
+                                ),
                             ),
-                            menu_items.bookmarks_clear(
-                                context
-                            ),
-                        ),
-                        'position': 0,
-                    },
-                }
-                if callback:
-                    item['_callback'] = callback
-                if item_params:
-                    item['_params'] = item_params
-                v3_response['items'].append(item)
+                            'position': 0,
+                        },
+                    }
+                    item['_callback'] = _update_bookmark(context, item_id, item)
+                    if item_params:
+                        item['_params'] = item_params
+                    v3_response['items'].append(item)
+                    continue
+
+                provider.log.warning(('Deleting unknown bookmark type',
+                                      'ID:   {item_id}',
+                                      'Item: {item}'),
+                                     item_id=item_id,
+                                     item=item)
+                bookmarks_list.del_item(item_id)
 
             bookmarks = v3.response_to_items(provider, context, v3_response)
             if command == 'play':
@@ -1934,7 +1946,6 @@ class Provider(AbstractProvider):
                                  uri=item_uri,
                                  image='{media}/bookmarks.png',
                                  plot=item_uri,
-                                 action=True,
                                  special_sort=False,
                                  date_time=now(),
                                  category_label='__inherit__')
