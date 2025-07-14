@@ -32,7 +32,6 @@ from ...constants import (
     PLAY_FORCE_AUDIO,
     SERVICE_IPC,
     SORT,
-    VALUE_FROM_STR,
 )
 from ...json_store import APIKeyStore, AccessManager
 from ...player import XbmcPlaylistPlayer
@@ -905,9 +904,8 @@ class XbmcContext(AbstractContext):
             return False
 
     def abort_requested(self):
-        return VALUE_FROM_STR.get(
-            self.get_ui().get_property(ABORT_FLAG, stacklevel=3),
-            False,
+        return self.get_ui().get_property(
+            ABORT_FLAG, stacklevel=3, as_bool=True
         )
 
     @staticmethod

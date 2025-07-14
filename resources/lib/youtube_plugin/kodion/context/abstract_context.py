@@ -23,6 +23,7 @@ from ..compatibility import (
     urlsplit,
 )
 from ..constants import (
+    BOOL_FROM_STR,
     CONTEXT_MENU,
     KEYMAP,
     PATHS,
@@ -32,7 +33,6 @@ from ..constants import (
     PLAY_STRM,
     PLAY_TIMESHIFT,
     PLAY_USING,
-    VALUE_FROM_STR,
     WINDOW_CACHE,
     WINDOW_FALLBACK,
     WINDOW_REPLACE,
@@ -459,10 +459,10 @@ class AbstractContext(object):
                 value = unquote(value)
             try:
                 if param in self._BOOL_PARAMS:
-                    parsed_value = VALUE_FROM_STR.get(str(value), False)
+                    parsed_value = BOOL_FROM_STR.get(str(value), False)
                 elif param in self._INT_PARAMS:
                     parsed_value = int(
-                        (VALUE_FROM_STR.get(str(value), value) or 0)
+                        (BOOL_FROM_STR.get(str(value), value) or 0)
                         if param in self._INT_BOOL_PARAMS else
                         value
                     )
@@ -477,7 +477,7 @@ class AbstractContext(object):
                 elif param in self._STRING_PARAMS:
                     parsed_value = to_str(value)
                     if param in self._STRING_BOOL_PARAMS:
-                        parsed_value = VALUE_FROM_STR.get(
+                        parsed_value = BOOL_FROM_STR.get(
                             parsed_value, parsed_value
                         )
                     # process and translate deprecated parameters
@@ -494,7 +494,7 @@ class AbstractContext(object):
                         param = 'playlist_id'
                 elif param in self._NON_EMPTY_STRING_PARAMS:
                     parsed_value = to_str(value)
-                    parsed_value = VALUE_FROM_STR.get(
+                    parsed_value = BOOL_FROM_STR.get(
                         parsed_value, parsed_value
                     )
                     if not parsed_value:

@@ -15,7 +15,7 @@ from weakref import ref
 from ..abstract_settings import AbstractSettings
 from ... import logging
 from ...compatibility import xbmcaddon
-from ...constants import ADDON_ID, VALUE_FROM_STR
+from ...constants import ADDON_ID, BOOL_FROM_STR
 from ...utils.system_version import current_system_version
 
 
@@ -147,7 +147,7 @@ class XbmcPluginSettings(AbstractSettings):
             error = exc
             try:
                 value = self.get_string(setting, echo_level=0)
-                value = VALUE_FROM_STR.get(value, default)
+                value = BOOL_FROM_STR.get(value, default)
             except TypeError as exc:
                 error = exc
                 value = default

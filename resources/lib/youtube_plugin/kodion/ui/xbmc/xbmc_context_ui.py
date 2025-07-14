@@ -15,7 +15,7 @@ from weakref import proxy
 from ..abstract_context_ui import AbstractContextUI
 from ... import logging
 from ...compatibility import string_type, xbmc, xbmcgui
-from ...constants import ADDON_ID, REFRESH_CONTAINER
+from ...constants import ADDON_ID, BOOL_FROM_STR, REFRESH_CONTAINER
 from ...utils import to_unicode
 
 
@@ -182,20 +182,24 @@ class XbmcContextUI(AbstractContextUI):
                      property_id,
                      stacklevel=2,
                      log_value=None,
-                     raw=False):
+                     raw=False,
+                     as_bool=False,
+                     default=False):
         _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
         value = xbmcgui.Window(10000).getProperty(_property_id)
         self.log.debug_trace('Get property {property_id!r}: {value!r}',
                              property_id=property_id,
                              value=value if log_value is None else log_value,
                              stacklevel=stacklevel)
-        return value
+        return BOOL_FROM_STR.get(value, default) if as_bool else value
 
     def pop_property(self,
                      property_id,
                      stacklevel=2,
                      log_value=None,
-                     raw=False):
+                     raw=False,
+                     as_bool=False,
+                     default=False):
         _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
         window = xbmcgui.Window(10000)
         value = window.getProperty(_property_id)
@@ -205,7 +209,7 @@ class XbmcContextUI(AbstractContextUI):
                              property_id=property_id,
                              value=value if log_value is None else log_value,
                              stacklevel=stacklevel)
-        return value
+        return BOOL_FROM_STR.get(value, default) if as_bool else value
 
     def clear_property(self, property_id, stacklevel=2, raw=False):
         self.log.debug_trace('Clear property {property_id!r}',

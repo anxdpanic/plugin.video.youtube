@@ -32,7 +32,7 @@ RESOURCE_PATH = ADDON_PATH + '/resources'
 TEMP_PATH = 'special://temp/' + ADDON_ID
 
 # Const values
-VALUE_FROM_STR = {
+BOOL_FROM_STR = {
     '0': False,
     '1': True,
     'false': False,
@@ -134,7 +134,7 @@ __all__ = (
     'TEMP_PATH',
 
     # Const values
-    'VALUE_FROM_STR',
+    'BOOL_FROM_STR',
     'VALUE_TO_STR',
 
     # Flags

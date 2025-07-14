@@ -17,6 +17,7 @@ from .. import logging
 from ..compatibility import urlsplit, xbmc, xbmcgui
 from ..constants import (
     ADDON_ID,
+    BOOL_FROM_STR,
     CHECK_SETTINGS,
     CONTAINER_FOCUS,
     FILE_READ,
@@ -135,20 +136,24 @@ class ServiceMonitor(xbmc.Monitor):
                      property_id,
                      stacklevel=2,
                      log_value=None,
-                     raw=False):
+                     raw=False,
+                     as_bool=False,
+                     default=False):
         _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
         value = xbmcgui.Window(10000).getProperty(_property_id)
         self.log.debug_trace('Get property {property_id!r}: {value!r}',
                              property_id=property_id,
                              value=value if log_value is None else log_value,
                              stacklevel=stacklevel)
-        return value
+        return BOOL_FROM_STR.get(value, default) if as_bool else value
 
     def pop_property(self,
                      property_id,
                      stacklevel=2,
                      log_value=None,
-                     raw=False):
+                     raw=False,
+                     as_bool=False,
+                     default=False):
         _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
         window = xbmcgui.Window(10000)
         value = window.getProperty(_property_id)
@@ -158,7 +163,7 @@ class ServiceMonitor(xbmc.Monitor):
                              property_id=property_id,
                              value=value if log_value is None else log_value,
                              stacklevel=stacklevel)
-        return value
+        return BOOL_FROM_STR.get(value, default) if as_bool else value
 
     def clear_property(self, property_id, stacklevel=2, raw=False):
         self.log.debug_trace('Clear property {property_id!r}',
