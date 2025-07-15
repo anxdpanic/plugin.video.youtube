@@ -25,6 +25,7 @@ class DirectoryItem(BaseItem):
                  special_sort=None,
                  date_time=None,
                  category_label=None,
+                 bookmark_id=None,
                  channel_id=None,
                  playlist_id=None,
                  subscription_id=None):
@@ -34,6 +35,7 @@ class DirectoryItem(BaseItem):
         self.set_category_label(category_label or name)
         self._plot = plot or name
         self._is_action = action
+        self._bookmark_id = bookmark_id
         self._channel_id = channel_id
         self._playlist_id = playlist_id
         self._subscription_id = subscription_id

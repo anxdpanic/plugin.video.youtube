@@ -325,13 +325,15 @@ def _process_description_links(provider, context):
                 ),
                 channel_id=channel_id,
             )
-            channel_id_dict[channel_id] = channel_item
+            channel_items = channel_id_dict.setdefault(channel_id, [])
+            channel_items.append(channel_item)
 
         utils.update_channel_items(provider, context, channel_id_dict)
 
         # clean up - remove empty entries
         result = [channel_item
-                  for channel_item in channel_id_dict.values()
+                  for channel_items in channel_id_dict.values()
+                  for channel_item in channel_items
                   if channel_item.get_name()]
         if not result:
             return False, None
@@ -362,7 +364,8 @@ def _process_description_links(provider, context):
                 ),
                 playlist_id=playlist_id,
             )
-            playlist_id_dict[playlist_id] = playlist_item
+            playlist_items = playlist_id_dict.setdefault(playlist_id, [])
+            playlist_items.append(playlist_item)
 
         channel_items_dict = {}
         utils.update_playlist_items(provider,
@@ -373,7 +376,8 @@ def _process_description_links(provider, context):
 
         # clean up - remove empty entries
         result = [playlist_item
-                  for playlist_item in playlist_id_dict.values()
+                  for playlist_items in playlist_id_dict.values()
+                  for playlist_item in playlist_items
                   if playlist_item.get_name()]
         if not result:
             return False, None

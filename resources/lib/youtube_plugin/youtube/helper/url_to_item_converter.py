@@ -10,7 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from collections import deque
 from re import (
     IGNORECASE,
     compile as re_compile,
@@ -47,6 +46,7 @@ class UrlToItemConverter(object):
         self._channel_id_dict = {}
         self._channel_items = []
         self._channel_ids = []
+        self._channel_items_dict = {}
 
     def add_url(self, url, context):
         parsed_url = urlsplit(url)
@@ -103,12 +103,8 @@ class UrlToItemConverter(object):
                     ),
                     video_id=video_id,
                 )
-                if video_id in self._video_id_dict:
-                    fifo_queue = self._video_id_dict[video_id]
-                else:
-                    fifo_queue = deque()
-                    self._video_id_dict[video_id] = fifo_queue
-                fifo_queue.appendleft(item)
+                items = self._video_id_dict.setdefault(video_id, [])
+                items.append(item)
 
         elif 'video_id' in new_params:
             video_id = new_params['video_id']
@@ -118,12 +114,8 @@ class UrlToItemConverter(object):
                 uri=context.create_uri((PATHS.PLAY,), new_params),
                 video_id=video_id,
             )
-            if video_id in self._video_id_dict:
-                fifo_queue = self._video_id_dict[video_id]
-            else:
-                fifo_queue = deque()
-                self._video_id_dict[video_id] = fifo_queue
-            fifo_queue.appendleft(item)
+            items = self._video_id_dict.setdefault(video_id, [])
+            items.append(item)
 
         if 'playlist_id' in new_params:
             playlist_id = new_params['playlist_id']
@@ -137,7 +129,8 @@ class UrlToItemConverter(object):
                 uri=context.create_uri(('playlist', playlist_id,), new_params),
                 playlist_id=playlist_id,
             )
-            self._playlist_id_dict[playlist_id] = item
+            items = self._playlist_id_dict.setdefault(playlist_id, [])
+            items.append(item)
 
         if 'channel_id' in new_params:
             channel_id = new_params['channel_id']
@@ -156,7 +149,8 @@ class UrlToItemConverter(object):
                 uri=context.create_uri(('channel', channel_id,), new_params),
                 channel_id=channel_id,
             )
-            self._channel_id_dict[channel_id] = item
+            items = self._channel_id_dict.setdefault(channel_id, [])
+            items.append(item)
 
         if not item:
             self.log.debug('No items found in url "%s"', url)
@@ -170,9 +164,6 @@ class UrlToItemConverter(object):
         query = context.get_param('q')
 
         if self._channel_ids:
-            # remove duplicates
-            self._channel_ids = list(frozenset(self._channel_ids))
-
             item_label = context.localize('channels')
             channels_item = DirectoryItem(
                 context.get_ui().bold(item_label),
@@ -194,9 +185,6 @@ class UrlToItemConverter(object):
             result.append(channels_item)
 
         if self._playlist_ids:
-            # remove duplicates
-            self._playlist_ids = list(frozenset(self._playlist_ids))
-
             if context.get_param('uri'):
                 playlists_item = UriItem(
                     context.create_uri(
@@ -244,23 +232,17 @@ class UrlToItemConverter(object):
         if self._video_items:
             return self._video_items
 
-        video_items = [
-            video_item
-            for video_items in self._video_id_dict.values()
-            for video_item in video_items
-        ]
-
-        channel_items_dict = {}
         utils.update_video_items(
             provider,
             context,
             self._video_id_dict,
-            channel_items_dict=channel_items_dict,
+            channel_items_dict=self._channel_items_dict,
         )
-        utils.update_channel_info(provider, context, channel_items_dict)
+        utils.update_channel_info(provider, context, self._channel_items_dict)
 
         self._video_items = [
             video_item
+            for video_items in self._video_id_dict.values()
             for video_item in video_items
             if skip_title or video_item.get_name()
         ]
@@ -270,26 +252,38 @@ class UrlToItemConverter(object):
         if self._playlist_items:
             return self._playlist_items
 
-        channel_items_dict = {}
-        utils.update_playlist_items(provider, context,
-                                    self._playlist_id_dict,
-                                    channel_items_dict=channel_items_dict)
-        utils.update_channel_info(provider, context, channel_items_dict)
+        utils.update_playlist_items(
+            provider,
+            context,
+            self._playlist_id_dict,
+            channel_items_dict=self._channel_items_dict,
+        )
+        utils.update_channel_info(provider, context, self._channel_items_dict)
 
         self._playlist_items = [
             playlist_item
-            for playlist_item in self._playlist_id_dict.values()
+            for playlist_items in self._playlist_id_dict.values()
+            for playlist_item in playlist_items
             if skip_title or playlist_item.get_name()
         ]
         return self._playlist_items
 
-    def get_channel_items(self, _provider, _context, skip_title=False):
+    def get_channel_items(self, provider, context, skip_title=False):
         if self._channel_items:
             return self._channel_items
 
+        utils.update_channel_items(
+            provider,
+            context,
+            self._channel_id_dict,
+            channel_items_dict=self._channel_items_dict,
+        )
+        utils.update_channel_info(provider, context, self._channel_items_dict)
+
         self._channel_items = [
             channel_item
-            for channel_item in self._channel_id_dict.values()
+            for channel_items in self._channel_id_dict.values()
+            for channel_item in channel_items
             if skip_title or channel_item.get_name()
         ]
         return self._channel_items

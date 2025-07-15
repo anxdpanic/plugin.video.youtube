@@ -232,11 +232,14 @@ def update_channel_items(provider, context, channel_id_dict,
     for channel_id, yt_item in data.items():
         if not yt_item or 'snippet' not in yt_item:
             continue
-        snippet = yt_item['snippet']
 
-        channel_item = channel_id_dict.get(channel_id)
-        if not channel_item:
+        channel_items = channel_id_dict.get(channel_id)
+        if channel_items:
+            channel_item = channel_items[-1]
+        else:
             continue
+
+        snippet = yt_item['snippet']
 
         label_stats = []
         stats = []
@@ -288,7 +291,7 @@ def update_channel_items(provider, context, channel_id_dict,
                 ui.bold(channel_name, cr_after=1),
                 ui.new_line(stats, cr_after=1) if stats else '',
                 ui.new_line(description, cr_after=1) if description else '',
-                ui.new_line('--------', cr_before=1, cr_after=1),
+                ui.new_line('--------', cr_after=1),
                 'https://www.youtube.com/',
                 channel_handle if channel_handle else
                 channel_id if channel_id.startswith('@') else
@@ -352,13 +355,11 @@ def update_channel_items(provider, context, channel_id_dict,
                 )
             )
 
-        if context_menu:
-            channel_item.add_context_menu(context_menu)
-
-        # update channel mapping
-        if channel_items_dict is not None:
-            channel_items = channel_items_dict.setdefault(channel_id, [])
-            channel_items.append(channel_item)
+        update_duplicate_items(channel_item,
+                               channel_items,
+                               channel_id,
+                               channel_items_dict,
+                               context_menu)
 
     if channel_items_dict:
         update_channel_info(provider,
@@ -427,13 +428,14 @@ def update_playlist_items(provider, context, playlist_id_dict,
         in_saved_playlists = True
 
     for playlist_id, yt_item in data.items():
-        playlist_item = playlist_id_dict.get(playlist_id)
-        if not playlist_item:
-            continue
-
         if not yt_item or 'snippet' not in yt_item:
             continue
-        snippet = yt_item['snippet']
+
+        playlist_items = playlist_id_dict.get(playlist_id)
+        if playlist_items:
+            playlist_item = playlist_items[-1]
+        else:
+            continue
 
         item_count_str, item_count = friendly_number(
             yt_item.get('contentDetails', {}).get('itemCount', 0),
@@ -441,6 +443,8 @@ def update_playlist_items(provider, context, playlist_id_dict,
         )
         if not item_count and playlist_id.startswith('UU'):
             continue
+
+        snippet = yt_item['snippet']
 
         playlist_item.available = True
 
@@ -485,7 +489,7 @@ def update_playlist_items(provider, context, playlist_id_dict,
                     cr_after=1,
                 ),
                 ui.new_line(description, cr_after=1) if description else '',
-                ui.new_line('--------', cr_before=1, cr_after=1),
+                ui.new_line('--------', cr_after=1),
                 'https://youtube.com/playlist?list=' + playlist_id,
             ))
         playlist_item.set_plot(description)
@@ -510,9 +514,6 @@ def update_playlist_items(provider, context, playlist_id_dict,
         # update channel mapping
         channel_id = snippet.get('channelId', '')
         playlist_item.channel_id = channel_id
-        if channel_id and channel_items_dict is not None:
-            channel_items = channel_items_dict.setdefault(channel_id, [])
-            channel_items.append(playlist_item)
 
         if in_my_playlists:
             context_menu = [
@@ -598,8 +599,11 @@ def update_playlist_items(provider, context, playlist_id_dict,
             None,
         ))
 
-        if context_menu:
-            playlist_item.add_context_menu(context_menu)
+        update_duplicate_items(playlist_item,
+                               playlist_items,
+                               channel_id,
+                               channel_items_dict,
+                               context_menu)
 
 
 def update_video_items(provider, context, video_id_dict,
@@ -687,19 +691,13 @@ def update_video_items(provider, context, video_id_dict,
             playlist_id = playlist_match.group('playlist_id')
             playlist_channel_id = playlist_match.group('channel_id')
 
-    media_items = None
-    media_item = None
-
     for video_id, yt_item in data.items():
-        if media_items and media_item:
-            update_duplicate_items(media_item, media_items)
-
         if not yt_item:
             continue
 
         media_items = video_id_dict.get(video_id)
         if media_items:
-            media_item = media_items.pop()
+            media_item = media_items[-1]
         else:
             continue
 
@@ -924,7 +922,7 @@ def update_video_items(provider, context, video_id_dict,
                 (ui.italic(start_at, cr_after=1) if media_item.upcoming
                  else ui.new_line(start_at, cr_after=1)) if start_at else '',
                 ui.new_line(description, cr_after=1) if description else '',
-                ui.new_line('--------', cr_before=1, cr_after=1),
+                ui.new_line('--------', cr_after=1),
                 'https://youtu.be/' + video_id,
             ))
         media_item.set_plot(description)
@@ -976,9 +974,6 @@ def update_video_items(provider, context, video_id_dict,
         # update channel mapping
         channel_id = snippet.get('channelId') or playlist_channel_id
         media_item.channel_id = channel_id
-        if channel_id and channel_items_dict is not None:
-            channel_items = channel_items_dict.setdefault(channel_id, [])
-            channel_items.append(media_item)
 
         item_playlist_id = playlist_id or media_item.playlist_id
 
@@ -1109,8 +1104,11 @@ def update_video_items(provider, context, video_id_dict,
             ),
         ))
 
-        if context_menu:
-            media_item.add_context_menu(context_menu)
+        update_duplicate_items(media_item,
+                               media_items,
+                               channel_id,
+                               channel_items_dict,
+                               context_menu)
 
 
 def update_play_info(provider,
@@ -1512,18 +1510,29 @@ def custom_filter_split(filter_string,
     return False
 
 
-def update_duplicate_items(item,
-                           duplicates,
+def update_duplicate_items(updated_item,
+                           items,
+                           channel_id=None,
+                           channel_items_dict=None,
+                           context_menu=None,
                            skip_keys=frozenset(('_bookmark_id',
                                                 '_bookmark_timestamp',
                                                 '_callback',
-                                                '_track_number')),
+                                                '_context_menu',
+                                                '_track_number',
+                                                '_uri')),
                            skip_vals=(None, '', -1)):
-    item = item.__dict__
-    keys = frozenset(item.keys()).difference(skip_keys)
-    for duplicate in duplicates:
-        duplicate = duplicate.__dict__
-        for key in keys:
-            val = item[key]
-            if val not in skip_vals:
-                duplicate[key] = val
+    updates = {
+        key: val
+        for key, val in updated_item.__dict__.items()
+        if key not in skip_keys and val not in skip_vals
+    }
+    for item in items:
+        if item != updated_item:
+            item.__dict__.update(updates)
+        if context_menu:
+            item.add_context_menu(context_menu)
+
+    if channel_id and channel_items_dict is not None:
+        channel_items = channel_items_dict.setdefault(channel_id, [])
+        channel_items.extend(items)
