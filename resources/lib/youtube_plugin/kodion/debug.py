@@ -100,7 +100,6 @@ class Profiler(object):
         '_reuse',
         '_sort_by',
         '_timer',
-        'name',
     )
 
     log = logging.getLogger(__name__)
@@ -118,7 +117,6 @@ class Profiler(object):
     def __init__(self,
                  enabled=True,
                  lazy=True,
-                 name=__name__,
                  num_lines=20,
                  print_callees=False,
                  reuse=False,
@@ -131,7 +129,6 @@ class Profiler(object):
         self._reuse = reuse
         self._sort_by = sort_by
         self._timer = timer
-        self.name = name
 
         if enabled and not lazy:
             self._create_profiler()
@@ -158,53 +155,19 @@ class Profiler(object):
 
         if not func:
             self._reuse = reuse
-            self.name = name
             return self
 
         @wraps(func)
         def wrapper(*args, **kwargs):
-            """Wrapper to:
+            """
+            Wrapper to:
                1) create a new Profiler instance;
                2) run the function being profiled;
                3) print out profiler result to the log; and
-               4) return result of function call"""
-
-            name = getattr(func, '__qualname__', None)
-            if name:
-                # If __qualname__ is available (Python 3.3+) then use it
-                pass
-
-            elif args and getattr(args[0], func.__name__, None):
-                if isinstance(args[0], type):
-                    class_name = args[0].__name__
-                else:
-                    class_name = args[0].__class__.__name__
-                name = '.'.join((
-                    class_name,
-                    func.__name__,
-                ))
-
-            elif (func.__class__
-                  and not isinstance(func.__class__, type)
-                  and func.__class__.__name__ != 'function'):
-                name = '.'.join((
-                    func.__class__.__name__,
-                    func.__name__,
-                ))
-
-            elif func.__module__:
-                name = '.'.join((
-                    func.__module__,
-                    func.__name__,
-                ))
-
-            else:
-                name = func.__name__
-
-            self.name = name
+               4) return result of function call
+            """
             with self:
                 result = func(*args, **kwargs)
-
             return result
 
         if not self._enabled:
