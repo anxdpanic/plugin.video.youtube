@@ -28,8 +28,15 @@ class DirectoryItem(BaseItem):
                  bookmark_id=None,
                  channel_id=None,
                  playlist_id=None,
-                 subscription_id=None):
-        super(DirectoryItem, self).__init__(name, uri, image, fanart)
+                 subscription_id=None,
+                 **kwargs):
+        super(DirectoryItem, self).__init__(
+            name=name,
+            uri=uri,
+            image=image,
+            fanart=fanart,
+            **kwargs
+        )
         name = self.get_name()
         self._category_label = None
         self.set_category_label(category_label or name)

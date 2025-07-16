@@ -34,6 +34,7 @@ from ...kodion.constants import (
     PLAY_USING,
 )
 from ...kodion.items import (
+    BookmarkItem,
     CommandItem,
     DirectoryItem,
     MediaItem,
@@ -64,9 +65,9 @@ def _process_list_response(provider,
         log.warning('Items list is empty')
         return None
 
-    _video_id_dict = {}
-    _playlist_id_dict = {}
-    _channel_id_dict = {}
+    new_video_id_dict = {}
+    new_playlist_id_dict = {}
+    new_channel_id_dict = {}
     if subscription_id_dict is None:
         subscription_id_dict = {}
 
@@ -393,8 +394,8 @@ def _process_list_response(provider,
             position = snippet.get('position') or len(items)
             item.set_track_number(position + 1)
 
-        elif kind_type == 'pluginitem':
-            item = DirectoryItem(**item_params)
+        elif kind_type == 'bookmarkitem':
+            item = BookmarkItem(**item_params)
 
         elif kind_type == 'commanditem':
             item = CommandItem(context=context, **item_params)
@@ -407,17 +408,39 @@ def _process_list_response(provider,
 
         if not video_id and 'video_id' in item_params:
             video_id = item_params['video_id']
-        if not playlist_id and 'playlist_id' in item_params:
-            playlist_id = item_params['playlist_id']
-        if not channel_id and 'channel_id' in item_params:
-            channel_id = item_params['channel_id']
+        if not playlist_id:
+            if 'playlist_id' in item_params:
+                playlist_id = item_params['playlist_id']
+            elif not video_id and not channel_id:
+                if 'channel_id' in item_params:
+                    channel_id = item_params['channel_id']
 
-        for item_id, new_dict, complete_dict, exclude_types in (
-                (video_id, _video_id_dict, video_id_dict, None),
-                (playlist_id, _playlist_id_dict, playlist_id_dict, MediaItem),
-                (channel_id, _channel_id_dict, channel_id_dict, MediaItem),
+        for item_id, new_dict, complete_dict, allow_types, allow_kinds in (
+                (
+                        video_id,
+                        new_video_id_dict,
+                        video_id_dict,
+                        MediaItem,
+                        None,
+                ),
+                (
+                        playlist_id,
+                        new_playlist_id_dict,
+                        playlist_id_dict,
+                        DirectoryItem,
+                        None,
+                ),
+                (
+                        channel_id,
+                        new_channel_id_dict,
+                        channel_id_dict,
+                        DirectoryItem,
+                        {'channel', 'bookmarkitem'},
+                ),
         ):
-            if not item_id or exclude_types and isinstance(item, exclude_types):
+            if (not item_id
+                    or (allow_types and not isinstance(item, allow_types))
+                    or (allow_kinds and kind_type not in allow_kinds)):
                 continue
 
             if complete_dict is None:
@@ -463,9 +486,9 @@ def _process_list_response(provider,
     channel_items_dict = {}
 
     if progress_dialog:
-        delta = (len(_video_id_dict)
-                 + len(_channel_id_dict)
-                 + len(_playlist_id_dict)
+        delta = (len(new_video_id_dict)
+                 + len(new_channel_id_dict)
+                 + len(new_playlist_id_dict)
                  + len(subscription_id_dict))
         progress_dialog.grow_total(delta=delta)
         progress_dialog.update(steps=delta)
@@ -475,7 +498,7 @@ def _process_list_response(provider,
         1: {
             'fetcher': resource_manager.get_videos,
             'args': (
-                _video_id_dict,
+                new_video_id_dict,
             ),
             'kwargs': {
                 'live_details': True,
@@ -488,7 +511,7 @@ def _process_list_response(provider,
             'upd_args': (
                 provider,
                 context,
-                _video_id_dict,
+                new_video_id_dict,
                 channel_items_dict,
             ),
             'upd_kwargs': {
@@ -502,7 +525,7 @@ def _process_list_response(provider,
         2: {
             'fetcher': resource_manager.get_playlists,
             'args': (
-                _playlist_id_dict,
+                new_playlist_id_dict,
             ),
             'kwargs': {
                 'defer_cache': True,
@@ -512,7 +535,7 @@ def _process_list_response(provider,
             'upd_args': (
                 provider,
                 context,
-                _playlist_id_dict,
+                new_playlist_id_dict,
                 channel_items_dict,
             ),
             'upd_kwargs': {
@@ -524,7 +547,7 @@ def _process_list_response(provider,
         3: {
             'fetcher': resource_manager.get_channels,
             'args': (
-                _channel_id_dict,
+                new_channel_id_dict,
             ),
             'kwargs': {
                 '_force_run': True,
@@ -535,7 +558,7 @@ def _process_list_response(provider,
             'upd_args': (
                 provider,
                 context,
-                _channel_id_dict,
+                new_channel_id_dict,
                 subscription_id_dict,
                 channel_items_dict,
             ),

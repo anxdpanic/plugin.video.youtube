@@ -13,6 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 import json
 from datetime import date, datetime
 
+from .bookmark_item import BookmarkItem
 from .directory_item import DirectoryItem
 from .image_item import ImageItem
 from .media_item import AudioItem, VideoItem
@@ -23,6 +24,7 @@ from ..utils.datetime_parser import strptime
 
 _ITEM_TYPES = {
     'AudioItem': AudioItem,
+    'BookmarkItem': BookmarkItem,
     'DirectoryItem': DirectoryItem,
     'ImageItem': ImageItem,
     'VideoItem': VideoItem,

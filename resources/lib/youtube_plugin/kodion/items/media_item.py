@@ -35,8 +35,15 @@ class MediaItem(BaseItem):
                  channel_id=None,
                  playlist_id=None,
                  playlist_item_id=None,
-                 subscription_id=None):
-        super(MediaItem, self).__init__(name, uri, image, fanart)
+                 subscription_id=None,
+                 **kwargs):
+        super(MediaItem, self).__init__(
+            name=name,
+            uri=uri,
+            image=image,
+            fanart=fanart,
+            **kwargs
+        )
         self._aired = None
         self._premiered = None
         self._scheduled_start_utc = None
@@ -386,16 +393,18 @@ class AudioItem(MediaItem):
                  playlist_id=None,
                  playlist_item_id=None,
                  subscription_id=None):
-        super(AudioItem, self).__init__(name,
-                                        uri,
-                                        image,
-                                        fanart,
-                                        plot,
-                                        video_id,
-                                        channel_id,
-                                        playlist_id,
-                                        playlist_item_id,
-                                        subscription_id)
+        super(AudioItem, self).__init__(
+            name=name,
+            uri=uri,
+            image=image,
+            fanart=fanart,
+            plot=plot,
+            video_id=video_id,
+            channel_id=channel_id,
+            playlist_id=playlist_id,
+            playlist_item_id=playlist_item_id,
+            subscription_id=subscription_id,
+        )
         self._album = None
 
     def set_album_name(self, album_name):
@@ -425,17 +434,21 @@ class VideoItem(MediaItem):
                  channel_id=None,
                  playlist_id=None,
                  playlist_item_id=None,
-                 subscription_id=None):
-        super(VideoItem, self).__init__(name,
-                                        uri,
-                                        image,
-                                        fanart,
-                                        plot,
-                                        video_id,
-                                        channel_id,
-                                        playlist_id,
-                                        playlist_item_id,
-                                        subscription_id)
+                 subscription_id=None,
+                 **kwargs):
+        super(VideoItem, self).__init__(
+            name=name,
+            uri=uri,
+            image=image,
+            fanart=fanart,
+            plot=plot,
+            video_id=video_id,
+            channel_id=channel_id,
+            playlist_id=playlist_id,
+            playlist_item_id=playlist_item_id,
+            subscription_id=subscription_id,
+            **kwargs
+        )
         self._directors = None
         self._imdb_id = None
 

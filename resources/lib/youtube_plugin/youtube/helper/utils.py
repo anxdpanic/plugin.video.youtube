@@ -875,7 +875,7 @@ def update_video_items(provider, context, video_id_dict,
         # update and set the title
         localised_info = snippet.get('localized') or {}
         title = media_item.get_name()
-        if not title or title == untitled:
+        if not title or title == untitled or media_item.bookmark_id:
             title = (localised_info.get('title')
                      or snippet.get('title')
                      or untitled)
@@ -952,7 +952,7 @@ def update_video_items(provider, context, video_id_dict,
         image = media_item.get_image()
         if (not image
                 or get_better_thumbs
-                or image.startswith('Default')):
+                or image.startswith(('Default', 'special://'))):
             image = get_thumbnail(thumb_size, snippet.get('thumbnails'))
         if image and media_item.live:
             if '?' in image:

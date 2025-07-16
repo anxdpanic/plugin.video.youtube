@@ -54,6 +54,7 @@ from ...utils import parse_and_redact_uri
 class XbmcPlugin(AbstractPlugin):
     _LIST_ITEM_MAP = {
         'AudioItem': media_listitem,
+        'BookmarkItem': directory_listitem,
         'CommandItem': directory_listitem,
         'DirectoryItem': directory_listitem,
         'ImageItem': image_listitem,
@@ -67,6 +68,7 @@ class XbmcPlugin(AbstractPlugin):
 
     _PLAY_ITEM_MAP = {
         'AudioItem': playback_item,
+        'BookmarkItem': playback_item,
         'UriItem': uri_listitem,
         'VideoItem': playback_item,
     }
@@ -244,7 +246,8 @@ class XbmcPlugin(AbstractPlugin):
 
                 if (force_resolve
                         and not result_item
-                        and item_type in self._PLAY_ITEM_MAP):
+                        and item_type in self._PLAY_ITEM_MAP
+                        and item.playable):
                     result_item = item
 
                 listitem_type = self._LIST_ITEM_MAP.get(item_type)

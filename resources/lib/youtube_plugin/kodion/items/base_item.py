@@ -28,7 +28,8 @@ class BaseItem(object):
     _version = 3
     _playable = False
 
-    def __init__(self, name, uri, image=None, fanart=None):
+    def __init__(self, name, uri, image=None, fanart=None, **kwargs):
+        super(BaseItem, self).__init__()
         self._name = None
         self.set_name(name)
 
@@ -82,12 +83,19 @@ class BaseItem(object):
             cls=_Encoder
         )
 
+    @staticmethod
+    def generate_id(*args, **kwargs):
+        prefix = kwargs.get('prefix')
+        if prefix:
+            return '%s.%s' % (prefix, generate_hash(*args))
+        return generate_hash(*args)
+
     def get_id(self):
         """
         Returns a unique id of the item.
         :return: unique id of the item.
         """
-        return generate_hash(self._name, self._uri)
+        return self.generate_id(self._name, self._uri)
 
     def set_name(self, name):
         try:

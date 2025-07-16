@@ -40,6 +40,7 @@ from ..kodion.constants import (
 )
 from ..kodion.items import (
     BaseItem,
+    BookmarkItem,
     DirectoryItem,
     NewSearchItem,
     SearchItem,
@@ -1735,14 +1736,14 @@ class Provider(AbstractProvider):
                 'kind': 'plugin#pluginListResponse',
                 'items': [
                     {
-                        'kind': 'plugin#pluginItem',
+                        'kind': 'plugin#bookmarkItem',
                         '_params': {
                             'name': localize('bookmarks.add'),
                             'uri': context.create_uri(
                                 (PATHS.BOOKMARKS, 'add_custom',),
                             ),
-                            'image': '{media}/bookmarks.png',
                             'action': True,
+                            'playable': False,
                             'special_sort': 'top',
                         },
                     },
@@ -1799,30 +1800,28 @@ class Provider(AbstractProvider):
                     if not isinstance(item, BaseItem):
                         break
                     item_name = item.get_name()
+                    item_uri = item.get_uri()
 
-                    if isinstance(item, VideoItem):
-                        kind = 'youtube#video'
-                        yt_id = item.video_id
-                        continue
-
-                    bookmark_id = getattr(item, 'bookmark_id', '')
-                    if bookmark_id.startswith('custom-'):
-                        item_uri = item.get_uri()
-                        kind = 'plugin#pluginItem'
+                    if isinstance(item, BookmarkItem):
+                        kind = 'plugin#bookmarkItem'
                         yt_id = False
                         can_edit = True
                         item_params = {
                             'name': item_name,
                             'uri': item_uri,
-                            'bookmark_id': bookmark_id,
-                            'image': '{media}/bookmarks.png',
+                            'bookmark_id': item_id,
                             'plot': item_uri,
-                            'action': getattr(item, 'is_action', bool)(),
+                            'action': item.is_action(),
                             'special_sort': False,
                             'date_time': item.get_date(),
                             'category_label': '__inherit__',
                         }
                     else:
+                        if isinstance(item, VideoItem):
+                            kind = 'youtube#video'
+                            yt_id = item.video_id
+                            continue
+
                         yt_id = getattr(item, 'playlist_id', None)
                         if yt_id:
                             kind = 'youtube#playlist'
@@ -1832,10 +1831,6 @@ class Provider(AbstractProvider):
                         if yt_id:
                             kind = 'youtube#channel'
                             continue
-
-                    item_uri = item_uri or item.get_uri()
-                    if not item_uri:
-                        break
 
                     item_ids = parse_item_ids(item_uri)
                     for _kind in ('video', 'playlist', 'channel'):
@@ -1852,7 +1847,6 @@ class Provider(AbstractProvider):
                     if kind:
                         partial_result = True
                         continue
-
                     break
                 else:
                     v3_response['items'].append({
@@ -1880,7 +1874,7 @@ class Provider(AbstractProvider):
 
                 provider.log.warning(('Deleting unknown bookmark type',
                                       'ID:   {item_id}',
-                                      'Item: {item}'),
+                                      'Item: {item!r}'),
                                      item_id=item_id,
                                      item=item)
                 bookmarks_list.del_item(item_id)
@@ -1934,17 +1928,23 @@ class Provider(AbstractProvider):
             if not context.is_plugin_path(item_uri):
                 return False
 
-            item = DirectoryItem(name=item_name,
-                                 uri=item_uri,
-                                 image='{media}/bookmarks.png',
-                                 plot=item_uri,
-                                 special_sort=False,
-                                 date_time=now(),
-                                 category_label='__inherit__')
+            item_date_time = now()
+            item = BookmarkItem(name=item_name,
+                                uri=item_uri,
+                                plot=item_uri,
+                                date_time=item_date_time,
+                                category_label='__inherit__')
             if item_id:
+                item.bookmark_id = item_id
                 context.get_bookmarks_list().update_item(item_id, repr(item))
             else:
-                item_id = 'custom-' + item.get_id()
+                item_id = item.generate_id(
+                    item_name,
+                    item_uri,
+                    item_date_time.timestamp(),
+                    prefix='custom',
+                )
+                item.bookmark_id = item_id
                 context.get_bookmarks_list().add_item(item_id, repr(item))
             ui.refresh_container()
 
