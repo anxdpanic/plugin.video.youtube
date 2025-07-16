@@ -279,6 +279,17 @@ class KodiLogger(logging.Logger):
                 **kwargs
             )
 
+    def waring_trace(self, msg, *args, **kwargs):
+        if self.isEnabledFor(WARNING):
+            self._log(
+                WARNING,
+                msg,
+                args,
+                stack_info=kwargs.pop('stack_info', True),
+                stacklevel=kwargs.pop('stacklevel', 1),
+                **kwargs
+            )
+
     def debug_trace(self, msg, *args, **kwargs):
         if self.isEnabledFor(DEBUG):
             self._log(
@@ -385,6 +396,14 @@ def error_trace(msg, *args, **kwargs):
                stack_info=kwargs.pop('stack_info', True),
                stacklevel=kwargs.pop('stacklevel', 1),
                **kwargs)
+
+
+def warning_trace(msg, *args, **kwargs):
+    root.warning(msg,
+                 *args,
+                 stack_info=kwargs.pop('stack_info', True),
+                 stacklevel=kwargs.pop('stacklevel', 1),
+                 **kwargs)
 
 
 def debug_trace(msg, *args, **kwargs):
