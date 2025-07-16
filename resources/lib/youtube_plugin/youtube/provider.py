@@ -1194,9 +1194,7 @@ class Provider(AbstractProvider):
     @staticmethod
     def on_playback_history(provider, context, re_match):
         params = context.get_params()
-        command = re_match.group('command')
-        if not command:
-            return False, None
+        command = re_match.group('command') or 'list'
 
         localize = context.localize
         playback_history = context.get_playback_history()
@@ -1722,9 +1720,7 @@ class Provider(AbstractProvider):
     @staticmethod
     def on_bookmarks(provider, context, re_match):
         params = context.get_params()
-        command = re_match.group('command')
-        if not command:
-            return False, None
+        command = re_match.group('command') or 'list'
 
         ui = context.get_ui()
         localize = context.localize
@@ -2001,9 +1997,7 @@ class Provider(AbstractProvider):
     @staticmethod
     def on_watch_later(provider, context, re_match):
         params = context.get_params()
-        command = re_match.group('command')
-        if not command:
-            return False, None
+        command = re_match.group('command') or 'list'
 
         localize = context.localize
         ui = context.get_ui()
