@@ -24,7 +24,10 @@ _context = XbmcContext()
 _log = logging.getLogger(__name__)
 _plugin = XbmcPlugin()
 _provider = Provider()
-_profiler = Profiler(enabled=False, print_callees=False, num_lines=20)
+_profiler = Profiler(enabled=False,
+                     timer=Profiler.elapsed_timer,
+                     print_callees=False,
+                     num_lines=20)
 
 
 def run(context=_context,

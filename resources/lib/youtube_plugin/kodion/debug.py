@@ -12,10 +12,10 @@ from __future__ import absolute_import, division, unicode_literals
 
 import sys
 import threading
+import time
 from atexit import register as atexit_register
 from cProfile import Profile
 from functools import wraps
-from os import times as os_times
 from os.path import normpath
 from pstats import Stats
 from traceback import extract_stack, format_list
@@ -182,10 +182,12 @@ class Profiler(object):
             self._profiler = Profile()
         self._profiler.enable()
 
-    @classmethod
-    def wait_timer(cls):
-        times_result = os_times()
-        return times_result.elapsed - (times_result.system + times_result.user)
+    try:
+        elapsed_timer = time.perf_counter
+        process_timer = time.process_time
+    except AttributeError:
+        elapsed_timer = time.clock
+        process_timer = time.clock
 
     def disable(self):
         if self._profiler:
