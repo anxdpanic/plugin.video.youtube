@@ -11,7 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from .base_item import BaseItem
-from ..compatibility import unescape, urlencode
+from ..compatibility import parse_qsl, unescape, urlencode, urlsplit
 
 
 class DirectoryItem(BaseItem):
@@ -65,19 +65,15 @@ class DirectoryItem(BaseItem):
             return
 
         current_label = self._category_label
-        if current_label:
-            if current_label != label:
-                uri = self.get_uri()
-                self.set_uri(uri.replace(
-                    urlencode({'category_label': current_label}),
-                    urlencode({'category_label': label}) if label else '',
-                ))
-        elif label:
-            uri = self.get_uri()
-            self.set_uri(('&' if '?' in uri else '?').join((
-                uri,
-                urlencode({'category_label': label}),
-            )))
+        if current_label or label and current_label != label:
+            uri = urlsplit(self.get_uri())
+            params = dict(parse_qsl(uri.query))
+            if label:
+                params['category_label'] = label
+            else:
+                del params['category_label']
+            self.set_uri(uri._replace(query=urlencode(params)).geturl())
+
         self._category_label = label
 
     def get_category_label(self):
