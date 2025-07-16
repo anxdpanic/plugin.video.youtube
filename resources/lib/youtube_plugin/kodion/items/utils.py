@@ -16,6 +16,7 @@ from datetime import date, datetime
 from .directory_item import DirectoryItem
 from .image_item import ImageItem
 from .media_item import AudioItem, VideoItem
+from .. import logging
 from ..compatibility import string_type, to_str
 from ..utils.datetime_parser import strptime
 
@@ -67,13 +68,15 @@ def from_json(json_data, *args):
 
     item_type = json_data.get('type')
     if not item_type or item_type not in _ITEM_TYPES:
+        logging.warning_trace(('Unsupported item type', 'Data: %r'), json_data)
+        return None
+
+    item_data = json_data.get('data')
+    if not item_data:
         return None
 
     item = _ITEM_TYPES[item_type](name='', uri='')
-
-    for key, value in json_data.get('data', {}).items():
-        if hasattr(item, key):
-            setattr(item, key, value)
+    item.__dict__.update(item_data)
 
     if bookmark_id:
         item.bookmark_id = bookmark_id
