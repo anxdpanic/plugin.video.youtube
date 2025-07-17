@@ -2020,7 +2020,7 @@ class PlayerClient(LoginClient):
                 if not mime_type:
                     continue
 
-                itag = stream.get('itag')
+                itag = str(stream.get('itag'))
                 if not itag:
                     continue
 
@@ -2142,6 +2142,10 @@ class PlayerClient(LoginClient):
                         ))
                     else:
                         quality_group = mime_group
+
+                    is_drc = stream.get('isDrc', False)
+                    if is_drc:
+                        itag += '.drc'
                 elif audio_only:
                     continue
                 else:
@@ -2210,7 +2214,7 @@ class PlayerClient(LoginClient):
                             codec,
                         )
                     )
-                    channels = sample_rate = None
+                    channels = sample_rate = is_drc = None
                     language = role = role_order = None
                     label = quality['label'].format(
                         quality['nom_height'] or compare_height,
@@ -2259,6 +2263,7 @@ class PlayerClient(LoginClient):
                     'roleOrder': role_order,
                     'sampleRate': sample_rate,
                     'channels': channels,
+                    'drc': is_drc,
                 }
                 data[mime_group][itag] = data[quality_group][itag] = details
                 self.log.debug('Found stream: %s (%s - %s - %s)',
@@ -2285,6 +2290,7 @@ class PlayerClient(LoginClient):
                 - preferred,
                 - stream['channels'],
                 - stream['biasedBitrate'],
+                stream['drc'],
             )
 
         def _group_sort(item):
