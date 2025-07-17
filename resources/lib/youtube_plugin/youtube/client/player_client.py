@@ -2016,12 +2016,16 @@ class PlayerClient(LoginClient):
             if not stream_data:
                 continue
 
+            log_client = True
+            log_audio_header = None
+            log_video_header = None
+
             for stream in stream_data:
                 mime_type = stream.get('mimeType')
                 if not mime_type:
                     continue
 
-                itag = str(stream.get('itag'))
+                itag_id = itag = str(stream.get('itag'))
                 if not itag:
                     continue
 
@@ -2139,7 +2143,7 @@ class PlayerClient(LoginClient):
                         mime_group = mime_type
 
                     sample_rate = int(stream.get('audioSampleRate', '0'), 10)
-                    height = width = fps = frame_rate = hdr = None
+                    height = width = fps = frame_rate = is_hdr = None
                     language = context.get_language_name(language_code)
                     label = '{0} ({1} kbps)'.format(label, bitrate // 1000)
                     if channels > 2 or 'auto' not in stream_select:
@@ -2153,6 +2157,11 @@ class PlayerClient(LoginClient):
                     is_drc = stream.get('isDrc', False)
                     if is_drc:
                         itag += '.drc'
+
+                    log_audio = True
+                    log_video = False
+                    if log_audio_header is None:
+                        log_audio_header = True
                 elif audio_only:
                     continue
                 else:
@@ -2166,11 +2175,14 @@ class PlayerClient(LoginClient):
                         continue
 
                     if 'colorInfo' in stream:
-                        hdr = not any(value.endswith('BT709')
-                                      for value in stream['colorInfo'].values())
+                        is_hdr = not any(
+                            value.endswith('BT709')
+                            for value in stream['colorInfo'].values()
+                        )
                     else:
-                        hdr = 'HDR' in stream.get('qualityLabel', '')
-                    if hdr and not allow_hdr:
+                        is_hdr = 'HDR' in stream.get('qualityLabel', '')
+                    if is_hdr and not allow_hdr:
+                        continue
                         continue
 
                     height = stream.get('height')
@@ -2216,7 +2228,7 @@ class PlayerClient(LoginClient):
                             mime_type,
                             codec,
                             'hdr',
-                        ) if hdr else (
+                        ) if is_hdr else (
                             mime_type,
                             codec,
                         )
@@ -2226,9 +2238,14 @@ class PlayerClient(LoginClient):
                     label = quality['label'].format(
                         quality['nom_height'] or compare_height,
                         fps if fps > 30 else '',
-                        ' HDR' if hdr else '',
+                        ' HDR' if is_hdr else '',
                     )
                     quality_group = '_'.join((container, codec, label))
+
+                    log_audio = False
+                    log_video = True
+                    if log_video_header is None:
+                        log_video_header = True
 
                 if mime_group not in data:
                     data[mime_group] = {}
@@ -2261,7 +2278,7 @@ class PlayerClient(LoginClient):
                                   // 1000),
                     'fps': fps,
                     'frameRate': frame_rate,
-                    'hdr': hdr,
+                    'hdr': is_hdr,
                     'indexRange': '{start}-{end}'.format(**index_range),
                     'initRange': '{start}-{end}'.format(**init_range),
                     'langCode': language_code,
@@ -2273,8 +2290,85 @@ class PlayerClient(LoginClient):
                     'drc': is_drc,
                 }
                 data[mime_group][itag] = data[quality_group][itag] = details
-                self.log.debug('Found stream: %s (%s - %s - %s)',
-                               itag, client_name, mime_group, label)
+
+                if log_client:
+                    self.log.debug('{_:{_}^100}', _='=')
+                    self.log.debug('Streams found for %r client:', client_name)
+                    log_client = False
+                if log_audio:
+                    if log_audio_header:
+                        self.log.debug('{_:{_}^100}', _='-')
+                        self.log.debug('{itag:^3}'
+                                       ' | {container:^4}'
+                                       ' | {channels:^5}'
+                                       ' | {bitrate:^8}'
+                                       ' | {sample_rate:^9}'
+                                       ' | {drc:^3}'
+                                       ' | {codecs:^19}'
+                                       ' | {info}',
+                                       itag='ID',
+                                       container='TYPE',
+                                       channels='CH',
+                                       bitrate='ABR',
+                                       sample_rate='ASR',
+                                       drc='DRC',
+                                       codecs='CODECS',
+                                       info='INFO')
+                        self.log.debug('{_:{_}^100}', _='-')
+                        log_audio_header = False
+                    self.log.debug('{itag:3}'
+                                   ' | {container:4}'
+                                   ' | {channels:2} ch'
+                                   ' | {bitrate:3} kbps'
+                                   ' | {sample_rate:<5.2f} kHz'
+                                   ' | {drc:^3}'
+                                   ' | {codecs:19}'
+                                   ' | {language}'
+                                   ' {role_type}',
+                                   itag=itag_id,
+                                   container=container,
+                                   channels=channels,
+                                   bitrate=bitrate // 1000,
+                                   sample_rate=sample_rate / 1000,
+                                   drc='Y' if is_drc else '-',
+                                   codecs='%s (%s)' % (codec, codecs),
+                                   language=language,
+                                   role_type=role_type)
+                elif log_video:
+                    if log_video_header:
+                        self.log.debug('{_:{_}^100}', _='-')
+                        self.log.debug('{itag:^3}'
+                                       ' | {container:^4}'
+                                       ' | {width:>4} x {height:<4}'
+                                       ' | {fps:^6}'
+                                       ' | {hdr:^3}'
+                                       ' | {bitrate:^11}'
+                                       ' | {codecs}',
+                                       itag='ID',
+                                       container='TYPE',
+                                       width='W',
+                                       height='H',
+                                       fps='FPS',
+                                       hdr='HDR',
+                                       bitrate='VBR',
+                                       codecs='CODECS')
+                        self.log.debug('{_:{_}^100}', _='-')
+                        log_video_header = False
+                    self.log.debug('{itag:3}'
+                                   ' | {container:4}'
+                                   ' | {width:>4} x {height:<4}'
+                                   ' | {fps:2} fps'
+                                   ' | {hdr:^3}'
+                                   ' | {bitrate:6,} kbps'
+                                   ' | {codecs}',
+                                   itag=itag_id,
+                                   container=container,
+                                   width=width,
+                                   height=height,
+                                   fps=fps,
+                                   hdr='Y' if is_hdr else '-',
+                                   bitrate=bitrate // 1000,
+                                   codecs='%s (%s)' % (codec, codecs))
 
         if not video_data and not audio_only:
             self.log.debug('No video mime-types found')
