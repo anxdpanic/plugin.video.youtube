@@ -168,35 +168,53 @@ class XbmcContextUI(AbstractContextUI):
                      property_id,
                      value='true',
                      stacklevel=2,
+                     process=None,
                      log_value=None,
+                     log_process=None,
                      raw=False):
+        if log_value is None:
+            log_value = value
+        if log_process:
+            log_value = log_process(log_value)
         self.log.debug_trace('Set property {property_id!r}: {value!r}',
                              property_id=property_id,
-                             value=value if log_value is None else log_value,
+                             value=log_value,
                              stacklevel=stacklevel)
         _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
+        if process:
+            value = process(value)
         xbmcgui.Window(10000).setProperty(_property_id, value)
         return value
 
     def get_property(self,
                      property_id,
                      stacklevel=2,
+                     process=None,
                      log_value=None,
+                     log_process=None,
                      raw=False,
                      as_bool=False,
                      default=False):
         _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
         value = xbmcgui.Window(10000).getProperty(_property_id)
+        if log_value is None:
+            log_value = value
+        if log_process:
+            log_value = log_process(log_value)
         self.log.debug_trace('Get property {property_id!r}: {value!r}',
                              property_id=property_id,
-                             value=value if log_value is None else log_value,
+                             value=log_value,
                              stacklevel=stacklevel)
+        if process:
+            value = process(value)
         return BOOL_FROM_STR.get(value, default) if as_bool else value
 
     def pop_property(self,
                      property_id,
                      stacklevel=2,
+                     process=None,
                      log_value=None,
+                     log_process=None,
                      raw=False,
                      as_bool=False,
                      default=False):
@@ -205,9 +223,15 @@ class XbmcContextUI(AbstractContextUI):
         value = window.getProperty(_property_id)
         if value:
             window.clearProperty(_property_id)
+        if process:
+            value = process(value)
+        if log_value is None:
+            log_value = value
+        if log_process:
+            log_value = log_process(log_value)
         self.log.debug_trace('Pop property {property_id!r}: {value!r}',
                              property_id=property_id,
-                             value=value if log_value is None else log_value,
+                             value=log_value,
                              stacklevel=stacklevel)
         return BOOL_FROM_STR.get(value, default) if as_bool else value
 

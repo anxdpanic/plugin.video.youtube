@@ -116,24 +116,10 @@ def select_stream(context,
     logging.debug('%d available stream(s)', num_streams)
 
     for idx, stream in enumerate(stream_list):
-        log_data = stream.copy()
-
-        if 'license_info' in log_data:
-            license_info = log_data['license_info'].copy()
-            for detail in ('url', 'token'):
-                original_value = license_info.get(detail)
-                if original_value:
-                    license_info[detail] = '<redacted>'
-            log_data['license_info'] = license_info
-
-        original_value = log_data.get('url')
-        if original_value:
-            log_data['url'] = redact_ip_in_uri(original_value)
-
         logging.debug(('Stream {idx}:',
                        '{stream_details}'),
                       idx=idx,
-                      stream_details=log_data)
+                      stream_details=redact_params(stream))
 
     if ask_for_quality:
         selected_stream = context.get_ui().on_select(
@@ -361,9 +347,22 @@ def redact_ip_in_uri(
     return _re.sub(r'\g<1>ip\g<2><redacted>', url)
 
 
-def redact_auth_header(header_string,
+def redact_auth_header(headers,
                        _re=re_compile(r'"Authorization": "[^"]+"')):
-    return _re.sub(r'"Authorization": "<redacted>"', header_string)
+    if isinstance(headers, dict):
+        log_headers = headers.copy()
+        if 'Authorization' in log_headers:
+            log_headers['Authorization'] = '<redacted>'
+        return log_headers
+    return _re.sub(r'"Authorization": "<redacted>"', headers)
+
+
+def redact_license_info(license_info):
+    license_info = license_info.copy()
+    for detail in ('url', 'token'):
+        if detail in license_info:
+            license_info[detail] = '<redacted>'
+    return license_info
 
 
 def redact_params(params):
@@ -391,7 +390,11 @@ def redact_params(params):
                 if len(value) > 11 else
                 '...'
             )
-        elif param in {'access_token', 'refresh_token', 'token'}:
+        elif param in {'access_token',
+                       'ip',
+                       'playback_stats',
+                       'refresh_token',
+                       'token'}:
             log_value = (
                 ['<redacted>' for _ in value]
                 if isinstance(value, (list, tuple)) else
@@ -403,23 +406,23 @@ def redact_params(params):
                 if isinstance(value, (list, tuple)) else
                 redact_ip_in_uri(value)
             )
-        elif param == 'ip':
-            log_value = (
-                ['<redacted>' for _ in value]
-                if isinstance(value, (list, tuple)) else
-                '<redacted>'
-            )
         elif param == 'location':
             log_value = (
                 ['xx.xxxx,xx.xxxx' for _ in value]
                 if isinstance(value, (list, tuple)) else
                 'xx.xxxx,xx.xxxx'
             )
-        elif param == '__headers':
+        elif param in {'headers', '__headers'}:
             log_value = (
                 [redact_auth_header(val) for val in value]
                 if isinstance(value, (list, tuple)) else
                 redact_auth_header(value)
+            )
+        elif param == 'license_info':
+            log_value = (
+                [redact_license_info(val) for val in value]
+                if isinstance(value, (list, tuple)) else
+                redact_license_info(value)
             )
         else:
             continue

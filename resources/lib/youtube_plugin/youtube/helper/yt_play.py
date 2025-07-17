@@ -35,7 +35,12 @@ from ...kodion.constants import (
 )
 from ...kodion.items import AudioItem, UriItem, VideoItem
 from ...kodion.network import get_connect_address
-from ...kodion.utils import datetime_parser, parse_item_ids, select_stream
+from ...kodion.utils import (
+    datetime_parser,
+    parse_item_ids,
+    redact_params,
+    select_stream,
+)
 
 
 def _play_stream(provider, context):
@@ -167,7 +172,10 @@ def _play_stream(provider, context):
         'refresh_only': screensaver
     }
 
-    ui.set_property(PLAYER_DATA, json.dumps(playback_data, ensure_ascii=False))
+    ui.set_property(PLAYER_DATA,
+                    value=playback_data,
+                    process=json.dumps,
+                    log_process=redact_params)
     ui.set_property(TRAKT_PAUSE_FLAG, raw=True)
     context.send_notification(PLAYBACK_INIT, playback_data)
     return media_item

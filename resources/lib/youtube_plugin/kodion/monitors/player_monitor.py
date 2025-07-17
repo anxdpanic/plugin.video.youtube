@@ -24,6 +24,7 @@ from ..constants import (
     REFRESH_CONTAINER,
     TRAKT_PAUSE_FLAG,
 )
+from ..utils import redact_params
 
 
 class PlayerMonitorThread(threading.Thread):
@@ -398,18 +399,20 @@ class PlayerMonitor(xbmc.Player):
             return
 
     def onAVStarted(self):
-        if self._ui.get_property(PLAY_USING):
+        ui = self._ui
+        if ui.get_property(PLAY_USING):
             return
 
-        if not self._ui.busy_dialog_active():
-            self._ui.clear_property(BUSY_FLAG)
+        if not ui.busy_dialog_active():
+            ui.clear_property(BUSY_FLAG)
 
-        player_data = self._ui.pop_property(PLAYER_DATA)
+        player_data = ui.pop_property(PLAYER_DATA,
+                                      process=json.loads,
+                                      log_process=redact_params)
         if not player_data:
             return
         self.cleanup_threads()
 
-        player_data = json.loads(player_data)
         try:
             self.seek_time = float(player_data.get('seek_time'))
             self.start_time = float(player_data.get('start_time'))
