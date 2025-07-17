@@ -1975,7 +1975,8 @@ class PlayerClient(LoginClient):
                                   responses,
                                   default_lang_code='und',
                                   codec_re=re_compile(
-                                      r'codecs="([a-z0-9]+([.\-][0-9](?="))?)'
+                                      r'codecs='
+                                      r'"((?P<codec>.+?)\.(?P<props>.+))"'
                                   )):
         context = self._context
         settings = context.get_settings()
@@ -2039,18 +2040,24 @@ class PlayerClient(LoginClient):
                     continue
 
                 mime_type, codecs = unquote(mime_type).split('; ')
-                codec = codec_re.match(codecs)
-                if codec:
-                    codec = codec.group(1)
-                    if codec.startswith('vp9'):
+                codecs = codec_re.match(codecs)
+                if codecs:
+                    codec = codecs.group('codec')
+                    codec_properties = codecs.group('props')
+                    codecs = codecs.group(1)
+                    if codec.startswith(('vp9', 'vp09')):
                         codec = 'vp9'
-                    elif codec.startswith('vp09'):
-                        codec = 'vp9.2'
-                    elif codec.startswith('dts'):
-                        codec = 'dts'
-                if codec not in isa_capabilities:
+                        preferred_codec = codec in stream_features
+                        if codec_properties.startswith(('2', '02.')):
+                            codec = 'vp9.2'
+                    else:
+                        if codec.startswith('dts'):
+                            codec = 'dts'
+                        preferred_codec = codec in stream_features
+                    if codec not in isa_capabilities:
+                        continue
+                else:
                     continue
-                preferred_codec = codec.split('.')[0] in stream_features
                 media_type, container = mime_type.split('/')
                 bitrate = stream.get('bitrate', 0)
 
@@ -2492,7 +2499,7 @@ class PlayerClient(LoginClient):
                 output.extend([(
                     '\t\t\t<Representation'
                         ' id="{id}"'
-                        ' {codecs}'
+                        ' codecs="{codecs}"'
                         ' mimeType="{mimeType}"'
                         ' bandwidth="{bitrate}"'
                         ' sampleRate="{sampleRate}"'
@@ -2531,7 +2538,7 @@ class PlayerClient(LoginClient):
                 output.extend([(
                     '\t\t\t<Representation'
                         ' id="{id}"'
-                        ' {codecs}'
+                        ' codecs="{codecs}"'
                         ' mimeType="{mimeType}"'
                         ' bandwidth="{bitrate}"'
                         ' width="{width}"'
