@@ -2200,14 +2200,16 @@ class PlayerClient(LoginClient):
                     else:
                         frame_rate = None
 
-                    mime_group = '_'.join((
-                        mime_type,
-                        codec,
-                        'hdr',
-                    ) if hdr else (
-                        mime_type,
-                        codec,
-                    ))
+                    mime_group = '_'.join(
+                        (
+                            mime_type,
+                            codec,
+                            'hdr',
+                        ) if hdr else (
+                            mime_type,
+                            codec,
+                        )
+                    )
                     channels = sample_rate = None
                     language = role = role_order = None
                     label = quality['label'].format(

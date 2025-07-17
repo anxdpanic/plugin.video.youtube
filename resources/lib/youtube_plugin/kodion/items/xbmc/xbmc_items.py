@@ -639,7 +639,7 @@ def image_listitem(context, image_item, show_fanart=None, **_kwargs):
     return uri, list_item, False
 
 
-def uri_listitem(context, uri_item, **_kwargs):
+def uri_listitem(_context, uri_item, **_kwargs):
     uri = uri_item.get_uri()
     logging.debug('Converting UriItem: %r', uri)
 

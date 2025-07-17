@@ -219,7 +219,8 @@ class Provider(AbstractProvider):
         num_refresh_tokens = len([1 for token in refresh_tokens if token])
 
         if num_access_tokens or num_refresh_tokens:
-            self.log.debug('# Access tokens: |%d|, # Refresh tokens: |%d|',
+            self.log.debug(('# Access tokens:  %d',
+                            '# Refresh tokens: %d'),
                            num_access_tokens,
                            num_refresh_tokens)
         else:

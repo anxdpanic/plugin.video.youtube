@@ -141,7 +141,7 @@
                         - alternate sorting of unselected codecs
                         - ttml subtitles
                     -->
-                    <default>avc1,vp9,av01,hdr,hfr,vorbis,mp4a,ssa,ac-3,ec-3,dts,filter,vtt</default>
+                    <default>avc1,vp9,av01,hdr,hfr,vorbis,mp4a,ssa,ac-3,ec-3,dts,vtt,filter</default>
                     <constraints>
                         <options>
                             <option label="30727">avc1</option>
@@ -159,10 +159,10 @@
                             <option label="30754">ac-3</option>
                             <option label="30755">ec-3</option>
                             <option label="30756">dts</option>
-                            <option label="30757">filter</option>
-                            <option label="30729">alt_sort</option>
                             <option label="30709">vtt</option>
                             <option label="30710">ttml</option>
+                            <option label="30757">filter</option>
+                            <option label="30729">alt_sort</option>
                         </options>
                         <delimiter>,</delimiter>
                         <minimumitems>1</minimumitems>

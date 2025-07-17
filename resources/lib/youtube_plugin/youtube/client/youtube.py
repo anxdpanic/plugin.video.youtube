@@ -3045,7 +3045,7 @@ class YouTube(LoginClient):
         self.log.debug(('{request_name} API request',
                         'method:    {method!r}',
                         'path:      {path!r}',
-                        'params:    {params!r}|',
+                        'params:    {params!r}',
                         'post_data: {data!r}',
                         'headers:   {headers!r}'),
                        request_name=client.get('_name'),

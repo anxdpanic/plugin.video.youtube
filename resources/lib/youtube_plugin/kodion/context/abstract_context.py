@@ -622,3 +622,6 @@ class AbstractContext(object):
     @staticmethod
     def is_plugin_folder(folder_name=None):
         raise NotImplementedError()
+
+    def refresh_requested(self, force=False, on=False, off=False, params=None):
+        raise NotImplementedError
