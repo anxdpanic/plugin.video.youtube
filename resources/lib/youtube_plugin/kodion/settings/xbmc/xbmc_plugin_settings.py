@@ -312,7 +312,7 @@ class XbmcPluginSettings(AbstractSettings):
                 value = [] if default is None else default
         except (RuntimeError, TypeError) as exc:
             error = exc
-            value = default
+            value = [] if default is None else default
 
         if echo_level and self._echo_level:
             self.log.debug_trace('Get setting {name!r}:'
