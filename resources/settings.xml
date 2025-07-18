@@ -138,10 +138,11 @@
                         - no HFR at max quality
                         - no fractional framerate hinting
                         - no framerate hinting
+                        - spatial audio
                         - alternate sorting of unselected codecs
                         - ttml subtitles
                     -->
-                    <default>avc1,vp9,av01,hdr,hfr,vorbis,mp4a,ssa,ac-3,ec-3,dts,vtt,filter</default>
+                    <default>avc1,vp9,av01,hdr,hfr,3d,vr,vorbis,mp4a,ssa,ac-3,ec-3,dts,vtt,filter</default>
                     <constraints>
                         <options>
                             <option label="30727">avc1</option>
@@ -152,6 +153,8 @@
                             <option label="30768">no_hfr_max</option>
                             <option label="30771">no_frac_fr_hint</option>
                             <option label="30772">no_fr_hint</option>
+                            <option label="30020">3d</option>
+                            <option label="30721">vr</option>
                             <option label="30750">vorbis</option>
                             <option label="30751">opus</option>
                             <option label="30752">mp4a</option>
@@ -159,6 +162,7 @@
                             <option label="30754">ac-3</option>
                             <option label="30755">ec-3</option>
                             <option label="30756">dts</option>
+                            <option label="30738">spa</option>
                             <option label="30709">vtt</option>
                             <option label="30710">ttml</option>
                             <option label="30757">filter</option>

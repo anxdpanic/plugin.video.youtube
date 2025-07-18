@@ -109,7 +109,7 @@ msgid "144p"
 msgstr ""
 
 msgctxt "#30020"
-msgid "Allow 3D"
+msgid "Enable Stereoscopic 3D video"
 msgstr ""
 
 msgctxt "#30021"
@@ -1190,7 +1190,7 @@ msgid "Unsubscribed from channel"
 msgstr ""
 
 msgctxt "#30721"
-msgid ""
+msgid "Enable Panoramic/180/360/VR video"
 msgstr ""
 
 msgctxt "#30722"
@@ -1258,7 +1258,7 @@ msgid "Shorts - Max duration"
 msgstr ""
 
 msgctxt "#30738"
-msgid ""
+msgid "Enable spatial audio"
 msgstr ""
 
 msgctxt "#30739"

@@ -1989,10 +1989,13 @@ class PlayerClient(LoginClient):
         qualities = settings.mpd_video_qualities()
         isa_capabilities = context.inputstream_adaptive_capabilities()
         stream_features = settings.stream_features()
+        allow_3d = '3d' in stream_features
         allow_hdr = 'hdr' in stream_features
         allow_hfr = 'hfr' in stream_features
         disable_hfr_max = 'no_hfr_max' in stream_features
+        allow_spa = 'spa' in stream_features
         allow_ssa = 'ssa' in stream_features
+        allow_vr = 'vr' in stream_features
         fps_map = (self.INTEGER_FPS_SCALE
                    if 'no_frac_fr_hint' in stream_features else
                    self.FRACTIONAL_FPS_SCALE)
@@ -2076,6 +2079,10 @@ class PlayerClient(LoginClient):
                     if channels > 2 and not allow_ssa:
                         continue
 
+                    is_spa = stream.get('spatialAudioType', '')
+                    if is_spa and not allow_3d:
+                        continue
+
                     if 'audioTrack' in stream:
                         audio_track = stream['audioTrack']
 
@@ -2148,7 +2155,8 @@ class PlayerClient(LoginClient):
                         mime_group = mime_type
 
                     sample_rate = int(stream.get('audioSampleRate', '0'), 10)
-                    height = width = fps = frame_rate = is_hdr = None
+                    height = width = fps = frame_rate = None
+                    is_hdr = is_vr = is_3d = None
                     language = context.get_language_name(language_code)
                     label = '{0} ({1} kbps)'.format(label, bitrate // 1000)
                     if channels > 2 or 'auto' not in stream_select:
@@ -2188,7 +2196,17 @@ class PlayerClient(LoginClient):
                         is_hdr = 'HDR' in stream.get('qualityLabel', '')
                     if is_hdr and not allow_hdr:
                         continue
+
+                    is_3d = stream.get('stereoLayout', '')
+                    if is_3d and not allow_3d:
                         continue
+
+                    is_vr = stream.get('projectionType', '')
+                    if is_vr:
+                        if is_vr == 'RECTANGULAR':
+                            is_vr = ''
+                        elif not allow_vr:
+                            continue
 
                     height = stream.get('height')
                     width = stream.get('width')
@@ -2228,22 +2246,21 @@ class PlayerClient(LoginClient):
                     else:
                         frame_rate = None
 
-                    mime_group = '_'.join(
-                        (
-                            mime_type,
-                            codec,
-                            'hdr',
-                        ) if is_hdr else (
-                            mime_type,
-                            codec,
-                        )
-                    )
-                    channels = sample_rate = is_drc = None
+                    mime_group = '_'.join([token for token in (
+                        mime_type,
+                        codec,
+                        'hdr' if is_hdr else None,
+                        'vr' if is_vr else None,
+                    ) if token])
+
+                    channels = sample_rate = is_drc = is_spa = None
                     language = role = role_order = None
                     label = quality['label'].format(
                         quality['nom_height'] or compare_height,
                         fps if fps > 30 else '',
                         ' HDR' if is_hdr else '',
+                        ' 3D' if is_3d else '',
+                        ' VR' if is_vr else '',
                     )
                     quality_group = '_'.join((container, codec, label))
 
@@ -2284,6 +2301,8 @@ class PlayerClient(LoginClient):
                     'fps': fps,
                     'frameRate': frame_rate,
                     'hdr': is_hdr,
+                    'projection': is_vr,
+                    'stereoLayout': is_3d,
                     'indexRange': '{start}-{end}'.format(**index_range),
                     'initRange': '{start}-{end}'.format(**init_range),
                     'langCode': language_code,
@@ -2293,6 +2312,7 @@ class PlayerClient(LoginClient):
                     'sampleRate': sample_rate,
                     'channels': channels,
                     'drc': is_drc,
+                    'spatial': is_spa,
                 }
                 data[mime_group][itag] = data[quality_group][itag] = details
 
@@ -2347,6 +2367,8 @@ class PlayerClient(LoginClient):
                                        ' | {width:>4} x {height:<4}'
                                        ' | {fps:^6}'
                                        ' | {hdr:^3}'
+                                       ' | {s3d:^3}'
+                                       ' | {vr:^3}'
                                        ' | {bitrate:^11}'
                                        ' | {codecs}',
                                        itag='ID',
@@ -2355,6 +2377,8 @@ class PlayerClient(LoginClient):
                                        height='H',
                                        fps='FPS',
                                        hdr='HDR',
+                                       s3d='3D',
+                                       vr='VR',
                                        bitrate='VBR',
                                        codecs='CODECS')
                         self.log.debug('{_:{_}^100}', _='-')
@@ -2364,6 +2388,8 @@ class PlayerClient(LoginClient):
                                    ' | {width:>4} x {height:<4}'
                                    ' | {fps:2} fps'
                                    ' | {hdr:^3}'
+                                   ' | {s3d:^3}'
+                                   ' | {vr:^3}'
                                    ' | {bitrate:6,} kbps'
                                    ' | {codecs}',
                                    itag=itag_id,
@@ -2372,6 +2398,8 @@ class PlayerClient(LoginClient):
                                    height=height,
                                    fps=fps,
                                    hdr='Y' if is_hdr else '-',
+                                   s3d='Y' if is_3d else '-',
+                                   vr='Y' if is_vr else '-',
                                    bitrate=bitrate // 1000,
                                    codecs='%s (%s)' % (codec, codecs))
 
@@ -2389,11 +2417,14 @@ class PlayerClient(LoginClient):
                 - stream['height']
                 if preferred or not alt_sort else
                 stream['height'],
+                not stream['projection'],
+                not stream['stereoLayout'],
                 - stream['fps'],
                 - stream['hdr'],
                 - stream['biasedBitrate'],
             ) if stream['mediaType'] == 'video' else (
                 - preferred,
+                not stream['spatial'],
                 - stream['channels'],
                 - stream['biasedBitrate'],
                 stream['drc'],
