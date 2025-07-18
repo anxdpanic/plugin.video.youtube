@@ -769,13 +769,13 @@ class PlayerClient(LoginClient):
     }
 
     LANG_ROLE_DETAILS = {
-        4:  ('original', 'main', -1),
-        3:  ('dub', 'dub', -2),
-        6:  ('secondary', 'alternate', -3),
-        10: ('dub.auto', 'dub', -4),
-        2:  ('descriptive', 'description', -5),
-        0:  ('alt', 'alternate', -6),
-        -1: ('original', 'main', -6),
+        '4':  ('original', 'main', -1),
+        '3':  ('dub', 'dub', -2),
+        '6':  ('secondary', 'alternate', -3),
+        '10': ('dub.auto', 'dub', -4),
+        '2':  ('descriptive', 'description', -5),
+        '0':  ('alt', 'alternate', -6),
+        '-1': ('original', 'main', -6),
     }
 
     def __init__(self,
@@ -2006,8 +2006,8 @@ class PlayerClient(LoginClient):
         audio_data = {}
         video_data = {}
         preferred_audio = {
-            'id': '',
             'language_code': None,
+            'role_id': None,
             'role_order': None,
             'fallback': True,
         }
@@ -2088,88 +2088,83 @@ class PlayerClient(LoginClient):
 
                         language = audio_track.get('id', default_lang_code)
                         if '.' in language:
-                            language_code, role_str = language.split('.')
-                            role_id = int(role_str)
+                            language_code, role_id = language.split('.')
                         else:
                             language_code = language
-                            role_id = 4
-                            role_str = '4'
-
-                        role_details = lang_role_details.get(role_id)
-                        # Unsure of what other audio types are available
-                        # Role set to "alternate" as default fallback
-                        if not role_details:
-                            role_details = lang_role_details[0]
-
-                        role_type, role, role_order = role_details
-                        label = localize('stream.{0}'.format(role_type))
-
-                        preferred_order = preferred_audio['role_order']
-                        language_fallback = preferred_audio['fallback']
-
-                        if (default_lang
-                                and language_code.startswith(default_lang)):
-                            is_fallback = False
-                            if prefer_default_lang:
-                                role = 'main'
-                                role_order = 0
-                            elif role_type.startswith('dub'):
-                                is_fallback = True
-                            lang_match = (
-                                    (language_fallback and not is_fallback)
-                                    or preferred_order is None
-                                    or role_order > preferred_order
-                            )
-                            language_fallback = is_fallback
-                        else:
-                            lang_match = (
-                                    language_fallback
-                                    and (preferred_order is None
-                                         or role_order > preferred_order)
-                            )
-                            language_fallback = True
-
-                        if lang_match:
-                            preferred_audio = {
-                                'id': ''.join((
-                                    '_',
-                                    language_code,
-                                    '.',
-                                    role_str,
-                                )),
-                                'language_code': language_code,
-                                'role_order': role_order,
-                                'fallback': language_fallback,
-                            }
-
-                        mime_group = ''.join((
-                            mime_type, '_', language_code, '.', role_str,
-                        ))
+                            role_id = '4'
                     else:
                         language_code = default_lang_code
-                        role_id = -1
-                        role_str = str(role_id)
-                        role_details = lang_role_details[role_id]
-                        role_type, role, role_order = role_details
-                        label = localize('stream.{0}'.format(role_type))
-                        mime_group = mime_type
+                        role_id = '-1'
+
+                    role_details = lang_role_details.get(role_id)
+                    # Unsure of what other audio types are available
+                    # Role set to "alternate" as default fallback
+                    if not role_details:
+                        role_details = lang_role_details[0]
+                    role_type, role, role_order = role_details
+
+                    preferred_order = preferred_audio['role_order']
+                    language_fallback = preferred_audio['fallback']
+
+                    if (default_lang
+                            and language_code.startswith(default_lang)):
+                        is_fallback = False
+                        if prefer_default_lang:
+                            role = 'main'
+                            role_order = 0
+                        elif role_type.startswith('dub'):
+                            is_fallback = True
+                        lang_match = (
+                                (language_fallback and not is_fallback)
+                                or preferred_order is None
+                                or role_order > preferred_order
+                        )
+                        language_fallback = is_fallback
+                    else:
+                        lang_match = (
+                                language_fallback
+                                and (preferred_order is None
+                                     or role_order > preferred_order)
+                        )
+                        language_fallback = True
+
+                    if lang_match:
+                        preferred_audio = {
+                            'language_code': language_code,
+                            'role_id': role_id,
+                            'role_order': role_order,
+                            'fallback': language_fallback,
+                        }
+                    language = context.get_language_name(language_code)
 
                     sample_rate = int(stream.get('audioSampleRate', '0'), 10)
-                    height = width = fps = frame_rate = None
-                    is_hdr = is_vr = is_3d = None
-                    language = context.get_language_name(language_code)
-                    label = '{0} ({1} kbps)'.format(label, bitrate // 1000)
-                    if channels > 2 or 'auto' not in stream_select:
-                        quality_group = ''.join((
-                            container, '_', codec, '_', language_code,
-                            '.', role_str,
-                        ))
-                    else:
-                        quality_group = mime_group
 
                     is_drc = stream.get('isDrc', False)
                     if is_drc:
                         itag += '.drc'
+
+                    mime_group = (
+                        mime_type,
+                        language_code,
+                        role_id,
+                    )
+
+                    label = '{0} ({1} kbps)'.format(
+                        localize('stream.{0}'.format(role_type)),
+                        bitrate // 1000,
+                    )
+                    if channels > 2 or 'auto' not in stream_select:
+                        quality_group = (
+                            container,
+                            codec,
+                            language_code,
+                            role_id,
+                        )
+                    else:
+                        quality_group = mime_group
+
+                    height = width = fps = frame_rate = None
+                    is_hdr = is_vr = is_3d = None
 
                     log_audio = True
                     log_video = False
@@ -2246,15 +2241,13 @@ class PlayerClient(LoginClient):
                     else:
                         frame_rate = None
 
-                    mime_group = '_'.join([token for token in (
+                    mime_group = (
                         mime_type,
                         codec,
-                        'hdr' if is_hdr else None,
-                        'vr' if is_vr else None,
-                    ) if token])
+                        is_hdr,
+                        is_vr,
+                    )
 
-                    channels = sample_rate = is_drc = is_spa = None
-                    language = role = role_order = None
                     label = quality['label'].format(
                         quality['nom_height'] or compare_height,
                         fps if fps > 30 else '',
@@ -2262,17 +2255,19 @@ class PlayerClient(LoginClient):
                         ' 3D' if is_3d else '',
                         ' VR' if is_vr else '',
                     )
-                    quality_group = '_'.join((container, codec, label))
+                    quality_group = (
+                        container,
+                        codec,
+                        label,
+                    )
+
+                    channels = sample_rate = is_drc = is_spa = None
+                    language = role = role_order = role_type = None
 
                     log_audio = False
                     log_video = True
                     if log_video_header is None:
                         log_video_header = True
-
-                if mime_group not in data:
-                    data[mime_group] = {}
-                if quality_group not in data:
-                    data[quality_group] = {}
 
                 urls = self._process_url_params(
                     unquote(url),
@@ -2314,7 +2309,9 @@ class PlayerClient(LoginClient):
                     'drc': is_drc,
                     'spatial': is_spa,
                 }
-                data[mime_group][itag] = data[quality_group][itag] = details
+                mime_group = data.setdefault(mime_group, {})
+                quality_group = data.setdefault(quality_group, {})
+                mime_group[itag] = quality_group[itag] = details
 
                 if log_client:
                     self.log.debug('{_:{_}^100}', _='=')
@@ -2435,10 +2432,11 @@ class PlayerClient(LoginClient):
             main_stream = streams[0]
 
             key = (
-                not group.startswith(main_stream['mimeType']),
+                group[0] != main_stream['mimeType'],
             ) if main_stream['mediaType'] == 'video' else (
-                not group.startswith(main_stream['mimeType']),
-                preferred_audio['id'] not in group,
+                group[0] != main_stream['mimeType'],
+                group[-2] != preferred_audio['language_code'],
+                group[-1] != preferred_audio['role_id'],
                 main_stream['langName'],
                 - main_stream['roleOrder'],
             )
@@ -2483,8 +2481,8 @@ class PlayerClient(LoginClient):
             if media_type != previous_stream['mediaType']:
                 return not skip_group
 
-            if previous_group.startswith(previous_stream['mimeType']):
-                if new_group.startswith(new_stream['container']):
+            if previous_group[0] == previous_stream['mimeType']:
+                if new_group[0] == new_stream['container']:
                     return not skip_group
 
                 skip_group = (
@@ -2493,7 +2491,7 @@ class PlayerClient(LoginClient):
                     new_stream['channels'] <= previous_stream['channels']
                 )
             else:
-                if new_group.startswith(new_stream['mimeType']):
+                if new_group[0] == new_stream['mimeType']:
                     return not skip_group
 
                 skip_group = (
@@ -2563,7 +2561,7 @@ class PlayerClient(LoginClient):
             language = stream['langCode']
             role = stream['role'] or ''
 
-            if group.startswith(mime_type) and 'auto' in stream_select:
+            if group[0] == mime_type and 'auto' in stream_select:
                 label = '{0} [{1}]'.format(
                     stream['langName']
                     or localize('stream.automatic'),
@@ -2572,7 +2570,7 @@ class PlayerClient(LoginClient):
                 if stream == main_stream[media_type]:
                     default = True
                     role = 'main'
-            elif group.startswith(container) and 'list' in stream_select:
+            elif group[0] == container and 'list' in stream_select:
                 if 'auto' in stream_select or media_type == 'video':
                     label = stream['label']
                 else:
