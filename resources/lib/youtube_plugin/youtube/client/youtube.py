@@ -382,7 +382,8 @@ class YouTube(LoginClient):
                          client_data=client_data,
                          params=params,
                          no_content=True,
-                         do_auth=True)
+                         do_auth=True,
+                         cache=False)
 
     @staticmethod
     def get_streams(context,
@@ -3065,6 +3066,8 @@ class YouTube(LoginClient):
             return {}
         if context.get_settings().log_level() & 2:
             kwargs.setdefault('extended_debug', True)
+        if cache is None and 'no_content' in kwargs:
+            cache = False
         return self.request(response_hook=self._response_hook,
                             event_hook_kwargs=kwargs,
                             error_hook=self._error_hook,
