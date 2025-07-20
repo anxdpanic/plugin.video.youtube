@@ -62,7 +62,10 @@ class ResourceManager(object):
         client = self._client
         data_cache = context.get_data_cache()
         function_cache = context.get_function_cache()
-        refresh = context.refresh_requested()
+
+        forced_cache = not context.internet_available()
+        refresh = not forced_cache and context.refresh_requested()
+
         updated = []
         handles = {}
         for identifier in ids:
@@ -90,7 +93,7 @@ class ResourceManager(object):
         else:
             result = data_cache.get_items(
                 ids,
-                data_cache.ONE_DAY if client.logged_in else None,
+                None if forced_cache else data_cache.ONE_DAY,
             )
         to_update = [id_ for id_ in ids
                      if id_
@@ -155,7 +158,10 @@ class ResourceManager(object):
                          defer_cache=False):
         context = self._context
         client = self._client
-        refresh = context.refresh_requested()
+
+        forced_cache = not context.internet_available()
+        refresh = not forced_cache and context.refresh_requested()
+
         if not refresh and channel_data:
             result = channel_data
         else:
@@ -170,7 +176,7 @@ class ResourceManager(object):
             data_cache = context.get_data_cache()
             result.update(data_cache.get_items(
                 to_check,
-                data_cache.ONE_MONTH if client.logged_in else None,
+                None if forced_cache else data_cache.ONE_MONTH,
             ))
         to_update = [id_ for id_ in ids
                      if id_
@@ -256,17 +262,21 @@ class ResourceManager(object):
         return result
 
     def get_playlists(self, ids, suppress_errors=False, defer_cache=False):
+        ids = tuple(ids)
+
         context = self._context
         client = self._client
-        ids = tuple(ids)
-        refresh = context.refresh_requested()
+
+        forced_cache = not context.internet_available()
+        refresh = not forced_cache and context.refresh_requested()
+
         if refresh or not ids:
             result = {}
         else:
             data_cache = context.get_data_cache()
             result = data_cache.get_items(
                 ids,
-                data_cache.ONE_DAY if client.logged_in else None,
+                None if forced_cache else data_cache.ONE_DAY,
             )
         to_update = [id_ for id_ in ids
                      if id_
@@ -336,8 +346,13 @@ class ResourceManager(object):
 
         context = self._context
         client = self._client
-        logged_in = client.logged_in
-        refresh = context.refresh_requested()
+
+        forced_cache = (
+                not context.internet_available()
+                or (context.get_param('channel_id') == 'mine'
+                    and not client.logged_in)
+        )
+        refresh = not forced_cache and context.refresh_requested()
 
         if batch_id:
             ids = [batch_id[0]]
@@ -372,7 +387,7 @@ class ResourceManager(object):
                     break
                 age = batch.get('age')
                 batch = batch.get('value')
-                if not logged_in:
+                if forced_cache:
                     result[batch_id] = batch
                 elif page_token:
                     if age <= data_cache.ONE_DAY:
@@ -499,17 +514,21 @@ class ResourceManager(object):
                    suppress_errors=False,
                    defer_cache=False,
                    yt_items=None):
+        ids = tuple(ids)
+
         context = self._context
         client = self._client
-        ids = tuple(ids)
-        refresh = context.refresh_requested()
+
+        forced_cache = not context.internet_available()
+        refresh = not forced_cache and context.refresh_requested()
+
         if refresh or not ids:
             result = {}
         else:
             data_cache = context.get_data_cache()
             result = data_cache.get_items(
                 ids,
-                data_cache.ONE_MONTH if client.logged_in else None,
+                None if forced_cache else data_cache.ONE_MONTH,
             )
         to_update = [id_ for id_ in ids
                      if id_
