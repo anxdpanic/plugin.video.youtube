@@ -38,6 +38,7 @@ __all__ = (
 
 class RecordFormatter(logging.Formatter):
     def formatMessage(self, record):
+        record.__dict__['__sep__'] = '\n' if '\n' in record.message else ' - '
         try:
             return self._style.format(record)
         except AttributeError:
@@ -104,11 +105,12 @@ class Handler(logging.Handler):
         logging.CRITICAL: xbmc.LOGFATAL,
     }
     STANDARD_FORMATTER = RecordFormatter(
-        fmt='[%(addon_id)s] %(module)s:%(lineno)d(%(funcName)s) - %(message)s',
+        fmt='[%(addon_id)s] %(module)s:%(lineno)d(%(funcName)s)'
+            '%(__sep__)s%(message)s',
     )
     DEBUG_FORMATTER = RecordFormatter(
         fmt='[%(addon_id)s] %(module)s, line %(lineno)d, in %(funcName)s'
-            '\n\t%(message)s',
+            '\n%(message)s',
     )
 
     _stack_info = False
@@ -175,7 +177,7 @@ class KodiLogger(logging.Logger):
              stacklevel=1,
              **kwargs):
         if isinstance(msg, (list, tuple)):
-            msg = '\n\t'.join(map(to_str, msg))
+            msg = '\n'.join(map(to_str, msg))
         if kwargs:
             msg = MessageFormatter(msg, *args, **kwargs)
             args = ()
