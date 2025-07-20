@@ -14,6 +14,7 @@ import json
 import os
 import shutil
 from base64 import urlsafe_b64decode
+from collections import defaultdict
 from datetime import timedelta
 from math import floor, log
 from re import MULTILINE, compile as re_compile
@@ -115,11 +116,18 @@ def select_stream(context,
     ask_for_quality = ask_for_quality and num_streams >= 1
     logging.debug('%d available stream(s)', num_streams)
 
+    def _default_NA():
+        return 'N/A'
+
     for idx, stream in enumerate(stream_list):
-        logging.debug(('Stream {idx}:',
-                       '{stream_details}'),
+        logging.debug(('Stream {idx}',
+                       'Container: {stream[container]}',
+                       'Adaptive:  {stream[adaptive]}',
+                       'Audio:     {stream[audio]}',
+                       'Video:     {stream[video]}',
+                       'Sort:      {stream[sort]}'),
                       idx=idx,
-                      stream_details=redact_params(stream))
+                      stream=defaultdict(_default_NA, stream))
 
     if ask_for_quality:
         selected_stream = context.get_ui().on_select(

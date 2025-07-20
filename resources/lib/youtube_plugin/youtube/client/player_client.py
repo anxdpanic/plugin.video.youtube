@@ -1794,7 +1794,7 @@ class PlayerClient(LoginClient):
                 _reason = self._get_error_details(_playability)
             raise YouTubeException(_reason or 'UNKNOWN')
 
-        self.yt_item = {
+        self.yt_item = yt_item = {
             'id': video_id,
             'snippet': {
                 'title': video_details.get('title'),
@@ -1971,10 +1971,16 @@ class PlayerClient(LoginClient):
                 playback_stats=playback_stats,
             )
 
-        if not stream_list:
+        if stream_list:
+            self.log.debug(('Media details:',
+                            'Status: {status!r}',
+                            'Item:   {item!r}'),
+                           status=meta_info['status'],
+                           item=yt_item)
+        else:
             raise YouTubeException('No streams found')
 
-        return stream_list.values(), self.yt_item
+        return stream_list.values(), yt_item
 
     def _process_adaptive_streams(self,
                                   responses,
