@@ -2850,21 +2850,21 @@ class YouTube(LoginClient):
     def _auth_required(self, params):
         if params:
             if params.get('mine') or params.get('forMine'):
-                return not self.logged_in, True
+                return True
             request_channel_id = params.get('channelId')
             if request_channel_id == 'mine':
-                return not self.logged_in, True
+                return True
         else:
             request_channel_id = None
 
         uri_channel_id = self._context.get_param('channel_id')
         if uri_channel_id == 'mine':
-            return not self.logged_in, True
+            return True
 
         channel_id = self.channel_id
         if channel_id and channel_id in (uri_channel_id, request_channel_id):
-            return not self.logged_in, True
-        return False, False
+            return True
+        return False
 
     def _response_hook(self, **kwargs):
         response = kwargs['response']
@@ -2979,14 +2979,13 @@ class YouTube(LoginClient):
         if params:
             client_data['params'] = params
 
+        if do_auth is None:
+            do_auth = self._auth_required(params)
         if do_auth:
             abort = not self.logged_in
-        elif do_auth is None:
-            abort, do_auth = self._auth_required(params)
+            client_data.setdefault('_auth_required', do_auth)
         else:
             abort = False
-        if do_auth:
-            client_data.setdefault('_auth_required', do_auth)
 
         # a config can decide if a token is allowed
         config = self._configs.get('user', {})
