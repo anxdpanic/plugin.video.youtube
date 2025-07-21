@@ -695,6 +695,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         visitor_data = client.get('_visitor_data')
         if visitor_data:
             client['json']['context']['client']['visitorData'] = visitor_data
+            client['headers']['X-Goog-Visitor-Id'] = visitor_data
 
         for values, template_id, template in templates.values():
             if template_id in values:
