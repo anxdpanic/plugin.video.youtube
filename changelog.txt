@@ -1,3 +1,22 @@
+## v7.3.0+alpha.3
+### Fixed
+- Ensure plugin folders in channel listings are not processed as YouTube items
+- Fix not refreshing cached data when not logged in #1224
+- Fix potentially misidentifying vp9.2 video streams #1222
+- Fix not fully redacting logged stream data
+
+### Changed
+- Do not show notification when automatically removing played video from Watch Later list
+- Add visitor ID to stream headers #1222
+- Improve logging of adaptive streams from player requests #1222
+- Identify and de-prioritise DRC audio streams
+- Specifically use elapsed time for plugin profiling if available
+- Use new BookmarkItem class for custom bookmarks to allow updating details like normal bookmarks
+- Default to list as path command if not given when navigating to various internal listings
+
+### New
+- Add support for 3D/VR video and spatial audio in stream selections
+
 ## v7.3.0+alpha.2
 ### Fixed
 - Fix clip start and end time parsing
