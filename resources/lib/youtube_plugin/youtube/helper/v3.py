@@ -70,6 +70,7 @@ def _process_list_response(provider,
     new_channel_id_dict = {}
     if subscription_id_dict is None:
         subscription_id_dict = {}
+    channel_items_dict = {}
 
     items = []
     do_callbacks = False
@@ -262,35 +263,20 @@ def _process_list_response(provider,
                                  subscription_id=subscription_id)
 
         elif kind_type == 'searchfolder':
-            channel_id = snippet.get('channelId')
-            item = NewSearchItem(context,
-                                 ui.bold(title),
-                                 image=image,
-                                 fanart=fanart,
-                                 channel_id=channel_id)
+            channel_id = item_params['channel_id']
+            item = NewSearchItem(context, **item_params)
+            channel_items = channel_items_dict.setdefault(channel_id, [])
+            channel_items.append(item)
 
         elif kind_type == 'playlistfolder':
-            playlist_id = item_id
-            # set channel id to 'mine' if the path is for a playlist of our own
-            channel_id = snippet.get('channelId')
-            if context.get_path().startswith(PATHS.MY_PLAYLISTS):
-                uri_channel_id = 'mine'
-            else:
-                uri_channel_id = channel_id
-            if not uri_channel_id:
-                continue
-            item_uri = context.create_uri(
-                (PATHS.CHANNEL, uri_channel_id, playlist_id,),
-                item_params,
+            channel_id = item_params['channel_id']
+            item_params['uri'] = context.create_uri(
+                (PATHS.CHANNEL, channel_id, 'playlists',),
             )
-            item = DirectoryItem(ui.bold(title),
-                                 item_uri,
-                                 image=image,
-                                 fanart=fanart,
-                                 plot=description,
-                                 category_label=title,
-                                 channel_id=channel_id,
-                                 playlist_id=playlist_id)
+            item_params['name'] = ui.bold(item_params.pop('title', ''))
+            item = DirectoryItem(**item_params)
+            channel_items = channel_items_dict.setdefault(channel_id, [])
+            channel_items.append(item)
 
         elif kind_type == 'playlist':
             playlist_id = item_id
@@ -480,10 +466,6 @@ def _process_list_response(provider,
             item.set_track_number(position + 1)
 
         items.append(item)
-
-    # this will also update the channel_id_dict with the correct channel_id
-    # for each video.
-    channel_items_dict = {}
 
     if progress_dialog:
         delta = (len(new_video_id_dict)

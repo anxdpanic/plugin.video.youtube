@@ -710,31 +710,23 @@ class Provider(AbstractProvider):
 
         if params.get('page', 1) == 1 and not params.get('hide_folders'):
             v3_response = {
-                'kind': 'youtube#pluginListResponse',
+                'kind': 'plugin#pluginListResponse',
                 'items': [
                     {
-                        'kind': 'youtube#playlistFolder',
-                        'id': 'playlists',
-                        'snippet': {
-                            'channelId': channel_id,
+                        'kind': 'plugin#playlistFolder',
+                        '_params': {
                             'title': context.localize('playlists'),
-                            'thumbnails': {'default': {
-                                'url': '{media}/playlist.png',
-                            }},
+                            'image': '{media}/playlist.png',
+                            'channel_id': channel_id,
                         },
-                        '_partial': True,
                     } if not params.get('hide_playlists') else None,
                     {
-                        'kind': 'youtube#searchFolder',
-                        'id': 'search',
-                        'snippet': {
-                            'channelId': channel_id,
+                        'kind': 'plugin#searchFolder',
+                        '_params': {
                             'title': context.localize('search'),
-                            'thumbnails': {'default': {
-                                'url': '{media}/search.png',
-                            }},
+                            'image': '{media}/search.png',
+                            'channel_id': channel_id,
                         },
-                        '_partial': True,
                     } if not params.get('hide_search') else None,
                     {
                         'kind': 'youtube#playlist',
