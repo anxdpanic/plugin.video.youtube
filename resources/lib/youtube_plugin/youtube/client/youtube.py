@@ -2871,15 +2871,21 @@ class YouTube(LoginClient):
         if kwargs.get('extended_debug'):
             self.log.debug(('Request response',
                             'Status:  {response.status_code!r}',
-                            'Headers: {response.headers!r}',
+                            'Headers: {headers!r}',
                             'Content: {response.text}'),
                            response=response,
+                           headers=(response.headers._store
+                                    if response.headers else
+                                    None),
                            stacklevel=4)
         else:
             self.log.debug(('Request response',
                             'Status:  {response.status_code!r}',
-                            'Headers: {response.headers!r}'),
+                            'Headers: {headers!r}'),
                            response=response,
+                           headers=(response.headers._store
+                                    if response.headers else
+                                    None),
                            stacklevel=4)
 
         if response.status_code == 204 and 'no_content' in kwargs:

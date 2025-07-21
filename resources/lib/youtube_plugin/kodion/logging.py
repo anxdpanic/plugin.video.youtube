@@ -12,6 +12,8 @@ from __future__ import absolute_import, division, unicode_literals
 
 import logging
 from os.path import normpath
+from pprint import PrettyPrinter
+from string import Formatter
 from sys import exc_info as sys_exc_info
 from traceback import extract_stack, format_list
 
@@ -77,7 +79,82 @@ class RecordFormatter(logging.Formatter):
         return s
 
 
+class StreamWrapper(object):
+    OPEN = frozenset(('(', '[', '{'))
+    CLOSE = frozenset((')', ']', '}'))
+
+    def __init__(self, stream, indent_per_level, level, indent):
+        self.stream = stream
+        self.indent_per_level = indent_per_level
+        self.level = level
+        self.indent = indent
+        self.previous_indent = 0
+        self.previous_out = ''
+
+    def update_level(self, level, indent):
+        self.level = level
+        self.indent = indent
+
+    def write(self, out):
+        write = self.stream.write
+        indent = self.indent
+        if '\n' in out:
+            write(out)
+        elif out in self.OPEN:
+            write(out)
+            write('\n' + (1 + indent) * ' ')
+        elif out in self.CLOSE:
+            if self.previous_out not in self.CLOSE:
+                if indent == self.previous_indent:
+                    indent = (self.level - 1) * self.indent_per_level
+                write('\n' + indent * ' ')
+            write(out)
+        else:
+            write(out)
+        self.previous_indent = indent
+        self.previous_out = out
+
+
+class VariableWidthPrettyPrinter(PrettyPrinter, object):
+    def _format(self, object, stream, indent, allowance, context, level):
+        if not isinstance(object, string_type):
+            indent = level * self._indent_per_level
+
+        if level:
+            stream.update_level(level, indent)
+        else:
+            stream = StreamWrapper(
+                stream,
+                self._indent_per_level,
+                level,
+                indent,
+            )
+
+        super(VariableWidthPrettyPrinter, self)._format(
+            object=object,
+            stream=stream,
+            indent=indent,
+            allowance=allowance,
+            context=context,
+            level=level,
+        )
+
+
+class PrettyPrintFormatter(Formatter):
+    _pretty_printer = VariableWidthPrettyPrinter(indent=4, width=160)
+
+    def convert_field(self, value, conversion):
+        if conversion == 'r':
+            return self._pretty_printer.pformat(value)
+        return super(PrettyPrintFormatter, self).convert_field(
+            value,
+            conversion,
+        )
+
+
 class MessageFormatter(object):
+    _formatter = PrettyPrintFormatter()
+
     __slots__ = (
         'args',
         'kwargs',
@@ -90,7 +167,7 @@ class MessageFormatter(object):
         self.kwargs = kwargs
 
     def __str__(self):
-        return self.msg.format(*self.args, **self.kwargs)
+        return self._formatter.vformat(self.msg, self.args, self.kwargs)
 
 
 class Handler(logging.Handler):

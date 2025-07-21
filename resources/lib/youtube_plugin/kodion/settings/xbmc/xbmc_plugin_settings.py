@@ -316,7 +316,7 @@ class XbmcPluginSettings(AbstractSettings):
 
         if echo_level and self._echo_level:
             self.log.debug_trace('Get setting {name!r}:'
-                                 ' {value!r} (list[str], {state})',
+                                 ' {value} (list[str], {state})',
                                  name=setting,
                                  value=value,
                                  state=(error if error else 'success'),
@@ -337,7 +337,7 @@ class XbmcPluginSettings(AbstractSettings):
 
         if echo_level and self._echo_level:
             self.log.debug_trace('Set setting {name!r}:'
-                                 ' {value!r} (list[str], {state})',
+                                 ' {value} (list[str], {state})',
                                  name=setting,
                                  value=value,
                                  state=(error if error else 'success'),
