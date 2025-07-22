@@ -330,7 +330,7 @@ class Provider(AbstractProvider):
         if items:
             return (items if listing else items[0]), None
 
-        return False, None
+        return [], None
 
     @AbstractProvider.register_path(
         r'^/channel/(?P<channel_id>[^/]+)'
