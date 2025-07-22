@@ -142,11 +142,12 @@ def _process_remove_video(provider,
             )
             return False
 
-        ui.show_notification(
-            message=localize('removed.from.x') % localize('playlist'),
-            time_ms=2500,
-            audible=False,
-        )
+        if not confirmed:
+            ui.show_notification(
+                message=localize('removed.from.x') % localize('playlist'),
+                time_ms=2500,
+                audible=False,
+            )
 
         if not context.is_plugin_path(container_uri):
             return True
