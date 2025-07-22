@@ -645,6 +645,7 @@ class XbmcContext(AbstractContext):
                       sub_type=None,
                       category_label=None):
         # ui local variable used for ui.get_view_manager() in unofficial version
+        # noinspection PyUnusedLocal
         ui = self.get_ui()
 
         if content_type:
@@ -762,7 +763,7 @@ class XbmcContext(AbstractContext):
             return
 
         ui = self.get_ui()
-        waitForAbort = xbmc.Monitor().waitForAbort
+        wait_for_abort = xbmc.Monitor().waitForAbort
 
         xbmc.executebuiltin(command, wait)
 
@@ -772,11 +773,11 @@ class XbmcContext(AbstractContext):
         if wait_for_set:
             ui.clear_property(wait_for)
             pop_property = ui.pop_property
-            while not pop_property(wait_for) and not waitForAbort(1):
+            while not pop_property(wait_for) and not wait_for_abort(1):
                 pass
         else:
             get_property = ui.get_property
-            while get_property(wait_for) and not waitForAbort(1):
+            while get_property(wait_for) and not wait_for_abort(1):
                 pass
 
         if block_ui:

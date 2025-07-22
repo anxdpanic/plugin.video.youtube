@@ -410,26 +410,31 @@ def _process_description_links(provider, context):
 def _process_saved_playlists(provider, context, client):
     params = context.get_params()
 
+    browse_id = 'FEplaylist_aggregation'
+    browse_response_type = 'playlists'
+    browse_client = 'tv'
+    browse_paths = client.JSON_PATHS['tv_grid']
+
     json_data = client.get_browse_items(
-        browse_id='FEplaylist_aggregation',
-        client='tv',
-        response_type='playlists',
+        browse_id=browse_id,
+        client=browse_client,
+        response_type=browse_response_type,
         do_auth=True,
         page_token=params.get('page_token'),
         click_tracking=params.get('click_tracking'),
         visitor=params.get('visitor'),
-        json_path=client.JSON_PATHS['tv_grid'],
+        json_path=browse_paths,
     )
     if not json_data:
         return False, None
 
     filler = partial(
         client.get_browse_items,
-        browse_id='FEplaylist_aggregation',
-        client='tv',
-        response_type='playlists',
+        browse_id=browse_id,
+        client=browse_client,
+        response_type=browse_response_type,
         do_auth=True,
-        json_path=client.JSON_PATHS['tv_grid'],
+        json_path=browse_paths,
     )
     json_data['_pre_filler'] = filler
     json_data['_post_filler'] = filler

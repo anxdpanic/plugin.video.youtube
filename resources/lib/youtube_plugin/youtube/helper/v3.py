@@ -60,7 +60,7 @@ def _process_list_response(provider,
                            playlist_id_dict=None,
                            subscription_id_dict=None,
                            log=_log):
-    yt_items = json_data.get('items', [])
+    yt_items = json_data.get('items')
     if not yt_items:
         log.warning('Items list is empty')
         return None

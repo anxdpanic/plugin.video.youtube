@@ -322,11 +322,11 @@ class Provider(AbstractProvider):
         if not resolved_url:
             return False, None
 
-        url_converter = UrlToItemConverter(flatten=True)
-        url_converter.add_url(resolved_url, context)
-        items = url_converter.get_items(provider=provider,
-                                        context=context,
-                                        skip_title=skip_title)
+        url_to_item_converter = UrlToItemConverter(flatten=True)
+        url_to_item_converter.add_url(resolved_url, context)
+        items = url_to_item_converter.get_items(provider=provider,
+                                                context=context,
+                                                skip_title=skip_title)
         if items:
             return (items if listing else items[0]), None
 
