@@ -1,3 +1,20 @@
+## v7.3.0+alpha.4
+### Fixed
+- Fix not showing Create bookmark item if bookmarks list is empty
+- Python 2 compatibility fixes for pretty print logging and lack of datetime.datetime.timestamp
+- Fix typo resulting in spatial audio streams not being correctly enabled/disabled
+- Ensure DELETE API requests are properly authorised #1226
+- Update XbmcContext.localize to handle string interpolation #1225
+- Attempt to mitigate possible memory leaks associated with use of Python Requests
+
+### Changed
+- Allow bookmarking channel of videos within Bookmarks list
+- Return empty listing on failure to parse YouTube url
+- Update known itag details
+
+### New
+- Add support for directly adding YouTube URL as custom bookmark
+
 ## v7.3.0+alpha.3
 ### Fixed
 - Ensure plugin folders in channel listings are not processed as YouTube items
