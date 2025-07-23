@@ -328,7 +328,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
 
             if updated:
                 # Successfully updated
-                updated = localize('api.config.updated') % ', '.join(updated)
+                updated = localize('api.config.updated', ', '.join(updated))
             else:
                 # No changes, not updated
                 updated = localize('api.config.not_updated')

@@ -1141,10 +1141,10 @@ class Provider(AbstractProvider):
             ])
         settings.subscriptions_filter(filter_list)
 
-        ui.show_notification(context.localize('added.to.x'
-                                              if command == 'add' else
-                                              'removed.from.x')
-                             % context.localize('my_subscriptions.filtered'))
+        ui.show_notification(context.localize(('added.to.x'
+                                               if command == 'add' else
+                                               'removed.from.x',
+                                               'my_subscriptions.filtered')))
         return True, None
 
     @AbstractProvider.register_path(
@@ -1264,7 +1264,7 @@ class Provider(AbstractProvider):
             video_name = to_unicode(video_name)
             if not ui.on_yes_no_input(
                     localize('content.remove'),
-                    localize('content.remove.check.x') % video_name,
+                    localize('content.remove.check.x', video_name),
             ):
                 return False, {provider.FALLBACK: False}
 
@@ -1272,7 +1272,7 @@ class Provider(AbstractProvider):
             ui.refresh_container()
 
             ui.show_notification(
-                localize('removed.name.x') % video_name,
+                localize('removed.name.x', video_name),
                 time_ms=2500,
                 audible=False,
             )
@@ -1956,7 +1956,7 @@ class Provider(AbstractProvider):
             ui.refresh_container()
 
             ui.show_notification(
-                localize('updated.x') % item_name
+                localize('updated.x', item_name)
                 if item_id else
                 localize('bookmark.created'),
                 time_ms=2500,
@@ -1988,7 +1988,7 @@ class Provider(AbstractProvider):
             bookmark_name = to_unicode(bookmark_name)
             if not ui.on_yes_no_input(
                     localize('content.remove'),
-                    localize('content.remove.check.x') % bookmark_name,
+                    localize('content.remove.check.x', bookmark_name),
             ):
                 return False, {provider.FALLBACK: False}
 
@@ -1996,7 +1996,7 @@ class Provider(AbstractProvider):
             ui.refresh_container()
 
             ui.show_notification(
-                localize('removed.name.x') % bookmark_name,
+                localize('removed.name.x', bookmark_name),
                 time_ms=2500,
                 audible=False,
             )
@@ -2084,7 +2084,7 @@ class Provider(AbstractProvider):
 
             context.get_watch_later_list().add_item(video_id, item)
             ui.show_notification(
-                localize('added.to.x') % localize('watch_later'),
+                localize(('added.to.x', 'watch_later')),
                 time_ms=2500,
                 audible=False,
             )
@@ -2095,7 +2095,7 @@ class Provider(AbstractProvider):
             video_name = to_unicode(video_name)
             if not ui.on_yes_no_input(
                     localize('content.remove'),
-                    localize('content.remove.check.x') % video_name,
+                    localize('content.remove.check.x', video_name),
             ):
                 return False, {provider.FALLBACK: False}
 
@@ -2103,7 +2103,7 @@ class Provider(AbstractProvider):
             ui.refresh_container()
 
             ui.show_notification(
-                localize('removed.name.x') % video_name,
+                localize('removed.name.x', video_name),
                 time_ms=2500,
                 audible=False,
             )

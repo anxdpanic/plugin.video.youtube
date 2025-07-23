@@ -32,7 +32,7 @@ class NextPageItem(DirectoryItem):
         if 'page_token' not in params and can_jump:
             params['page_token'] = self.create_page_token(page, items_per_page)
 
-        name = context.localize('page.next') % page
+        name = context.localize('page.next', page)
         filtered = params.get('filtered')
         if filtered:
             name = ''.join((

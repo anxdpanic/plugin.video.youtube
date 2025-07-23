@@ -614,30 +614,63 @@ class XbmcContext(AbstractContext):
                 self.__class__._settings = XbmcPluginSettings(addon)
         return self._settings
 
-    def localize(self, text_id, default_text=None):
-        if default_text is None:
-            default_text = 'Undefined string ID: {0!r}'.format(text_id)
+    def localize(self, text_id, args=None, default_text=None):
+        if isinstance(text_id, tuple):
+            _args = text_id[1:]
+            _text_id = text_id[0]
+            localize_args = True
+        else:
+            _args = args
+            _text_id = text_id
+            localize_args = False
 
-        if not isinstance(text_id, int):
+        if not isinstance(_text_id, int):
             try:
-                text_id = self.LOCAL_MAP[text_id]
+                _text_id = self.LOCAL_MAP[_text_id]
             except KeyError:
                 try:
-                    text_id = int(text_id)
+                    _text_id = int(_text_id)
                 except ValueError:
-                    return default_text
-        if text_id <= 0:
+                    _text_id = -1
+        if _text_id <= 0:
+            msg = 'Undefined string ID: {text_id!r}'
+            if default_text is None:
+                default_text = msg.format(text_id=text_id)
+                self.log.warning(msg)
+            else:
+                self.log.warning(msg, text_id=text_id)
             return default_text
 
         """
         We want to use all localization strings!
-        Addons should only use the range 30000 thru 30999
-        (see: http://kodi.wiki/view/Language_support) but we do it anyway.
+        Addons should only use the range 30000 through 30999
+        (see: http://kodi.wiki/view/Language_support), but we do it anyway.
         I want some of the localized strings for the views of a skin.
         """
-        source = self._addon if 30000 <= text_id < 31000 else xbmc
-        result = source.getLocalizedString(text_id)
-        result = to_unicode(result) if result else default_text
+        source = self._addon if 30000 <= _text_id < 31000 else xbmc
+        result = source.getLocalizedString(_text_id)
+        if not result:
+            msg = 'Untranslated string ID: {text_id!r}'
+            if default_text is None:
+                default_text = msg.format(text_id=text_id)
+                self.log.warning(msg)
+            else:
+                self.log.warning(msg, text_id=text_id)
+            return default_text
+        result = to_unicode(result)
+
+        if _args:
+            if localize_args:
+                _args = tuple(self.localize(arg, default_text=arg)
+                              for arg in _args)
+            try:
+                return result % _args
+            except TypeError:
+                self.log.exception(('Localization error',
+                                    'text_id: {text_id!r}',
+                                    'args:    {original_args!r}'),
+                                   text_id=text_id,
+                                   original_args=args)
         return result
 
     def apply_content(self,

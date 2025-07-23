@@ -344,8 +344,7 @@ class APIKeyStore(JSONStore):
             updated_list.append(localize('api.secret'))
             log_list.append('client_secret')
         if updated_list:
-            ui.show_notification(localize('updated.x')
-                                 % ', '.join(updated_list))
+            ui.show_notification(localize('updated.x', ', '.join(updated_list)))
         self.log.debug('Updated API details: %s', log_list)
 
         client_id = settings.api_id()
@@ -367,8 +366,8 @@ class APIKeyStore(JSONStore):
             if not client_secret:
                 missing_list.append(localize('api.secret'))
                 log_list.append('client_secret')
-            ui.show_notification(localize('api.personal.failed')
-                                 % ', '.join(missing_list))
+            ui.show_notification(localize('api.personal.failed',
+                                          ', '.join(missing_list)))
             self.log.error_trace(('Failed to enable personal API keys',
                                   'Missing: %s'),
                                  log_list)

@@ -76,7 +76,7 @@ def _do_login(provider, context, client=None, **kwargs):
                 verification_url = 'youtube.com/activate'
 
             message = ''.join((
-                localize('sign.go_to') % ui.bold(verification_url),
+                localize('sign.go_to', ui.bold(verification_url)),
                 '[CR]',
                 localize('sign.enter_code'),
                 ' ',

@@ -374,11 +374,12 @@ class Subtitles(object):
         if not num_total:
             self.log.debug('No subtitles found for prompt')
         else:
-            translation_lang = self._context.localize('subtitles.translation.x')
+            localize = self._context.localize
             choice = self._context.get_ui().on_select(
-                self._context.localize('subtitles.language'),
+                localize('subtitles.language'),
                 [name for _, name in captions] +
-                [translation_lang % name for _, name in translations]
+                [localize('subtitles.translation.x', name)
+                 for _, name in translations]
             )
 
             if 0 <= choice < num_captions:

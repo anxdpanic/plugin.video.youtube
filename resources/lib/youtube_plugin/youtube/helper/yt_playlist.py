@@ -57,16 +57,14 @@ def _process_add_video(provider, context):
         logging.debug('Playlist/Add: failed for playlist {playlist_id!r}'
                       .format(playlist_id=playlist_id))
         ui.show_notification(
-            message=(localize('failed.x')
-                     % localize('add.to.x')
-                     % localize('playlist')),
+            message=localize(('failed.x', ('add.to.x', 'playlist'))),
             time_ms=2500,
             audible=False,
         )
         return False
 
     ui.show_notification(
-        message=localize('added.to.x') % localize('playlist'),
+        message=localize(('added.to.x', 'playlist')),
         time_ms=2500,
         audible=False,
     )
@@ -134,9 +132,7 @@ def _process_remove_video(provider,
         )
         if not success:
             ui.show_notification(
-                message=(localize('failed.x')
-                         % localize('remove.from.x')
-                         % localize('playlist')),
+                message=localize(('failed.x', ('remove.from.x', 'playlist'))),
                 time_ms=2500,
                 audible=False,
             )
@@ -144,7 +140,7 @@ def _process_remove_video(provider,
 
         if not confirmed:
             ui.show_notification(
-                message=localize('removed.from.x') % localize('playlist'),
+                message=localize(('removed.from.x', 'playlist')),
                 time_ms=2500,
                 audible=False,
             )
@@ -198,16 +194,14 @@ def _process_remove_playlist(provider, context):
         success = provider.get_client(context).remove_playlist(playlist_id)
         if not success:
             ui.show_notification(
-                message=(localize('failed.x')
-                         % localize('remove.x')
-                         % localize('playlist')),
+                message=localize(('failed.x', ('remove.x', 'playlist'))),
                 time_ms=2500,
                 audible=False,
             )
             return False
 
         ui.show_notification(
-            message=localize('removed.name.x') % playlist_name,
+            message=localize('removed.name.x', playlist_name),
             time_ms=2500,
             audible=False,
         )
@@ -323,7 +317,7 @@ def _process_select_playlist(provider, context):
         if page_token:
             next_page = current_page + 1
             items.append((
-                ui.bold(context.localize('page.next') % next_page), '',
+                ui.bold(context.localize('page.next', next_page)), '',
                 'playlist.next',
                 'DefaultFolder.png',
             ))
@@ -378,9 +372,7 @@ def _process_rename_playlist(provider, context):
     )
     if not success:
         ui.show_notification(
-            message=(localize('failed.x')
-                     % localize('rename')
-                     % localize('playlist')),
+            message=localize(('failed.x', ('rename', 'playlist'))),
             time_ms=2500,
             audible=False,
         )
@@ -420,7 +412,7 @@ def _playlist_id_change(context, playlist, command):
             context.get_name(),
             context.localize('{type}.list.{command}.check'.format(
                 type=playlist, command=command
-            )) % playlist_name
+            ), playlist_name),
     ):
         if command == 'unassign':
             playlist_id = None
@@ -472,7 +464,7 @@ def _process_rate_playlist(provider,
         ui.show_notification(
             message=(localize('saved')
                      if rating == 'like' else
-                     localize('removed.name.x') % playlist_name),
+                     localize('removed.name.x', playlist_name)),
             time_ms=2500,
             audible=False,
         )
@@ -500,8 +492,7 @@ def _process_rate_playlist(provider,
 
     elif success is False:
         ui.show_notification(
-            message=(localize('failed.x')
-                     % localize('save')
+            message=(localize(('failed.x', 'save'))
                      if rating == 'like' else
                      localize('remove')),
             time_ms=2500,

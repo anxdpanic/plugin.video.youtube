@@ -384,8 +384,7 @@ def history_list_assign(context, playlist_id, playlist_name):
 
 def my_subscriptions_filter_remove(context, channel_name):
     return (
-        context.localize('remove.from.x')
-        % context.localize('my_subscriptions.filtered'),
+        context.localize(('remove.from.x', 'my_subscriptions.filtered')),
         context_menu_uri(
             context,
             ('my_subscriptions', 'filter', 'remove'),
@@ -398,8 +397,7 @@ def my_subscriptions_filter_remove(context, channel_name):
 
 def my_subscriptions_filter_add(context, channel_name):
     return (
-        context.localize('add.to.x')
-        % context.localize('my_subscriptions.filtered'),
+        context.localize(('add.to.x', 'my_subscriptions.filtered')),
         context_menu_uri(
             context,
             ('my_subscriptions', 'filter', 'add',),
@@ -467,7 +465,7 @@ def watch_later_local_clear(context):
 
 def channel_go_to(context, channel_id, channel_name):
     return (
-        context.localize('go_to.x') % context.get_ui().bold(channel_name),
+        context.localize('go_to.x', context.get_ui().bold(channel_name)),
         context_menu_uri(
             context,
             (PATHS.ROUTE, PATHS.CHANNEL, channel_id,),
@@ -477,7 +475,7 @@ def channel_go_to(context, channel_id, channel_name):
 
 def channel_subscribe_to(context, channel_id, channel_name=''):
     return (
-        context.localize('subscribe_to.x') % context.get_ui().bold(channel_name)
+        context.localize('subscribe_to.x', context.get_ui().bold(channel_name))
         if channel_name else
         context.localize('subscribe'),
         context_menu_uri(
@@ -661,10 +659,10 @@ def bookmark_add(context, item):
 
 def bookmark_add_channel(context, channel_id, channel_name=''):
     return (
-        (context.localize('bookmark.x') % (
-            context.get_ui().bold(channel_name) if channel_name else
-            context.localize('channel')
-        )),
+        context.localize('bookmark.x',
+                         context.get_ui().bold(channel_name)
+                         if channel_name else
+                         context.localize('channel')),
         context_menu_uri(
             context,
             (PATHS.BOOKMARKS, 'add',),
@@ -678,7 +676,7 @@ def bookmark_add_channel(context, channel_id, channel_name=''):
 
 def bookmark_edit(context, item_id, item_name, item_uri):
     return (
-        context.localize('edit.x') % context.localize('bookmark'),
+        context.localize(('edit.x', 'bookmark')),
         context_menu_uri(
             context,
             (PATHS.BOOKMARKS, 'edit',),

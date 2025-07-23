@@ -2698,14 +2698,13 @@ class PlayerClient(LoginClient):
             set_id += 1
 
         if subs_data:
-            translation_lang = localize('subtitles.translation.x')
             headers = subs_data.pop('_headers', None)
             for lang_id, subtitle in subs_data.items():
                 lang_code = subtitle['lang']
                 label = language = subtitle['language']
                 kind = subtitle['kind']
                 if kind == 'translation':
-                    label = translation_lang % language
+                    label = localize('subtitles.translation.x', language)
                     kind = '_'.join((lang_code, kind))
                 else:
                     kind = lang_id
