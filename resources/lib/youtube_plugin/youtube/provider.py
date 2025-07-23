@@ -1959,6 +1959,9 @@ class Provider(AbstractProvider):
                 return False
 
             context.get_bookmarks_list().add_item(item_id, item)
+            if context.get_path().startswith(PATHS.BOOKMARKS):
+                ui.refresh_container()
+
             ui.show_notification(
                 localize('bookmark.created'),
                 time_ms=2500,

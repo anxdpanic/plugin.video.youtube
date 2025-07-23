@@ -1065,17 +1065,16 @@ def update_video_items(provider, context, video_id_dict,
                     )
                 )
 
-            if not in_bookmarks_list:
-                context_menu.append(
-                    # remove bookmarked channel of the video
-                    menu_items.bookmark_remove(
-                        context, channel_id, channel_name
-                    ) if in_my_subscriptions_list else
-                    # bookmark channel of the video
-                    menu_items.bookmark_add_channel(
-                        context, channel_id, channel_name
-                    )
+            context_menu.append(
+                # remove bookmarked channel of the video
+                menu_items.bookmark_remove(
+                    context, channel_id, channel_name
+                ) if in_my_subscriptions_list else
+                # bookmark channel of the video
+                menu_items.bookmark_add_channel(
+                    context, channel_id, channel_name
                 )
+            )
 
         if use_play_data:
             context_menu.append(
