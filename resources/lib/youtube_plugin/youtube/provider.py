@@ -323,7 +323,7 @@ class Provider(AbstractProvider):
             return False, None
 
         url_to_item_converter = UrlToItemConverter(flatten=True)
-        url_to_item_converter.add_url(resolved_url, context)
+        url_to_item_converter.process_url(resolved_url, context)
         items = url_to_item_converter.get_items(provider=provider,
                                                 context=context,
                                                 skip_title=skip_title)

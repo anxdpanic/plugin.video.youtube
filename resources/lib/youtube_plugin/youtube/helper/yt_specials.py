@@ -289,7 +289,7 @@ def _process_description_links(provider, context):
                     break
 
             url_to_item_converter = UrlToItemConverter()
-            url_to_item_converter.add_urls(res_urls, context)
+            url_to_item_converter.process_urls(res_urls, context)
             result = url_to_item_converter.get_items(provider, context)
 
         if not result:

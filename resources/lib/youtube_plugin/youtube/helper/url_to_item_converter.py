@@ -48,14 +48,16 @@ class UrlToItemConverter(object):
         self._channel_ids = []
         self._channel_items_dict = {}
 
-    def add_url(self, url, context):
+        self._new_params = None
+
+    def add_url(self, url):
         parsed_url = urlsplit(url)
         if (not parsed_url.hostname
                 or parsed_url.hostname.lower() not in self.VALID_HOSTNAMES):
             self.log.debug('Unknown hostname "{hostname}" in url "{url}"',
                            hostname=parsed_url.hostname,
                            url=url)
-            return
+            return False
 
         url_params = dict(parse_qsl(parsed_url.query))
         new_params = {
@@ -89,16 +91,25 @@ class UrlToItemConverter(object):
             self.log.debug('Unknown path "{path}" in url "{url}"',
                            path=parsed_url.path,
                            url=url)
-            return
+            self._new_params = None
+            return False
+        self._new_params = new_params
+        return True
 
+    def create_item(self, context, as_uri=False):
+        new_params = self._new_params
         item = None
 
         if 'video_ids' in new_params:
+            item_uri = context.create_uri(PATHS.PLAY, new_params)
+            if as_uri:
+                return item_uri
+
             for video_id in new_params['video_ids'].split(','):
                 item = VideoItem(
                     name='',
                     uri=context.create_uri(
-                        (PATHS.PLAY,),
+                        PATHS.PLAY,
                         dict(new_params, video_id=video_id),
                     ),
                     video_id=video_id,
@@ -107,11 +118,15 @@ class UrlToItemConverter(object):
                 items.append(item)
 
         elif 'video_id' in new_params:
+            item_uri = context.create_uri(PATHS.PLAY, new_params)
+            if as_uri:
+                return item_uri
+
             video_id = new_params['video_id']
 
             item = VideoItem(
                 name='',
-                uri=context.create_uri((PATHS.PLAY,), new_params),
+                uri=item_uri,
                 video_id=video_id,
             )
             items = self._video_id_dict.setdefault(video_id, [])
@@ -120,13 +135,17 @@ class UrlToItemConverter(object):
         if 'playlist_id' in new_params:
             playlist_id = new_params['playlist_id']
 
+            item_uri = context.create_uri(('playlist', playlist_id), new_params)
+            if as_uri:
+                return item_uri
+
             if self._flatten:
                 self._playlist_ids.append(playlist_id)
-                return
+                return playlist_id
 
             item = DirectoryItem(
                 name='',
-                uri=context.create_uri(('playlist', playlist_id,), new_params),
+                uri=item_uri,
                 playlist_id=playlist_id,
             )
             items = self._playlist_id_dict.setdefault(playlist_id, [])
@@ -136,28 +155,42 @@ class UrlToItemConverter(object):
             channel_id = new_params['channel_id']
             live = new_params.get('live')
 
+            item_uri = context.create_uri(
+                PATHS.PLAY if live else ('channel', channel_id),
+                new_params
+            )
+            if as_uri:
+                return item_uri
+
             if not live and self._flatten:
                 self._channel_ids.append(channel_id)
-                return
+                return channel_id
 
             item = VideoItem(
                 name='',
-                uri=context.create_uri((PATHS.PLAY,), new_params),
+                uri=item_uri,
                 channel_id=channel_id,
             ) if live else DirectoryItem(
                 name='',
-                uri=context.create_uri(('channel', channel_id,), new_params),
+                uri=item_uri,
                 channel_id=channel_id,
             )
             items = self._channel_id_dict.setdefault(channel_id, [])
             items.append(item)
 
+        return item
+
+    def process_url(self, url, context, as_uri=False):
+        if not self.add_url(url):
+            return False
+        item = self.create_item(context, as_uri=as_uri)
         if not item:
             self.log.debug('No items found in url "%s"', url)
+        return item
 
-    def add_urls(self, urls, context):
+    def process_urls(self, urls, context):
         for url in urls:
-            self.add_url(url, context)
+            self.process_url(url, context)
 
     def get_items(self, provider, context, skip_title=False):
         result = []
