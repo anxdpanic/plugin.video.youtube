@@ -1917,8 +1917,22 @@ class Provider(AbstractProvider):
                                            params.get('uri', ''))
             if not results[0]:
                 return False
+
             item_uri = results[1]
-            if not context.is_plugin_path(item_uri):
+            if not item_uri:
+                return False
+            if item_uri.startswith(('https://', 'http://')):
+                item_uri = UrlToItemConverter().process_url(
+                    UrlResolver(context).resolve(item_uri),
+                    context,
+                    as_uri=True,
+                )
+            if not item_uri or not context.is_plugin_path(item_uri):
+                ui.show_notification(
+                    localize('failed'),
+                    time_ms=2500,
+                    audible=False,
+                )
                 return False
 
             item_date_time = now()
