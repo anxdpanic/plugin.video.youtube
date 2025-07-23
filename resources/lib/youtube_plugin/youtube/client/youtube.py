@@ -2351,23 +2351,24 @@ class YouTube(LoginClient):
             else:
                 return True, False
 
-            response = self.request(
-                ''.join((
-                    'https://www.youtube.com/feeds/videos.xml?playlist_id=',
-                    item_id,
-                )),
-                headers=headers,
-            )
-            if response is None:
-                return False, True
-            elif response.status_code == 404:
-                response = None
-            elif response.status_code == 429:
-                return False, True
+            with self.request(
+                    ''.join(('https://www.youtube.com/feeds/videos.xml'
+                             '?playlist_id=', item_id)),
+                    headers=headers,
+            ) as response:
+                if response is None:
+                    return False, True
+                elif response.status_code == 404:
+                    content = None
+                elif response.status_code == 429:
+                    return False, True
+                else:
+                    response.encoding = 'utf-8'
+                    content = response.content
 
             _output = {
                 'channel_id': channel_id,
-                'content': response,
+                'content': content,
                 'refresh': True,
             }
 
@@ -2414,8 +2415,7 @@ class YouTube(LoginClient):
                 content = feed.get('content')
 
                 if refresh_feed and content:
-                    content.encoding = 'utf-8'
-                    content = to_unicode(content.content).replace('\n', '')
+                    content = to_unicode(content).replace('\n', '')
 
                     root = ET.fromstring(content if utf8 else to_str(content))
                     channel_name = findtext(
@@ -2867,43 +2867,40 @@ class YouTube(LoginClient):
         return False
 
     def _response_hook(self, **kwargs):
-        response = kwargs['response']
-        if kwargs.get('extended_debug'):
-            self.log.debug(('Request response',
-                            'Status:  {response.status_code!r}',
-                            'Headers: {headers!r}',
-                            'Content: {response.text}'),
-                           response=response,
-                           headers=(response.headers._store
-                                    if response.headers else
-                                    None),
-                           stacklevel=4)
-        else:
-            self.log.debug(('Request response',
-                            'Status:  {response.status_code!r}',
-                            'Headers: {headers!r}'),
-                           response=response,
-                           headers=(response.headers._store
-                                    if response.headers else
-                                    None),
-                           stacklevel=4)
+        with kwargs['response'] as response:
+            headers = response.headers
+            if kwargs.get('extended_debug'):
+                self.log.debug(('Request response',
+                                'Status:  {response.status_code!r}',
+                                'Headers: {headers!r}',
+                                'Content: {response.text}'),
+                               response=response,
+                               headers=headers._store if headers else None,
+                               stacklevel=4)
+            else:
+                self.log.debug(('Request response',
+                                'Status:  {response.status_code!r}',
+                                'Headers: {headers!r}'),
+                               response=response,
+                               headers=headers._store if headers else None,
+                               stacklevel=4)
 
-        if response.status_code == 204 and 'no_content' in kwargs:
-            return None, True
+            if response.status_code == 204 and 'no_content' in kwargs:
+                return None, True
 
-        try:
-            json_data = response.json()
-        except ValueError as exc:
-            kwargs.setdefault('raise_exc', True)
-            raise InvalidJSON(exc, **kwargs)
+            try:
+                json_data = response.json()
+            except ValueError as exc:
+                kwargs.setdefault('raise_exc', True)
+                raise InvalidJSON(exc, **kwargs)
 
-        if 'error' in json_data:
-            kwargs.setdefault('pass_data', False)
-            raise YouTubeException('"error" in response JSON data',
-                                   json_data=json_data,
-                                   **kwargs)
+            if 'error' in json_data:
+                kwargs.setdefault('pass_data', False)
+                raise YouTubeException('"error" in response JSON data',
+                                       json_data=json_data,
+                                       **kwargs)
 
-        response.raise_for_status()
+            response.raise_for_status()
         return json_data.get('etag'), json_data
 
     def _error_hook(self, **kwargs):

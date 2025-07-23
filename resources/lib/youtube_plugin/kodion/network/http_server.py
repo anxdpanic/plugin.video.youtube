@@ -959,13 +959,13 @@ def httpd_status(context, address=None):
     ))
     if not RequestHandler.requests:
         RequestHandler.requests = BaseRequestsClass(context=context)
-    response = RequestHandler.requests.request(url, cache=False)
-    if response is None:
-        result = None
-    else:
-        result = response.status_code
-        if result == 204:
-            return True
+    with RequestHandler.requests.request(url, cache=False) as response:
+        if response is None:
+            result = None
+        else:
+            result = response.status_code
+            if result == 204:
+                return True
 
     logging.debug(('Ping',
                    'Address:  {netloc!r}',
@@ -976,7 +976,6 @@ def httpd_status(context, address=None):
 
 
 def get_client_ip_address(context):
-    ip_address = None
     url = urlunsplit((
         'http',
         get_connect_address(context, as_netloc=True),
@@ -986,12 +985,13 @@ def get_client_ip_address(context):
     ))
     if not RequestHandler.requests:
         RequestHandler.requests = BaseRequestsClass(context=context)
-    response = RequestHandler.requests.request(url, cache=False)
-    if response is not None and response.status_code == 200:
+    with RequestHandler.requests.request(url, cache=False) as response:
+        if response is None or response.status_code != 200:
+            return None
         response_json = response.json()
-        if response_json:
-            ip_address = response_json.get('ip')
-    return ip_address
+    if response_json:
+        return response_json.get('ip')
+    return None
 
 
 def get_connect_address(context, as_netloc=False, address=None):

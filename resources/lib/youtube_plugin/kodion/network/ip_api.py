@@ -27,8 +27,8 @@ class Locator(BaseRequestsClass):
 
     def locate_requester(self):
         request_url = '/'.join((self._base_url, 'json'))
-        response = self.request(request_url)
-        self._response = response.json() if response is not None else {}
+        with self.request(request_url) as response:
+            self._response = response.json() if response is not None else {}
 
     def success(self):
         response = self.response()

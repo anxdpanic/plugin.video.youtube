@@ -843,31 +843,6 @@ class PlayerClient(LoginClient):
         super(PlayerClient, self).__init__(context=context, **kwargs)
 
     @staticmethod
-    def _response_hook_json(**kwargs):
-        response = kwargs['response']
-        try:
-            json_data = response.json()
-            if 'error' in json_data:
-                kwargs.setdefault('pass_data', True)
-                raise YouTubeException('"error" in response JSON data',
-                                       json_data=json_data,
-                                       **kwargs)
-        except ValueError as exc:
-            kwargs.setdefault('raise_exc', True)
-            raise InvalidJSON(exc, **kwargs)
-        response.raise_for_status()
-        return json_data.get('etag'), json_data
-
-    @staticmethod
-    def _response_hook_text(**kwargs):
-        response = kwargs['response']
-        response.raise_for_status()
-        result = response and response.text
-        if not result:
-            raise YouTubeException('Empty response text', **kwargs)
-        return None, result
-
-    @staticmethod
     def _error_hook(**kwargs):
         exc = kwargs.pop('exc')
         json_data = getattr(exc, 'json_data', None)

@@ -125,28 +125,30 @@ class YouTubeResolver(AbstractResolver):
                 query=urlencode(next_params)
             ).geturl()
 
-        response = self.request(url,
-                                method=method,
-                                headers=self._HEADERS,
-                                # Manually configured cookies to avoid cookie
-                                # consent redirect
-                                cookies={'SOCS': 'CAISAiAD'},
-                                allow_redirects=True)
-        if response is None or response.status_code >= 400:
-            return url
+        with self.request(url,
+                          method=method,
+                          headers=self._HEADERS,
+                          # Manually configured cookies to avoid cookie
+                          # consent redirect
+                          cookies={'SOCS': 'CAISAiAD'},
+                          allow_redirects=True) as response:
+            if response is None or response.status_code >= 400:
+                return url
+            url = response.url
+            response_text = response.text if method == 'GET' else None
 
         if path.startswith('/clip'):
-            all_matches = self._RE_CLIP_DETAILS.finditer(response.text)
+            all_matches = self._RE_CLIP_DETAILS.finditer(response_text)
             matched_state = 0
             url_components = params = start_time = end_time = None
             for matches in all_matches:
                 matches = matches.groupdict()
 
                 if not matched_state & 1:
-                    url = matches['video_url']
-                    if url:
+                    new_url = matches['video_url']
+                    if new_url:
                         matched_state += 1
-                        url_components = urlsplit(unescape(url))
+                        url_components = urlsplit(unescape(new_url))
                         params = dict(parse_qsl(url_components.query))
 
                 if not matched_state & 2:
@@ -178,7 +180,7 @@ class YouTubeResolver(AbstractResolver):
 
         elif path == '/watch_videos':
             params = dict(parse_qsl(url_components.query))
-            new_components = urlsplit(response.url)
+            new_components = urlsplit(url)
             new_params = dict(parse_qsl(new_components.query))
             # add/overwrite all other params from original query string
             new_params.update(params)
@@ -191,20 +193,20 @@ class YouTubeResolver(AbstractResolver):
         # With the channel id we can construct a URL we already work with
         # https://www.youtube.com/channel/<CHANNEL_ID>
         elif method == 'GET':
-            match = self._RE_CHANNEL_URL.search(response.text)
+            match = self._RE_CHANNEL_URL.search(response_text)
             if match:
-                url = match.group('channel_url')
+                new_url = match.group('channel_url')
                 if path.endswith(('/live', '/streams')):
-                    url_components = urlsplit(unescape(url))
+                    url_components = urlsplit(unescape(new_url))
                     params = dict(parse_qsl(url_components.query))
                     params['live'] = 1
                     return url_components._replace(
                         query=urlencode(params)
                     ).geturl()
-                if url != 'undefined':
-                    return url
+                if new_url != 'undefined':
+                    return new_url
 
-        return response.url
+        return url
 
 
 class CommonResolver(AbstractResolver):
@@ -221,13 +223,13 @@ class CommonResolver(AbstractResolver):
         return 'HEAD'
 
     def resolve(self, url, url_components, method='HEAD'):
-        response = self.request(url,
-                                method=method,
-                                headers=self._HEADERS,
-                                allow_redirects=True)
-        if response is None or response.status_code >= 400:
-            return url
-        return response.url
+        with self.request(url,
+                          method=method,
+                          headers=self._HEADERS,
+                          allow_redirects=True) as response:
+            if response is None or response.status_code >= 400:
+                return url
+            return response.url
 
 
 class UrlResolver(object):

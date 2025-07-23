@@ -471,17 +471,17 @@ class Subtitles(object):
         if not download:
             return subtitle_url, self.FORMATS[sub_format]
 
-        response = BaseRequestsClass(context=self._context).request(
-            subtitle_url,
-            headers=self.headers,
-            error_title='Failed to download subtitle for: {sub_lang!r}',
-            sub_lang=lang,
-        )
-        response = response and response.text
-        if not response:
-            return None, None
+        with BaseRequestsClass(context=self._context).request(
+                subtitle_url,
+                headers=self.headers,
+                error_title='Failed to download subtitle for: {sub_lang!r}',
+                sub_lang=lang,
+        ) as response:
+            response_text = response and response.text
+            if not response_text:
+                return None, None
 
-        output = bytearray(self._unescape(response),
+        output = bytearray(self._unescape(response_text),
                            encoding='utf8',
                            errors='ignore')
         try:
