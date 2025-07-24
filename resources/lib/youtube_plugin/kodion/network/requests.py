@@ -202,7 +202,7 @@ class BaseRequestsClass(object):
         timestamp = None
 
         if url:
-            prepared_request = Request(
+            prepared_request = self._session.prepare_request(Request(
                 method=method,
                 url=url,
                 headers=headers,
@@ -213,7 +213,7 @@ class BaseRequestsClass(object):
                 auth=auth,
                 cookies=cookies,
                 hooks=hooks,
-            ).prepare()
+            ))
 
         if cache is not False:
             if prepared_request:
