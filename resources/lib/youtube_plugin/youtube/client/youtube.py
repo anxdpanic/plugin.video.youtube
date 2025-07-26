@@ -403,6 +403,7 @@ class YouTube(LoginClient):
                   'mine': True}
         return self.api_request(method='DELETE', path='playlists',
                                 params=params,
+                                do_auth=True,
                                 no_content=True,
                                 **kwargs)
 
@@ -551,6 +552,7 @@ class YouTube(LoginClient):
             params = {'id': playlist_item_id}
             return self.api_request(method='DELETE', path='playlistItems',
                                     params=params,
+                                    do_auth=True,
                                     no_content=True,
                                     **kwargs)
 
@@ -584,6 +586,7 @@ class YouTube(LoginClient):
         params = {'id': subscription_id}
         return self.api_request(method='DELETE', path='subscriptions',
                                 params=params,
+                                do_auth=True,
                                 no_content=True,
                                 **kwargs)
 
@@ -2978,6 +2981,8 @@ class YouTube(LoginClient):
             if do_auth is None:
                 do_auth = True
         else:
+            if do_auth is None and method == 'DELETE':
+                do_auth = True
             clear_data = True
         if params:
             client_data['params'] = params
