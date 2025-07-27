@@ -1997,6 +1997,8 @@ class PlayerClient(LoginClient):
         stream_select = settings.stream_select()
         localize = context.localize
 
+        debugging = self.log.debugging
+
         audio_data = {}
         video_data = {}
         preferred_audio = {
@@ -2018,7 +2020,7 @@ class PlayerClient(LoginClient):
             if not stream_data:
                 continue
 
-            log_client = True
+            log_client = debugging
             log_audio_header = None
             log_video_header = None
 
@@ -2160,10 +2162,10 @@ class PlayerClient(LoginClient):
                     height = width = fps = frame_rate = None
                     is_hdr = is_vr = is_3d = None
 
-                    log_audio = True
+                    log_audio = debugging
                     log_video = False
                     if log_audio_header is None:
-                        log_audio_header = True
+                        log_audio_header = debugging
                 elif audio_only:
                     continue
                 else:
@@ -2259,9 +2261,9 @@ class PlayerClient(LoginClient):
                     language = role = role_order = role_type = None
 
                     log_audio = False
-                    log_video = True
+                    log_video = debugging
                     if log_video_header is None:
-                        log_video_header = True
+                        log_video_header = debugging
 
                 urls = self._process_url_params(
                     unquote(url),

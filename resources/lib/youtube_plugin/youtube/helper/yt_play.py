@@ -329,20 +329,21 @@ def _select_stream(context,
     stream_list.sort(key=_stream_sort, reverse=True)
     num_streams = len(stream_list)
     ask_for_quality = ask_for_quality and num_streams >= 1
-    logging.debug('%d available stream(s)', num_streams)
 
-    def _default_NA():
-        return 'N/A'
+    if logging.debugging:
+        def _default_NA():
+            return 'N/A'
 
-    for idx, stream in enumerate(stream_list):
-        logging.debug(('Stream {idx}',
-                       'Container: {stream[container]}',
-                       'Adaptive:  {stream[adaptive]}',
-                       'Audio:     {stream[audio]}',
-                       'Video:     {stream[video]}',
-                       'Sort:      {stream[sort]}'),
-                      idx=idx,
-                      stream=defaultdict(_default_NA, stream))
+        logging.debug('%d available stream(s)', num_streams)
+        for idx, stream in enumerate(stream_list):
+            logging.debug(('Stream {idx}',
+                           'Container: {stream[container]}',
+                           'Adaptive:  {stream[adaptive]}',
+                           'Audio:     {stream[audio]}',
+                           'Video:     {stream[video]}',
+                           'Sort:      {stream[sort]}'),
+                          idx=idx,
+                          stream=defaultdict(_default_NA, stream))
 
     if ask_for_quality:
         selected_stream = context.get_ui().on_select(
