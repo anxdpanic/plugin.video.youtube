@@ -1,3 +1,11 @@
+## v7.3.0+alpha.5
+### Fixed
+- Fix not correctly updating channel details of subscriptions #1226
+- Redact IP address in stream urls when not using InputStream.Adaptive
+- Fix implementation of logging module debugging property
+- Python 2 compatibility fix to automatically handle timezones when determining timestamps
+- Fix not skipping invalid items in plugin list response
+
 ## v7.3.0+alpha.4
 ### Fixed
 - Fix not showing Create bookmark item if bookmarks list is empty
