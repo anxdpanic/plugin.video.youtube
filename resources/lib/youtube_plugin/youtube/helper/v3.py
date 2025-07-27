@@ -43,7 +43,8 @@ from ...kodion.items import (
     VideoItem,
     menu_items,
 )
-from ...kodion.utils import datetime_parser, strip_html_from_text
+from ...kodion.utils.convert_format import strip_html_from_text
+from ...kodion.utils.datetime_parser import parse_to_dt, utc_to_local
 
 
 _log = logging.getLogger(__name__)
@@ -333,8 +334,8 @@ def _process_list_response(provider,
             # date time
             published_at = snippet.get('publishedAt')
             if published_at:
-                datetime = datetime_parser.parse(published_at)
-                local_datetime = datetime_parser.utc_to_local(datetime)
+                datetime = parse_to_dt(published_at)
+                local_datetime = utc_to_local(datetime)
                 # If item is in a playlist, then set data added to playlist
                 item.set_dateadded_from_datetime(local_datetime)
 

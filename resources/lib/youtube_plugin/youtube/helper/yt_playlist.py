@@ -20,7 +20,7 @@ from ...kodion.constants import (
     PLAYLISTITEM_ID,
     PLAYLIST_ID, VIDEO_ID,
 )
-from ...kodion.utils import parse_item_ids
+from ...kodion.utils.methods import parse_item_ids
 
 
 def _process_add_video(provider, context):

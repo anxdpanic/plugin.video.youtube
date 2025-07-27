@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 from ..youtube_exceptions import YouTubeException
 from ...kodion.compatibility import range_type
 from ...kodion.network import BaseRequestsClass
-from ...kodion.utils import merge_dicts
+from ...kodion.utils.methods import merge_dicts
 
 
 class YouTubeRequestClient(BaseRequestsClass):

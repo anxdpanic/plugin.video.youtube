@@ -40,7 +40,9 @@ from ..constants import (
     PATHS,
     TEMP_PATH,
 )
-from ..utils import fix_subtitle_stream, parse_and_redact_uri, wait
+from ..utils.convert_format import fix_subtitle_stream
+from ..utils.methods import wait
+from ..utils.redact import parse_and_redact_uri
 
 
 class HTTPServer(ThreadingMixIn, TCPServer):

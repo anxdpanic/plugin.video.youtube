@@ -11,7 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from .storage import Storage
-from ..utils import generate_hash
+from ..utils.methods import generate_hash
 
 
 class SearchHistory(Storage):

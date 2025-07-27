@@ -48,8 +48,9 @@ from ..kodion.items import (
     VideoItem,
     menu_items,
 )
-from ..kodion.utils import parse_item_ids, strip_html_from_text, to_unicode
+from ..kodion.utils.convert_format import strip_html_from_text, to_unicode
 from ..kodion.utils.datetime_parser import now
+from ..kodion.utils.methods import parse_item_ids
 
 
 class Provider(AbstractProvider):

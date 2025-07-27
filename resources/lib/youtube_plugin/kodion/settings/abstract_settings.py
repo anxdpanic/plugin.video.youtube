@@ -13,12 +13,9 @@ from __future__ import absolute_import, division, unicode_literals
 import sys
 
 from ..constants import SETTINGS
-from ..utils import (
-    current_system_version,
-    get_kodi_setting_bool,
-    get_kodi_setting_value,
-)
 from ..network.http_server import validate_ip_address
+from ..utils.methods import get_kodi_setting_bool, get_kodi_setting_value
+from ..utils.system_version import current_system_version
 
 
 class AbstractSettings(object):

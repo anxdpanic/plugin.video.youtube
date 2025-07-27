@@ -21,7 +21,7 @@ from ..helper.ratebypass import ratebypass
 from ..helper.signature.cipher import Cipher
 from ..helper.subtitles import SUBTITLE_SELECTIONS, Subtitles
 from ..helper.utils import THUMB_TYPES
-from ..youtube_exceptions import InvalidJSON, YouTubeException
+from ..youtube_exceptions import YouTubeException
 from ...kodion import logging
 from ...kodion.compatibility import (
     entity_escape,
@@ -37,12 +37,10 @@ from ...kodion.compatibility import (
 )
 from ...kodion.constants import PATHS, TEMP_PATH, VALUE_TO_STR
 from ...kodion.network import get_connect_address
-from ...kodion.utils import (
-    make_dirs,
-    merge_dicts,
-    redact_ip_in_uri,
-)
 from ...kodion.utils.datetime_parser import fromtimestamp
+from ...kodion.utils.file_system import make_dirs
+from ...kodion.utils.methods import merge_dicts
+from ...kodion.utils.redact import redact_ip_in_uri
 
 
 class PlayerClient(LoginClient):

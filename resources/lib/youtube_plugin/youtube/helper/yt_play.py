@@ -12,6 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import json
 import random
+from collections import defaultdict
 
 from ..helper import utils, v3
 from ..youtube_exceptions import YouTubeException
@@ -35,12 +36,9 @@ from ...kodion.constants import (
 )
 from ...kodion.items import AudioItem, UriItem, VideoItem
 from ...kodion.network import get_connect_address
-from ...kodion.utils import (
-    datetime_parser,
-    parse_item_ids,
-    redact_params,
-    select_stream,
-)
+from ...kodion.utils.datetime_parser import datetime_to_since
+from ...kodion.utils.methods import parse_item_ids
+from ...kodion.utils.redact import redact_params
 
 
 def _play_stream(provider, context):
@@ -94,7 +92,7 @@ def _play_stream(provider, context):
             ui.show_notification(context.localize('error.no_streams_found'))
             return False
 
-        stream = select_stream(
+        stream = _select_stream(
             context,
             streams,
             ask_for_quality=ask_for_quality,
@@ -289,6 +287,190 @@ def _play_channel_live(provider, context):
     )
 
 
+def _select_stream(context,
+                   stream_data_list,
+                   ask_for_quality,
+                   audio_only,
+                   use_mpd=True):
+    settings = context.get_settings()
+    if settings.use_isa():
+        isa_capabilities = context.inputstream_adaptive_capabilities()
+        use_adaptive = bool(isa_capabilities)
+        use_live_adaptive = use_adaptive and 'live' in isa_capabilities
+        use_live_mpd = use_live_adaptive and settings.use_mpd_live_streams()
+    else:
+        use_adaptive = False
+        use_live_adaptive = False
+        use_live_mpd = False
+
+    if audio_only:
+        logging.debug('Audio only')
+        stream_list = [item for item in stream_data_list
+                       if 'video' not in item]
+    else:
+        stream_list = [
+            item for item in stream_data_list
+            if (not item.get('adaptive')
+                or (not item.get('live')
+                    and ((use_mpd and item.get('dash/video'))
+                         or (use_adaptive and item.get('hls/video'))))
+                or (item.get('live')
+                    and ((use_live_mpd and item.get('dash/video'))
+                         or (use_live_adaptive and item.get('hls/video')))))
+        ]
+
+    if not stream_list:
+        logging.debug('No streams found')
+        return None
+
+    def _stream_sort(_stream):
+        return _stream.get('sort', [0, 0, 0])
+
+    stream_list.sort(key=_stream_sort, reverse=True)
+    num_streams = len(stream_list)
+    ask_for_quality = ask_for_quality and num_streams >= 1
+    logging.debug('%d available stream(s)', num_streams)
+
+    def _default_NA():
+        return 'N/A'
+
+    for idx, stream in enumerate(stream_list):
+        logging.debug(('Stream {idx}',
+                       'Container: {stream[container]}',
+                       'Adaptive:  {stream[adaptive]}',
+                       'Audio:     {stream[audio]}',
+                       'Video:     {stream[video]}',
+                       'Sort:      {stream[sort]}'),
+                      idx=idx,
+                      stream=defaultdict(_default_NA, stream))
+
+    if ask_for_quality:
+        selected_stream = context.get_ui().on_select(
+            context.localize('select_video_quality'),
+            [stream['title'] for stream in stream_list],
+        )
+        if selected_stream == -1:
+            logging.debug('No stream selected')
+            return None
+    else:
+        selected_stream = 0
+
+    logging.debug('Stream %d selected', selected_stream)
+    return stream_list[selected_stream]
+
+
+def process_items_for_playlist(context,
+                               items,
+                               action=None,
+                               play_from=None,
+                               order=None,
+                               recent_days=None):
+    params = context.get_params()
+
+    if play_from is None:
+        play_from = params.get('video_id')
+
+    if recent_days is None:
+        recent_days = params.get('recent_days')
+
+    num_items = len(items) if items else 0
+    if num_items > 1:
+        # select order
+        if order is None:
+            order = params.get('order')
+        if not order and play_from is None and recent_days is None:
+            order = 'ask'
+        if order == 'ask':
+            order_list = ('default', 'reverse', 'shuffle')
+            selection_list = [
+                (context.localize('playlist.play.%s' % order), order)
+                for order in order_list
+            ]
+            order = context.get_ui().on_select(
+                context.localize('playlist.play.select'),
+                selection_list,
+            )
+            if order not in order_list:
+                order = 'default'
+
+        # reverse the list
+        if order == 'reverse':
+            items = items[::-1]
+        elif order == 'shuffle':
+            # we have to shuffle the playlist by our self.
+            # The implementation of XBMC/KODI is quite weak :(
+            random.shuffle(items)
+    elif not num_items:
+        return False
+
+    if action == 'list':
+        return items
+
+    # stop and clear the playlist
+    playlist_player = context.get_playlist_player()
+    playlist_player.clear()
+    playlist_player.unshuffle()
+
+    # check if we have a video as starting point for the playlist
+    if play_from == 'start':
+        play_from = 0
+    elif play_from == 'end':
+        play_from = -1
+    if isinstance(play_from, int):
+        position = play_from
+    elif isinstance(play_from, string_type):
+        position = None
+    else:
+        position = False
+
+    # add videos to playlist
+    num_items = 0
+    # convert from days to seconds
+    recent_limit = recent_days * 24 * 60 * 60 if recent_days else None
+    for idx, item in enumerate(items):
+        if not item.playable:
+            continue
+        if (recent_limit and datetime_to_since(
+                context,
+                item.get_dateadded(),
+                as_seconds=True,
+        ) > recent_limit):
+            continue
+        playlist_player.add(item)
+        num_items += 1
+        if position is None and item.video_id == play_from:
+            position = num_items
+
+    if not num_items:
+        return False
+
+    if isinstance(play_from, int):
+        if num_items >= play_from > 0:
+            position = play_from
+        elif play_from < 0:
+            position = num_items + play_from
+        else:
+            position = 1
+    elif not position:
+        position = 1
+
+    if action == 'queue':
+        return items
+    if action == 'play':
+        ui = context.get_ui()
+        timeout = position
+        while ui.busy_dialog_active() or playlist_player.size() < position:
+            timeout -= 1
+            if timeout < 0:
+                command = playlist_player.play_playlist_item(position,
+                                                             defer=True)
+                return UriItem(command)
+            context.sleep(1)
+        else:
+            playlist_player.play_playlist_item(position)
+    return items[position - 1]
+
+
 def process(provider, context, **_kwargs):
     """
     Plays a video, playlist, or channel live stream.
@@ -380,115 +562,3 @@ def process(provider, context, **_kwargs):
     if 'channel_id' in params:
         return _play_channel_live(provider, context)
     return False
-
-
-def process_items_for_playlist(context,
-                               items,
-                               action=None,
-                               play_from=None,
-                               order=None,
-                               recent_days=None):
-    params = context.get_params()
-
-    if play_from is None:
-        play_from = params.get('video_id')
-
-    if recent_days is None:
-        recent_days = params.get('recent_days')
-
-    num_items = len(items) if items else 0
-    if num_items > 1:
-        # select order
-        if order is None:
-            order = params.get('order')
-        if not order and play_from is None and recent_days is None:
-            order = 'ask'
-        if order == 'ask':
-            order_list = ('default', 'reverse', 'shuffle')
-            selection_list = [
-                (context.localize('playlist.play.%s' % order), order)
-                for order in order_list
-            ]
-            order = context.get_ui().on_select(
-                context.localize('playlist.play.select'),
-                selection_list,
-            )
-            if order not in order_list:
-                order = 'default'
-
-        # reverse the list
-        if order == 'reverse':
-            items = items[::-1]
-        elif order == 'shuffle':
-            # we have to shuffle the playlist by our self.
-            # The implementation of XBMC/KODI is quite weak :(
-            random.shuffle(items)
-    elif not num_items:
-        return False
-
-    if action == 'list':
-        return items
-
-    # stop and clear the playlist
-    playlist_player = context.get_playlist_player()
-    playlist_player.clear()
-    playlist_player.unshuffle()
-
-    # check if we have a video as starting point for the playlist
-    if play_from == 'start':
-        play_from = 0
-    elif play_from == 'end':
-        play_from = -1
-    if isinstance(play_from, int):
-        position = play_from
-    elif isinstance(play_from, string_type):
-        position = None
-    else:
-        position = False
-
-    # add videos to playlist
-    num_items = 0
-    # convert from days to seconds
-    recent_limit = recent_days * 24 * 60 * 60 if recent_days else None
-    for idx, item in enumerate(items):
-        if not item.playable:
-            continue
-        if (recent_limit and datetime_parser.datetime_to_since(
-                context,
-                item.get_dateadded(),
-                as_seconds=True,
-        ) > recent_limit):
-            continue
-        playlist_player.add(item)
-        num_items += 1
-        if position is None and item.video_id == play_from:
-            position = num_items
-
-    if not num_items:
-        return False
-
-    if isinstance(play_from, int):
-        if num_items >= play_from > 0:
-            position = play_from
-        elif play_from < 0:
-            position = num_items + play_from
-        else:
-            position = 1
-    elif not position:
-        position = 1
-
-    if action == 'queue':
-        return items
-    if action == 'play':
-        ui = context.get_ui()
-        timeout = position
-        while ui.busy_dialog_active() or playlist_player.size() < position:
-            timeout -= 1
-            if timeout < 0:
-                command = playlist_player.play_playlist_item(position,
-                                                             defer=True)
-                return UriItem(command)
-            context.sleep(1)
-        else:
-            playlist_player.play_playlist_item(position)
-    return items[position - 1]

@@ -19,7 +19,7 @@ from threading import RLock, Timer
 from .. import logging
 from ..compatibility import to_str
 from ..utils.datetime_parser import fromtimestamp, since_epoch
-from ..utils.methods import make_dirs
+from ..utils.file_system import make_dirs
 
 
 class StorageLock(object):

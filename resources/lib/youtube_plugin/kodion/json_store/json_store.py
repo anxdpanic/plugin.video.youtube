@@ -15,7 +15,9 @@ from io import open
 
 from .. import logging
 from ..constants import DATA_PATH, FILE_READ, FILE_WRITE
-from ..utils import make_dirs, merge_dicts, to_unicode
+from ..utils.convert_format import to_unicode
+from ..utils.file_system import make_dirs
+from ..utils.methods import merge_dicts
 
 
 class JSONStore(object):

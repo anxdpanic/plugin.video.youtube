@@ -16,7 +16,7 @@ from . import UrlResolver, UrlToItemConverter, utils, v3
 from ...kodion import KodionException, logging
 from ...kodion.constants import CONTENT, PATHS
 from ...kodion.items import DirectoryItem, UriItem
-from ...kodion.utils import strip_html_from_text
+from ...kodion.utils.convert_format import strip_html_from_text
 
 
 def _process_related_videos(provider, context, client):

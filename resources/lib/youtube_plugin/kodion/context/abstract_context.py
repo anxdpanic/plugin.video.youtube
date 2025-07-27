@@ -48,7 +48,7 @@ from ..sql_store import (
     SearchHistory,
     WatchLaterList,
 )
-from ..utils import current_system_version
+from ..utils.system_version import current_system_version
 
 
 class AbstractContext(object):

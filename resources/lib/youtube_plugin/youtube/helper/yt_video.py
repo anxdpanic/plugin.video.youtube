@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from ...kodion import KodionException
 from ...kodion.constants import PATHS
 from ...kodion.items import menu_items
-from ...kodion.utils import parse_item_ids
+from ...kodion.utils.methods import parse_item_ids
 
 
 def _process_rate_video(provider,

@@ -14,7 +14,7 @@ from functools import partial
 from itertools import chain
 
 from .storage import Storage
-from ..utils import generate_hash
+from ..utils.methods import generate_hash
 
 
 class FunctionCache(Storage):

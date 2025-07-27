@@ -70,7 +70,7 @@ now = datetime.now
 fromtimestamp = datetime.fromtimestamp
 
 
-def parse(datetime_string):
+def parse_to_dt(datetime_string):
     if not datetime_string:
         return None
 

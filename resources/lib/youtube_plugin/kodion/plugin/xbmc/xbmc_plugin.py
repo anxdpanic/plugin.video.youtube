@@ -48,7 +48,7 @@ from ...items import (
     playback_item,
     uri_listitem,
 )
-from ...utils import parse_and_redact_uri
+from ...utils.redact import parse_and_redact_uri
 
 
 class XbmcPlugin(AbstractPlugin):

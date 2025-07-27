@@ -26,10 +26,11 @@ from ..youtube_exceptions import InvalidJSON, YouTubeException
 from ...kodion import logging
 from ...kodion.compatibility import available_cpu_count, string_type, to_str
 from ...kodion.items import DirectoryItem
-from ...kodion.utils import (
-    datetime_parser as dt,
-    strip_html_from_text,
-    to_unicode,
+from ...kodion.utils.convert_format import strip_html_from_text, to_unicode
+from ...kodion.utils.datetime_parser import (
+    since_epoch,
+    strptime,
+    yt_datetime_offset,
 )
 
 
@@ -1589,7 +1590,7 @@ class YouTube(LoginClient):
             if isinstance(after, string_type) and after.startswith('{'):
                 after = json.loads(after)
             params['publishedAfter'] = (
-                dt.yt_datetime_offset(**after)
+                yt_datetime_offset(**after)
                 if isinstance(after, dict) else
                 after
             )
@@ -2154,7 +2155,7 @@ class YouTube(LoginClient):
             if isinstance(published, string_type) and published.startswith('{'):
                 published = json.loads(published)
             search_params['publishedBefore'] = (
-                dt.yt_datetime_offset(**published)
+                yt_datetime_offset(**published)
                 if isinstance(published, dict) else
                 published
             )
@@ -2164,7 +2165,7 @@ class YouTube(LoginClient):
             if isinstance(published, string_type) and published.startswith('{'):
                 published = json.loads(published)
             search_params['publishedAfter'] = (
-                dt.yt_datetime_offset(**published)
+                yt_datetime_offset(**published)
                 if isinstance(published, dict) else
                 published
             )
@@ -2248,7 +2249,7 @@ class YouTube(LoginClient):
             if '_timestamp' in item:
                 timestamp = item['_timestamp']
             else:
-                timestamp = dt.since_epoch(item['snippet'].get('publishedAt'))
+                timestamp = since_epoch(item['snippet'].get('publishedAt'))
                 item['_timestamp'] = timestamp
             return timestamp
 
@@ -2453,7 +2454,7 @@ class YouTube(LoginClient):
                                 '',
                                 ns,
                             ),
-                            'publishedAt': dt.strptime(
+                            'publishedAt': strptime(
                                 findtext(item, 'atom:published', '', ns)
                             ),
                         },

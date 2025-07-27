@@ -31,10 +31,11 @@ from ...kodion import logging
 from ...kodion.compatibility import string_type, unquote, urlsplit
 from ...kodion.constants import CONTENT, PATHS
 from ...kodion.items import AudioItem, CommandItem, DirectoryItem, menu_items
-from ...kodion.utils import (
-    datetime_parser,
-    friendly_number,
-    strip_html_from_text,
+from ...kodion.utils.convert_format import friendly_number, strip_html_from_text
+from ...kodion.utils.datetime_parser import (
+    get_scheduled_start,
+    parse_to_dt,
+    utc_to_local,
 )
 
 
@@ -124,8 +125,8 @@ def make_comment_item(context, snippet, uri, reply_count=0):
         ui.new_line(body, cr_after=1) if body else ''
     ))
 
-    datetime = datetime_parser.parse(published_at)
-    local_datetime = datetime_parser.utc_to_local(datetime)
+    datetime = parse_to_dt(published_at)
+    local_datetime = utc_to_local(datetime)
 
     if uri:
         comment_item = DirectoryItem(
@@ -161,8 +162,8 @@ def make_comment_item(context, snippet, uri, reply_count=0):
     comment_item.set_dateadded_from_datetime(local_datetime)
 
     if edited:
-        datetime = datetime_parser.parse(updated_at)
-        local_datetime = datetime_parser.utc_to_local(datetime)
+        datetime = parse_to_dt(updated_at)
+        local_datetime = utc_to_local(datetime)
     comment_item.set_date_from_datetime(local_datetime)
 
     return comment_item
@@ -302,9 +303,9 @@ def update_channel_items(provider, context, channel_id_dict,
         # date time
         published_at = snippet.get('publishedAt')
         if published_at:
-            datetime = datetime_parser.parse(published_at)
+            datetime = parse_to_dt(published_at)
             channel_item.set_added_utc(datetime)
-            local_datetime = datetime_parser.utc_to_local(datetime)
+            local_datetime = utc_to_local(datetime)
             channel_item.set_date_from_datetime(local_datetime)
 
         # try to find a better resolution for the image
@@ -497,9 +498,9 @@ def update_playlist_items(provider, context, playlist_id_dict,
         # date time
         published_at = snippet.get('publishedAt')
         if published_at:
-            datetime = datetime_parser.parse(published_at)
+            datetime = parse_to_dt(published_at)
             playlist_item.set_added_utc(datetime)
-            local_datetime = datetime_parser.utc_to_local(datetime)
+            local_datetime = utc_to_local(datetime)
             playlist_item.set_date_from_datetime(local_datetime)
 
         # try to find a better resolution for the image
@@ -723,7 +724,7 @@ def update_video_items(provider, context, video_id_dict,
         else:
             duration = yt_item.get('contentDetails', {}).get('duration')
             if duration:
-                duration = datetime_parser.parse(duration)
+                duration = parse_to_dt(duration)
                 if duration.seconds:
                     # subtract 1s because YouTube duration is +1s too long
                     duration = duration.seconds - 1
@@ -803,9 +804,9 @@ def update_video_items(provider, context, video_id_dict,
                     media_item.set_start_time(play_data['played_time'])
 
         if start_at:
-            datetime = datetime_parser.parse(start_at)
+            datetime = parse_to_dt(start_at)
             media_item.set_scheduled_start_utc(datetime)
-            local_datetime = datetime_parser.utc_to_local(datetime)
+            local_datetime = utc_to_local(datetime)
             media_item.set_year_from_datetime(local_datetime)
             media_item.set_aired_from_datetime(local_datetime)
             media_item.set_premiered_from_datetime(local_datetime)
@@ -821,7 +822,7 @@ def update_video_items(provider, context, video_id_dict,
                 type_label = localize('start')
             start_at = ' '.join((
                 type_label,
-                datetime_parser.get_scheduled_start(context, local_datetime),
+                get_scheduled_start(context, local_datetime),
             ))
 
         label_stats = []
@@ -932,12 +933,12 @@ def update_video_items(provider, context, video_id_dict,
         if not published_at:
             datetime = None
         elif isinstance(published_at, string_type):
-            datetime = datetime_parser.parse(published_at)
+            datetime = parse_to_dt(published_at)
         else:
             datetime = published_at
         if datetime:
             media_item.set_added_utc(datetime)
-            local_datetime = datetime_parser.utc_to_local(datetime)
+            local_datetime = utc_to_local(datetime)
             # If item is in a playlist, then use date added to playlist rather
             # than date that item was published to YouTube
             if not media_item.get_dateadded():
@@ -1452,7 +1453,7 @@ def filter_parse(item,
                     if input_1 is None:
                         input_1 = ''
                     elif isinstance(input_1, (dt_date, dt_datetime)):
-                        input_2 = datetime_parser.parse(input_2)
+                        input_2 = parse_to_dt(input_2)
                 else:
                     input_2 = float(input_2)
                     if input_1 is None:

@@ -34,7 +34,9 @@ from ...constants import (
     VALUE_TO_STR,
     VIDEO_ID,
 )
-from ...utils import current_system_version, datetime_parser, redact_ip_in_uri
+from ...utils.datetime_parser import datetime_to_since, utc_to_local
+from ...utils.redact import redact_ip_in_uri
+from ...utils.system_version import current_system_version
 
 
 def set_info(list_item, item, properties, set_play_count=True, resume=True):
@@ -687,12 +689,12 @@ def media_listitem(context,
     datetime = scheduled_start or published_at
     local_datetime = None
     if datetime:
-        local_datetime = datetime_parser.utc_to_local(datetime)
+        local_datetime = utc_to_local(datetime)
         props['PublishedLocal'] = to_str(local_datetime)
     if media_item.live:
         props['PublishedSince'] = context.localize('live')
     elif local_datetime:
-        props['PublishedSince'] = to_str(datetime_parser.datetime_to_since(
+        props['PublishedSince'] = to_str(datetime_to_since(
             context, local_datetime
         ))
 

@@ -38,7 +38,7 @@ from ..constants import (
     VIDEO_ID,
 )
 from ..network import get_connect_address, get_http_server, httpd_status
-from ..utils import jsonrpc
+from ..utils.methods import jsonrpc
 
 
 class ServiceMonitor(xbmc.Monitor):

@@ -21,7 +21,7 @@ from ..compatibility import (
     unescape,
 )
 from ..constants import MEDIA_PATH
-from ..utils import generate_hash
+from ..utils.methods import generate_hash
 
 
 class BaseItem(object):

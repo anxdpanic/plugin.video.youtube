@@ -14,7 +14,7 @@ import uuid
 from .json_store import JSONStore
 from ..compatibility import string_type
 from ..constants import ADDON_ID
-from ..utils import generate_hash
+from ..utils.methods import generate_hash
 
 
 class AccessManager(JSONStore):

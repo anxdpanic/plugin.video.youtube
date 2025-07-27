@@ -37,16 +37,16 @@ from ...json_store import APIKeyStore, AccessManager
 from ...player import XbmcPlaylistPlayer
 from ...settings import XbmcPluginSettings
 from ...ui import XbmcContextUI
-from ...utils import (
-    current_system_version,
+from ...utils.convert_format import to_unicode
+from ...utils.file_system import make_dirs
+from ...utils.methods import (
     get_kodi_setting_bool,
     get_kodi_setting_value,
     jsonrpc,
     loose_version,
-    make_dirs,
-    to_unicode,
     wait,
 )
+from ...utils.system_version import current_system_version
 
 
 class IPCMonitor(xbmc.Monitor):

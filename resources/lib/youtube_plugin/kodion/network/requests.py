@@ -20,7 +20,7 @@ from requests.utils import DEFAULT_CA_BUNDLE_PATH, extract_zipped_paths
 from urllib3.util.ssl_ import create_urllib3_context
 
 from .. import logging
-from ..utils import generate_hash
+from ..utils.methods import generate_hash
 
 
 __all__ = (

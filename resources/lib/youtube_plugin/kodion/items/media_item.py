@@ -16,7 +16,7 @@ from re import compile as re_compile
 from . import BaseItem
 from ..compatibility import datetime_infolabel, to_str, unescape, urlencode
 from ..constants import CONTENT
-from ..utils import duration_to_seconds, seconds_to_duration
+from ..utils.convert_format import duration_to_seconds, seconds_to_duration
 
 
 class MediaItem(BaseItem):

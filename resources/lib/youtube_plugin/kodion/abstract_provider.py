@@ -37,7 +37,7 @@ from .items import (
     SearchHistoryItem,
     UriItem,
 )
-from .utils import to_unicode
+from .utils.convert_format import to_unicode
 
 
 class AbstractProvider(object):

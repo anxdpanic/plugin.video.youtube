@@ -20,7 +20,7 @@ from .constants import (
 )
 from .context import XbmcContext
 from .monitors import PlayerMonitor, ServiceMonitor
-from .utils import rm_dir
+from .utils.file_system import rm_dir
 from ..youtube.provider import Provider
 
 

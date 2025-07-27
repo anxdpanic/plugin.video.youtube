@@ -29,7 +29,7 @@ from .network import (
     get_listen_addresses,
     httpd_status,
 )
-from .utils import rm_dir
+from .utils.file_system import rm_dir
 from ..youtube import Provider
 
 

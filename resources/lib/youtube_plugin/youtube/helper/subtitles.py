@@ -25,7 +25,7 @@ from ...kodion.constants import (
     TRANSLATION_LANGUAGES,
 )
 from ...kodion.network import BaseRequestsClass
-from ...kodion.utils import make_dirs
+from ...kodion.utils.file_system import make_dirs
 
 
 SUBTITLE_OPTIONS = {

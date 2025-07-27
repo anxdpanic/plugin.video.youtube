@@ -24,7 +24,7 @@ from ..constants import (
     REFRESH_CONTAINER,
     TRAKT_PAUSE_FLAG,
 )
-from ..utils import redact_params
+from ..utils.redact import redact_params
 
 
 class PlayerMonitorThread(threading.Thread):

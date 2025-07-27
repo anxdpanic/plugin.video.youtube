@@ -16,7 +16,7 @@ from ..abstract_context_ui import AbstractContextUI
 from ... import logging
 from ...compatibility import string_type, xbmc, xbmcgui
 from ...constants import ADDON_ID, BOOL_FROM_STR, REFRESH_CONTAINER
-from ...utils import to_unicode
+from ...utils.convert_format import to_unicode
 
 
 class XbmcContextUI(AbstractContextUI):

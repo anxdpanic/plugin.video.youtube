@@ -20,7 +20,7 @@ from ...kodion import logging
 from ...kodion.compatibility import parse_qsl, urlsplit
 from ...kodion.constants import PATHS
 from ...kodion.items import DirectoryItem, UriItem, VideoItem
-from ...kodion.utils import duration_to_seconds
+from ...kodion.utils.convert_format import duration_to_seconds
 
 
 class UrlToItemConverter(object):
