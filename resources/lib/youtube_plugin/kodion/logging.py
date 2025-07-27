@@ -11,6 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import logging
+import sys
 from os.path import normpath
 from pprint import PrettyPrinter
 from string import Formatter
@@ -23,6 +24,7 @@ from .utils.convert_format import to_unicode
 from .utils.system_version import current_system_version
 
 
+# noinspection PyUnresolvedReferences
 __all__ = (
     'check_frame',
     'critical',
@@ -468,8 +470,6 @@ info = root.info
 debug = root.debug
 log = root.log
 
-debugging = root.debugging
-
 CRITICAL = logging.CRITICAL
 ERROR = logging.ERROR
 WARNING = logging.WARNING
@@ -540,3 +540,22 @@ def check_frame(frame, stacklevel=None, skip_paths=None):
     ))):
         stacklevel += 1
     return stacklevel, is_internal
+
+
+__original_module__ = sys.modules[__name__]
+
+
+class ModuleProperties(__original_module__.__class__, object):
+    __name__ = __original_module__.__name__
+    __file__ = __original_module__.__file__
+    __getattribute__ = __original_module__.__getattribute__
+
+    def __getattr__(self, item):
+        if item == 'debugging':
+            return root.isEnabledFor(logging.DEBUG)
+        raise AttributeError(
+            'module \'{}\' has no attribute \'{}\''.format(__name__, item)
+        )
+
+
+sys.modules[__name__] = ModuleProperties(__name__, __doc__)
