@@ -17,7 +17,7 @@ from ...kodion.constants import ADDON_ID, DATA_PATH, WAIT_END_FLAG
 from ...kodion.network import get_listen_addresses, httpd_status
 from ...kodion.sql_store import PlaybackHistory, SearchHistory
 from ...kodion.utils.convert_format import to_unicode
-from ...kodion.utils.datetime_parser import strptime
+from ...kodion.utils.datetime_parser import since_epoch, strptime
 
 
 def process_pre_run(context):
@@ -282,7 +282,7 @@ def process_old_search_db(context, step, steps, **_kwargs):
         def _convert_old_search_item(value, item):
             return {
                 'text': to_unicode(value),
-                'timestamp': strptime(item[1]).timestamp(),
+                'timestamp': since_epoch(strptime(item[1])),
             }
 
         search_history = context.get_search_history()
@@ -336,7 +336,7 @@ def process_old_history_db(context, step, steps, **_kwargs):
                 'total_time': float(values[1]),
                 'played_time': float(values[2]),
                 'played_percent': int(values[3]),
-                'timestamp': strptime(item[1]).timestamp(),
+                'timestamp': since_epoch(strptime(item[1])),
             }
 
         playback_history = context.get_playback_history()

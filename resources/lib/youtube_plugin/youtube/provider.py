@@ -49,7 +49,7 @@ from ..kodion.items import (
     menu_items,
 )
 from ..kodion.utils.convert_format import strip_html_from_text, to_unicode
-from ..kodion.utils.datetime_parser import now
+from ..kodion.utils.datetime_parser import now, since_epoch
 from ..kodion.utils.methods import parse_item_ids
 
 
@@ -1949,7 +1949,7 @@ class Provider(AbstractProvider):
                 item_id = item.generate_id(
                     item_name,
                     item_uri,
-                    item_date_time.timestamp(),
+                    since_epoch(item_date_time),
                     prefix='custom',
                 )
                 item.bookmark_id = item_id

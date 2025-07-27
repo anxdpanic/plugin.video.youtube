@@ -19,6 +19,8 @@ from traceback import extract_stack, format_list
 
 from .compatibility import StringIO, string_type, to_str, xbmc
 from .constants import ADDON_ID
+from .utils.convert_format import to_unicode
+from .utils.system_version import current_system_version
 
 
 __all__ = (
@@ -48,8 +50,11 @@ class RecordFormatter(logging.Formatter):
             try:
                 return self._fmt % record.__dict__
             except UnicodeDecodeError as e:
+                record.__dict__ = {
+                    key: to_unicode(value)
+                    for key, value in record.__dict__.items()
+                }
                 try:
-                    record.name = record.name.decode('utf-8')
                     return self._fmt % record.__dict__
                 except UnicodeDecodeError:
                     raise e
@@ -58,7 +63,7 @@ class RecordFormatter(logging.Formatter):
         return stack_info
 
     def format(self, record):
-        record.message = record.getMessage()
+        record.message = to_unicode(record.getMessage())
         if self.usesTime():
             record.asctime = self.formatTime(record, self.datefmt)
         s = self.formatMessage(record)
@@ -99,19 +104,20 @@ class StreamWrapper(object):
     def write(self, out):
         write = self.stream.write
         indent = self.indent
+        out = to_unicode(out)
         if '\n' in out:
-            write(out)
+            write(to_str(out))
         elif out in self.OPEN:
-            write(out)
+            write(to_str(out))
             write('\n' + (1 + indent) * ' ')
         elif out in self.CLOSE:
             if self.previous_out not in self.CLOSE:
                 if indent == self.previous_indent:
                     indent = (self.level - 1) * self.indent_per_level
                 write('\n' + indent * ' ')
-            write(out)
+            write(to_str(out))
         else:
-            write(out)
+            write(to_str(out))
         self.previous_indent = indent
         self.previous_out = out
 
@@ -151,6 +157,14 @@ class PrettyPrintFormatter(Formatter):
             value,
             conversion,
         )
+
+    if not current_system_version.compatible(19):
+        def parse(self, *args, **kwargs):
+            output = super(PrettyPrintFormatter, self).parse(*args, **kwargs)
+            return (
+                (to_str(literal_text), field_name, format_spec, conversion)
+                for literal_text, field_name, format_spec, conversion in output
+            )
 
 
 class MessageFormatter(object):
