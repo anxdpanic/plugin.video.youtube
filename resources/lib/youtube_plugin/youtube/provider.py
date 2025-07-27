@@ -1723,8 +1723,6 @@ class Provider(AbstractProvider):
         if command in {'list', 'play'}:
             bookmarks_list = context.get_bookmarks_list()
             items = bookmarks_list.get_items()
-            if not items:
-                return True, None
 
             v3_response = {
                 'kind': 'plugin#pluginListResponse',
