@@ -12,11 +12,11 @@ from __future__ import absolute_import, division, unicode_literals
 
 import json
 import threading
-import xml.etree.ElementTree as ET
 from functools import partial
 from itertools import chain, islice
 from random import randint
 from re import compile as re_compile
+from xml.etree.ElementTree import Element as ET_Element, XML as ET_XML
 
 from .login_client import LoginClient
 from .player_client import PlayerClient
@@ -24,9 +24,9 @@ from ..helper.utils import channel_filter_split
 from ..helper.v3 import pre_fill
 from ..youtube_exceptions import InvalidJSON, YouTubeException
 from ...kodion import logging
-from ...kodion.compatibility import available_cpu_count, string_type, to_str
+from ...kodion.compatibility import available_cpu_count, string_type
 from ...kodion.items import DirectoryItem
-from ...kodion.utils.convert_format import strip_html_from_text, to_unicode
+from ...kodion.utils.convert_format import strip_html_from_text
 from ...kodion.utils.datetime_parser import (
     since_epoch,
     strptime,
@@ -2393,7 +2393,6 @@ class YouTube(LoginClient):
                          sort_method,
                          sort_limits,
                          progress_dialog=None,
-                         utf8=context.get_system_version().compatible(19),
                          filters=channel_filters,
                          ns=namespaces,
                          feed_history=feed_history,
@@ -2406,8 +2405,8 @@ class YouTube(LoginClient):
                 )
 
             dict_get = {}.get
-            find = ET.Element.find
-            findtext = ET.Element.findtext
+            find = ET_Element.find
+            findtext = ET_Element.findtext
 
             all_items = {}
             new_cache = {}
@@ -2419,9 +2418,7 @@ class YouTube(LoginClient):
                 content = feed.get('content')
 
                 if refresh_feed and content:
-                    content = to_unicode(content).replace('\n', '')
-
-                    root = ET.fromstring(content if utf8 else to_str(content))
+                    root = ET_XML(content)
                     channel_name = findtext(
                         root,
                         'atom:author/atom:name',
