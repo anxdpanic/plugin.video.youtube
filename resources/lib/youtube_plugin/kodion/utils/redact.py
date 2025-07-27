@@ -75,7 +75,8 @@ def redact_params(params):
                 if isinstance(value, (list, tuple)) else
                 '<redacted>'
             )
-        elif param == 'url':
+        elif param in {'url',
+                       'playing_file'}:
             log_value = (
                 [redact_ip_in_uri(val) for val in value]
                 if isinstance(value, (list, tuple)) else
