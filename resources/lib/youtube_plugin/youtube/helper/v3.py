@@ -105,6 +105,8 @@ def _process_list_response(provider,
     untitled = context.localize('untitled')
 
     for yt_item in yt_items:
+        if not yt_item:
+            continue
         kind, is_youtube, is_plugin, kind_type = _parse_kind(yt_item)
         if not (is_youtube or is_plugin) or not kind_type:
             log.debug('Item discarded: %r', kind)
