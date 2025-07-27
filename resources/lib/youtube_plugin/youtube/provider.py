@@ -213,7 +213,7 @@ class Provider(AbstractProvider):
             if expired:
                 num_access_tokens = 0
             elif client.logged_in:
-                self.log.info('User is logged in')
+                self.log.debug('User is logged in')
                 return client
 
         refresh_tokens = access_manager.get_refresh_token(dev_id)
@@ -225,7 +225,7 @@ class Provider(AbstractProvider):
                            num_access_tokens,
                            num_refresh_tokens)
         else:
-            self.log.info('User is not logged in')
+            self.log.debug('User is not logged in')
             access_manager.update_access_token(dev_id, access_token='')
             return client
 
