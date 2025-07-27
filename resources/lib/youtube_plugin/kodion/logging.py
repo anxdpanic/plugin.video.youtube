@@ -25,6 +25,7 @@ __all__ = (
     'check_frame',
     'critical',
     'debug',
+    'debugging',
     'error',
     'exception',
     'info',
@@ -452,6 +453,8 @@ warning = root.warning
 info = root.info
 debug = root.debug
 log = root.log
+
+debugging = root.debugging
 
 CRITICAL = logging.CRITICAL
 ERROR = logging.ERROR
