@@ -2076,7 +2076,7 @@ class PlayerClient(LoginClient):
                         continue
 
                     is_spa = stream.get('spatialAudioType', '')
-                    if is_spa and not allow_3d:
+                    if is_spa and not allow_spa:
                         continue
 
                     if 'audioTrack' in stream:
