@@ -44,9 +44,11 @@ __RE_MATCH_ABBREVIATED__ = re_compile(
 )
 
 __INTERNAL_CONSTANTS__ = {
-    'epoch_dt': (
-        datetime.fromtimestamp(0, tz=timezone.utc) if timezone
-        else datetime.fromtimestamp(0)
+    'epoch_dt': datetime.fromtimestamp(0),
+    'epoch_dt_utc': (
+        datetime.fromtimestamp(0, tz=timezone.utc)
+        if timezone else
+        None
     ),
     'local_offset': None,
     'Jan': 1,
@@ -292,7 +294,15 @@ def strptime(datetime_str, fmt=None, _strptime=modules['_strptime']):
 def since_epoch(dt_object=None):
     if dt_object is None:
         dt_object = now(tz=timezone.utc) if timezone else datetime.utcnow()
-    return (dt_object - __INTERNAL_CONSTANTS__['epoch_dt']).total_seconds()
+    if dt_object.tzinfo:
+        if timezone:
+            epoch = __INTERNAL_CONSTANTS__['epoch_dt_utc']
+        else:
+            dt_object = dt_object.replace(tzinfo=None)
+            epoch = __INTERNAL_CONSTANTS__['epoch_dt']
+    else:
+        epoch = __INTERNAL_CONSTANTS__['epoch_dt']
+    return (dt_object - epoch).total_seconds()
 
 
 def yt_datetime_offset(**kwargs):
