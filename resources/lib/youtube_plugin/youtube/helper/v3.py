@@ -424,7 +424,7 @@ def _process_list_response(provider,
                         new_channel_id_dict,
                         channel_id_dict,
                         DirectoryItem,
-                        {'channel', 'bookmarkitem'},
+                        {'channel', 'bookmarkitem', 'subscription'},
                 ),
         ):
             if (not item_id
