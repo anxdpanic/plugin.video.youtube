@@ -16,6 +16,7 @@ import time
 from atexit import register as atexit_register
 from cProfile import Profile
 from functools import wraps
+from inspect import getargvalues
 from os.path import normpath
 from pstats import Stats
 from traceback import extract_stack, format_list
@@ -255,22 +256,25 @@ class ExecTimeout(object):
 
     def __init__(self,
                  seconds,
+                 log_only=False,
                  trace_opcodes=False,
                  trace_threads=False,
+                 log_locals=False,
+                 callback=None,
                  skip_paths=('\\python\\lib\\',
                              '\\logging.py',
-                             '\\addons\\script.'),
-                 callback=None):
+                             '\\addons\\script.')):
         self._interval = seconds
+        self._log_only = log_only
+        self._last_event = (None, None, None)
         self._timed_out = False
 
         self._trace_opcodes = trace_opcodes
         self._trace_threads = trace_threads
+        self._log_locals = log_locals
+        self._callback = callback if callable(callback) else None
 
         self._skip_paths = skip_paths
-        self._last_event = (None, None, None)
-
-        self._callback = callback if callable(callback) else None
 
     def __call__(self, function):
         @wraps(function)
@@ -291,6 +295,7 @@ class ExecTimeout(object):
                 sys.settrace(None)
                 if self._callback:
                     self._callback()
+                self._last_event = (None, None, None)
 
         return wrapper
 
@@ -298,7 +303,8 @@ class ExecTimeout(object):
         if self._trace_opcodes and hasattr(frame, 'f_trace_opcodes'):
             frame.f_trace_opcodes = True
         if self._timed_out:
-            raise RuntimeError(self._get_msg())
+            if not self._log_only:
+                raise RuntimeError('Python execution timed out')
         else:
             filename = normpath(frame.f_code.co_filename).lower()
             skip_event = (
@@ -312,21 +318,39 @@ class ExecTimeout(object):
         return self.timeout_trace
 
     def set_timed_out(self):
-        self.log.error(self._get_msg())
+        msg, kwargs = self._get_msg(to_log=True)
+        self.log.error(msg, **kwargs)
         self._timed_out = True
 
-    def _get_msg(self):
-        event = self._last_event
-        stack_trace = '\t'.join(format_list(extract_stack(event[1])))
-        return (
-            'Python execution timed out'
-            '\n\tLast event: {event[0]}'
-            '\n\tFrame:      {event[1]!r}'
-            '\n\tArg:        {event[2]!r}'
-            '\n'
-            '\n\tStack (most recent call last):'
-            '\n\t{stack_trace}'
-        ).format(event=event, stack_trace=stack_trace)
+    def _get_msg(self, to_log=False):
+        event, frame, arg = self._last_event
+        out = (
+            'Python execution timed out',
+            'Event:  {event!r}',
+            'Frame:  {frame!r}',
+            'Arg:    {arg!r}',
+            'Locals: {locals!r}',
+            '',
+            'Stack (most recent call last):',
+            '{stack_trace}',
+        )
+        log_locals = self._log_locals
+        if log_locals:
+            _locals = getargvalues(frame).locals
+            if log_locals is not True:
+                _locals = dict(tuple(_locals.items())[slice(*log_locals)])
+        else:
+            _locals = None
+        kwargs = {
+            'event': event,
+            'frame': frame,
+            'arg': arg,
+            'locals': _locals,
+            'stack_trace': ''.join(format_list(extract_stack(frame))),
+        }
+        if to_log:
+            return out, kwargs
+        return '\n'.join(out).format(**kwargs)
 
 
 ExecTimeout.src_file = normpath(

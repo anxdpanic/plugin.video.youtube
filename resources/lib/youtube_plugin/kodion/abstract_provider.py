@@ -184,7 +184,14 @@ class AbstractProvider(object):
 
             exec_limit = context.get_settings().exec_limit()
             if exec_limit:
-                handler = ExecTimeout(exec_limit)(handler)
+                handler = ExecTimeout(
+                    seconds=exec_limit,
+                    # log_only=True,
+                    # trace_opcodes=True,
+                    # trace_threads=True,
+                    log_locals=(-15, None),
+                    callback=None,
+                )(handler)
 
             options = {
                 self.CACHE_TO_DISC: True,
