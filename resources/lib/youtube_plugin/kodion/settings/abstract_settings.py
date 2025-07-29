@@ -503,9 +503,7 @@ class AbstractSettings(object):
         return self.get_string(SETTINGS.API_SECRET)
 
     def get_location(self):
-        location = self.get_string(SETTINGS.LOCATION,
-                                   '',
-                                   echo_level=3).replace(' ', '').strip()
+        location = self.get_string(SETTINGS.LOCATION).replace(' ', '').strip()
         coords = location.split(',')
         latitude = longitude = None
         if len(coords) == 2:
@@ -571,8 +569,7 @@ class AbstractSettings(object):
     def stream_features(self, value=None):
         if value is not None:
             return self.set_string_list(SETTINGS.MPD_STREAM_FEATURES, value)
-        return frozenset(self.get_string_list(SETTINGS.MPD_STREAM_FEATURES,
-                                              echo_level=3))
+        return frozenset(self.get_string_list(SETTINGS.MPD_STREAM_FEATURES))
 
     _STREAM_SELECT = {
         1: 'auto',
@@ -611,8 +608,7 @@ class AbstractSettings(object):
         if override is None:
             override = self.get_string_list(SETTINGS.HIDE_VIDEOS)
             override = dict.fromkeys(override, False)
-            override['custom'] = self.get_string(SETTINGS.FILTER_LIST,
-                                                 echo_level=3).split(',')
+            override['custom'] = self.get_string(SETTINGS.FILTER_LIST).split(',')
         elif isinstance(override, (list, tuple)):
             _override = {'custom': []}
             for value in override:
@@ -657,9 +653,9 @@ class AbstractSettings(object):
             if isinstance(value, (list, tuple, set)):
                 value = ','.join(value).lstrip(',')
             return self.set_string(SETTINGS.SUBSCRIPTIONS_FILTER_LIST, value)
-        return self.get_string(SETTINGS.SUBSCRIPTIONS_FILTER_LIST,
-                               '',
-                               echo_level=3).replace(', ', ',')
+        return self.get_string(SETTINGS.SUBSCRIPTIONS_FILTER_LIST).replace(
+            ', ', ','
+        )
 
     def shorts_duration(self, value=None):
         if value is not None:
@@ -677,9 +673,7 @@ class AbstractSettings(object):
         return self.get_bool(SETTINGS.DETAILED_LABELS, True)
 
     def get_language(self):
-        return self.get_string(SETTINGS.LANGUAGE,
-                               'en_US',
-                               echo_level=3).replace('_', '-')
+        return self.get_string(SETTINGS.LANGUAGE, 'en_US').replace('_', '-')
 
     def set_language(self, language_id):
         return self.set_string(SETTINGS.LANGUAGE, language_id)
@@ -691,17 +685,13 @@ class AbstractSettings(object):
         return self.set_string(SETTINGS.REGION, region_id)
 
     def get_watch_later_playlist(self):
-        return self.get_string(SETTINGS.WATCH_LATER_PLAYLIST,
-                               '',
-                               echo_level=3).strip()
+        return self.get_string(SETTINGS.WATCH_LATER_PLAYLIST).strip()
 
     def set_watch_later_playlist(self, value):
         return self.set_string(SETTINGS.WATCH_LATER_PLAYLIST, value)
 
     def get_history_playlist(self):
-        return self.get_string(SETTINGS.HISTORY_PLAYLIST,
-                               '',
-                               echo_level=3).strip()
+        return self.get_string(SETTINGS.HISTORY_PLAYLIST).strip()
 
     def set_history_playlist(self, value):
         return self.set_string(SETTINGS.HISTORY_PLAYLIST, value)
@@ -730,8 +720,7 @@ class AbstractSettings(object):
             return self._COLOR_MAP.get(label_part, 'white')
 
     def get_channel_name_aliases(self):
-        return frozenset(self.get_string_list(SETTINGS.CHANNEL_NAME_ALIASES,
-                                              echo_level=3))
+        return frozenset(self.get_string_list(SETTINGS.CHANNEL_NAME_ALIASES))
 
     def log_level(self, value=None):
         if value is not None:
