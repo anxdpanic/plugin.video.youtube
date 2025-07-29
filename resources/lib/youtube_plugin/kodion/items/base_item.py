@@ -61,24 +61,37 @@ class BaseItem(object):
         self._artists = None
         self._studios = None
 
-    def __str__(self):
-        return ('{type}'
-                '(name={name!r},'
-                ' uri={uri!r},'
-                ' available={available!r},'
-                ' added=\'{added!s}\','
-                ' filtered={filtered!r})').format(
-            type=self.__class__.__name__,
-            name=self._name,
-            uri=self._uri,
-            available=self._available,
-            added=self._added_utc,
-            filtered=self._filter_reason,
+    def __str_parts__(self, as_dict=False):
+        kwargs = {
+            'type': self.__class__.__name__,
+            'name': self._name,
+            'uri': self._uri,
+            'available': self._available,
+            'added': self._added_utc,
+            'filtered': self._filter_reason,
+        }
+        if as_dict:
+            return kwargs
+        out = (
+            '{type}(',
+            'name={name!r}, ',
+            'uri={uri!r}, ',
+            'available={available!r}, ',
+            'added=\'{added!s}\', ',
+            'filtered={filtered!r})',
         )
+        return out, kwargs
+
+    def __str__(self):
+        out, kwargs = self.__str_parts__()
+        return ''.join(out).format(**kwargs)
+
+    def __repr_data__(self):
+        return {'type': self.__class__.__name__, 'data': self.__dict__}
 
     def __repr__(self):
         return json.dumps(
-            {'type': self.__class__.__name__, 'data': self.__dict__},
+            self.__repr_data__(),
             ensure_ascii=False,
             cls=_Encoder
         )

@@ -80,44 +80,52 @@ class MediaItem(BaseItem):
         self._playlist_id = playlist_id
         self._playlist_item_id = playlist_item_id
 
-    def __str__(self):
-        return ('{type}'
-                '(name={name!r},'
-                ' uri={uri!r},'
-                ' video_id={video_id!r},'
-                ' channel_id={channel_id!r},'
-                ' playlist_id={playlist_id!r},'
-                # ' playlist_item_id={playlist_item_id!r},'
-                # ' subscription_id={subscription_id!r},'
-                ' available={available!r},'
-                ' vod={vod!r},'
-                ' live={live!r},'
-                ' completed={completed!r},'
-                ' upcoming={upcoming!r},'
-                ' short={short!r},'
-                ' duration={duration!r},'
-                ' play_count={play_count!r},'
-                ' added=\'{added!s}\','
-                ' filtered={filtered!r})').format(
-            type=self.__class__.__name__,
-            name=self._name,
-            uri=self._uri,
-            video_id=self._video_id,
-            channel_id=self._channel_id,
-            playlist_id=self._playlist_id,
-            # playlist_item_id=self._playlist_item_id,
-            # subscription_id=self._subscription_id,
-            available=self._available,
-            vod=self._vod,
-            live=self._live,
-            completed=self._completed,
-            upcoming=self._upcoming,
-            short=self._short,
-            duration=self._duration,
-            play_count=self._play_count,
-            added=self._added_utc,
-            filtered=self._filter_reason,
+    def __str_parts__(self, as_dict=False):
+        kwargs = {
+            'type': self.__class__.__name__,
+            'name': self._name,
+            'uri': self._uri,
+            'video_id': self._video_id,
+            'channel_id': self._channel_id,
+            'playlist_id': self._playlist_id,
+            # 'playlist_item_id': self._playlist_item_id,
+            # 'subscription_id': self._subscription_id,
+            'available': self._available,
+            'vod': self._vod,
+            'live': self._live,
+            'completed': self._completed,
+            'upcoming': self._upcoming,
+            'short': self._short,
+            'duration': self._duration,
+            'play_count': self._play_count,
+            'added': self._added_utc,
+            'track_number': self._track_number,
+            'filtered': self._filter_reason,
+        }
+        if as_dict:
+            return kwargs
+        out = (
+            '{type}(',
+            'name={name!r}, ',
+            'uri={uri!r}, ',
+            'video_id={video_id!r}, ',
+            'channel_id={channel_id!r}, ',
+            'playlist_id={playlist_id!r}, ',
+            # 'playlist_item_id={playlist_item_id!r}, ',
+            # 'subscription_id={subscription_id!r}, ',
+            'available={available!r}, ',
+            'vod={vod!r}, ',
+            'live={live!r}, ',
+            'completed={completed!r}, ',
+            'upcoming={upcoming!r}, ',
+            'short={short!r}, ',
+            'duration={duration!r}, ',
+            'play_count={play_count!r}, ',
+            'added=\'{added!s}\', ',
+            'track_number={track_number!r}, ',
+            'filtered={filtered!r})',
         )
+        return out, kwargs
 
     def set_aired(self, year, month, day):
         self._aired = date(year, month, day)

@@ -12,6 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import threading
 from collections import deque
+from operator import methodcaller
 from re import compile as re_compile
 
 from .utils import (
@@ -767,8 +768,9 @@ def response_to_items(provider,
                 if filtered_out:
                     filtered += len(filtered_out)
                     log.debugging and log.debug(
-                        'Items filtered out: [\n\t%s\n]',
-                        ',\n\t'.join(map(to_str, filtered_out)),
+                        'Items filtered out: {items!e}',
+                        items=map(methodcaller('__str_parts__', as_dict=True),
+                                  filtered_out),
                     )
 
             post_filler = json_data.get('_post_filler')
