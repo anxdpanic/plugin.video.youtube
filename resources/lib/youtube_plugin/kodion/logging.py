@@ -155,6 +155,48 @@ class PrettyPrintFormatter(Formatter):
     def convert_field(self, value, conversion):
         if conversion == 'r':
             return self._pretty_printer.pformat(value)
+        if conversion in {'d', 'e', 't', 'w'}:
+            _sort_dicts = sort_dicts = getattr(self._pretty_printer,
+                                               '_sort_dicts',
+                                               None)
+            width = self._pretty_printer._width
+            # __dict__
+            if conversion == 'd':
+                if sort_dicts:
+                    _sort_dicts = False
+                try:
+                    value = getattr(value, '__repr_data__')()
+                except AttributeError:
+                    if not isinstance(value, dict):
+                        value = {
+                            attr: getattr(value, attr, None)
+                            for attr in dir(value)
+                        }
+            # eval iterators
+            elif conversion == 'e':
+                if (getattr(value, '__iter__', None)
+                        and not getattr(value, '__len__', None)):
+                    value = tuple(value)
+                if sort_dicts:
+                    _sort_dicts = False
+            # text representation
+            elif conversion == 't':
+                try:
+                    value = getattr(value, '__str_parts__')(as_dict=True)
+                    if sort_dicts:
+                        _sort_dicts = False
+                except AttributeError:
+                    pass
+            # wide output
+            elif conversion == 'w':
+                self._pretty_printer._width = 2 * width
+            if _sort_dicts != sort_dicts:
+                self._pretty_printer._sort_dicts = _sort_dicts
+            out = self._pretty_printer.pformat(value)
+            if sort_dicts:
+                self._pretty_printer._sort_dicts = sort_dicts
+            self._pretty_printer._width = width
+            return out
         return super(PrettyPrintFormatter, self).convert_field(
             value,
             conversion,
