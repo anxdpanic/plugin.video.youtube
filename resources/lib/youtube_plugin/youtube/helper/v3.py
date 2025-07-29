@@ -25,7 +25,6 @@ from .utils import (
     update_video_items,
 )
 from ...kodion import KodionException, logging
-from ...kodion.compatibility import to_str
 from ...kodion.constants import (
     PATHS,
     PLAY_FORCE_AUDIO,
@@ -571,6 +570,9 @@ def _process_list_response(provider,
     }
 
     def _fetch(resource):
+        active_thread_ids = threads['active_thread_ids']
+        thread_id = threading.current_thread().ident
+        active_thread_ids.add(thread_id)
         try:
             data = resource['fetcher'](*resource['args'], **resource['kwargs'])
 
@@ -588,13 +590,13 @@ def _process_list_response(provider,
             log.exception('Error')
         finally:
             resource['complete'] = True
-            threads['current'].discard(resource['thread'])
+            active_thread_ids.discard(thread_id)
             threads['loop_enable'].set()
 
-    current_threads = set()
+    active_thread_ids = set()
     loop_enable = threading.Event()
     threads = {
-        'current': current_threads,
+        'active_thread_ids': active_thread_ids,
         'loop_enable': loop_enable,
     }
 
@@ -605,16 +607,16 @@ def _process_list_response(provider,
     completed = []
     iterator = iter(resources)
     loop_enable.set()
-    while loop_enable.wait():
+    while loop_enable.wait(1) or active_thread_ids:
         try:
             resource_id = next(iterator)
         except StopIteration:
-            if current_threads:
+            if active_thread_ids:
                 loop_enable.clear()
             for resource_id in completed:
                 del resources[resource_id]
             remaining = len(resources)
-            if remaining <= 0 and not current_threads:
+            if remaining <= 0 and not active_thread_ids:
                 break
             deferred = len([
                 1 for resource in resources.values() if resource['defer']
@@ -637,17 +639,17 @@ def _process_list_response(provider,
                 continue
             resource['defer'] = False
 
-        if not resource['thread']:
-            if (not resource['kwargs'].pop('_force_run', False)
-                    and not any(resource['args'])):
-                resource['complete'] = True
-                continue
+        if resource['thread']:
+            continue
+        if (not resource['kwargs'].pop('_force_run', False)
+                and not any(resource['args'])):
+            resource['complete'] = True
+            continue
 
-            new_thread = threading.Thread(target=_fetch, args=(resource,))
-            new_thread.daemon = True
-            current_threads.add(new_thread)
-            resource['thread'] = new_thread
-            new_thread.start()
+        new_thread = threading.Thread(target=_fetch, args=(resource,))
+        new_thread.daemon = True
+        resource['thread'] = new_thread
+        new_thread.start()
 
     return items, do_callbacks
 

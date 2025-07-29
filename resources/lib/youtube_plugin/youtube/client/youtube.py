@@ -2531,6 +2531,9 @@ class YouTube(LoginClient):
                             pool_id,
                             check_inputs,
                             **_kwargs):
+            active_thread_ids = threads['active_thread_ids']
+            thread_id = threading.current_thread().ident
+            active_thread_ids.add(thread_id)
             counts = threads['counts']
             complete = False
             while not threads['balance'].is_set():
@@ -2564,14 +2567,14 @@ class YouTube(LoginClient):
             elif counts[pool_id]:
                 counts[pool_id] -= 1
             counts['all'] -= 1
-            threads['current'].discard(threading.current_thread())
+            threads['active_thread_ids'].discard(thread_id)
             threads['loop_enable'].set()
 
         max_threads = min(32, 2 * (available_cpu_count() + 4))
         counts = {
             'all': 0,
         }
-        current_threads = set()
+        active_thread_ids = set()
         counter = threading.Semaphore(max_threads)
         balance_enable = threading.Event()
         loop_enable = threading.Event()
@@ -2580,7 +2583,7 @@ class YouTube(LoginClient):
             'loop_enable': loop_enable,
             'counter': counter,
             'counts': counts,
-            'current': current_threads,
+            'active_thread_ids': active_thread_ids,
         }
 
         payloads = {}
@@ -2765,16 +2768,16 @@ class YouTube(LoginClient):
         remaining = payloads.keys()
         iterator = iter(payloads)
         loop_enable.set()
-        while loop_enable.wait():
+        while loop_enable.wait(1) or active_thread_ids:
             try:
                 pool_id = next(iterator)
             except StopIteration:
-                if current_threads:
+                if active_thread_ids:
                     loop_enable.clear()
                 for pool_id in completed:
                     del payloads[pool_id]
                 remaining = payloads.keys()
-                if not remaining and not current_threads:
+                if not remaining and not active_thread_ids:
                     break
                 completed = []
                 iterator = iter(payloads)
@@ -2821,7 +2824,6 @@ class YouTube(LoginClient):
                 kwargs=payload,
             )
             new_thread.daemon = True
-            current_threads.add(new_thread)
             counts[pool_id] += 1
             counts['all'] += 1
             counter.acquire(True)
