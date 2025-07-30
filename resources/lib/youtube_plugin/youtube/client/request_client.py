@@ -156,31 +156,41 @@ class YouTubeRequestClient(BaseRequestsClass):
         # 4k no VP9 HDR
         # Limited subtitle availability
         'android_testsuite': {
-            '_id': 30,
             '_disabled': True,
+            '_id': {
+                'client_id': 30,
+                'client_name': 'ANDROID_TESTSUITE',
+                'client_version': '1.9',
+                'android_sdk_version': '32',
+                'os_name': 'Android',
+                'os_version': '15',
+                'package_id': 'com.google.android.youtube',
+                'platform': 'MOBILE',
+            },
+            '_auth_type': False,
             '_query_subtitles': True,
             'json': {
                 # 'params': _PLAYER_PARAMS['android_testsuite'],
                 'context': {
                     'client': {
-                        'clientName': 'ANDROID_TESTSUITE',
-                        'clientVersion': '1.9',
-                        'androidSdkVersion': '30',
-                        'osName': 'Android',
-                        'osVersion': '11',
-                        'platform': 'MOBILE',
+                        'clientName': '{_id[client_name]}',
+                        'clientVersion': '{_id[client_version]}',
+                        'androidSdkVersion': '{_id[android_sdk_version]}',
+                        'osName': '{_id[os_name]}',
+                        'osVersion': '{_id[os_version]}',
+                        'platform': '{_id[platform]}',
                     },
                 },
             },
             'headers': {
                 'User-Agent': (
-                    'com.google.android.youtube/'
-                    '{json[context][client][clientVersion]}'
-                    ' (Linux; U; {json[context][client][osName]}'
-                    ' {json[context][client][osVersion]}) gzip'
+                    '{_id[package_id]}/{_id[client_version]}'
+                    ' (Linux; U;'
+                    ' {_id[os_name]} {_id[os_version]}'
+                    ') gzip'
                 ),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
+                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Version': '{_id[client_version]}',
             },
         },
         # Disabled - requires PO token
@@ -188,19 +198,30 @@ class YouTubeRequestClient(BaseRequestsClass):
         # Only for videos that allow embedding
         # Limited to 720p on some videos
         'android_embedded': {
-            '_id': 55,
             '_disabled': True,
+            '_id': {
+                'client_id': 55,
+                'client_name': 'ANDROID_EMBEDDED_PLAYER',
+                'client_version': '20.10.38',
+                'android_sdk_version': '32',
+                'os_name': 'Android',
+                'os_version': '15',
+                'package_id': 'com.google.android.youtube',
+                'platform': 'MOBILE',
+            },
+            '_auth_type': False,
+            '_auth_required': 'ignore_fail',
             '_query_subtitles': 'optional',
             'json': {
                 'context': {
                     'client': {
-                        'clientName': 'ANDROID_EMBEDDED_PLAYER',
+                        'clientName': '{_id[client_name]}',
                         'clientScreen': 'EMBED',
-                        'clientVersion': '19.29.37',
-                        'androidSdkVersion': '30',
-                        'osName': 'Android',
-                        'osVersion': '11',
-                        'platform': 'MOBILE',
+                        'clientVersion': '{_id[client_version]}',
+                        'androidSdkVersion': '{_id[android_sdk_version]}',
+                        'osName': '{_id[os_name]}',
+                        'osVersion': '{_id[os_version]}',
+                        'platform': '{_id[platform]}',
                     },
                 },
                 'thirdParty': {
@@ -209,13 +230,13 @@ class YouTubeRequestClient(BaseRequestsClass):
             },
             'headers': {
                 'User-Agent': (
-                    'com.google.android.youtube/'
-                    '{json[context][client][clientVersion]}'
-                    ' (Linux; U; {json[context][client][osName]}'
-                    ' {json[context][client][osVersion]}) gzip'
+                    '{_id[package_id]}/{_id[client_version]}'
+                    ' (Linux; U;'
+                    ' {_id[os_name]} {_id[os_version]}'
+                    ') gzip'
                 ),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
+                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Version': '{_id[client_version]}',
             },
         },
         'ios': {

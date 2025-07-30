@@ -751,10 +751,14 @@ class XbmcContext(AbstractContext):
                 (SORT.TRACKNUM,         '[%N. ]%T '),
             )
 
-    def add_sort_method(self, *sort_methods):
-        args = slice(None if current_system_version.compatible(19) else 2)
-        for sort_method in sort_methods:
-            xbmcplugin.addSortMethod(self._plugin_handle, *sort_method[args])
+    if current_system_version.compatible(19):
+        def add_sort_method(self, *sort_methods):
+            for sort_method in sort_methods:
+                xbmcplugin.addSortMethod(self._plugin_handle, *sort_method)
+    else:
+        def add_sort_method(self, *sort_methods):
+            for sort_method in sort_methods:
+                xbmcplugin.addSortMethod(self._plugin_handle, *sort_method[:2])
 
     def clone(self, new_path=None, new_params=None):
         if not new_path:

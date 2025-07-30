@@ -1155,6 +1155,14 @@ class PlayerClient(LoginClient):
         else:
             selected_height = settings.fixed_video_quality()
 
+        # Regular expression used to capture the URL of a HLS m3u8 playlist and
+        # the itag from that URL.
+        # The playlist might include a #EXT-X-MEDIA entry, but it's usually
+        # for a default stream with itag 133 (240p) and can be ignored.
+        re_playlist_data = re_compile(
+            r'#EXT-X-STREAM-INF[^#]+'
+            r'(?P<url>http\S+/itag/(?P<itag>\d+)\S+)'
+        )
         itags = ('9995', '9996') if is_live else ('9993', '9994')
 
         for client_name, response in responses.items():
@@ -1190,13 +1198,6 @@ class PlayerClient(LoginClient):
                     playback_stats=playback_stats,
                 )
 
-            # The playlist might include a #EXT-X-MEDIA entry, but it's usually
-            # for a default stream with itag 133 (240p) and can be ignored.
-            # Capture the URL of a .m3u8 playlist and the itag from that URL.
-            re_playlist_data = re_compile(
-                r'#EXT-X-STREAM-INF[^#]+'
-                r'(?P<url>http\S+/itag/(?P<itag>\d+)\S+)'
-            )
             for match in re_playlist_data.finditer(result):
                 itag = match.group('itag')
                 if itag in stream_list:
