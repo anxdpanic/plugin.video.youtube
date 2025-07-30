@@ -103,7 +103,8 @@ def _do_login(provider, context, client=None, **kwargs):
                         log_data['access_token'] = '<redacted>'
                     if 'refresh_token' in log_data:
                         log_data['refresh_token'] = '<redacted>'
-                    logging.debug('Requesting access token: %r', log_data)
+                    logging.debug('Requesting access token: {data!r}',
+                                  data=log_data)
 
                     if 'error' not in json_data:
                         access_token = json_data.get('access_token', '')

@@ -70,7 +70,8 @@ def from_json(json_data, *args):
 
     item_type = json_data.get('type')
     if not item_type or item_type not in _ITEM_TYPES:
-        logging.warning_trace(('Unsupported item type', 'Data: %r'), json_data)
+        logging.warning_trace(('Unsupported item type', 'Data: {data!r}'),
+                              data=json_data)
         return None
 
     item_data = json_data.get('data')

@@ -98,8 +98,8 @@ class JSONStore(object):
                                stacklevel=stacklevel)
             return False
         except (TypeError, ValueError):
-            self.log.exception(('Invalid data', 'Data: %r'),
-                               data,
+            self.log.exception(('Invalid data', 'Data: {data!r}'),
+                               data=data,
                                stacklevel=stacklevel)
             self.set_defaults(reset=True)
             return False
@@ -140,8 +140,8 @@ class JSONStore(object):
                                filepath,
                                stacklevel=stacklevel)
         except (TypeError, ValueError):
-            self.log.exception(('Invalid data', 'Data: %r'),
-                               data,
+            self.log.exception(('Invalid data', 'Data: {data!r}'),
+                               data=data,
                                stacklevel=stacklevel)
 
     def get_data(self, process=True, fallback=True, stacklevel=2):
@@ -154,8 +154,8 @@ class JSONStore(object):
                 object_pairs_hook=(self._process_data if process else None),
             )
         except (TypeError, ValueError) as exc:
-            self.log.exception(('Invalid data', 'Data: %r'),
-                               data,
+            self.log.exception(('Invalid data', 'Data: {data!r}'),
+                               data=data,
                                stacklevel=stacklevel)
             if fallback:
                 self.set_defaults(reset=True)
@@ -169,7 +169,7 @@ class JSONStore(object):
                 object_pairs_hook=(self._process_data if process else None),
             )
         except (TypeError, ValueError):
-            self.log.exception(('Invalid data', 'Data: %r'),
-                               data,
+            self.log.exception(('Invalid data', 'Data: {data!r}'),
+                               data=data,
                                stacklevel=stacklevel)
         return {}
