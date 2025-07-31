@@ -14,8 +14,8 @@ import os
 
 from .. import logging
 from ..compatibility import (
+    default_quote,
     parse_qsl,
-    quote,
     string_type,
     to_str,
     unquote,
@@ -347,9 +347,12 @@ class AbstractContext(object):
                 if isinstance(params, dict):
                     params = params.items()
                 params = urlencode([
-                    (('%' + param, ','.join([quote(item) for item in value]))
-                     if len(value) > 1 else
-                     (param, value[0]))
+                    (
+                        ('%' + param,
+                         ','.join([default_quote(item) for item in value]))
+                        if len(value) > 1 else
+                        (param, value[0])
+                    )
                     if value and isinstance(value, (list, tuple)) else
                     (param, value)
                     for param, value in params
@@ -407,7 +410,7 @@ class AbstractContext(object):
             return ('/', parts) if include_parts else '/'
 
         if kwargs.get('is_uri'):
-            path = quote(path)
+            path = default_quote(path)
         return (path, parts) if include_parts else path
 
     def get_path(self):
