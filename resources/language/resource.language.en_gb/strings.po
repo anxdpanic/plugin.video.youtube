@@ -224,7 +224,7 @@ msgid "Enter the name of the bookmark"
 msgstr ""
 
 msgctxt "#30109"
-msgid "Enter a valid plugin URL for the bookmark"
+msgid "Enter a valid YouTube or plugin URL for the bookmark"
 msgstr ""
 
 msgctxt "#30110"

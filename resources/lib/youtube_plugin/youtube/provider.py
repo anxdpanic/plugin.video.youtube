@@ -1906,20 +1906,14 @@ class Provider(AbstractProvider):
         item_id = params.get('item_id')
 
         if command in {'add_custom', 'edit'}:
-            results = ui.on_keyboard_input(localize('bookmarks.edit.name'),
-                                           params.get('item_name', ''))
-            if not results[0]:
-                return False
-            item_name = results[1]
-
             results = ui.on_keyboard_input(localize('bookmarks.edit.uri'),
                                            params.get('uri', ''))
             if not results[0]:
                 return False
-
             item_uri = results[1]
             if not item_uri:
                 return False
+
             if item_uri.startswith(('https://', 'http://')):
                 item_uri = UrlToItemConverter().process_url(
                     UrlResolver(context).resolve(item_uri),
@@ -1933,6 +1927,12 @@ class Provider(AbstractProvider):
                     audible=False,
                 )
                 return False
+
+            results = ui.on_keyboard_input(localize('bookmarks.edit.name'),
+                                           params.get('item_name', item_uri))
+            if not results[0]:
+                return False
+            item_name = results[1]
 
             item_date_time = now()
             item = BookmarkItem(name=item_name,
