@@ -25,8 +25,8 @@ class YouTubeRequestClient(BaseRequestsClass):
         'web': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
     }
     _PLAYER_PARAMS = {
-        'android': 'CgIIAdgDAQ==',
-        'android_testsuite': '2AMB',
+        'default': '8AEB',
+        'testsuite': '2AMB',
     }
 
     CLIENTS = {
@@ -57,8 +57,11 @@ class YouTubeRequestClient(BaseRequestsClass):
                         'platform': '{_id[platform]}',
                     },
                 },
+                'cpn': '{_cpn}',
+                'params': _PLAYER_PARAMS['default'],
             },
             'headers': {
+                'Origin': 'https://m.youtube.com',
                 'User-Agent': (
                     '{_id[package_id]}/{_id[client_version]}'
                     ' (Linux; U;'
@@ -98,6 +101,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 },
             },
             'headers': {
+                'Origin': 'https://www.youtube.com',
                 'User-Agent': (
                     '{_id[package_id]}/{_id[client_version]}'
                     ' (Linux; U;'
@@ -141,6 +145,46 @@ class YouTubeRequestClient(BaseRequestsClass):
                 },
             },
             'headers': {
+                'Origin': 'https://m.youtube.com',
+                'User-Agent': (
+                    '{_id[package_id]}/{_id[client_version]}'
+                    ' (Linux; U;'
+                    ' {_id[os_name]} {_id[os_version]}'
+                    ') gzip'
+                ),
+                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Version': '{_id[client_version]}',
+            },
+        },
+        'android_testsuite_params': {
+            '_id': {
+                'client_id': 3,
+                'client_name': 'ANDROID',
+                'client_version': '20.10.38',
+                'android_sdk_version': '32',
+                'os_name': 'Android',
+                'os_version': '15',
+                'package_id': 'com.google.android.youtube',
+                'platform': 'MOBILE',
+            },
+            '_auth_type': False,
+            '_query_subtitles': 'optional',
+            'json': {
+                'context': {
+                    'client': {
+                        'clientName': '{_id[client_name]}',
+                        'clientVersion': '{_id[client_version]}',
+                        'androidSdkVersion': '{_id[android_sdk_version]}',
+                        'osName': '{_id[os_name]}',
+                        'osVersion': '{_id[os_version]}',
+                        'platform': '{_id[platform]}',
+                    },
+                },
+                'cpn': '{_cpn}',
+                'params': _PLAYER_PARAMS['testsuite'],
+            },
+            'headers': {
+                'Origin': 'https://m.youtube.com',
                 'User-Agent': (
                     '{_id[package_id]}/{_id[client_version]}'
                     ' (Linux; U;'
@@ -170,7 +214,6 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_auth_type': False,
             '_query_subtitles': True,
             'json': {
-                # 'params': _PLAYER_PARAMS['android_testsuite'],
                 'context': {
                     'client': {
                         'clientName': '{_id[client_name]}',
@@ -181,8 +224,11 @@ class YouTubeRequestClient(BaseRequestsClass):
                         'platform': '{_id[platform]}',
                     },
                 },
+                'cpn': '{_cpn}',
+                'params': _PLAYER_PARAMS['testsuite'],
             },
             'headers': {
+                'Origin': 'https://m.youtube.com',
                 'User-Agent': (
                     '{_id[package_id]}/{_id[client_version]}'
                     ' (Linux; U;'
@@ -210,7 +256,6 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'platform': 'MOBILE',
             },
             '_auth_type': False,
-            '_auth_required': 'ignore_fail',
             '_query_subtitles': 'optional',
             'json': {
                 'context': {
@@ -272,8 +317,59 @@ class YouTubeRequestClient(BaseRequestsClass):
                         'platform': '{_id[platform]}',
                     },
                 },
+                'cpn': '{_cpn}',
             },
             'headers': {
+                'Origin': 'https://m.youtube.com',
+                'User-Agent': (
+                    '{_id[package_id]}/{_id[client_version]}'
+                    ' ({_id[device_model]}; U; CPU'
+                    ' {_id[os_name]}'
+                    ' {_id[os_major]}_{_id[os_minor]}_{_id[os_patch]}'
+                    ' like Mac OS X)'
+                ),
+                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Version': '{_id[client_version]}',
+            },
+        },
+        'ios_testsuite_params': {
+            '_id': {
+                'client_id': 5,
+                'client_name': 'IOS',
+                'client_version': '20.20.7',
+                'device_make': 'Apple',
+                'device_model': 'iPhone16,2',
+                'os_name': 'iOS',
+                'os_major': '18',
+                'os_minor': '5',
+                'os_patch': '0',
+                'os_build': '22F76',
+                'package_id': 'com.google.ios.youtube',
+                'platform': 'MOBILE',
+            },
+            '_auth_type': False,
+            'json': {
+                'context': {
+                    'client': {
+                        'clientName': '{_id[client_name]}',
+                        'clientVersion': '{_id[client_version]}',
+                        'deviceMake': '{_id[device_make]}',
+                        'deviceModel': '{_id[device_model]}',
+                        'osName': '{_id[os_name]}',
+                        'osVersion': (
+                            '{_id[os_major]}'
+                            '.{_id[os_minor]}'
+                            '.{_id[os_patch]}'
+                            '.{_id[os_build]}'
+                        ),
+                        'platform': '{_id[platform]}',
+                    },
+                },
+                'cpn': '{_cpn}',
+                'params': _PLAYER_PARAMS['testsuite'],
+            },
+            'headers': {
+                'Origin': 'https://m.youtube.com',
                 'User-Agent': (
                     '{_id[package_id]}/{_id[client_version]}'
                     ' ({_id[device_model]}; U; CPU'
@@ -326,6 +422,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 },
             },
             'headers': {
+                'Origin': 'https://m.youtube.com',
                 'User-Agent': (
                     '{_id[package_id]}/{_id[client_version]}'
                     ' ({_id[device_model]}; U; CPU'

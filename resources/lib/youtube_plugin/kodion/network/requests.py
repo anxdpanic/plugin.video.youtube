@@ -68,6 +68,7 @@ class BaseRequestsClass(object):
     log = logging.getLogger(__name__)
 
     _session = Session()
+    _session.trust_env = False
     _session.mount('https://', SSLHTTPAdapter(
         pool_maxsize=10,
         pool_block=True,

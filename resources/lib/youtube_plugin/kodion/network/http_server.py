@@ -456,7 +456,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                 headers['Host'] = server
                 with self.requests.request(
                         stream_url,
-                        method='GET',
+                        method='POST',
                         headers=headers,
                         allow_redirects=False,
                         stream=True,
@@ -477,10 +477,12 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                                 _headers = (
                                     ('Authorization', headers['Authorization']),
                                     ('Host', target),
+                                    ('Referer', response.url)
                                 )
                             else:
                                 _headers = (
                                     ('Host', target),
+                                    ('Referer', response.url)
                                 )
                             request.headers.update(_headers)
 

@@ -826,8 +826,11 @@ class PlayerClient(LoginClient):
                 'ios_youtube_tv',
                 'android_youtube_tv',
             )),
-            ('auth_disabled_kids', (
-                'ios',
+            ('auth_disabled_kids_vp9_avc1', (
+                'ios_testsuite_params',
+            )),
+            ('auth_disabled_kids_av1_avc1', (
+                'android_testsuite_params',
             )),
             ('auth_enabled_no_kids', (
                 'android_vr',
@@ -879,15 +882,14 @@ class PlayerClient(LoginClient):
         return None, info, details, data, exception
 
     @staticmethod
-    def _generate_cpn():
+    def _generate_cpn(_alphabet=('abcdefghijklmnopqrstuvwxyz'
+                                 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+                                 '0123456789-_')):
         # https://github.com/rg3/youtube-dl/blob/master/youtube_dl/extractor/youtube.py#L1381
         # LICENSE: The Unlicense
         # cpn generation algorithm is reverse engineered from base.js.
         # In fact it works even with dummy cpn.
-        cpn_alphabet = ('abcdefghijklmnopqrstuvwxyz'
-                        'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-                        '0123456789-_')
-        return ''.join(random_choice(cpn_alphabet) for _ in range(16))
+        return ''.join([random_choice(_alphabet) for _ in range(16)])
 
     def _get_stream_format(self, itag, info=None, max_height=None, **kwargs):
         yt_format = self.FORMAT.get(itag)
@@ -1381,6 +1383,7 @@ class PlayerClient(LoginClient):
                             url,
                             mpd=True,
                             headers=None,
+                            cpn=False,
                             digits_re=re_compile(r'\d+')):
         if not url:
             return url
@@ -1431,6 +1434,9 @@ class PlayerClient(LoginClient):
                         digits_re.sub(fvip, prefix),
                         server.replace(primary, secondary),
                     )))
+
+            if cpn is not False:
+                new_params['cpn'] = cpn or self._generate_cpn()
 
             params.update(new_params)
             query_str = urlencode(params, doseq=True)
@@ -1604,6 +1610,7 @@ class PlayerClient(LoginClient):
                 None
             ),
             '_access_token_tv': self._access_tokens.get('tv'),
+            '_cpn': None,
             '_visitor_data': None,
         }
         if use_remote_history:
@@ -1624,6 +1631,7 @@ class PlayerClient(LoginClient):
                 for _client_name in clients:
                     if _client_name in exclude_retry:
                         continue
+                    client_data['_cpn'] = self._generate_cpn()
                     _client = self.build_client(_client_name, client_data)
                     if _client:
                         _has_auth = _client.get('_has_auth', False)
@@ -1849,7 +1857,7 @@ class PlayerClient(LoginClient):
             playback_tracking = (self._auth_client
                                  .get('result', {})
                                  .get('playbackTracking', {}))
-            cpn = self._generate_cpn()
+            cpn = self._auth_client.get('_cpn') or self._generate_cpn()
 
             for key, url_key in playback_stats.items():
                 url = playback_tracking.get(url_key, {}).get('baseUrl')
@@ -2269,6 +2277,7 @@ class PlayerClient(LoginClient):
                 urls = self._process_url_params(
                     unquote(url),
                     headers=client['headers'],
+                    cpn=client.get('_cpn'),
                 )
                 if not urls:
                     continue
