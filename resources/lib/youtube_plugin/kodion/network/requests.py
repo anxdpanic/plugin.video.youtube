@@ -229,8 +229,12 @@ class BaseRequestsClass(object):
                     )
 
             if request_id:
-                cache = self._context.get_requests_cache()
-                cached_request = cache.get(request_id)
+                if cache == 'refresh':
+                    cache = self._context.get_requests_cache()
+                    cached_request = None
+                else:
+                    cache = self._context.get_requests_cache()
+                    cached_request = cache.get(request_id)
             else:
                 cache = False
                 cached_request = None

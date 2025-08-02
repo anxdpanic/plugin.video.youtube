@@ -3075,6 +3075,8 @@ class YouTube(LoginClient):
             kwargs.setdefault('extended_debug', True)
         if cache is None and 'no_content' in kwargs:
             cache = False
+        elif cache is not False and self._context.refresh_requested():
+            cache = 'refresh'
         return self.request(response_hook=self._response_hook,
                             event_hook_kwargs=kwargs,
                             error_hook=self._error_hook,
