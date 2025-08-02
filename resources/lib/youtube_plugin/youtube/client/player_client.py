@@ -981,6 +981,7 @@ class PlayerClient(LoginClient):
             video_id=self.video_id,
             client_name=client_name,
             has_auth=False,
+            cache=False,
         )
         if not result:
             return None
@@ -1055,6 +1056,7 @@ class PlayerClient(LoginClient):
             video_id=self.video_id,
             client_name=client_name,
             has_auth=False,
+            cache=False,
         )
         if not result:
             return ''
@@ -1183,6 +1185,7 @@ class PlayerClient(LoginClient):
                 video_id=self.video_id,
                 client_name=client_name,
                 has_auth=False,
+                cache=False,
             )
             if not result:
                 continue
@@ -1500,6 +1503,7 @@ class PlayerClient(LoginClient):
                 video_id=video_id,
                 client_name=client_name,
                 has_auth=client.get('_has_auth', False),
+                cache=False,
                 **client
             )
 
@@ -1655,6 +1659,7 @@ class PlayerClient(LoginClient):
                         video_id=video_id,
                         client_name=_client_name,
                         has_auth=_has_auth,
+                        cache=False,
                         **_client
                     ) or {}
 
