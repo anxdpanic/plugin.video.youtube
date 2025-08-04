@@ -789,7 +789,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         base_client = None
         if client_name:
             base_client = cls.CLIENTS.get(client_name)
-            if base_client and base_client.get('_disabled'):
+            if not base_client or base_client.get('_disabled'):
                 return None
         if not base_client:
             base_client = YouTubeRequestClient.CLIENTS['web']
