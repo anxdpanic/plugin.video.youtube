@@ -1569,6 +1569,7 @@ class YouTube(LoginClient):
         # prepare params
         params = {'part': 'snippet',
                   'type': 'video',
+                  'q': '-|',
                   'order': order,
                   'eventType': event_type,
                   'regionCode': self._region,
