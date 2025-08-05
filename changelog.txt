@@ -1,3 +1,19 @@
+## v7.3.0+beta.1
+### Fixed
+- Workaround for distributions that patch Kodi to disable System.InternetState #1224
+- Workaround issue with search not returning items if no search query is used
+- Misc updates to try and prevent some GVS requests from failing #1222
+
+### Changed
+- Use WebP thumbnails instead of JPEG thumbnails
+- Update Setup Wizard for the various new Stream Features that have been added
+- Don't cache playback associated requests
+- Bypass requests cache when a listing is refreshed
+- Update order and wording of prompts used when adding custom bookmark
+
+### New
+- Add dubbed audio preferences to stream features #1036 #1228 #1232
+
 ## v7.3.0+alpha.5
 ### Fixed
 - Fix not correctly updating channel details of subscriptions #1226
