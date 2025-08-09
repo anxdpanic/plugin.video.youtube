@@ -2004,6 +2004,8 @@ class PlayerClient(LoginClient):
         allow_spa = 'spa' in stream_features
         allow_ssa = 'ssa' in stream_features
         allow_vr = 'vr' in stream_features
+        prefer_dub = 'prefer_dub' in stream_features
+        prefer_auto_dub = 'prefer_auto_dub' in stream_features
         fps_map = (self.INTEGER_FPS_SCALE
                    if 'no_frac_fr_hint' in stream_features else
                    self.FRACTIONAL_FPS_SCALE)
@@ -2118,12 +2120,18 @@ class PlayerClient(LoginClient):
 
                     if (default_lang
                             and language_code.startswith(default_lang)):
-                        is_fallback = False
-                        if prefer_default_lang:
+                        is_fallback = role != 'main'
+                        if role_type == 'dub.auto':
+                            if prefer_auto_dub:
+                                role = 'main'
+                                role_order = 0
+                        elif role_type == 'dub':
+                            if prefer_dub:
+                                role = 'main'
+                                role_order = 0
+                        elif prefer_default_lang:
                             role = 'main'
                             role_order = 0
-                        elif role_type.startswith('dub'):
-                            is_fallback = True
                         lang_match = (
                                 (language_fallback and not is_fallback)
                                 or preferred_order is None

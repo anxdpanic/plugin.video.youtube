@@ -1158,11 +1158,11 @@ msgid "Rate videos in playlists"
 msgstr ""
 
 msgctxt "#30713"
-msgid ""
+msgid "Prefer dubbed audio over original audio"
 msgstr ""
 
 msgctxt "#30714"
-msgid ""
+msgid "Prefer automatically translated dubbed audio over original audio"
 msgstr ""
 
 msgctxt "#30715"
