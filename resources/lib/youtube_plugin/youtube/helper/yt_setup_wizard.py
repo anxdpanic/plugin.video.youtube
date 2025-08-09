@@ -172,42 +172,42 @@ def process_performance_settings(context, step, steps, **_kwargs):
         device_types = {
             '720p30': {
                 'max_resolution': 3,  # 720p
-                'stream_features': ('avc1', 'mp4a', 'filter', 'alt_sort', 'vtt'),
+                'stream_features': ('avc1', '3d', 'vr', 'prefer_dub', 'prefer_auto_dub', 'mp4a', 'vtt', 'filter', 'alt_sort'),
                 'num_items': 10,
             },
             '1080p30_avc': {
                 'max_resolution': 4,  # 1080p
-                'stream_features': ('avc1', 'vorbis', 'mp4a', 'filter', 'alt_sort', 'vtt'),
+                'stream_features': ('avc1', '3d', 'vr', 'prefer_dub', 'prefer_auto_dub', 'vorbis', 'mp4a', 'vtt', 'filter', 'alt_sort'),
                 'num_items': 10,
             },
             '1080p30': {
                 'max_resolution': 4,  # 1080p
-                'stream_features': ('avc1', 'vp9', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter', 'alt_sort', 'vtt'),
+                'stream_features': ('avc1', 'vp9', '3d', 'vr', 'prefer_dub', 'prefer_auto_dub', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'vtt', 'filter', 'alt_sort'),
                 'num_items': 20,
             },
             '1080p60': {
                 'max_resolution': 4,  # 1080p
-                'stream_features': ('avc1', 'vp9', 'hfr', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter', 'vtt'),
+                'stream_features': ('avc1', 'vp9', 'hfr', '3d', 'vr', 'prefer_dub', 'prefer_auto_dub', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'vtt', 'filter'),
                 'num_items': 30,
             },
             '4k30': {
                 'max_resolution': 6,  # 4k
-                'stream_features': ('avc1', 'vp9', 'hdr', 'hfr', 'no_hfr_max', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter', 'vtt'),
+                'stream_features': ('avc1', 'vp9', 'hdr', 'hfr', '3d', 'vr', 'prefer_dub', 'prefer_auto_dub', 'no_hfr_max', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'vtt', 'filter'),
                 'num_items': 50,
             },
             '4k60': {
                 'max_resolution': 6,  # 4k
-                'stream_features': ('avc1', 'vp9', 'hdr', 'hfr', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter', 'vtt'),
+                'stream_features': ('avc1', 'vp9', 'hdr', 'hfr', '3d', 'vr', 'prefer_dub', 'prefer_auto_dub', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'vtt', 'filter'),
                 'num_items': 50,
             },
             '4k60_av1': {
                 'max_resolution': 6,  # 4k
-                'stream_features': ('avc1', 'vp9', 'av01', 'hdr', 'hfr', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter', 'vtt'),
+                'stream_features': ('avc1', 'vp9', 'av01', 'hdr', 'hfr', '3d', 'vr', 'prefer_dub', 'prefer_auto_dub', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'vtt', 'filter'),
                 'num_items': 50,
             },
             'max': {
                 'max_resolution': 7,  # 8k
-                'stream_features': ('avc1', 'vp9', 'av01', 'hdr', 'hfr', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter', 'vtt'),
+                'stream_features': ('avc1', 'vp9', 'av01', 'hdr', 'hfr', '3d', 'vr', 'prefer_dub', 'prefer_auto_dub', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'vtt', 'filter'),
                 'num_items': 50,
             },
         }
