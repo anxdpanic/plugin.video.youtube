@@ -628,7 +628,3 @@ class AbstractContext(object):
 
     def refresh_requested(self, force=False, on=False, off=False, params=None):
         raise NotImplementedError
-
-    @staticmethod
-    def internet_available():
-        raise NotImplementedError

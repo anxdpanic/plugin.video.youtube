@@ -1051,7 +1051,3 @@ class XbmcContext(AbstractContext):
             refresh += 1
 
         return refresh
-
-    @staticmethod
-    def internet_available():
-        return xbmc.getCondVisibility('System.InternetState')

@@ -632,6 +632,23 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'muted': '0',
             },
         },
+        'generate_204': {
+            'url': 'https://www.youtube.com/generate_204',
+            'method': 'HEAD',
+            'headers': {
+                'Accept-Encoding': 'gzip, deflate',
+                'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+                'Accept': '*/*',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'User-Agent': (
+                    'Mozilla/5.0 (Linux; Android 10; SM-G981B)'
+                    ' AppleWebKit/537.36 (KHTML, like Gecko)'
+                    ' Chrome/80.0.3987.162'
+                    ' Mobile Safari/537.36'
+                ),
+            },
+            'cache': False,
+        },
         '_common': {
             '_access_token': None,
             '_access_token_tv': None,
@@ -870,3 +887,11 @@ class YouTubeRequestClient(BaseRequestsClass):
         client['_has_auth'] = has_auth
 
         return client
+
+    def internet_available(self):
+        with self.request(**self.CLIENTS['generate_204']) as response:
+            if response is None:
+                return False
+            if response.status_code == 204:
+                return True
+        return False
