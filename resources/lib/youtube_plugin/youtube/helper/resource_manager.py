@@ -99,6 +99,7 @@ class ResourceManager(object):
             result = data_cache.get_items(
                 ids,
                 None if forced_cache else data_cache.ONE_DAY,
+                memory_store=self.new_data,
             )
         to_update = [id_ for id_ in ids
                      if id_
@@ -188,6 +189,7 @@ class ResourceManager(object):
             result.update(data_cache.get_items(
                 to_check,
                 None if forced_cache else data_cache.ONE_MONTH,
+                memory_store=self.new_data,
             ))
         to_update = [id_ for id_ in ids
                      if id_
@@ -294,6 +296,7 @@ class ResourceManager(object):
             result = data_cache.get_items(
                 ids,
                 None if forced_cache else data_cache.ONE_DAY,
+                memory_store=self.new_data,
             )
         to_update = [id_ for id_ in ids
                      if id_
@@ -558,6 +561,7 @@ class ResourceManager(object):
             result = data_cache.get_items(
                 ids,
                 None if forced_cache else data_cache.ONE_MONTH,
+                memory_store=self.new_data,
             )
         to_update = [id_ for id_ in ids
                      if id_

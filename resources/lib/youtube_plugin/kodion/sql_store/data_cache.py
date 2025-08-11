@@ -27,11 +27,24 @@ class DataCache(Storage):
                   content_ids,
                   seconds=None,
                   as_dict=True,
-                  values_only=True):
+                  values_only=True,
+                  memory_store=None):
+        if memory_store:
+            memory_ids = memory_store.keys()
+            in_memory_result = {
+                key: value
+                for key, value in memory_store.items()
+                if key in memory_ids & content_ids
+            }
+            content_ids = content_ids - memory_ids
+        else:
+            in_memory_result = None
         result = self._get_by_ids(content_ids,
                                   seconds=seconds,
                                   as_dict=as_dict,
                                   values_only=values_only)
+        if in_memory_result:
+            result.update(in_memory_result)
         return result
 
     def get_items_like(self, content_id, seconds=None):
