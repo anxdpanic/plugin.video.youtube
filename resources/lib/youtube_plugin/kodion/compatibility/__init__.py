@@ -21,6 +21,7 @@ __all__ = (
     'generate_hash',
     'parse_qs',
     'parse_qsl',
+    'pickle',
     'quote',
     'quote_plus',
     'range_type',
@@ -42,6 +43,7 @@ __all__ = (
 
 # Kodi v19+ and Python v3.x
 try:
+    import _pickle as pickle
     from hashlib import md5
     from html import unescape
     from http.server import BaseHTTPRequestHandler
@@ -184,6 +186,7 @@ try:
 
 # Compatibility shims for Kodi v18 and Python v2.7
 except ImportError:
+    import cPickle as pickle
     from hashlib import md5
     from BaseHTTPServer import BaseHTTPRequestHandler
     from SocketServer import TCPServer, ThreadingMixIn
@@ -301,6 +304,13 @@ except ImportError:
         return md5(''.join(
             map(to_str, args or kwargs.get('iter'))
         )).hexdigest()
+
+
+    def _loads(string, _loads=pickle.loads):
+        return _loads(to_str(string))
+
+
+    pickle.loads = _loads
 
 # Kodi v20+
 if hasattr(xbmcgui.ListItem, 'setDateTime'):

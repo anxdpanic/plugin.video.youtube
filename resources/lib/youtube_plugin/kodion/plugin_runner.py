@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+import gc
 from . import logging
 from .constants import CHECK_SETTINGS, PATHS
 from .context import XbmcContext
@@ -35,7 +36,7 @@ def run(context=_context,
         plugin=_plugin,
         provider=_provider,
         profiler=_profiler):
-
+    gc.disable()
     if context.get_ui().pop_property(CHECK_SETTINGS):
         provider.reset_client()
         settings = context.get_settings(refresh=True)
@@ -111,3 +112,5 @@ def run(context=_context,
 
     if log_level:
         profiler.print_stats()
+    gc.enable()
+    gc.collect()

@@ -11,13 +11,12 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import os
-import pickle
 import sqlite3
 import time
 from threading import RLock, Timer
 
 from .. import logging
-from ..compatibility import to_str
+from ..compatibility import pickle, to_str
 from ..utils.datetime_parser import fromtimestamp, since_epoch
 from ..utils.file_system import make_dirs
 
@@ -504,7 +503,7 @@ class Storage(object):
     def _encode(key, obj, timestamp=None, for_update=False):
         timestamp = timestamp or since_epoch()
         blob = sqlite3.Binary(pickle.dumps(
-            obj, protocol=pickle.HIGHEST_PROTOCOL
+            obj, protocol=-1
         ))
         size = getattr(blob, 'nbytes', None)
         if not size:
