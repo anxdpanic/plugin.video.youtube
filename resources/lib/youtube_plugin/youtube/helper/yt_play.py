@@ -516,7 +516,8 @@ def process(provider, context, **_kwargs):
 
     video_id = params.get(VIDEO_ID)
     video_ids = params.get('video_ids')
-    playlist_id = params.get(PLAYLIST_ID)
+    playlist_id = params.get(PLAYLIST_ID,
+                             context.get_listitem_property(PLAYLIST_ID))
 
     force_play_params = FORCE_PLAY_PARAMS.intersection(param_keys)
 

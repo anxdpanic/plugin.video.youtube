@@ -1200,6 +1200,10 @@ class Provider(AbstractProvider):
             if not items:
                 return True, None
 
+            context_menu = (
+                menu_items.history_local_remove(context),
+                menu_items.history_local_clear(context),
+            )
             v3_response = {
                 'kind': 'youtube#videoListResponse',
                 'items': [
@@ -1208,14 +1212,7 @@ class Provider(AbstractProvider):
                         'id': video_id,
                         '_partial': True,
                         '_context_menu': {
-                            'context_menu': (
-                                menu_items.history_local_remove(
-                                    context, video_id
-                                ),
-                                menu_items.history_local_clear(
-                                    context
-                                ),
-                            ),
+                            'context_menu': context_menu,
                             'position': 0,
                         }
                     }
@@ -1724,6 +1721,17 @@ class Provider(AbstractProvider):
             bookmarks_list = context.get_bookmarks_list()
             items = bookmarks_list.get_items()
 
+            context_menu_custom = (
+                menu_items.bookmark_edit(context),
+                menu_items.bookmark_remove(context),
+                menu_items.bookmarks_clear(context),
+            )
+            context_menu = (
+                menu_items.bookmark_edit(context),
+                menu_items.bookmark_remove(context),
+                menu_items.bookmarks_clear(context),
+            )
+
             v3_response = {
                 'kind': 'plugin#pluginListResponse',
                 'items': [
@@ -1847,15 +1855,9 @@ class Provider(AbstractProvider):
                         '_partial': partial_result,
                         '_context_menu': {
                             'context_menu': (
-                                menu_items.bookmark_edit(
-                                    context, item_id, item_name, item_uri
-                                ) if can_edit else None,
-                                menu_items.bookmark_remove(
-                                    context, item_id, item_name
-                                ),
-                                menu_items.bookmarks_clear(
-                                    context
-                                ),
+                                context_menu_custom
+                                if can_edit else
+                                context_menu
                             ),
                             'position': 0,
                         },
@@ -2016,6 +2018,10 @@ class Provider(AbstractProvider):
             if not items:
                 return True, None
 
+            context_menu = (
+                menu_items.watch_later_local_remove(context),
+                menu_items.watch_later_local_clear(context),
+            )
             v3_response = {
                 'kind': 'youtube#videoListResponse',
                 'items': [
@@ -2024,14 +2030,7 @@ class Provider(AbstractProvider):
                         'id': video_id,
                         '_partial': True,
                         '_context_menu': {
-                            'context_menu': (
-                                menu_items.watch_later_local_remove(
-                                    context, video_id, item.get_name()
-                                ),
-                                menu_items.watch_later_local_clear(
-                                    context
-                                ),
-                            ),
+                            'context_menu': context_menu,
                             'position': 0,
                         }
                     }

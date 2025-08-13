@@ -12,6 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from ..constants import (
     ADDON_ID,
+    BOOKMARK_ID,
     CHANNEL_ID,
     CONTEXT_MENU,
     MARK_AS_LABEL,
@@ -29,6 +30,17 @@ from ..constants import (
 )
 
 
+ARTIST_INFOLABEL = '$INFO[ListItem.Artist]'
+BOOKMARK_ID_INFOLABEL = '$INFO[ListItem.Property(%s)]' % BOOKMARK_ID
+CHANNEL_ID_INFOLABEL = '$INFO[ListItem.Property(%s)]' % CHANNEL_ID
+PLAYLIST_ID_INFOLABEL = '$INFO[ListItem.Property(%s)]' % PLAYLIST_ID
+PLAYLIST_ITEM_ID_INFOLABEL = '$INFO[ListItem.Property(%s)]' % PLAYLIST_ITEM_ID
+SUBSCRIPTION_ID_INFOLABEL = '$INFO[ListItem.Property(%s)]' % SUBSCRIPTION_ID
+TITLE_INFOLABEL = '$INFO[ListItem.Title]'
+URI_INFOLABEL = '$INFO[ListItem.FileNameAndPath]'
+VIDEO_ID_INFOLABEL = '$INFO[ListItem.Property(%s)]' % VIDEO_ID
+
+
 def context_menu_uri(context, path, params=None):
     if params is None:
         params = {CONTEXT_MENU: True}
@@ -38,8 +50,8 @@ def context_menu_uri(context, path, params=None):
 
 
 def video_more_for(context,
-                   video_id,
-                   video_name=None,
+                   video_id=VIDEO_ID_INFOLABEL,
+                   video_name=TITLE_INFOLABEL,
                    logged_in=False,
                    refresh=False):
     params = {
@@ -60,7 +72,7 @@ def video_more_for(context,
     )
 
 
-def video_related(context, video_id):
+def video_related(context, video_id=VIDEO_ID_INFOLABEL):
     return (
         context.localize('video.related'),
         context_menu_uri(
@@ -73,7 +85,9 @@ def video_related(context, video_id):
     )
 
 
-def video_comments(context, video_id, video_name=None):
+def video_comments(context,
+                   video_id=VIDEO_ID_INFOLABEL,
+                   video_name=TITLE_INFOLABEL):
     return (
         context.localize('video.comments'),
         context_menu_uri(
@@ -87,7 +101,7 @@ def video_comments(context, video_id, video_name=None):
     )
 
 
-def video_description_links(context, video_id):
+def video_description_links(context, video_id=VIDEO_ID_INFOLABEL):
     return (
         context.localize('video.description_links'),
         context_menu_uri(
@@ -100,7 +114,7 @@ def video_description_links(context, video_id):
     )
 
 
-def media_play_using(context, video_id):
+def media_play_using(context, video_id=VIDEO_ID_INFOLABEL):
     return (
         context.localize('video.play.using'),
         context_menu_uri(
@@ -155,7 +169,7 @@ def media_queue(context):
     )
 
 
-def playlist_play(context, playlist_id):
+def playlist_play(context, playlist_id=PLAYLIST_ID_INFOLABEL):
     return (
         context.localize('playlist.play.all'),
         context_menu_uri(
@@ -169,7 +183,9 @@ def playlist_play(context, playlist_id):
     )
 
 
-def playlist_play_from(context, playlist_id, video_id):
+def playlist_play_from(context,
+                       playlist_id=PLAYLIST_ID_INFOLABEL,
+                       video_id=VIDEO_ID_INFOLABEL):
     return (
         context.localize('playlist.play.from_here'),
         context_menu_uri(
@@ -183,7 +199,7 @@ def playlist_play_from(context, playlist_id, video_id):
     )
 
 
-def playlist_play_recently_added(context, playlist_id):
+def playlist_play_recently_added(context, playlist_id=PLAYLIST_ID_INFOLABEL):
     return (
         context.localize('playlist.play.recently_added'),
         context_menu_uri(
@@ -197,7 +213,7 @@ def playlist_play_recently_added(context, playlist_id):
     )
 
 
-def playlist_view(context, playlist_id):
+def playlist_view(context, playlist_id=PLAYLIST_ID_INFOLABEL):
     return (
         context.localize('playlist.view.all'),
         context_menu_uri(
@@ -212,7 +228,7 @@ def playlist_view(context, playlist_id):
     )
 
 
-def playlist_shuffle(context, playlist_id):
+def playlist_shuffle(context, playlist_id=PLAYLIST_ID_INFOLABEL):
     return (
         context.localize('playlist.play.shuffle'),
         context_menu_uri(
@@ -227,9 +243,12 @@ def playlist_shuffle(context, playlist_id):
     )
 
 
-def playlist_add_to(context, video_id, playlist_id):
+def playlist_add_to(context,
+                    playlist_id,
+                    name_id='playlist',
+                    video_id=VIDEO_ID_INFOLABEL):
     return (
-        context.localize('watch_later.add'),
+        context.localize(('add.to.x', name_id)),
         context_menu_uri(
             context,
             (PATHS.PLAYLIST, 'add', 'video',),
@@ -241,7 +260,7 @@ def playlist_add_to(context, video_id, playlist_id):
     )
 
 
-def playlist_add_to_selected(context, video_id):
+def playlist_add_to_selected(context, video_id=VIDEO_ID_INFOLABEL):
     return (
         context.localize('video.add_to_playlist'),
         context_menu_uri(
@@ -255,10 +274,10 @@ def playlist_add_to_selected(context, video_id):
 
 
 def playlist_remove_from(context,
-                         playlist_id,
-                         playlist_item_id,
-                         video_id,
-                         video_name):
+                         playlist_id=PLAYLIST_ID_INFOLABEL,
+                         playlist_item_id=PLAYLIST_ITEM_ID_INFOLABEL,
+                         video_id=VIDEO_ID_INFOLABEL,
+                         video_name=TITLE_INFOLABEL):
     return (
         context.localize('remove'),
         context_menu_uri(
@@ -278,7 +297,9 @@ def playlist_remove_from(context,
     )
 
 
-def playlist_rename(context, playlist_id, playlist_name):
+def playlist_rename(context,
+                    playlist_id=PLAYLIST_ID_INFOLABEL,
+                    playlist_name=TITLE_INFOLABEL):
     return (
         context.localize('rename'),
         context_menu_uri(
@@ -292,7 +313,9 @@ def playlist_rename(context, playlist_id, playlist_name):
     )
 
 
-def playlist_delete(context, playlist_id, playlist_name):
+def playlist_delete(context,
+                    playlist_id=PLAYLIST_ID_INFOLABEL,
+                    playlist_name=TITLE_INFOLABEL):
     return (
         context.localize('delete'),
         context_menu_uri(
@@ -306,7 +329,7 @@ def playlist_delete(context, playlist_id, playlist_name):
     )
 
 
-def playlist_save_to_library(context, playlist_id):
+def playlist_save_to_library(context, playlist_id=PLAYLIST_ID_INFOLABEL):
     return (
         context.localize('save'),
         context_menu_uri(
@@ -319,7 +342,9 @@ def playlist_save_to_library(context, playlist_id):
     )
 
 
-def playlist_remove_from_library(context, playlist_id, playlist_name):
+def playlist_remove_from_library(context,
+                                 playlist_id=PLAYLIST_ID_INFOLABEL,
+                                 playlist_name=TITLE_INFOLABEL):
     return (
         context.localize('remove'),
         context_menu_uri(
@@ -334,7 +359,9 @@ def playlist_remove_from_library(context, playlist_id, playlist_name):
     )
 
 
-def watch_later_list_unassign(context, playlist_id, playlist_name):
+def watch_later_list_unassign(context,
+                              playlist_id=PLAYLIST_ID_INFOLABEL,
+                              playlist_name=TITLE_INFOLABEL):
     return (
         context.localize('watch_later.list.unassign'),
         context_menu_uri(
@@ -348,7 +375,9 @@ def watch_later_list_unassign(context, playlist_id, playlist_name):
     )
 
 
-def watch_later_list_assign(context, playlist_id, playlist_name):
+def watch_later_list_assign(context,
+                            playlist_id=PLAYLIST_ID_INFOLABEL,
+                            playlist_name=TITLE_INFOLABEL):
     return (
         context.localize('watch_later.list.assign'),
         context_menu_uri(
@@ -362,7 +391,9 @@ def watch_later_list_assign(context, playlist_id, playlist_name):
     )
 
 
-def history_list_unassign(context, playlist_id, playlist_name):
+def history_list_unassign(context,
+                          playlist_id=PLAYLIST_ID_INFOLABEL,
+                          playlist_name=TITLE_INFOLABEL):
     return (
         context.localize('history.list.unassign'),
         context_menu_uri(
@@ -376,7 +407,9 @@ def history_list_unassign(context, playlist_id, playlist_name):
     )
 
 
-def history_list_assign(context, playlist_id, playlist_name):
+def history_list_assign(context,
+                        playlist_id=PLAYLIST_ID_INFOLABEL,
+                        playlist_name=TITLE_INFOLABEL):
     return (
         context.localize('history.list.assign'),
         context_menu_uri(
@@ -390,7 +423,7 @@ def history_list_assign(context, playlist_id, playlist_name):
     )
 
 
-def my_subscriptions_filter_remove(context, channel_name):
+def my_subscriptions_filter_remove(context, channel_name=ARTIST_INFOLABEL):
     return (
         context.localize(('remove.from.x', 'my_subscriptions.filtered')),
         context_menu_uri(
@@ -403,7 +436,7 @@ def my_subscriptions_filter_remove(context, channel_name):
     )
 
 
-def my_subscriptions_filter_add(context, channel_name):
+def my_subscriptions_filter_add(context, channel_name=ARTIST_INFOLABEL):
     return (
         context.localize(('add.to.x', 'my_subscriptions.filtered')),
         context_menu_uri(
@@ -416,7 +449,7 @@ def my_subscriptions_filter_add(context, channel_name):
     )
 
 
-def video_rate(context, video_id, refresh=False):
+def video_rate(context, video_id=VIDEO_ID_INFOLABEL, refresh=False):
     params = {
         VIDEO_ID: video_id,
     }
@@ -447,7 +480,9 @@ def watch_later_local_add(context, item):
     )
 
 
-def watch_later_local_remove(context, video_id, video_name=''):
+def watch_later_local_remove(context,
+                             video_id=VIDEO_ID_INFOLABEL,
+                             video_name=TITLE_INFOLABEL):
     return (
         context.localize('watch_later.remove'),
         context_menu_uri(
@@ -471,7 +506,9 @@ def watch_later_local_clear(context):
     )
 
 
-def channel_go_to(context, channel_id, channel_name):
+def channel_go_to(context,
+                  channel_id=CHANNEL_ID_INFOLABEL,
+                  channel_name=ARTIST_INFOLABEL):
     return (
         context.localize('go_to.x', context.get_ui().bold(channel_name)),
         context_menu_uri(
@@ -481,7 +518,9 @@ def channel_go_to(context, channel_id, channel_name):
     )
 
 
-def channel_subscribe_to(context, channel_id, channel_name=''):
+def channel_subscribe_to(context,
+                         channel_id=CHANNEL_ID_INFOLABEL,
+                         channel_name=ARTIST_INFOLABEL):
     return (
         context.localize('subscribe_to.x', context.get_ui().bold(channel_name))
         if channel_name else
@@ -516,7 +555,8 @@ def channel_unsubscribe_from(context, channel_id=None, subscription_id=None):
     )
 
 
-def media_play_with_subtitles(context, video_id):
+def media_play_with_subtitles(context,
+                              video_id=VIDEO_ID_INFOLABEL):
     return (
         context.localize('video.play.with_subtitles'),
         context_menu_uri(
@@ -530,7 +570,8 @@ def media_play_with_subtitles(context, video_id):
     )
 
 
-def media_play_audio_only(context, video_id):
+def media_play_audio_only(context,
+                          video_id=VIDEO_ID_INFOLABEL):
     return (
         context.localize('video.play.audio_only'),
         context_menu_uri(
@@ -544,7 +585,8 @@ def media_play_audio_only(context, video_id):
     )
 
 
-def media_play_ask_for_quality(context, video_id):
+def media_play_ask_for_quality(context,
+                               video_id=VIDEO_ID_INFOLABEL):
     return (
         context.localize('video.play.ask_for_quality'),
         context_menu_uri(
@@ -558,7 +600,8 @@ def media_play_ask_for_quality(context, video_id):
     )
 
 
-def media_play_timeshift(context, video_id):
+def media_play_timeshift(context,
+                         video_id=VIDEO_ID_INFOLABEL):
     return (
         context.localize('video.play.timeshift'),
         context_menu_uri(
@@ -572,7 +615,9 @@ def media_play_timeshift(context, video_id):
     )
 
 
-def history_local_remove(context, video_id, video_name=''):
+def history_local_remove(context,
+                         video_id=VIDEO_ID_INFOLABEL,
+                         video_name=TITLE_INFOLABEL):
     return (
         context.localize('history.remove'),
         context_menu_uri(
@@ -596,7 +641,7 @@ def history_local_clear(context):
     )
 
 
-def history_local_mark_as(context, video_id):
+def history_local_mark_as(context, video_id=VIDEO_ID_INFOLABEL):
     return (
         '$INFO[Window(Home).Property({addon_id}-{label_property})]'.format(
             addon_id=ADDON_ID,
@@ -612,7 +657,7 @@ def history_local_mark_as(context, video_id):
     )
 
 
-def history_local_mark_watched(context, video_id):
+def history_local_mark_watched(context, video_id=VIDEO_ID_INFOLABEL):
     return (
         context.localize('history.mark.watched'),
         context_menu_uri(
@@ -625,7 +670,7 @@ def history_local_mark_watched(context, video_id):
     )
 
 
-def history_local_mark_unwatched(context, video_id):
+def history_local_mark_unwatched(context, video_id=VIDEO_ID_INFOLABEL):
     return (
         context.localize('history.mark.unwatched'),
         context_menu_uri(
@@ -638,7 +683,7 @@ def history_local_mark_unwatched(context, video_id):
     )
 
 
-def history_local_reset_resume(context, video_id):
+def history_local_reset_resume(context, video_id=VIDEO_ID_INFOLABEL):
     return (
         context.localize('history.reset.resume_point'),
         context_menu_uri(
@@ -665,7 +710,9 @@ def bookmark_add(context, item):
     )
 
 
-def bookmark_add_channel(context, channel_id, channel_name=''):
+def bookmark_add_channel(context,
+                         channel_id=CHANNEL_ID_INFOLABEL,
+                         channel_name=ARTIST_INFOLABEL):
     return (
         context.localize('bookmark.x',
                          context.get_ui().bold(channel_name)
@@ -682,7 +729,10 @@ def bookmark_add_channel(context, channel_id, channel_name=''):
     )
 
 
-def bookmark_edit(context, item_id, item_name, item_uri):
+def bookmark_edit(context,
+                  item_id=BOOKMARK_ID_INFOLABEL,
+                  item_name=TITLE_INFOLABEL,
+                  item_uri=URI_INFOLABEL):
     return (
         context.localize(('edit.x', 'bookmark')),
         context_menu_uri(
@@ -697,7 +747,9 @@ def bookmark_edit(context, item_id, item_name, item_uri):
     )
 
 
-def bookmark_remove(context, item_id, item_name=''):
+def bookmark_remove(context,
+                    item_id=BOOKMARK_ID_INFOLABEL,
+                    item_name=TITLE_INFOLABEL):
     return (
         context.localize('bookmark.remove'),
         context_menu_uri(

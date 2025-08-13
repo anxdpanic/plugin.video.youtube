@@ -230,6 +230,23 @@ def update_channel_items(provider, context, channel_id_dict,
         False
     )
 
+    cxm_unsubscribe_from_channel = menu_items.channel_unsubscribe_from(
+        context,
+        subscription_id=menu_items.SUBSCRIPTION_ID_INFOLABEL,
+    )
+    cxm_subscribe_to_channel = (
+        menu_items.channel_subscribe_to(context)
+        if logged_in and not in_subscription_list else
+        None
+    )
+    cxm_filter_remove = menu_items.my_subscriptions_filter_remove(context)
+    cxm_filter_add = menu_items.my_subscriptions_filter_add(context)
+    cxm_bookmark_channel = (
+        None
+        if in_bookmarks_list else
+        menu_items.bookmark_add_channel(context)
+    )
+
     for channel_id, yt_item in data.items():
         if not yt_item or 'snippet' not in yt_item:
             continue
@@ -317,43 +334,25 @@ def update_channel_items(provider, context, channel_id_dict,
             fanart = get_thumbnail(thumb_fanart, snippet.get('thumbnails'))
             channel_item.set_fanart(fanart)
 
-        # - update context menu
-        context_menu = []
-
-        # -- unsubscribe from channel
         subscription_id = subscription_id_dict.get(channel_id, '')
         if subscription_id:
             channel_item.subscription_id = subscription_id
-            context_menu.append(
-                menu_items.channel_unsubscribe_from(
-                    context, subscription_id=subscription_id
-                )
-            )
-
-        # -- subscribe to the channel
-        if logged_in and not in_subscription_list:
-            context_menu.append(
-                menu_items.channel_subscribe_to(
-                    context, channel_id
-                )
-            )
+            context_menu = [
+                cxm_unsubscribe_from_channel,
+                cxm_bookmark_channel,
+            ]
+        else:
+            context_menu = [
+                cxm_subscribe_to_channel,
+                cxm_bookmark_channel,
+            ]
 
         # add/remove from filter list
         if filters_set is not None:
             context_menu.append(
-                menu_items.my_subscriptions_filter_remove(
-                    context, channel_handle or channel_name
-                ) if client.channel_match(channel_id, filters_set) else
-                menu_items.my_subscriptions_filter_add(
-                    context, channel_handle or channel_name
-                )
-            )
-
-        if not in_bookmarks_list:
-            context_menu.append(
-                menu_items.bookmark_add_channel(
-                    context, channel_id
-                )
+                cxm_filter_remove
+                if client.channel_match(channel_id, filters_set) else
+                cxm_filter_add
             )
 
         update_duplicate_items(channel_item,
@@ -411,7 +410,6 @@ def update_playlist_items(provider, context, playlist_id_dict,
     video_count_label = localize('stats.videoCount')
     podcast_label = context.localize('playlist.podcast')
     untitled = localize('untitled')
-    separator = menu_items.separator()
 
     path = context.get_path()
     ui = context.get_ui()
@@ -427,6 +425,39 @@ def update_playlist_items(provider, context, playlist_id_dict,
         in_bookmarks_list = True
     elif path.startswith(PATHS.SAVED_PLAYLISTS):
         in_saved_playlists = True
+
+    cxm_playlist_delete = menu_items.playlist_delete(context)
+    cxm_playlist_rename = menu_items.playlist_rename(context)
+    cxm_watch_later_unassign = menu_items.watch_later_list_unassign(context)
+    cxm_watch_later_assign = menu_items.watch_later_list_assign(context)
+    cxm_history_list_unassign = menu_items.history_list_unassign(context)
+    cxm_history_list_assign = menu_items.history_list_assign(context)
+    cxm_separator = menu_items.separator()
+    cxm_play_playlist = menu_items.playlist_play(context)
+    cxm_play_recently_added = menu_items.playlist_play_recently_added(context)
+    cxm_view_playlist = menu_items.playlist_view(context)
+    cxm_play_shuffled_playlist = menu_items.playlist_shuffle(context)
+    cxm_remove_saved_playlist = menu_items.playlist_remove_from_library(context)
+    cxm_save_playlist = (
+        menu_items.playlist_save_to_library(context)
+        if logged_in and not (in_my_playlists or in_saved_playlists) else
+        None
+    )
+    cxm_go_to_channel = (
+        menu_items.channel_go_to(context)
+        if not in_my_playlists else
+        None
+    )
+    cxm_subscribe_to_channel = (
+        menu_items.channel_subscribe_to(context)
+        if logged_in and not in_my_playlists else
+        None
+    )
+    cxm_bookmark_channel = (
+        menu_items.bookmark_add_channel(context)
+        if not in_my_playlists else
+        None
+    )
 
     for playlist_id, yt_item in data.items():
         if not yt_item or 'snippet' not in yt_item:
@@ -519,85 +550,47 @@ def update_playlist_items(provider, context, playlist_id_dict,
         if in_my_playlists:
             context_menu = [
                 # remove my playlist
-                menu_items.playlist_delete(
-                    context, playlist_id, title
-                ),
+                cxm_playlist_delete,
                 # rename playlist
-                menu_items.playlist_rename(
-                    context, playlist_id, title
-                ),
+                cxm_playlist_rename,
                 # remove as my custom watch later playlist
-                menu_items.watch_later_list_unassign(
-                    context, playlist_id, title
-                )
+                cxm_watch_later_unassign
                 if playlist_id == watch_later_id else
                 # set as my custom watch later playlist
-                menu_items.watch_later_list_assign(
-                    context, playlist_id, title
-                ),
+                cxm_watch_later_assign,
                 # remove as custom history playlist
-                menu_items.history_list_unassign(
-                    context, playlist_id, title
-                )
+                cxm_history_list_unassign
                 if playlist_id == history_id else
                 # set as custom history playlist
-                menu_items.history_list_assign(
-                    context, playlist_id, title
-                ),
-                separator,
+                cxm_history_list_assign,
+                cxm_separator,
             ]
         elif in_saved_playlists:
             context_menu = [
-                menu_items.playlist_remove_from_library(
-                    context, playlist_id, title
-                ),
-                separator,
+                cxm_remove_saved_playlist,
+                cxm_separator,
             ]
         else:
             context_menu = []
 
         context_menu.extend((
             # play all videos of the playlist
-            menu_items.playlist_play(
-                context, playlist_id
-            ),
-            menu_items.playlist_play_recently_added(
-                context, playlist_id
-            ),
-            menu_items.playlist_view(
-                context, playlist_id
-            ),
-            menu_items.playlist_shuffle(
-                context, playlist_id
-            ),
-            separator,
-            menu_items.playlist_save_to_library(
-                context, playlist_id
-            )
-            if logged_in and not (in_my_playlists or in_saved_playlists) else
-            None,
+            cxm_play_playlist,
+            cxm_play_recently_added,
+            cxm_view_playlist,
+            cxm_play_shuffled_playlist,
+            cxm_separator,
+            cxm_save_playlist,
             menu_items.bookmark_add(
                 context, playlist_item
             )
             if not (in_my_playlists or in_bookmarks_list) else
             None,
-            menu_items.channel_go_to(
-                context, channel_id, channel_name
-            )
-            if not in_my_playlists else
-            None,
+            cxm_go_to_channel,
             # subscribe to the channel via the playlist item
-            menu_items.channel_subscribe_to(
-                context, channel_id, channel_name
-            )
-            if logged_in and not in_my_playlists else
-            None,
+            cxm_subscribe_to_channel,
             # bookmark channel of the playlist
-            menu_items.bookmark_add_channel(
-                context, channel_id, channel_name
-            )
-            if not in_my_playlists else
-            None,
+            cxm_bookmark_channel,
         ))
 
         update_duplicate_items(playlist_item,
@@ -691,6 +684,61 @@ def update_video_items(provider, context, video_id_dict,
         if playlist_match:
             playlist_id = playlist_match.group('playlist_id')
             playlist_channel_id = playlist_match.group('channel_id')
+
+    cxm_remove_from_playlist = menu_items.playlist_remove_from(
+        context,
+        playlist_id=playlist_id,
+    )
+    cxm_separator = menu_items.separator()
+    cxm_play = menu_items.media_play(context)
+    cxm_play_with_subtitles = (
+        None
+        if subtitles_prompt else
+        menu_items.media_play_with_subtitles(context)
+    )
+    cxm_play_audio_only = (
+        None
+        if audio_only else
+        menu_items.media_play_audio_only(context)
+    )
+    cxm_play_ask_for_quality = (
+        None
+        if ask_quality else
+        menu_items.media_play_ask_for_quality(context)
+    )
+    cxm_play_timeshift = menu_items.media_play_timeshift(context)
+    cxm_play_using = (
+        menu_items.media_play_using(context)
+        if alternate_player else
+        None
+    )
+    cxm_play_from = menu_items.playlist_play_from(context, playlist_id)
+    cxm_queue = menu_items.media_queue(context)
+    cxm_watch_later = menu_items.playlist_add_to(
+        context,
+        watch_later_id,
+        'watch_later',
+    )
+    cxm_go_to_channel = menu_items.channel_go_to(context)
+    cxm_unsubscribe_from_channel = menu_items.channel_unsubscribe_from(
+        context,
+        channel_id=menu_items.CHANNEL_ID_INFOLABEL,
+    )
+    cxm_subscribe_to_channel = menu_items.channel_subscribe_to(context)
+    cxm_remove_bookmarked_channel = menu_items.bookmark_remove(
+        context,
+        menu_items.CHANNEL_ID_INFOLABEL,
+        menu_items.ARTIST_INFOLABEL,
+    )
+    cxm_bookmark_channel = menu_items.bookmark_add_channel(context)
+    cxm_mark_as = menu_items.history_local_mark_as(context)
+    cxm_reset_resume = menu_items.history_local_reset_resume(context)
+    cxm_refresh_listing = menu_items.refresh_listing(context)
+    cxm_more = menu_items.video_more_for(
+        context,
+        logged_in=logged_in,
+        refresh=path.startswith((PATHS.LIKED_VIDEOS, PATHS.DISLIKED_VIDEOS)),
+    )
 
     for video_id, yt_item in data.items():
         if not yt_item:
@@ -976,61 +1024,38 @@ def update_video_items(provider, context, video_id_dict,
         channel_id = snippet.get('channelId') or playlist_channel_id
         media_item.channel_id = channel_id
 
-        item_playlist_id = playlist_id or media_item.playlist_id
+        item_from_playlist = playlist_id or media_item.playlist_id
 
         # Provide 'remove' in own playlists or virtual lists, except the
         # YouTube Watch History list as that does not support direct edits
         if (not in_watch_history_list
-                and item_playlist_id
+                and item_from_playlist
                 and logged_in
                 and playlist_channel_id == 'mine'):
             context_menu = [
-                menu_items.playlist_remove_from(
-                    context,
-                    playlist_id=item_playlist_id,
-                    playlist_item_id=media_item.playlist_item_id,
-                    video_id=video_id,
-                    video_name=title,
-                ),
-                menu_items.separator(),
+                cxm_remove_from_playlist,
+                cxm_separator,
             ]
         else:
             context_menu = []
 
         if available:
             context_menu.extend((
-                menu_items.media_play(context),
-                menu_items.media_play_with_subtitles(
-                    context, video_id
-                ) if not subtitles_prompt else None,
-                menu_items.media_play_audio_only(
-                    context, video_id
-                ) if not audio_only else None,
-                menu_items.media_play_ask_for_quality(
-                    context, video_id
-                ) if not ask_quality else None,
-                menu_items.media_play_timeshift(
-                    context, video_id
-                ) if media_item.live else None,
-                # 'play with...' (external player)
-                menu_items.media_play_using(
-                    context, video_id
-                ) if alternate_player else None,
-                menu_items.playlist_play_from(
-                    context, item_playlist_id, video_id
-                ) if item_playlist_id else None,
-                menu_items.media_queue(context),
+                cxm_play,
+                cxm_play_with_subtitles,
+                cxm_play_audio_only,
+                cxm_play_ask_for_quality,
+                cxm_play_timeshift if media_item.live else None,
+                cxm_play_using,
+                cxm_play_from if item_from_playlist else None,
+                cxm_queue,
             ))
 
         # add 'Watch Later' only if we are not in my 'Watch Later' list
         if not available or in_watch_later_list:
             pass
         elif watch_later_id:
-            context_menu.append(
-                menu_items.playlist_add_to(
-                    context, video_id, watch_later_id
-                )
-            )
+            context_menu.append(cxm_watch_later)
         else:
             context_menu.append(
                 menu_items.watch_later_local_add(
@@ -1049,60 +1074,35 @@ def update_video_items(provider, context, video_id_dict,
             # got to [CHANNEL] only if we are not directly in the channel
             if context.create_path(PATHS.CHANNEL, channel_id) != path:
                 media_item.channel_id = channel_id
-                context_menu.append(
-                    menu_items.channel_go_to(
-                        context, channel_id, channel_name
-                    )
-                )
+                context_menu.append(cxm_go_to_channel)
 
             if logged_in:
                 context_menu.append(
                     # unsubscribe from the channel of the video
-                    menu_items.channel_unsubscribe_from(
-                        context, channel_id=channel_id
-                    ) if in_my_subscriptions_list else
+                    cxm_unsubscribe_from_channel
+                    if in_my_subscriptions_list else
                     # subscribe to the channel of the video
-                    menu_items.channel_subscribe_to(
-                        context, channel_id, channel_name
-                    )
+                    cxm_subscribe_to_channel
                 )
 
             context_menu.append(
                 # remove bookmarked channel of the video
-                menu_items.bookmark_remove(
-                    context, channel_id, channel_name
-                ) if in_my_subscriptions_list else
+                cxm_remove_bookmarked_channel
+                if in_my_subscriptions_list else
                 # bookmark channel of the video
-                menu_items.bookmark_add_channel(
-                    context, channel_id, channel_name
-                )
+                cxm_bookmark_channel
             )
 
         if use_play_data:
-            context_menu.append(
-                menu_items.history_local_mark_as(
-                    context, video_id
-                )
-            )
+            context_menu.append(cxm_mark_as)
             if play_data and (play_data.get('played_percent', 0) > 0
                               or play_data.get('played_time', 0) > 0):
-                context_menu.append(
-                    menu_items.history_local_reset_resume(
-                        context, video_id
-                    )
-                )
+                context_menu.append(cxm_reset_resume)
 
         # more...
-        refresh = path.startswith((PATHS.LIKED_VIDEOS, PATHS.DISLIKED_VIDEOS))
         context_menu.extend((
-            menu_items.refresh_listing(context),
-            menu_items.video_more_for(
-                context,
-                video_id,
-                video_name=title,
-                logged_in=logged_in,
-                refresh=refresh,
-            ),
+            cxm_refresh_listing,
+            cxm_more,
         ))
 
         update_duplicate_items(media_item,
