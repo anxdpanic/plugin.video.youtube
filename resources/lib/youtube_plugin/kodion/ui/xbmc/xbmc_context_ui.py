@@ -32,7 +32,8 @@ class XbmcContextUI(AbstractContextUI):
                                total=None,
                                background=False,
                                message_template=None,
-                               template_params=None):
+                               template_params=None,
+                               hide_progress=None):
         if not message_template and background:
             message_template = '{_message} {_current}/{_total}'
 
@@ -47,7 +48,11 @@ class XbmcContextUI(AbstractContextUI):
             total=int(total) if total is not None else 0,
             message_template=message_template,
             template_params=template_params,
-            hide=self._context.get_param('hide_progress'),
+            hide=(
+                self._context.get_param('hide_progress')
+                if hide_progress is None else
+                hide_progress
+            ),
         )
 
     def on_keyboard_input(self, title, default='', hidden=False):

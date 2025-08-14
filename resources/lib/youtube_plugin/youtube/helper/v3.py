@@ -678,6 +678,7 @@ def response_to_items(provider,
                       allow_duplicates=True,
                       process_next_page=True,
                       item_filter=None,
+                      hide_progress=None,
                       log=_log):
     params = context.get_params()
     settings = context.get_settings()
@@ -707,6 +708,7 @@ def response_to_items(provider,
             heading=context.localize('loading.directory'),
             message_template=context.localize('loading.directory.progress'),
             background=True,
+            hide_progress=hide_progress,
     ) as progress_dialog:
         while 1:
             kind, is_youtube, is_plugin, kind_type = _parse_kind(json_data)
