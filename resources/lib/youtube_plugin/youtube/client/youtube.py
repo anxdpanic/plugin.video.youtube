@@ -547,6 +547,7 @@ class YouTube(LoginClient):
     def remove_video_from_playlist(self,
                                    playlist_id,
                                    playlist_item_id,
+                                   video_id,
                                    **kwargs):
         playlist_id_upper = playlist_id.upper() if playlist_id else ''
         if playlist_id_upper not in self._VIRTUAL_LISTS:
@@ -561,7 +562,7 @@ class YouTube(LoginClient):
             post_data = {
                 'playlistId': playlist_id_upper,
                 'actions': [{
-                    'removedVideoId': playlist_item_id,
+                    'removedVideoId': video_id,
                     'action': 'ACTION_REMOVE_VIDEO_BY_VIDEO_ID',
                 }],
             }
@@ -570,7 +571,7 @@ class YouTube(LoginClient):
         elif playlist_id_upper == 'LL':
             post_data = {
                 'target': {
-                    'videoId': playlist_item_id,
+                    'videoId': video_id,
                 },
             }
             path = 'like/removelike'

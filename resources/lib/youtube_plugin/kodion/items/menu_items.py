@@ -16,6 +16,7 @@ from ..constants import (
     CONTEXT_MENU,
     MARK_AS_LABEL,
     PATHS,
+    PLAYLIST_ITEM_ID,
     PLAYLIST_ID,
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
@@ -253,7 +254,11 @@ def playlist_add_to_selected(context, video_id):
     )
 
 
-def playlist_remove_from(context, playlist_id, video_id, video_name):
+def playlist_remove_from(context,
+                         playlist_id,
+                         playlist_item_id,
+                         video_id,
+                         video_name):
     return (
         context.localize('remove'),
         context_menu_uri(
@@ -261,10 +266,13 @@ def playlist_remove_from(context, playlist_id, video_id, video_name):
             (PATHS.PLAYLIST, 'remove', 'video',),
             dict(
                 context.get_params(),
-                playlist_id=playlist_id,
-                video_id=video_id,
-                item_name=video_name,
-                reload_path=context.get_path(),
+                **{
+                    PLAYLIST_ID: playlist_id,
+                    PLAYLIST_ITEM_ID: playlist_item_id,
+                    VIDEO_ID: video_id,
+                    'item_name': video_name,
+                    'reload_path': context.get_path(),
+                }
             ),
         ),
     )

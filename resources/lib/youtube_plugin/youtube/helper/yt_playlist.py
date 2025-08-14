@@ -17,8 +17,9 @@ from ...kodion.constants import (
     CONTEXT_MENU,
     KEYMAP,
     PATHS,
-    PLAYLISTITEM_ID,
-    PLAYLIST_ID, VIDEO_ID,
+    PLAYLIST_ITEM_ID,
+    PLAYLIST_ID,
+    VIDEO_ID,
 )
 from ...kodion.utils.methods import parse_item_ids
 
@@ -85,15 +86,18 @@ def _process_add_video(provider, context):
 def _process_remove_video(provider,
                           context,
                           playlist_id=None,
+                          playlist_item_id=None,
                           video_id=None,
                           video_name=None,
                           confirmed=None):
     container_uri = context.get_infolabel('Container.FolderPath')
     listitem_playlist_id = context.get_listitem_property(PLAYLIST_ID)
-    listitem_video_id = context.get_listitem_property(PLAYLISTITEM_ID)
+    listitem_playlist_item_id = context.get_listitem_property(PLAYLIST_ITEM_ID)
+    listitem_video_id = context.get_listitem_property(VIDEO_ID)
     listitem_video_name = context.get_listitem_info('Title')
     if not context.is_plugin_path(container_uri):
         listitem_playlist_id = ''
+        listitem_playlist_item_id = ''
         listitem_video_id = ''
         listitem_video_name = ''
 
@@ -105,6 +109,9 @@ def _process_remove_video(provider,
 
     if playlist_id is None:
         playlist_id = params.pop(PLAYLIST_ID, listitem_playlist_id)
+    if playlist_item_id is None:
+        playlist_item_id = params.pop(PLAYLIST_ITEM_ID,
+                                      listitem_playlist_item_id)
     if video_id is None:
         video_id = params.pop(VIDEO_ID, listitem_video_id)
     if video_name is None:
@@ -127,8 +134,9 @@ def _process_remove_video(provider,
     localize = context.localize
     if confirmed or ui.on_remove_content(video_name):
         success = provider.get_client(context).remove_video_from_playlist(
-            playlist_item_id=video_id,
             playlist_id=playlist_id,
+            playlist_item_id=playlist_item_id,
+            video_id=video_id,
         )
         if not success:
             ui.show_notification(
