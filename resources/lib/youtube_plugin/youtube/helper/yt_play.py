@@ -228,7 +228,8 @@ def _play_playlist(provider, context):
             result = v3.response_to_items(provider,
                                           context,
                                           chunk,
-                                          process_next_page=False)
+                                          process_next_page=False,
+                                          hide_progress=True)
             video_items.extend(result)
 
             progress_dialog.update(steps=len(result))
