@@ -60,6 +60,7 @@ WAIT_END_FLAG = 'builtin_completed'
 TRAKT_PAUSE_FLAG = 'script.trakt.paused'
 
 # ListItem Properties
+BOOKMARK_ID = 'bookmark_id'
 CHANNEL_ID = 'channel_id'
 PLAY_COUNT = 'video_play_count'
 PLAYLIST_ID = 'playlist_id'
@@ -144,6 +145,7 @@ __all__ = (
     'WAIT_END_FLAG',
 
     # ListItem properties
+    'BOOKMARK_ID',
     'CHANNEL_ID',
     'PLAY_COUNT',
     'PLAYLIST_ID',

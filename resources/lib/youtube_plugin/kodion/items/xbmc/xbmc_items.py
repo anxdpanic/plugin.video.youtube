@@ -22,6 +22,7 @@ from .. import (
 from ... import logging
 from ...compatibility import to_str, xbmc, xbmcgui
 from ...constants import (
+    BOOKMARK_ID,
     CHANNEL_ID,
     PATHS,
     PLAYLISTITEM_ID,
@@ -581,6 +582,11 @@ def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
             special_sort = None
             props[PLAYLIST_ID] = prop_value
 
+        prop_value = directory_item.bookmark_id
+        if prop_value:
+            special_sort = None
+            props[BOOKMARK_ID] = prop_value
+
         if special_sort:
             props['specialSort'] = special_sort
 
@@ -726,6 +732,11 @@ def media_listitem(context,
     prop_value = media_item.playlist_item_id
     if prop_value:
         props[PLAYLISTITEM_ID] = prop_value
+
+    # make bookmark_id property available for keymapping
+    prop_value = media_item.bookmark_id
+    if prop_value:
+        props[BOOKMARK_ID] = prop_value
 
     list_item = xbmcgui.ListItem(**kwargs)
 
