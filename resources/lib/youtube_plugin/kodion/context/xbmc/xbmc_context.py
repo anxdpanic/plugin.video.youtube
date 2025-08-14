@@ -636,7 +636,7 @@ class XbmcContext(AbstractContext):
             msg = 'Undefined string ID: {text_id!r}'
             if default_text is None:
                 default_text = msg.format(text_id=text_id)
-                self.log.warning(msg)
+                self.log.warning(default_text)
             else:
                 self.log.warning(msg, text_id=text_id)
             return default_text
@@ -653,7 +653,7 @@ class XbmcContext(AbstractContext):
             msg = 'Untranslated string ID: {text_id!r}'
             if default_text is None:
                 default_text = msg.format(text_id=text_id)
-                self.log.warning(msg)
+                self.log.warning(default_text)
             else:
                 self.log.warning(msg, text_id=text_id)
             return default_text
