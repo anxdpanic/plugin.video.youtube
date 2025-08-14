@@ -20,11 +20,13 @@ from ...kodion import logging
 from ...kodion.compatibility import string_type, urlencode, urlunsplit, xbmc
 from ...kodion.constants import (
     BUSY_FLAG,
+    CHANNEL_ID,
     CONTENT,
     FORCE_PLAY_PARAMS,
     PATHS,
     PLAYBACK_INIT,
     PLAYER_DATA,
+    PLAYLIST_ID,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
     PLAY_FORCE_AUDIO,
@@ -33,6 +35,7 @@ from ...kodion.constants import (
     PLAY_USING,
     SERVER_WAKEUP,
     TRAKT_PAUSE_FLAG,
+    VIDEO_ID,
 )
 from ...kodion.items import AudioItem, UriItem, VideoItem
 from ...kodion.network import get_connect_address
@@ -44,7 +47,7 @@ from ...kodion.utils.redact import redact_params
 def _play_stream(provider, context):
     ui = context.get_ui()
     params = context.get_params()
-    video_id = params.get('video_id')
+    video_id = params.get(VIDEO_ID)
     if not video_id:
         ui.show_notification(context.localize('error.no_streams_found'))
         return False
@@ -155,8 +158,8 @@ def _play_stream(provider, context):
     playback_stats = stream.get('playback_stats')
 
     playback_data = {
-        'video_id': video_id,
-        'channel_id': metadata.get('channel', {}).get('id', ''),
+        VIDEO_ID: video_id,
+        CHANNEL_ID: metadata.get('channel', {}).get('id', ''),
         'video_status': metadata.get('status', {}),
         'playing_file': media_item.get_uri(),
         'play_count': play_count,
@@ -187,11 +190,11 @@ def _play_playlist(provider, context):
     if not action and context.get_handle() == -1:
         action = 'play'
 
-    playlist_id = params.get('playlist_id')
+    playlist_id = params.get(PLAYLIST_ID)
     playlist_ids = params.get('playlist_ids')
     video_ids = params.get('video_ids')
     if not playlist_ids and playlist_id:
-        playlist_ids = [params.get('playlist_id')]
+        playlist_ids = [playlist_id]
 
     resource_manager = provider.get_resource_manager(context)
     ui = context.get_ui()
@@ -255,7 +258,7 @@ def _play_playlist(provider, context):
 
 
 def _play_channel_live(provider, context):
-    channel_id = context.get_param('channel_id')
+    channel_id = context.get_param(CHANNEL_ID)
     _, json_data = provider.get_client(context).search_with_params(params={
         'type': 'video',
         'eventType': 'live',
@@ -369,7 +372,7 @@ def process_items_for_playlist(context,
     params = context.get_params()
 
     if play_from is None:
-        play_from = params.get('video_id')
+        play_from = params.get(VIDEO_ID)
 
     if recent_days is None:
         recent_days = params.get('recent_days')
@@ -499,21 +502,21 @@ def process(provider, context, **_kwargs):
     params = context.get_params()
     param_keys = params.keys()
 
-    if ({'channel_id', 'playlist_id', 'playlist_ids', 'video_id', 'video_ids'}
+    if ({CHANNEL_ID, PLAYLIST_ID, 'playlist_ids', VIDEO_ID, 'video_ids'}
             .isdisjoint(param_keys)):
         listitem_path = context.get_listitem_info('FileNameAndPath')
         if context.is_plugin_path(listitem_path, PATHS.PLAY):
             item_ids = parse_item_ids(listitem_path)
-            if 'video_id' in item_ids:
+            if VIDEO_ID in item_ids:
                 context.set_params(**item_ids)
             else:
                 return False
         else:
             return False
 
-    video_id = params.get('video_id')
+    video_id = params.get(VIDEO_ID)
     video_ids = params.get('video_ids')
-    playlist_id = params.get('playlist_id')
+    playlist_id = params.get(PLAYLIST_ID)
 
     force_play_params = FORCE_PLAY_PARAMS.intersection(param_keys)
 
@@ -560,6 +563,6 @@ def process(provider, context, **_kwargs):
     if playlist_id or video_ids or 'playlist_ids' in params:
         return _play_playlist(provider, context)
 
-    if 'channel_id' in params:
+    if CHANNEL_ID in params:
         return _play_channel_live(provider, context)
     return False

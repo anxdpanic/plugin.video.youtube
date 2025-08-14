@@ -64,7 +64,7 @@ BOOKMARK_ID = 'bookmark_id'
 CHANNEL_ID = 'channel_id'
 PLAY_COUNT = 'video_play_count'
 PLAYLIST_ID = 'playlist_id'
-PLAYLISTITEM_ID = 'playlistitem_id'
+PLAYLIST_ITEM_ID = 'playlist_item_id'
 SUBSCRIPTION_ID = 'subscription_id'
 VIDEO_ID = 'video_id'
 
@@ -149,7 +149,7 @@ __all__ = (
     'CHANNEL_ID',
     'PLAY_COUNT',
     'PLAYLIST_ID',
-    'PLAYLISTITEM_ID',
+    'PLAYLIST_ITEM_ID',
     'SUBSCRIPTION_ID',
     'VIDEO_ID',
 

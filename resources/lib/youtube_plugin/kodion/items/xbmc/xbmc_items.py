@@ -25,7 +25,7 @@ from ...constants import (
     BOOKMARK_ID,
     CHANNEL_ID,
     PATHS,
-    PLAYLISTITEM_ID,
+    PLAYLIST_ITEM_ID,
     PLAYLIST_ID,
     PLAY_COUNT,
     PLAY_STRM,
@@ -731,7 +731,7 @@ def media_listitem(context,
     # make playlist_item_id property available for keymapping
     prop_value = media_item.playlist_item_id
     if prop_value:
-        props[PLAYLISTITEM_ID] = prop_value
+        props[PLAYLIST_ITEM_ID] = prop_value
 
     # make bookmark_id property available for keymapping
     prop_value = media_item.bookmark_id
