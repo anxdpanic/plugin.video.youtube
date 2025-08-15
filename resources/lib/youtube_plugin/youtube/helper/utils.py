@@ -1227,7 +1227,8 @@ def update_channel_info(provider,
 THUMB_TYPES = {
     'default': {
         'filename': 'default',
-        'url': 'https://i.ytimg.com/vi/{0}/default{1}.jpg',
+        # 'url': 'https://i.ytimg.com/vi/{0}/default{1}.jpg',
+        'url': 'https://i.ytimg.com/vi_webp/{0}/default{1}.webp',
         'width': 120,
         'height': 90,
         'size': 120 * 90,
@@ -1235,7 +1236,8 @@ THUMB_TYPES = {
     },
     'medium': {
         'filename': 'mqdefault',
-        'url': 'https://i.ytimg.com/vi/{0}/mqdefault{1}.jpg',
+        # 'url': 'https://i.ytimg.com/vi/{0}/mqdefault{1}.jpg',
+        'url': 'https://i.ytimg.com/vi_webp/{0}/mqdefault{1}.webp',
         'width': 320,
         'height': 180,
         'size': 320 * 180,
@@ -1243,7 +1245,8 @@ THUMB_TYPES = {
     },
     'high': {
         'filename': 'hqdefault',
-        'url': 'https://i.ytimg.com/vi/{0}/hqdefault{1}.jpg',
+        # 'url': 'https://i.ytimg.com/vi/{0}/hqdefault{1}.jpg',
+        'url': 'https://i.ytimg.com/vi_webp/{0}/hqdefault{1}.webp',
         'width': 480,
         'height': 360,
         'size': 480 * 360,
@@ -1251,7 +1254,8 @@ THUMB_TYPES = {
     },
     'standard': {
         'filename': 'sddefault',
-        'url': 'https://i.ytimg.com/vi/{0}/sddefault{1}.jpg',
+        # 'url': 'https://i.ytimg.com/vi/{0}/sddefault{1}.jpg',
+        'url': 'https://i.ytimg.com/vi_webp/{0}/sddefault{1}.webp',
         'width': 640,
         'height': 480,
         'size': 640 * 480,
@@ -1259,7 +1263,8 @@ THUMB_TYPES = {
     },
     '720': {
         'filename': 'hq720',
-        'url': 'https://i.ytimg.com/vi/{0}/hq720{1}.jpg',
+        # 'url': 'https://i.ytimg.com/vi/{0}/hq720{1}.jpg',
+        'url': 'https://i.ytimg.com/vi_webp/{0}/hq720{1}.webp',
         'width': 1280,
         'height': 720,
         'size': 1280 * 720,
@@ -1267,13 +1272,15 @@ THUMB_TYPES = {
     },
     'oar': {
         'filename': 'oardefault',
-        'url': 'https://i.ytimg.com/vi/{0}/oardefault{1}.jpg',
+        # 'url': 'https://i.ytimg.com/vi/{0}/oardefault{1}.jpg',
+        'url': 'https://i.ytimg.com/vi_webp/{0}/oardefault{1}.webp',
         'size': 0,
         'ratio': 0,
     },
     'maxres': {
         'filename': 'maxresdefault',
-        'url': 'https://i.ytimg.com/vi/{0}/maxresdefault{1}.jpg',
+        # 'url': 'https://i.ytimg.com/vi/{0}/maxresdefault{1}.jpg',
+        'url': 'https://i.ytimg.com/vi_webp/{0}/maxresdefault{1}.webp',
         'size': 0,
         'ratio': 0,
     },
@@ -1317,9 +1324,13 @@ def get_thumbnail(thumb_size, thumbnails, default_thumb=None):
                        key=_sort_ratio_size,
                        reverse=True)[0]
     url = (thumbnail[1] if is_dict else thumbnail).get('url')
-    if url and url.startswith('//'):
+    if not url:
+        return default_thumb
+    if '/vi_webp/' not in url:
+        url = url.replace('/vi/', '/vi_webp/', 1).replace('.jpg', '.webp', 1)
+    if url.startswith('//'):
         url = 'https:' + url
-    return url or default_thumb
+    return url
 
 
 def add_related_video_to_playlist(provider, context, client, v3, video_id):
