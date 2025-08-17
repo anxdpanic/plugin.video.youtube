@@ -811,7 +811,11 @@ class XbmcContext(AbstractContext):
         if block_ui:
             xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
 
-        if wait_for_set:
+        if isinstance(wait_for, tuple):
+            wait_for, wait_for_kwargs, delay = wait_for
+            while not wait_for(**wait_for_kwargs) and not wait_for_abort(delay):
+                pass
+        elif wait_for_set:
             ui.clear_property(wait_for)
             pop_property = ui.pop_property
             while not pop_property(wait_for) and not wait_for_abort(1):
