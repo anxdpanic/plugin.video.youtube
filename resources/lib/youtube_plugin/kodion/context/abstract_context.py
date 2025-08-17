@@ -150,6 +150,8 @@ class AbstractContext(object):
     _STRING_BOOL_PARAMS = frozenset((
         'reload_path',
     ))
+    _STRING_INT_PARAMS = frozenset((
+    ))
     _NON_EMPTY_STRING_PARAMS = set()
 
     def __init__(self, path='/', params=None, plugin_id=''):
@@ -489,6 +491,9 @@ class AbstractContext(object):
                         parsed_value = BOOL_FROM_STR.get(
                             parsed_value, parsed_value
                         )
+                    elif param in self._STRING_INT_PARAMS:
+                        if parsed_value.isdigit():
+                            parsed_value = int(parsed_value)
                     # process and translate deprecated parameters
                     elif param == 'action':
                         if parsed_value in {'play_all', 'play_video'}:
