@@ -105,7 +105,7 @@ msgid "144p"
 msgstr ""
 
 msgctxt "#30020"
-msgid "Allow 3D"
+msgid "Enable Stereoscopic 3D video"
 msgstr ""
 
 msgctxt "#30021"
@@ -149,7 +149,7 @@ msgid "Configure %s?"
 msgstr ""
 
 msgctxt "#30031"
-msgid ""
+msgid "Requests cache size (MB)"
 msgstr ""
 
 msgctxt "#30032"
@@ -215,11 +215,11 @@ msgid "Watch Later"
 msgstr ""
 
 msgctxt "#30108"
-msgid ""
+msgid "Enter the name of the bookmark"
 msgstr ""
 
 msgctxt "#30109"
-msgid ""
+msgid "Enter a valid YouTube or plugin URL for the bookmark"
 msgstr ""
 
 msgctxt "#30110"
@@ -299,11 +299,11 @@ msgstr ""
 # YouTube
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
-msgid ""
+msgid "%s failed"
 msgstr ""
 
 msgctxt "#30501"
-msgid ""
+msgid "Edit %s"
 msgstr ""
 
 msgctxt "#30502"
@@ -383,15 +383,15 @@ msgid "Add to..."
 msgstr ""
 
 msgctxt "#30521"
-msgid ""
+msgid "Delete requests cache database"
 msgstr ""
 
 msgctxt "#30522"
-msgid ""
+msgid "Clear requests cache"
 msgstr ""
 
 msgctxt "#30523"
-msgid ""
+msgid "requests cache"
 msgstr ""
 
 msgctxt "#30524"
@@ -459,7 +459,7 @@ msgid "Play recently added"
 msgstr ""
 
 msgctxt "#30540"
-msgid "Play with..."
+msgid ""
 msgstr ""
 
 msgctxt "#30541"
@@ -551,11 +551,11 @@ msgid "View all"
 msgstr ""
 
 msgctxt "#30563"
-msgid ""
+msgid "Plugin execution timeout"
 msgstr ""
 
 msgctxt "#30564"
-msgid ""
+msgid "For testing only - forcibly terminate plugin execution after set time limit. Set to 0 seconds (default) to disable."
 msgstr ""
 
 msgctxt "#30565"
@@ -607,7 +607,7 @@ msgid "Failed"
 msgstr ""
 
 msgctxt "#30577"
-msgid ""
+msgid "Smallest (4:3)"
 msgstr ""
 
 msgctxt "#30578"
@@ -647,19 +647,19 @@ msgid "Blacklist"
 msgstr ""
 
 msgctxt "#30587"
-msgid "Add to My Subscriptions filter"
+msgid ""
 msgstr ""
 
 msgctxt "#30588"
-msgid "Remove from My Subscriptions filter"
+msgid ""
 msgstr ""
 
 msgctxt "#30589"
-msgid "Added to My Subscriptions filter"
+msgid ""
 msgstr ""
 
 msgctxt "#30590"
-msgid "Removed from My Subscriptions filter"
+msgid ""
 msgstr ""
 
 msgctxt "#30591"
@@ -667,11 +667,11 @@ msgid "Thumbnail size"
 msgstr ""
 
 msgctxt "#30592"
-msgid "Medium (16:9)"
+msgid "Small (16:9)"
 msgstr ""
 
 msgctxt "#30593"
-msgid "High (4:3)"
+msgid "Medium (4:3)"
 msgstr ""
 
 msgctxt "#30594"
@@ -687,11 +687,11 @@ msgid "Strict"
 msgstr ""
 
 msgctxt "#30597"
-msgid "Updated: %s"
+msgid ""
 msgstr ""
 
 msgctxt "#30598"
-msgid ""
+msgid "Large (4:3)"
 msgstr ""
 
 msgctxt "#30599"
@@ -699,7 +699,7 @@ msgid "Failed to enable personal API keys. Missing: %s"
 msgstr ""
 
 msgctxt "#30600"
-msgid ""
+msgid "Largest (16:9)"
 msgstr ""
 
 msgctxt "#30601"
@@ -751,19 +751,19 @@ msgid "Retry"
 msgstr ""
 
 msgctxt "#30613"
-msgid ""
+msgid "Add to %s"
 msgstr ""
 
 msgctxt "#30614"
-msgid ""
+msgid "Remove from %s"
 msgstr ""
 
 msgctxt "#30615"
-msgid ""
+msgid "Added to %s"
 msgstr ""
 
 msgctxt "#30616"
-msgid ""
+msgid "Removed from %s"
 msgstr ""
 
 msgctxt "#30617"
@@ -783,7 +783,7 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr ""
 
 msgctxt "#30621"
-msgid ""
+msgid "Verbose"
 msgstr ""
 
 msgctxt "#30622"
@@ -975,11 +975,11 @@ msgid "Play count minimum percent"
 msgstr ""
 
 msgctxt "#30669"
-msgid "Mark unwatched"
+msgid "%s removed"
 msgstr ""
 
 msgctxt "#30670"
-msgid "Mark watched"
+msgid "Added %s"
 msgstr ""
 
 msgctxt "#30671"
@@ -995,7 +995,7 @@ msgid "playback history"
 msgstr ""
 
 msgctxt "#30674"
-msgid "Reset resume point"
+msgid ""
 msgstr ""
 
 msgctxt "#30675"
@@ -1135,11 +1135,11 @@ msgid "Play audio only"
 msgstr ""
 
 msgctxt "#30709"
-msgid ""
+msgid "WebVTT subtitles"
 msgstr ""
 
 msgctxt "#30710"
-msgid ""
+msgid "TTML subtitles"
 msgstr ""
 
 msgctxt "#30711"
@@ -1151,15 +1151,15 @@ msgid "Rate videos in playlists"
 msgstr ""
 
 msgctxt "#30713"
-msgid "Added to Watch Later"
+msgid "Prefer dubbed audio over original audio"
 msgstr ""
 
 msgctxt "#30714"
-msgid "Added to playlist"
+msgid "Prefer automatically translated dubbed audio over original audio"
 msgstr ""
 
 msgctxt "#30715"
-msgid "Removed from playlist"
+msgid "Use YouTube internal list for Watch History?[CR][CR]Requires signing-in via the addon and activating history tracking on YouTube."
 msgstr ""
 
 msgctxt "#30716"
@@ -1171,7 +1171,7 @@ msgid "Disliked video"
 msgstr ""
 
 msgctxt "#30718"
-msgid "Rating removed"
+msgid "Use YouTube internal list for Watch Later?[CR][CR]Requires signing-in via the addon."
 msgstr ""
 
 msgctxt "#30719"
@@ -1183,7 +1183,7 @@ msgid "Unsubscribed from channel"
 msgstr ""
 
 msgctxt "#30721"
-msgid ""
+msgid "Enable Panoramic/180/360/VR video"
 msgstr ""
 
 msgctxt "#30722"
@@ -1251,7 +1251,7 @@ msgid "Shorts - Max duration"
 msgstr ""
 
 msgctxt "#30738"
-msgid ""
+msgid "Enable spatial audio"
 msgstr ""
 
 msgctxt "#30739"

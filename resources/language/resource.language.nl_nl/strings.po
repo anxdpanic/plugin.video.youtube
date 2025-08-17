@@ -106,10 +106,9 @@ msgctxt "#30019"
 msgid "144p"
 msgstr ""
 
-# empty strings 30019
 msgctxt "#30020"
-msgid "Allow 3D"
-msgstr "Sta 3D Toe"
+msgid "Enable Stereoscopic 3D video"
+msgstr ""
 
 msgctxt "#30021"
 msgid "Show fanart"
@@ -152,7 +151,7 @@ msgid "Configure %s?"
 msgstr ""
 
 msgctxt "#30031"
-msgid ""
+msgid "Requests cache size (MB)"
 msgstr ""
 
 msgctxt "#30032"
@@ -218,11 +217,11 @@ msgid "Watch Later"
 msgstr "Bekijk Later"
 
 msgctxt "#30108"
-msgid ""
+msgid "Enter the name of the bookmark"
 msgstr ""
 
 msgctxt "#30109"
-msgid ""
+msgid "Enter a valid YouTube or plugin URL for the bookmark"
 msgstr ""
 
 msgctxt "#30110"
@@ -302,11 +301,11 @@ msgstr ""
 # YouTube
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
-msgid ""
+msgid "%s failed"
 msgstr ""
 
 msgctxt "#30501"
-msgid ""
+msgid "Edit %s"
 msgstr ""
 
 msgctxt "#30502"
@@ -386,15 +385,15 @@ msgid "Add to..."
 msgstr "Voeg toe aan..."
 
 msgctxt "#30521"
-msgid ""
+msgid "Delete requests cache database"
 msgstr ""
 
 msgctxt "#30522"
-msgid ""
+msgid "Clear requests cache"
 msgstr ""
 
 msgctxt "#30523"
-msgid ""
+msgid "requests cache"
 msgstr ""
 
 msgctxt "#30524"
@@ -462,8 +461,8 @@ msgid "Play recently added"
 msgstr ""
 
 msgctxt "#30540"
-msgid "Play with..."
-msgstr "Afspelen met..."
+msgid ""
+msgstr ""
 
 msgctxt "#30541"
 msgid "Show channel name and video details in description"
@@ -554,11 +553,11 @@ msgid "View all"
 msgstr ""
 
 msgctxt "#30563"
-msgid ""
+msgid "Plugin execution timeout"
 msgstr ""
 
 msgctxt "#30564"
-msgid ""
+msgid "For testing only - forcibly terminate plugin execution after set time limit. Set to 0 seconds (default) to disable."
 msgstr ""
 
 msgctxt "#30565"
@@ -610,7 +609,7 @@ msgid "Failed"
 msgstr "Mislukt"
 
 msgctxt "#30577"
-msgid ""
+msgid "Smallest (4:3)"
 msgstr ""
 
 msgctxt "#30578"
@@ -650,32 +649,32 @@ msgid "Blacklist"
 msgstr "Zwarte lijst"
 
 msgctxt "#30587"
-msgid "Add to My Subscriptions filter"
-msgstr "Toevoegen aan Mijn Abonnementen filter"
+msgid ""
+msgstr ""
 
 msgctxt "#30588"
-msgid "Remove from My Subscriptions filter"
-msgstr "Verwijder van Mijn Abonnementen filter"
+msgid ""
+msgstr ""
 
 msgctxt "#30589"
-msgid "Added to My Subscriptions filter"
-msgstr "Toegevoegd aan Mijn Abonnementen filter"
+msgid ""
+msgstr ""
 
 msgctxt "#30590"
-msgid "Removed from My Subscriptions filter"
-msgstr "Verwijderd van Mijn Abonnementen filter"
+msgid ""
+msgstr ""
 
 msgctxt "#30591"
 msgid "Thumbnail size"
 msgstr "Miniatuur formaat"
 
 msgctxt "#30592"
-msgid "Medium (16:9)"
-msgstr "Medium (16:9)"
+msgid "Small (16:9)"
+msgstr ""
 
 msgctxt "#30593"
-msgid "High (4:3)"
-msgstr "Hoog (4:3)"
+msgid "Medium (4:3)"
+msgstr ""
 
 msgctxt "#30594"
 msgid "Safe search"
@@ -690,11 +689,11 @@ msgid "Strict"
 msgstr "Streng"
 
 msgctxt "#30597"
-msgid "Updated: %s"
-msgstr "%s bijgewerkt"
+msgid ""
+msgstr ""
 
 msgctxt "#30598"
-msgid ""
+msgid "Large (4:3)"
 msgstr ""
 
 msgctxt "#30599"
@@ -702,7 +701,7 @@ msgid "Failed to enable personal API keys. Missing: %s"
 msgstr "Inschakelen persoonlijke API sleutels mislukt. %s ontbreekt"
 
 msgctxt "#30600"
-msgid ""
+msgid "Largest (16:9)"
 msgstr ""
 
 msgctxt "#30601"
@@ -754,19 +753,19 @@ msgid "Retry"
 msgstr "Probeer nogmaals"
 
 msgctxt "#30613"
-msgid ""
+msgid "Add to %s"
 msgstr ""
 
 msgctxt "#30614"
-msgid ""
+msgid "Remove from %s"
 msgstr ""
 
 msgctxt "#30615"
-msgid ""
+msgid "Added to %s"
 msgstr ""
 
 msgctxt "#30616"
-msgid ""
+msgid "Removed from %s"
 msgstr ""
 
 msgctxt "#30617"
@@ -786,7 +785,7 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "Poort %s al in gebruik. Kan de http server niet starten."
 
 msgctxt "#30621"
-msgid ""
+msgid "Verbose"
 msgstr ""
 
 msgctxt "#30622"
@@ -978,12 +977,12 @@ msgid "Play count minimum percent"
 msgstr "Afspeel minimum percentage"
 
 msgctxt "#30669"
-msgid "Mark unwatched"
-msgstr "Markeer als onbekeken"
+msgid "%s removed"
+msgstr ""
 
 msgctxt "#30670"
-msgid "Mark watched"
-msgstr "Markeer als bekeken"
+msgid "Added %s"
+msgstr ""
 
 msgctxt "#30671"
 msgid "Clear playback history"
@@ -998,8 +997,8 @@ msgid "playback history"
 msgstr "Afspeelgeschiedenis"
 
 msgctxt "#30674"
-msgid "Reset resume point"
-msgstr "Afspeelpunt resetten"
+msgid ""
+msgstr ""
 
 msgctxt "#30675"
 msgid "Use local playback history (watched, resume tracking)"
@@ -1138,11 +1137,11 @@ msgid "Play audio only"
 msgstr "Alleen geluid afspelen"
 
 msgctxt "#30709"
-msgid ""
+msgid "WebVTT subtitles"
 msgstr ""
 
 msgctxt "#30710"
-msgid ""
+msgid "TTML subtitles"
 msgstr ""
 
 msgctxt "#30711"
@@ -1154,16 +1153,16 @@ msgid "Rate videos in playlists"
 msgstr "Beoordeel video's in afspeellijsten"
 
 msgctxt "#30713"
-msgid "Added to Watch Later"
-msgstr "Toegevoegd aan Bekijk Later"
+msgid "Prefer dubbed audio over original audio"
+msgstr ""
 
 msgctxt "#30714"
-msgid "Added to playlist"
-msgstr "Toegevoegd aan afspeellijst"
+msgid "Prefer automatically translated dubbed audio over original audio"
+msgstr ""
 
 msgctxt "#30715"
-msgid "Removed from playlist"
-msgstr "Verwijderd van afspeellijst"
+msgid "Use YouTube internal list for Watch History?[CR][CR]Requires signing-in via the addon and activating history tracking on YouTube."
+msgstr ""
 
 msgctxt "#30716"
 msgid "Liked video"
@@ -1174,8 +1173,8 @@ msgid "Disliked video"
 msgstr "Niet Leuk"
 
 msgctxt "#30718"
-msgid "Rating removed"
-msgstr "Beoordeling verwijderd"
+msgid "Use YouTube internal list for Watch Later?[CR][CR]Requires signing-in via the addon."
+msgstr ""
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
@@ -1186,7 +1185,7 @@ msgid "Unsubscribed from channel"
 msgstr "Niet meer geabonneerd"
 
 msgctxt "#30721"
-msgid ""
+msgid "Enable Panoramic/180/360/VR video"
 msgstr ""
 
 msgctxt "#30722"
@@ -1254,7 +1253,7 @@ msgid "Shorts - Max duration"
 msgstr ""
 
 msgctxt "#30738"
-msgid ""
+msgid "Enable spatial audio"
 msgstr ""
 
 msgctxt "#30739"
@@ -1584,6 +1583,71 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+# empty strings 30019
+#~ msgctxt "#30020"
+#~ msgid "Allow 3D"
+#~ msgstr "Sta 3D Toe"
+
+#~ msgctxt "#30540"
+#~ msgid "Play with..."
+#~ msgstr "Afspelen met..."
+
+#~ msgctxt "#30587"
+#~ msgid "Add to My Subscriptions filter"
+#~ msgstr "Toevoegen aan Mijn Abonnementen filter"
+
+#~ msgctxt "#30588"
+#~ msgid "Remove from My Subscriptions filter"
+#~ msgstr "Verwijder van Mijn Abonnementen filter"
+
+#~ msgctxt "#30589"
+#~ msgid "Added to My Subscriptions filter"
+#~ msgstr "Toegevoegd aan Mijn Abonnementen filter"
+
+#~ msgctxt "#30590"
+#~ msgid "Removed from My Subscriptions filter"
+#~ msgstr "Verwijderd van Mijn Abonnementen filter"
+
+#~ msgctxt "#30592"
+#~ msgid "Medium (16:9)"
+#~ msgstr "Medium (16:9)"
+
+#~ msgctxt "#30593"
+#~ msgid "High (4:3)"
+#~ msgstr "Hoog (4:3)"
+
+#~ msgctxt "#30597"
+#~ msgid "Updated: %s"
+#~ msgstr "%s bijgewerkt"
+
+#~ msgctxt "#30669"
+#~ msgid "Mark unwatched"
+#~ msgstr "Markeer als onbekeken"
+
+#~ msgctxt "#30670"
+#~ msgid "Mark watched"
+#~ msgstr "Markeer als bekeken"
+
+#~ msgctxt "#30674"
+#~ msgid "Reset resume point"
+#~ msgstr "Afspeelpunt resetten"
+
+#~ msgctxt "#30713"
+#~ msgid "Added to Watch Later"
+#~ msgstr "Toegevoegd aan Bekijk Later"
+
+#~ msgctxt "#30714"
+#~ msgid "Added to playlist"
+#~ msgstr "Toegevoegd aan afspeellijst"
+
+#~ msgctxt "#30715"
+#~ msgid "Removed from playlist"
+#~ msgstr "Verwijderd van afspeellijst"
+
+#~ msgctxt "#30718"
+#~ msgid "Rating removed"
+#~ msgstr "Beoordeling verwijderd"
 
 #~ msgctxt "#30545"
 #~ msgid "No further links found."

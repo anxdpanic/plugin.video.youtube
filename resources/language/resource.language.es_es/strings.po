@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2025-05-12 21:19+0000\n"
 "Last-Translator: Alfonso Cachero <alfonso.cachero@gmail.com>\n"
@@ -105,10 +105,9 @@ msgctxt "#30019"
 msgid "144p"
 msgstr "144p"
 
-# empty strings 30019
 msgctxt "#30020"
-msgid "Allow 3D"
-msgstr "Permitir 3D"
+msgid "Enable Stereoscopic 3D video"
+msgstr ""
 
 msgctxt "#30021"
 msgid "Show fanart"
@@ -151,8 +150,8 @@ msgid "Configure %s?"
 msgstr "¿Configurar %s?"
 
 msgctxt "#30031"
-msgid ""
-msgstr " "
+msgid "Requests cache size (MB)"
+msgstr ""
 
 msgctxt "#30032"
 msgid "View: TV Shows"
@@ -217,12 +216,12 @@ msgid "Watch Later"
 msgstr "Ver más tarde"
 
 msgctxt "#30108"
-msgid ""
-msgstr " "
+msgid "Enter the name of the bookmark"
+msgstr ""
 
 msgctxt "#30109"
-msgid ""
-msgstr " "
+msgid "Enter a valid YouTube or plugin URL for the bookmark"
+msgstr ""
 
 msgctxt "#30110"
 msgid "New Search"
@@ -301,12 +300,12 @@ msgstr " "
 # YouTube
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
-msgid ""
-msgstr " "
+msgid "%s failed"
+msgstr ""
 
 msgctxt "#30501"
-msgid ""
-msgstr " "
+msgid "Edit %s"
+msgstr ""
 
 msgctxt "#30502"
 msgid "Go to %s"
@@ -385,16 +384,16 @@ msgid "Add to..."
 msgstr "Añadir a..."
 
 msgctxt "#30521"
-msgid ""
-msgstr " "
+msgid "Delete requests cache database"
+msgstr ""
 
 msgctxt "#30522"
-msgid ""
-msgstr " "
+msgid "Clear requests cache"
+msgstr ""
 
 msgctxt "#30523"
-msgid ""
-msgstr " "
+msgid "requests cache"
+msgstr ""
 
 msgctxt "#30524"
 msgid "Select language"
@@ -461,8 +460,8 @@ msgid "Play recently added"
 msgstr "Reproducir lo añadido recientemente"
 
 msgctxt "#30540"
-msgid "Play with..."
-msgstr "Abrir con..."
+msgid ""
+msgstr ""
 
 msgctxt "#30541"
 msgid "Show channel name and video details in description"
@@ -553,12 +552,12 @@ msgid "View all"
 msgstr "Ver todo"
 
 msgctxt "#30563"
-msgid ""
-msgstr " "
+msgid "Plugin execution timeout"
+msgstr ""
 
 msgctxt "#30564"
-msgid ""
-msgstr " "
+msgid "For testing only - forcibly terminate plugin execution after set time limit. Set to 0 seconds (default) to disable."
+msgstr ""
 
 msgctxt "#30565"
 msgid ""
@@ -609,8 +608,8 @@ msgid "Failed"
 msgstr "¡Vaya! Algo ha fallado"
 
 msgctxt "#30577"
-msgid ""
-msgstr " "
+msgid "Smallest (4:3)"
+msgstr ""
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
@@ -649,32 +648,32 @@ msgid "Blacklist"
 msgstr "Lista negra"
 
 msgctxt "#30587"
-msgid "Add to My Subscriptions filter"
-msgstr "Añadir filtro a 'Mis Suscripciones'"
+msgid ""
+msgstr ""
 
 msgctxt "#30588"
-msgid "Remove from My Subscriptions filter"
-msgstr "Borrar filtro de 'Mis Suscripciones'"
+msgid ""
+msgstr ""
 
 msgctxt "#30589"
-msgid "Added to My Subscriptions filter"
-msgstr "Añadido a filtro de 'Mis Suscripciones'"
+msgid ""
+msgstr ""
 
 msgctxt "#30590"
-msgid "Removed from My Subscriptions filter"
-msgstr "Borrado filtro de 'Mis Suscripciones'"
+msgid ""
+msgstr ""
 
 msgctxt "#30591"
 msgid "Thumbnail size"
 msgstr "Tamaño de miniaturas"
 
 msgctxt "#30592"
-msgid "Medium (16:9)"
-msgstr "Medio (16:9)"
+msgid "Small (16:9)"
+msgstr ""
 
 msgctxt "#30593"
-msgid "High (4:3)"
-msgstr "Alto (4:3)"
+msgid "Medium (4:3)"
+msgstr ""
 
 msgctxt "#30594"
 msgid "Safe search"
@@ -689,20 +688,20 @@ msgid "Strict"
 msgstr "Estricto"
 
 msgctxt "#30597"
-msgid "Updated: %s"
-msgstr "Actualizado: %s"
+msgid ""
+msgstr ""
 
 msgctxt "#30598"
-msgid ""
-msgstr " "
+msgid "Large (4:3)"
+msgstr ""
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
 msgstr "Error al habilitar claves API personales. No encontrado: %s"
 
 msgctxt "#30600"
-msgid ""
-msgstr " "
+msgid "Largest (16:9)"
+msgstr ""
 
 msgctxt "#30601"
 msgid "%s with Original/%s fallback"
@@ -753,20 +752,20 @@ msgid "Retry"
 msgstr "Volver a intentarlo"
 
 msgctxt "#30613"
-msgid ""
-msgstr " "
+msgid "Add to %s"
+msgstr ""
 
 msgctxt "#30614"
-msgid ""
-msgstr " "
+msgid "Remove from %s"
+msgstr ""
 
 msgctxt "#30615"
-msgid ""
-msgstr " "
+msgid "Added to %s"
+msgstr ""
 
 msgctxt "#30616"
-msgid ""
-msgstr " "
+msgid "Removed from %s"
+msgstr ""
 
 msgctxt "#30617"
 msgid "InputStream.Adaptive"
@@ -785,8 +784,8 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "El puerto %s ya esta en uso. No se ha podido iniciar el servidor HTTP."
 
 msgctxt "#30621"
-msgid ""
-msgstr " "
+msgid "Verbose"
+msgstr ""
 
 msgctxt "#30622"
 msgid "Purchases"
@@ -977,12 +976,12 @@ msgid "Play count minimum percent"
 msgstr "Porcentaje mínimo para contar como reproducido"
 
 msgctxt "#30669"
-msgid "Mark unwatched"
-msgstr "Marcar como no visto"
+msgid "%s removed"
+msgstr ""
 
 msgctxt "#30670"
-msgid "Mark watched"
-msgstr "Marcar como visto"
+msgid "Added %s"
+msgstr ""
 
 msgctxt "#30671"
 msgid "Clear playback history"
@@ -997,8 +996,8 @@ msgid "playback history"
 msgstr "historial de reproducción"
 
 msgctxt "#30674"
-msgid "Reset resume point"
-msgstr "Restablecer punto de reanudación"
+msgid ""
+msgstr ""
 
 msgctxt "#30675"
 msgid "Use local playback history (watched, resume tracking)"
@@ -1137,12 +1136,12 @@ msgid "Play audio only"
 msgstr "Reproducir sólo audio"
 
 msgctxt "#30709"
-msgid ""
-msgstr " "
+msgid "WebVTT subtitles"
+msgstr ""
 
 msgctxt "#30710"
-msgid ""
-msgstr " "
+msgid "TTML subtitles"
+msgstr ""
 
 msgctxt "#30711"
 msgid ""
@@ -1153,16 +1152,16 @@ msgid "Rate videos in playlists"
 msgstr "Valorar vídeos en listas de reproducción"
 
 msgctxt "#30713"
-msgid "Added to Watch Later"
-msgstr "Añadido a Ver más tarde"
+msgid "Prefer dubbed audio over original audio"
+msgstr ""
 
 msgctxt "#30714"
-msgid "Added to playlist"
-msgstr "Añadido a lista de reproducción"
+msgid "Prefer automatically translated dubbed audio over original audio"
+msgstr ""
 
 msgctxt "#30715"
-msgid "Removed from playlist"
-msgstr "Borrado de la lista de reproducción"
+msgid "Use YouTube internal list for Watch History?[CR][CR]Requires signing-in via the addon and activating history tracking on YouTube."
+msgstr ""
 
 msgctxt "#30716"
 msgid "Liked video"
@@ -1173,8 +1172,8 @@ msgid "Disliked video"
 msgstr "No me gusto el vídeo"
 
 msgctxt "#30718"
-msgid "Rating removed"
-msgstr "Valoración eliminada"
+msgid "Use YouTube internal list for Watch Later?[CR][CR]Requires signing-in via the addon."
+msgstr ""
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
@@ -1185,8 +1184,8 @@ msgid "Unsubscribed from channel"
 msgstr "Desuscrito del canal"
 
 msgctxt "#30721"
-msgid ""
-msgstr " "
+msgid "Enable Panoramic/180/360/VR video"
+msgstr ""
 
 msgctxt "#30722"
 msgid "Enable HDR video"
@@ -1253,8 +1252,8 @@ msgid "Shorts - Max duration"
 msgstr "Cortos - Duración máxima"
 
 msgctxt "#30738"
-msgid ""
-msgstr " "
+msgid "Enable spatial audio"
+msgstr ""
 
 msgctxt "#30739"
 msgid "Subscribers"
@@ -1583,6 +1582,161 @@ msgstr "Reproducir desde el inicio"
 msgctxt "#30820"
 msgid "Podcast"
 msgstr "Podcast"
+
+# empty strings 30019
+#~ msgctxt "#30020"
+#~ msgid "Allow 3D"
+#~ msgstr "Permitir 3D"
+
+#~ msgctxt "#30031"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30108"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30109"
+#~ msgid ""
+#~ msgstr " "
+
+# YouTube
+# empty strings from id 30206 to 30499
+#~ msgctxt "#30500"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30501"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30521"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30522"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30523"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30540"
+#~ msgid "Play with..."
+#~ msgstr "Abrir con..."
+
+#~ msgctxt "#30563"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30564"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30577"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30587"
+#~ msgid "Add to My Subscriptions filter"
+#~ msgstr "Añadir filtro a 'Mis Suscripciones'"
+
+#~ msgctxt "#30588"
+#~ msgid "Remove from My Subscriptions filter"
+#~ msgstr "Borrar filtro de 'Mis Suscripciones'"
+
+#~ msgctxt "#30589"
+#~ msgid "Added to My Subscriptions filter"
+#~ msgstr "Añadido a filtro de 'Mis Suscripciones'"
+
+#~ msgctxt "#30590"
+#~ msgid "Removed from My Subscriptions filter"
+#~ msgstr "Borrado filtro de 'Mis Suscripciones'"
+
+#~ msgctxt "#30592"
+#~ msgid "Medium (16:9)"
+#~ msgstr "Medio (16:9)"
+
+#~ msgctxt "#30593"
+#~ msgid "High (4:3)"
+#~ msgstr "Alto (4:3)"
+
+#~ msgctxt "#30597"
+#~ msgid "Updated: %s"
+#~ msgstr "Actualizado: %s"
+
+#~ msgctxt "#30598"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30600"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30613"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30614"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30615"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30616"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30621"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30669"
+#~ msgid "Mark unwatched"
+#~ msgstr "Marcar como no visto"
+
+#~ msgctxt "#30670"
+#~ msgid "Mark watched"
+#~ msgstr "Marcar como visto"
+
+#~ msgctxt "#30674"
+#~ msgid "Reset resume point"
+#~ msgstr "Restablecer punto de reanudación"
+
+#~ msgctxt "#30709"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30710"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30713"
+#~ msgid "Added to Watch Later"
+#~ msgstr "Añadido a Ver más tarde"
+
+#~ msgctxt "#30714"
+#~ msgid "Added to playlist"
+#~ msgstr "Añadido a lista de reproducción"
+
+#~ msgctxt "#30715"
+#~ msgid "Removed from playlist"
+#~ msgstr "Borrado de la lista de reproducción"
+
+#~ msgctxt "#30718"
+#~ msgid "Rating removed"
+#~ msgstr "Valoración eliminada"
+
+#~ msgctxt "#30721"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30738"
+#~ msgid ""
+#~ msgstr " "
 
 #~ msgctxt "#30545"
 #~ msgid "No further links found."

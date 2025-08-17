@@ -491,6 +491,8 @@ class AbstractContext(object):
                     )
                 elif param in self._STRING_PARAMS:
                     parsed_value = to_str(value)
+                    if parsed_value.startswith('$INFO['):
+                        parsed_value = self.get_infolabel(parsed_value)
                     if param in self._STRING_BOOL_PARAMS:
                         parsed_value = BOOL_FROM_STR.get(
                             parsed_value, parsed_value

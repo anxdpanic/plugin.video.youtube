@@ -236,11 +236,11 @@ class XbmcContextUI(AbstractContextUI):
         value = window.getProperty(_property_id)
         if value:
             window.clearProperty(_property_id)
-        if process:
-            value = process(value)
+            if process:
+                value = process(value)
         if log_value is None:
             log_value = value
-        if log_process:
+        if log_value and log_process:
             log_value = log_process(log_value)
         self.log.debug_trace('Pop property {property_id!r}: {value!r}',
                              property_id=property_id,
