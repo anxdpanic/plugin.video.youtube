@@ -105,10 +105,9 @@ msgctxt "#30019"
 msgid "144p"
 msgstr ""
 
-# empty strings 30019
 msgctxt "#30020"
-msgid "Allow 3D"
-msgstr "Izinkan 3D"
+msgid "Enable Stereoscopic 3D video"
+msgstr ""
 
 msgctxt "#30021"
 msgid "Show fanart"
@@ -151,7 +150,7 @@ msgid "Configure %s?"
 msgstr ""
 
 msgctxt "#30031"
-msgid ""
+msgid "Requests cache size (MB)"
 msgstr ""
 
 msgctxt "#30032"
@@ -217,11 +216,11 @@ msgid "Watch Later"
 msgstr "Nonton Nanti"
 
 msgctxt "#30108"
-msgid ""
+msgid "Enter the name of the bookmark"
 msgstr ""
 
 msgctxt "#30109"
-msgid ""
+msgid "Enter a valid YouTube or plugin URL for the bookmark"
 msgstr ""
 
 msgctxt "#30110"
@@ -301,11 +300,11 @@ msgstr ""
 # YouTube
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
-msgid ""
+msgid "%s failed"
 msgstr ""
 
 msgctxt "#30501"
-msgid ""
+msgid "Edit %s"
 msgstr ""
 
 msgctxt "#30502"
@@ -385,15 +384,15 @@ msgid "Add to..."
 msgstr "Tambahkan ke..."
 
 msgctxt "#30521"
-msgid ""
+msgid "Delete requests cache database"
 msgstr ""
 
 msgctxt "#30522"
-msgid ""
+msgid "Clear requests cache"
 msgstr ""
 
 msgctxt "#30523"
-msgid ""
+msgid "requests cache"
 msgstr ""
 
 msgctxt "#30524"
@@ -461,8 +460,8 @@ msgid "Play recently added"
 msgstr ""
 
 msgctxt "#30540"
-msgid "Play with..."
-msgstr "Putar dengan..."
+msgid ""
+msgstr ""
 
 msgctxt "#30541"
 msgid "Show channel name and video details in description"
@@ -553,11 +552,11 @@ msgid "View all"
 msgstr ""
 
 msgctxt "#30563"
-msgid ""
+msgid "Plugin execution timeout"
 msgstr ""
 
 msgctxt "#30564"
-msgid ""
+msgid "For testing only - forcibly terminate plugin execution after set time limit. Set to 0 seconds (default) to disable."
 msgstr ""
 
 msgctxt "#30565"
@@ -609,7 +608,7 @@ msgid "Failed"
 msgstr "Gagal"
 
 msgctxt "#30577"
-msgid ""
+msgid "Smallest (4:3)"
 msgstr ""
 
 msgctxt "#30578"
@@ -649,32 +648,32 @@ msgid "Blacklist"
 msgstr "Daftar hitam"
 
 msgctxt "#30587"
-msgid "Add to My Subscriptions filter"
-msgstr "Tambahkan ke filter Langgananku"
+msgid ""
+msgstr ""
 
 msgctxt "#30588"
-msgid "Remove from My Subscriptions filter"
-msgstr "Hapus dari filter Langgananku"
+msgid ""
+msgstr ""
 
 msgctxt "#30589"
-msgid "Added to My Subscriptions filter"
-msgstr "Ditambahkan ke filter Langgananku"
+msgid ""
+msgstr ""
 
 msgctxt "#30590"
-msgid "Removed from My Subscriptions filter"
-msgstr "Dihapus dari filter Langgananku"
+msgid ""
+msgstr ""
 
 msgctxt "#30591"
 msgid "Thumbnail size"
 msgstr "Ukuran Thumbnail"
 
 msgctxt "#30592"
-msgid "Medium (16:9)"
-msgstr "Sedang (16:9)"
+msgid "Small (16:9)"
+msgstr ""
 
 msgctxt "#30593"
-msgid "High (4:3)"
-msgstr "Tinggi (4:3)"
+msgid "Medium (4:3)"
+msgstr ""
 
 msgctxt "#30594"
 msgid "Safe search"
@@ -689,11 +688,11 @@ msgid "Strict"
 msgstr "Ketat"
 
 msgctxt "#30597"
-msgid "Updated: %s"
-msgstr "Diperbarui: %s"
+msgid ""
+msgstr ""
 
 msgctxt "#30598"
-msgid ""
+msgid "Large (4:3)"
 msgstr ""
 
 msgctxt "#30599"
@@ -701,7 +700,7 @@ msgid "Failed to enable personal API keys. Missing: %s"
 msgstr "Gagal mengaktifkan kunci API pribadi. Tidak ada: %s"
 
 msgctxt "#30600"
-msgid ""
+msgid "Largest (16:9)"
 msgstr ""
 
 msgctxt "#30601"
@@ -753,19 +752,19 @@ msgid "Retry"
 msgstr "Coba lagi"
 
 msgctxt "#30613"
-msgid ""
+msgid "Add to %s"
 msgstr ""
 
 msgctxt "#30614"
-msgid ""
+msgid "Remove from %s"
 msgstr ""
 
 msgctxt "#30615"
-msgid ""
+msgid "Added to %s"
 msgstr ""
 
 msgctxt "#30616"
-msgid ""
+msgid "Removed from %s"
 msgstr ""
 
 msgctxt "#30617"
@@ -785,7 +784,7 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "Port %s sudah digunakan. Tidak dapat memulai server http."
 
 msgctxt "#30621"
-msgid ""
+msgid "Verbose"
 msgstr ""
 
 msgctxt "#30622"
@@ -977,12 +976,12 @@ msgid "Play count minimum percent"
 msgstr "Mainkan menghitung persentase minimum"
 
 msgctxt "#30669"
-msgid "Mark unwatched"
-msgstr "Tandai belum ditonton"
+msgid "%s removed"
+msgstr ""
 
 msgctxt "#30670"
-msgid "Mark watched"
-msgstr "Tandai ditonton"
+msgid "Added %s"
+msgstr ""
 
 msgctxt "#30671"
 msgid "Clear playback history"
@@ -997,8 +996,8 @@ msgid "playback history"
 msgstr "riwayat pemutaran"
 
 msgctxt "#30674"
-msgid "Reset resume point"
-msgstr "Setel ulang titik resume"
+msgid ""
+msgstr ""
 
 msgctxt "#30675"
 msgid "Use local playback history (watched, resume tracking)"
@@ -1137,11 +1136,11 @@ msgid "Play audio only"
 msgstr "Putar hanya audio"
 
 msgctxt "#30709"
-msgid ""
+msgid "WebVTT subtitles"
 msgstr ""
 
 msgctxt "#30710"
-msgid ""
+msgid "TTML subtitles"
 msgstr ""
 
 msgctxt "#30711"
@@ -1153,16 +1152,16 @@ msgid "Rate videos in playlists"
 msgstr "Beri nilai video dalam daftar putar"
 
 msgctxt "#30713"
-msgid "Added to Watch Later"
-msgstr "Ditambahkan ke Tonton Nanti"
+msgid "Prefer dubbed audio over original audio"
+msgstr ""
 
 msgctxt "#30714"
-msgid "Added to playlist"
-msgstr "Ditambahkan ke daftar putar"
+msgid "Prefer automatically translated dubbed audio over original audio"
+msgstr ""
 
 msgctxt "#30715"
-msgid "Removed from playlist"
-msgstr "Dihapus dari daftar putar"
+msgid "Use YouTube internal list for Watch History?[CR][CR]Requires signing-in via the addon and activating history tracking on YouTube."
+msgstr ""
 
 msgctxt "#30716"
 msgid "Liked video"
@@ -1173,8 +1172,8 @@ msgid "Disliked video"
 msgstr "Video tak disukai"
 
 msgctxt "#30718"
-msgid "Rating removed"
-msgstr "Nilai dihapus"
+msgid "Use YouTube internal list for Watch Later?[CR][CR]Requires signing-in via the addon."
+msgstr ""
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
@@ -1185,7 +1184,7 @@ msgid "Unsubscribed from channel"
 msgstr "Berhenti berlangganan dari saluran"
 
 msgctxt "#30721"
-msgid ""
+msgid "Enable Panoramic/180/360/VR video"
 msgstr ""
 
 msgctxt "#30722"
@@ -1253,7 +1252,7 @@ msgid "Shorts - Max duration"
 msgstr ""
 
 msgctxt "#30738"
-msgid ""
+msgid "Enable spatial audio"
 msgstr ""
 
 msgctxt "#30739"
@@ -1583,6 +1582,71 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+# empty strings 30019
+#~ msgctxt "#30020"
+#~ msgid "Allow 3D"
+#~ msgstr "Izinkan 3D"
+
+#~ msgctxt "#30540"
+#~ msgid "Play with..."
+#~ msgstr "Putar dengan..."
+
+#~ msgctxt "#30587"
+#~ msgid "Add to My Subscriptions filter"
+#~ msgstr "Tambahkan ke filter Langgananku"
+
+#~ msgctxt "#30588"
+#~ msgid "Remove from My Subscriptions filter"
+#~ msgstr "Hapus dari filter Langgananku"
+
+#~ msgctxt "#30589"
+#~ msgid "Added to My Subscriptions filter"
+#~ msgstr "Ditambahkan ke filter Langgananku"
+
+#~ msgctxt "#30590"
+#~ msgid "Removed from My Subscriptions filter"
+#~ msgstr "Dihapus dari filter Langgananku"
+
+#~ msgctxt "#30592"
+#~ msgid "Medium (16:9)"
+#~ msgstr "Sedang (16:9)"
+
+#~ msgctxt "#30593"
+#~ msgid "High (4:3)"
+#~ msgstr "Tinggi (4:3)"
+
+#~ msgctxt "#30597"
+#~ msgid "Updated: %s"
+#~ msgstr "Diperbarui: %s"
+
+#~ msgctxt "#30669"
+#~ msgid "Mark unwatched"
+#~ msgstr "Tandai belum ditonton"
+
+#~ msgctxt "#30670"
+#~ msgid "Mark watched"
+#~ msgstr "Tandai ditonton"
+
+#~ msgctxt "#30674"
+#~ msgid "Reset resume point"
+#~ msgstr "Setel ulang titik resume"
+
+#~ msgctxt "#30713"
+#~ msgid "Added to Watch Later"
+#~ msgstr "Ditambahkan ke Tonton Nanti"
+
+#~ msgctxt "#30714"
+#~ msgid "Added to playlist"
+#~ msgstr "Ditambahkan ke daftar putar"
+
+#~ msgctxt "#30715"
+#~ msgid "Removed from playlist"
+#~ msgstr "Dihapus dari daftar putar"
+
+#~ msgctxt "#30718"
+#~ msgid "Rating removed"
+#~ msgstr "Nilai dihapus"
 
 #~ msgctxt "#30545"
 #~ msgid "No further links found."
