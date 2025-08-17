@@ -84,7 +84,7 @@ class XbmcPlugin(AbstractPlugin):
         path = context.get_path().rstrip('/')
 
         route = ui.pop_property(REROUTE_PATH)
-        post_run_action = None
+        post_run_actions = []
         succeeded = False
         for was_busy in (ui.pop_property(BUSY_FLAG),):
             if was_busy:
@@ -115,8 +115,10 @@ class XbmcPlugin(AbstractPlugin):
             if not playing:
                 logging.warning('Multiple busy dialogs active'
                                 ' - Plugin call ended to avoid Kodi crash')
-                result, post_run_action = self.uri_action(context, uri)
+                result, _post_run_action = self.uri_action(context, uri)
                 succeeded = result
+                if _post_run_action:
+                    post_run_actions.append(_post_run_action)
                 continue
 
             if position:
@@ -156,18 +158,20 @@ class XbmcPlugin(AbstractPlugin):
                                   ' - Playback restart failed, retrying...')
                     command = playlist_player.play_playlist_item(position,
                                                                  defer=True)
-                    result, post_run_action = self.uri_action(
+                    result, _post_run_action = self.uri_action(
                         context,
                         command,
                     )
                     succeeded = False
+                    if _post_run_action:
+                        post_run_actions.append(_post_run_action)
                     break
                 context.sleep(1)
             else:
                 playlist_player.play_playlist_item(position)
         else:
-            if post_run_action:
-                self.post_run(context, ui, post_run_action)
+            if post_run_actions:
+                self.post_run(context, ui, *post_run_actions)
             return succeeded
 
         if ui.get_property(PLUGIN_SLEEPING):
@@ -294,10 +298,12 @@ class XbmcPlugin(AbstractPlugin):
                     force_play = options.get(provider.FORCE_PLAY)
 
                 if force_play or not result_item.playable:
-                    result_item, post_run_action = self.uri_action(
+                    result_item, _post_run_action = self.uri_action(
                         context,
                         result_item.get_uri()
                     )
+                    if _post_run_action:
+                        post_run_actions.append(_post_run_action)
                 else:
                     item = self._PLAY_ITEM_MAP[item_type](
                         context,
@@ -359,10 +365,8 @@ class XbmcPlugin(AbstractPlugin):
                             context,
                             'command://Action(Back)',
                         )
-                if post_run_action and _post_run_action:
-                    post_run_action = [post_run_action, _post_run_action]
-                else:
-                    post_run_action = _post_run_action
+                if _post_run_action:
+                    post_run_actions.append(_post_run_action)
 
         if ui.pop_property(PLAY_FORCED):
             context.set_path(PATHS.PLAY)
@@ -383,10 +387,9 @@ class XbmcPlugin(AbstractPlugin):
         if container and position:
             context.send_notification(CONTAINER_FOCUS, [container, position])
 
-        if isinstance(post_run_action, list):
-            self.post_run(context, ui, *post_run_action)
-        elif post_run_action:
-            self.post_run(context, ui, post_run_action)
+
+        if post_run_actions:
+            self.post_run(context, ui, *post_run_actions)
         return succeeded
 
     @staticmethod
@@ -401,7 +404,17 @@ class XbmcPlugin(AbstractPlugin):
                     break
                 context.sleep(0.1)
             else:
-                context.execute(action)
+                if isinstance(action, tuple):
+                    action, action_kwargs = action
+                else:
+                    action_kwargs = None
+                if callable(action):
+                    if action_kwargs:
+                        action(**action_kwargs)
+                    else:
+                        action()
+                else:
+                    context.execute(action)
 
     @staticmethod
     def uri_action(context, uri):
