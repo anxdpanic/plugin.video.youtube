@@ -360,7 +360,7 @@ class XbmcPlugin(AbstractPlugin):
                             'command://Action(Back)',
                         )
                 if post_run_action and _post_run_action:
-                    post_run_action = (post_run_action, _post_run_action)
+                    post_run_action = [post_run_action, _post_run_action]
                 else:
                     post_run_action = _post_run_action
 
@@ -383,7 +383,7 @@ class XbmcPlugin(AbstractPlugin):
         if container and position:
             context.send_notification(CONTAINER_FOCUS, [container, position])
 
-        if isinstance(post_run_action, tuple):
+        if isinstance(post_run_action, list):
             self.post_run(context, ui, *post_run_action)
         elif post_run_action:
             self.post_run(context, ui, post_run_action)
@@ -399,7 +399,7 @@ class XbmcPlugin(AbstractPlugin):
                     logging.error('Multiple busy dialogs active'
                                   ' - Post run action unable to execute')
                     break
-                context.sleep(1)
+                context.sleep(0.1)
             else:
                 context.execute(action)
 
