@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -12,11 +12,11 @@ from __future__ import absolute_import, division, unicode_literals
 
 from functools import partial
 
-from . import UrlResolver, UrlToItemConverter, tv, utils, v3
-from ...kodion import KodionException
+from . import UrlResolver, UrlToItemConverter, utils, v3
+from ...kodion import KodionException, logging
 from ...kodion.constants import CONTENT, PATHS
 from ...kodion.items import DirectoryItem, UriItem
-from ...kodion.utils import strip_html_from_text
+from ...kodion.utils.convert_format import strip_html_from_text
 
 
 def _process_related_videos(provider, context, client):
@@ -107,25 +107,37 @@ def _process_recommendations(provider, context, client):
     function_cache = context.get_function_cache()
     refresh = context.refresh_requested()
     params = context.get_params()
-    # source = client.get_recommended_for_home_tv
-    source = client.get_recommended_for_home_vr
+
+    browse_id = 'FEwhat_to_watch'
+    # browse_client = 'tv'
+    # browse_paths = client.JSON_PATHS['tv_shelf_horizontal']
+    browse_client = 'android_vr'
+    browse_paths = client.JSON_PATHS['vr_shelf']
 
     json_data = function_cache.run(
-        source,
+        client.get_browse_items,
         function_cache.ONE_HOUR,
         _refresh=refresh,
-        visitor=params.get('visitor'),
+        browse_id=browse_id,
+        client=browse_client,
+        do_auth=True,
         page_token=params.get('page_token'),
         click_tracking=params.get('click_tracking'),
+        visitor=params.get('visitor'),
+        json_path=browse_paths,
     )
     if not json_data:
         return False, None
 
     filler = partial(
         function_cache.run,
-        source,
+        client.get_browse_items,
         function_cache.ONE_HOUR,
         _refresh=refresh,
+        browse_id=browse_id,
+        client=browse_client,
+        do_auth=True,
+        json_path=browse_paths,
     )
     json_data['_pre_filler'] = filler
     json_data['_post_filler'] = filler
@@ -147,25 +159,13 @@ def _process_recommendations(provider, context, client):
 
 
 def _process_trending(provider, context, client):
-    function_cache = context.get_function_cache()
-    refresh = context.refresh_requested()
-
-    json_data = function_cache.run(
-        client.get_trending_videos,
-        function_cache.ONE_HOUR,
-        _refresh=refresh,
+    json_data = client.get_trending_videos(
         page_token=context.get_param('page_token'),
     )
     if not json_data:
         return False, None
 
-    filler = partial(
-        function_cache.run,
-        client.get_trending_videos,
-        function_cache.ONE_HOUR,
-        _refresh=refresh,
-    )
-    json_data['_post_filler'] = filler
+    json_data['_post_filler'] = client.get_trending_videos
 
     result = v3.response_to_items(provider, context, json_data)
     options = {
@@ -285,11 +285,11 @@ def _process_description_links(provider, context):
                 res_urls.append(resolved_url)
 
                 if progress_dialog.is_aborted():
-                    context.log_debug('Resolving urls aborted')
+                    logging.debug('Resolving urls aborted')
                     break
 
             url_to_item_converter = UrlToItemConverter()
-            url_to_item_converter.add_urls(res_urls, context)
+            url_to_item_converter.process_urls(res_urls, context)
             result = url_to_item_converter.get_items(provider, context)
 
         if not result:
@@ -325,13 +325,15 @@ def _process_description_links(provider, context):
                 ),
                 channel_id=channel_id,
             )
-            channel_id_dict[channel_id] = channel_item
+            channel_items = channel_id_dict.setdefault(channel_id, [])
+            channel_items.append(channel_item)
 
         utils.update_channel_items(provider, context, channel_id_dict)
 
         # clean up - remove empty entries
         result = [channel_item
-                  for channel_item in channel_id_dict.values()
+                  for channel_items in channel_id_dict.values()
+                  for channel_item in channel_items
                   if channel_item.get_name()]
         if not result:
             return False, None
@@ -362,7 +364,8 @@ def _process_description_links(provider, context):
                 ),
                 playlist_id=playlist_id,
             )
-            playlist_id_dict[playlist_id] = playlist_item
+            playlist_items = playlist_id_dict.setdefault(playlist_id, [])
+            playlist_items.append(playlist_item)
 
         channel_items_dict = {}
         utils.update_playlist_items(provider,
@@ -373,7 +376,8 @@ def _process_description_links(provider, context):
 
         # clean up - remove empty entries
         result = [playlist_item
-                  for playlist_item in playlist_id_dict.values()
+                  for playlist_items in playlist_id_dict.values()
+                  for playlist_item in playlist_items
                   if playlist_item.get_name()]
         if not result:
             return False, None
@@ -399,19 +403,48 @@ def _process_description_links(provider, context):
     if playlist_ids:
         return _display_playlists(playlist_ids)
 
-    context.log_error('Missing video_id or playlist_ids for description links')
+    logging.error('Missing video_id or playlist_ids for description links')
     return False, None
 
 
-def _process_saved_playlists_tv(provider, context, client):
-    json_data = client.get_saved_playlists(
-        page_token=context.get_param('next_page_token', 0),
-        offset=context.get_param('offset', 0)
+def _process_saved_playlists(provider, context, client):
+    params = context.get_params()
+
+    browse_id = 'FEplaylist_aggregation'
+    browse_response_type = 'playlists'
+    browse_client = 'tv'
+    browse_paths = client.JSON_PATHS['tv_grid']
+
+    json_data = client.get_browse_items(
+        browse_id=browse_id,
+        client=browse_client,
+        response_type=browse_response_type,
+        do_auth=True,
+        page_token=params.get('page_token'),
+        click_tracking=params.get('click_tracking'),
+        visitor=params.get('visitor'),
+        json_path=browse_paths,
     )
     if not json_data:
         return False, None
 
-    result = tv.saved_playlists_to_items(provider, context, json_data)
+    filler = partial(
+        client.get_browse_items,
+        browse_id=browse_id,
+        client=browse_client,
+        response_type=browse_response_type,
+        do_auth=True,
+        json_path=browse_paths,
+    )
+    json_data['_pre_filler'] = filler
+    json_data['_post_filler'] = filler
+
+    result = v3.response_to_items(
+        provider,
+        context,
+        json_data,
+        allow_duplicates=False,
+    )
     options = {
         provider.CONTENT_TYPE: {
             'content_type': CONTENT.LIST_CONTENT,
@@ -427,8 +460,9 @@ def _process_my_subscriptions(provider,
                               client,
                               filtered=False,
                               feed_type=None,
-                              _feed_types={'videos', 'shorts', 'live'}):
-    logged_in = provider.is_logged_in()
+                              _feed_types=frozenset((
+                                      'videos', 'shorts', 'live'
+                              ))):
     refresh = context.refresh_requested()
 
     if feed_type not in _feed_types:
@@ -441,10 +475,12 @@ def _process_my_subscriptions(provider,
     ) as progress_dialog:
         json_data = client.get_my_subscriptions(
             page_token=context.get_param('page', 1),
-            logged_in=logged_in,
             do_filter=filtered,
             feed_type=feed_type,
             refresh=refresh,
+            force_cache=(not refresh
+                         and refresh is not False
+                         and refresh is not None),
             progress_dialog=progress_dialog,
         )
         if not json_data:
@@ -452,11 +488,10 @@ def _process_my_subscriptions(provider,
 
         filler = partial(
             client.get_my_subscriptions,
-            logged_in=logged_in,
             do_filter=filtered,
             feed_type=feed_type,
             refresh=refresh,
-            use_cache=True,
+            force_cache=True,
             progress_dialog=progress_dialog,
         )
         json_data['_post_filler'] = filler
@@ -507,16 +542,55 @@ def _process_my_subscriptions(provider,
                 'live_folder': True,
                 'shorts': True,
             } if feed_type == 'live' else {
-                'live': False,
+                'live_folder': True,
                 'shorts': True,
-                'upcoming_live': False,
-            } if feed_type == 'shorts' else {
-                'live': False,
-                'shorts': True,
-                'upcoming_live': False,
-            }
+                'vod': True,
+            },
         ))
         return result, options
+
+
+def _process_virtual_list(provider, context, _client, playlist_id=None):
+    params = context.get_params()
+
+    playlist_id = playlist_id or params.get('playlist_id')
+    if not playlist_id:
+        return False, None
+    playlist_id = playlist_id.upper()
+    context.parse_params({
+        'channel_id': 'mine',
+        'playlist_id': playlist_id,
+    })
+
+    resource_manager = provider.get_resource_manager(context)
+    json_data = resource_manager.get_playlist_items(
+        batch_id=(playlist_id, 0),
+        page_token=params.get('page_token'),
+    )
+    if not json_data:
+        return False, None
+
+    filler = partial(
+        resource_manager.get_playlist_items,
+        batch_id=(playlist_id, 0),
+    )
+    json_data['_pre_filler'] = filler
+    json_data['_post_filler'] = filler
+
+    result = v3.response_to_items(
+        provider,
+        context,
+        json_data,
+        allow_duplicates=False,
+    )
+    options = {
+        provider.CONTENT_TYPE: {
+            'content_type': CONTENT.VIDEO_CONTENT,
+            'sub_type': None,
+            'category_label': None,
+        },
+    }
+    return result, options
 
 
 def process(provider, context, re_match=None, category=None, sub_category=None):
@@ -526,7 +600,6 @@ def process(provider, context, re_match=None, category=None, sub_category=None):
         if sub_category is None:
             sub_category = re_match.group('sub_category')
 
-    # required for provider.is_logged_in()
     client = provider.get_client(context)
 
     if category == 'related_videos':
@@ -551,7 +624,7 @@ def process(provider, context, re_match=None, category=None, sub_category=None):
         )
 
     if category == 'disliked_videos':
-        if provider.is_logged_in():
+        if client.logged_in:
             return _process_disliked_videos(provider, context, client)
         return UriItem(context.create_uri(('sign', 'in')))
 
@@ -577,6 +650,9 @@ def process(provider, context, re_match=None, category=None, sub_category=None):
         return _process_comments(provider, context, client)
 
     if category == 'saved_playlists':
-        return _process_saved_playlists_tv(provider, context, client)
+        return _process_saved_playlists(provider, context, client)
+
+    if category == 'playlist':
+        return _process_virtual_list(provider, context, client, sub_category)
 
     raise KodionException('YouTube special category "%s" not found' % category)

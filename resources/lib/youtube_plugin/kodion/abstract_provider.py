@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -11,10 +11,11 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from re import (
-    UNICODE as re_UNICODE,
+    UNICODE,
     compile as re_compile,
 )
 
+from . import logging
 from .constants import (
     CHECK_SETTINGS,
     CONTAINER_ID,
@@ -27,6 +28,7 @@ from .constants import (
     WINDOW_REPLACE,
     WINDOW_RETURN,
 )
+from .debug import ExecTimeout
 from .exceptions import KodionException
 from .items import (
     DirectoryItem,
@@ -35,10 +37,12 @@ from .items import (
     SearchHistoryItem,
     UriItem,
 )
-from .utils import format_stack, to_unicode
+from .utils.convert_format import to_unicode
 
 
 class AbstractProvider(object):
+    log = logging.getLogger(__name__)
+
     CACHE_TO_DISC = 'provider_cache_to_disc'  # type: bool
     FALLBACK = 'provider_fallback'  # type: bool | str
     FORCE_PLAY = 'provider_force_play'  # type: bool
@@ -78,13 +82,13 @@ class AbstractProvider(object):
         self.register_path(r''.join((
             '^',
             PATHS.WATCH_LATER,
-            '/(?P<command>add|clear|list|play|remove)/?$'
+            '/(?P<command>add|clear|list|play|remove)?/?$'
         )), self.on_watch_later)
 
         self.register_path(r''.join((
             '^',
             PATHS.BOOKMARKS,
-            '/(?P<command>add|clear|list|play|remove)/?$'
+            '/(?P<command>add|add_custom|clear|edit|list|play|remove)?/?$'
         )), self.on_bookmarks)
 
         self.register_path(r''.join((
@@ -96,7 +100,7 @@ class AbstractProvider(object):
         self.register_path(r''.join((
             '^',
             PATHS.HISTORY,
-            '/(?P<command>clear|list|mark_unwatched|mark_watched|play|remove|reset_resume)/?$'
+            '/(?P<command>clear|list|mark_as|mark_unwatched|mark_watched|play|remove|reset_resume)?/?$'
         )), self.on_playback_history)
 
         self.register_path(r'(?P<path>.*\/)extrafanart\/([\?#].+)?$',
@@ -119,7 +123,7 @@ class AbstractProvider(object):
                 if not callable(func):
                     return None
 
-            cls._dict_path[re_compile(re_path, re_UNICODE)] = func
+            cls._dict_path[re_compile(re_path, UNICODE)] = func
             return command
 
         if command:
@@ -132,7 +136,7 @@ class AbstractProvider(object):
         ui = context.get_ui()
 
         settings_state = {'state': 'defer'}
-        context.wakeup(CHECK_SETTINGS, timeout=5, payload=settings_state)
+        context.ipc_exec(CHECK_SETTINGS, timeout=5, payload=settings_state)
 
         if last_run and last_run > 1:
             self.pre_run_wizard_step(provider=self, context=context)
@@ -145,8 +149,8 @@ class AbstractProvider(object):
         try:
             if wizard_steps and ui.on_yes_no_input(
                     ' - '.join((localize('youtube'), localize('setup_wizard'))),
-                    (localize('setup_wizard.prompt')
-                     % localize('setup_wizard.prompt.settings'))
+                    localize(('setup_wizard.prompt.x',
+                              'setup_wizard.prompt.settings')),
             ):
                 for wizard_step in wizard_steps:
                     if callable(wizard_step):
@@ -160,7 +164,7 @@ class AbstractProvider(object):
             settings = context.get_settings(refresh=True)
             settings.setup_wizard_enabled(False)
             settings_state['state'] = 'process'
-            context.wakeup(CHECK_SETTINGS, timeout=5, payload=settings_state)
+            context.ipc_exec(CHECK_SETTINGS, timeout=5, payload=settings_state)
 
     @staticmethod
     def get_wizard_steps():
@@ -178,6 +182,17 @@ class AbstractProvider(object):
             re_match = re_path.search(path)
             if not re_match:
                 continue
+
+            exec_limit = context.get_settings().exec_limit()
+            if exec_limit:
+                handler = ExecTimeout(
+                    seconds=exec_limit,
+                    # log_only=True,
+                    # trace_opcodes=True,
+                    # trace_threads=True,
+                    log_locals=(-15, None),
+                    callback=None,
+                )(handler)
 
             options = {
                 self.CACHE_TO_DISC: True,
@@ -279,7 +294,7 @@ class AbstractProvider(object):
             path, params = uri
 
         if not path:
-            context.log_error('Rerouting - No route path')
+            self.log.error_trace('No route path')
             return False
         elif path.startswith(PATHS.ROUTE):
             path = path[len(PATHS.ROUTE):]
@@ -292,17 +307,17 @@ class AbstractProvider(object):
         if window_fallback:
             container_uri = context.get_infolabel('Container.FolderPath')
             if context.is_plugin_path(container_uri):
-                context.log_debug('Rerouting - Fallback route not required')
+                self.log.debug('Rerouting - Fallback route not required')
                 return False, {self.FALLBACK: False}
 
         container = None
         position = None
-        refresh = params.get('refresh', 0)
+        refresh = context.refresh_requested(params=params)
         if (refresh or (
                 params == current_params
                 and path.rstrip('/') == current_path.rstrip('/')
         )):
-            if refresh < 0:
+            if refresh and refresh < 0:
                 del params['refresh']
             else:
                 container = context.get_infolabel('System.CurrentControlId')
@@ -315,76 +330,66 @@ class AbstractProvider(object):
 
         ui = context.get_ui()
         result = None
-        try:
-            if window_cache:
-                function_cache = context.get_function_cache()
-                with ui.on_busy():
-                    result, options = function_cache.run(
-                        self.navigate,
-                        _refresh=True,
-                        _scope=function_cache.SCOPE_NONE,
-                        context=context.clone(path, params),
-                    )
-        except Exception as exc:
-            context.log_error('Rerouting - Error'
-                              '\n\tException: {exc!r}'
-                              '\n\tStack trace (most recent call last):\n{stack}'
-                              .format(exc=exc,
-                                      stack=format_stack()))
-        finally:
-            uri = context.create_uri(path, params)
-            if result or not window_cache:
-                context.log_debug('Rerouting - Success'
-                                  '\n\tURI:      {uri}'
-                                  '\n\tCache:    |{window_cache}|'
-                                  '\n\tFallback: |{window_fallback}|'
-                                  '\n\tReplace:  |{window_replace}|'
-                                  '\n\tReturn:   |{window_return}|'
-                                  .format(uri=uri,
-                                          window_cache=window_cache,
-                                          window_fallback=window_fallback,
-                                          window_replace=window_replace,
-                                          window_return=window_return))
-            else:
-                context.log_debug('Rerouting - No results'
-                                  '\n\tURI: {uri}'
-                                  .format(uri=uri))
+        uri = context.create_uri(path, params)
+        if window_cache:
+            function_cache = context.get_function_cache()
+            with ui.on_busy():
+                result, options = function_cache.run(
+                    self.navigate,
+                    _refresh=True,
+                    _scope=function_cache.SCOPE_NONE,
+                    context=context.clone(path, params),
+                )
+            if not result:
+                self.log.debug(('No results', 'URI: %s'), uri)
                 return False
 
-            reroute_path = ui.get_property(REROUTE_PATH)
-            if reroute_path:
-                return True
+        self.log.debug(('Success',
+                        'URI:      {uri}',
+                        'Cache:    {window_cache!r}',
+                        'Fallback: {window_fallback!r}',
+                        'Replace:  {window_replace!r}',
+                        'Return:   {window_return!r}'),
+                       uri=uri,
+                       window_cache=window_cache,
+                       window_fallback=window_fallback,
+                       window_replace=window_replace,
+                       window_return=window_return)
 
-            if window_cache:
-                ui.set_property(REROUTE_PATH, path)
-                if container and position:
-                    ui.set_property(CONTAINER_ID, container)
-                    ui.set_property(CONTAINER_POSITION, position)
+        reroute_path = ui.get_property(REROUTE_PATH)
+        if reroute_path:
+            return True
 
-            action = ''.join((
-                'ReplaceWindow' if window_replace else 'ActivateWindow',
-                '(Videos,',
-                uri,
-                ',return)' if window_return else ')',
-            ))
+        if window_cache:
+            ui.set_property(REROUTE_PATH, path)
+            if container and position:
+                ui.set_property(CONTAINER_ID, container)
+                ui.set_property(CONTAINER_POSITION, position)
 
-            timeout = 30
-            while ui.busy_dialog_active():
-                timeout -= 1
-                if timeout < 0:
-                    context.log_warning('Multiple busy dialogs active'
-                                        ' - Rerouting workaround')
-                    return UriItem('command://{0}'.format(action))
-                context.sleep(1)
-            else:
-                context.execute(
-                    action,
-                    # wait=True,
-                    # wait_for=(REROUTE_PATH if window_cache else None),
-                    # wait_for_set=False,
-                    # block_ui=True,
-                )
-                return True
+        action = ''.join((
+            'ReplaceWindow' if window_replace else 'ActivateWindow',
+            '(Videos,',
+            uri,
+            ',return)' if window_return else ')',
+        ))
+
+        timeout = 30
+        while ui.busy_dialog_active():
+            timeout -= 1
+            if timeout < 0:
+                self.log.warning('Multiple busy dialogs active'
+                                 ' - Rerouting workaround')
+                return UriItem('command://{0}'.format(action))
+            context.sleep(1)
+        else:
+            context.execute(
+                action,
+                # wait=True,
+                # wait_for=(REROUTE_PATH if window_cache else None),
+                # wait_for_set=False,
+                # block_ui=True,
+            )
+            return True
 
     @staticmethod
     def on_bookmarks(provider, context, re_match):
@@ -425,18 +430,16 @@ class AbstractProvider(object):
             query = to_unicode(params.get('q', ''))
             if not ui.on_yes_no_input(
                     localize('content.remove'),
-                    localize('content.remove.check') % query,
+                    localize('content.remove.check.x', query),
             ):
                 return False, None
 
             search_history.del_item(query)
             ui.refresh_container()
 
-            ui.show_notification(
-                localize('removed') % query,
-                time_ms=2500,
-                audible=False,
-            )
+            ui.show_notification(localize('removed.name.x', query),
+                                 time_ms=2500,
+                                 audible=False)
             return True, None
 
         if command == 'rename':
@@ -444,27 +447,27 @@ class AbstractProvider(object):
             result, new_query = ui.on_keyboard_input(
                 localize('search.rename'), query
             )
-            if result:
-                search_history.del_item(query)
-                search_history.add_item(new_query)
-                ui.refresh_container()
+            if not result:
+                return False, None
+
+            search_history.del_item(query)
+            search_history.add_item(new_query)
+            ui.refresh_container()
             return True, None
 
         if command == 'clear':
             if not ui.on_yes_no_input(
                     localize('search.clear'),
-                    localize('content.clear.check') % localize('search.history')
+                    localize(('content.clear.check.x', 'search.history'))
             ):
                 return False, None
 
             search_history.clear()
             ui.refresh_container()
 
-            ui.show_notification(
-                localize('completed'),
-                time_ms=2500,
-                audible=False,
-            )
+            ui.show_notification(localize('completed'),
+                                 time_ms=2500,
+                                 audible=False)
             return True, None
 
         if command == 'links':

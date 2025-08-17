@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -11,7 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from .base_item import BaseItem
-from ..compatibility import unescape, urlencode
+from ..compatibility import parse_qsl, unescape, urlencode, urlsplit
 
 
 class DirectoryItem(BaseItem):
@@ -22,20 +22,35 @@ class DirectoryItem(BaseItem):
                  fanart=None,
                  plot=None,
                  action=False,
+                 special_sort=None,
+                 date_time=None,
                  category_label=None,
+                 bookmark_id=None,
                  channel_id=None,
                  playlist_id=None,
-                 subscription_id=None):
-        super(DirectoryItem, self).__init__(name, uri, image, fanart)
+                 subscription_id=None,
+                 **kwargs):
+        super(DirectoryItem, self).__init__(
+            name=name,
+            uri=uri,
+            image=image,
+            fanart=fanart,
+            **kwargs
+        )
         name = self.get_name()
         self._category_label = None
         self.set_category_label(category_label or name)
         self._plot = plot or name
         self._is_action = action
+        self._bookmark_id = bookmark_id
         self._channel_id = channel_id
         self._playlist_id = playlist_id
         self._subscription_id = subscription_id
         self._next_page = False
+        if special_sort is not None:
+            self.set_special_sort(special_sort)
+        if date_time is not None:
+            self.set_date_from_datetime(date_time=date_time)
 
     def set_name(self, name, category_label=None):
         name = super(DirectoryItem, self).set_name(name)
@@ -50,19 +65,15 @@ class DirectoryItem(BaseItem):
             return
 
         current_label = self._category_label
-        if current_label:
-            if current_label != label:
-                uri = self.get_uri()
-                self.set_uri(uri.replace(
-                    urlencode({'category_label': current_label}),
-                    urlencode({'category_label': label}) if label else '',
-                ))
-        elif label:
-            uri = self.get_uri()
-            self.set_uri(('&' if '?' in uri else '?').join((
-                uri,
-                urlencode({'category_label': label}),
-            )))
+        if current_label or label and current_label != label:
+            uri = urlsplit(self.get_uri())
+            params = dict(parse_qsl(uri.query))
+            if label:
+                params['category_label'] = label
+            else:
+                del params['category_label']
+            self.set_uri(uri._replace(query=urlencode(params)).geturl())
+
         self._category_label = label
 
     def get_category_label(self):

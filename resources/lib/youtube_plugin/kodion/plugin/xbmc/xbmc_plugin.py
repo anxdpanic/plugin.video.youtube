@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -11,6 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from ..abstract_plugin import AbstractPlugin
+from ... import logging
 from ...compatibility import string_type, xbmc, xbmcgui, xbmcplugin
 from ...constants import (
     BUSY_FLAG,
@@ -23,6 +24,7 @@ from ...constants import (
     PLAYER_VIDEO_ID,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
+    PLAY_CANCELLED,
     PLAY_FORCED,
     PLAY_FORCE_AUDIO,
     PLUGIN_SLEEPING,
@@ -30,6 +32,8 @@ from ...constants import (
     REFRESH_CONTAINER,
     RELOAD_ACCESS_MANAGER,
     REROUTE_PATH,
+    SYNC_LISTITEM,
+    TRAKT_PAUSE_FLAG,
     VIDEO_ID,
     WINDOW_FALLBACK,
     WINDOW_REPLACE,
@@ -44,12 +48,13 @@ from ...items import (
     playback_item,
     uri_listitem,
 )
-from ...utils import format_stack, parse_and_redact_uri
+from ...utils.redact import parse_and_redact_uri
 
 
 class XbmcPlugin(AbstractPlugin):
     _LIST_ITEM_MAP = {
         'AudioItem': media_listitem,
+        'BookmarkItem': directory_listitem,
         'CommandItem': directory_listitem,
         'DirectoryItem': directory_listitem,
         'ImageItem': image_listitem,
@@ -63,6 +68,7 @@ class XbmcPlugin(AbstractPlugin):
 
     _PLAY_ITEM_MAP = {
         'AudioItem': playback_item,
+        'BookmarkItem': playback_item,
         'UriItem': uri_listitem,
         'VideoItem': playback_item,
     }
@@ -74,8 +80,11 @@ class XbmcPlugin(AbstractPlugin):
         handle = context.get_handle()
         ui = context.get_ui()
 
+        uri = context.get_uri()
+        path = context.get_path().rstrip('/')
+
         route = ui.pop_property(REROUTE_PATH)
-        post_run_action = None
+        post_run_actions = []
         succeeded = False
         for was_busy in (ui.pop_property(BUSY_FLAG),):
             if was_busy:
@@ -86,17 +95,15 @@ class XbmcPlugin(AbstractPlugin):
             else:
                 break
 
-            uri = context.get_uri()
             playlist_player = context.get_playlist_player()
             position, remaining = playlist_player.get_position()
-            playing = (playlist_player.is_playing()
-                       and context.is_plugin_path(uri, PATHS.PLAY))
+            playing = path == PATHS.PLAY and playlist_player.is_playing()
 
             if playing:
                 items = playlist_player.get_items()
                 playlist_player.clear()
-                context.log_warning('Multiple busy dialogs active'
-                                    ' - Playlist cleared to avoid Kodi crash')
+                logging.warning('Multiple busy dialogs active'
+                                ' - Playlist cleared to avoid Kodi crash')
 
             xbmcplugin.endOfDirectory(
                 handle,
@@ -106,10 +113,12 @@ class XbmcPlugin(AbstractPlugin):
             )
 
             if not playing:
-                context.log_warning('Multiple busy dialogs active'
-                                    ' - Plugin call ended to avoid Kodi crash')
-                result, post_run_action = self.uri_action(context, uri)
+                logging.warning('Multiple busy dialogs active'
+                                ' - Plugin call ended to avoid Kodi crash')
+                result, _post_run_action = self.uri_action(context, uri)
                 succeeded = result
+                if _post_run_action:
+                    post_run_actions.append(_post_run_action)
                 continue
 
             if position:
@@ -127,13 +136,13 @@ class XbmcPlugin(AbstractPlugin):
             while ui.busy_dialog_active():
                 timeout -= 1
                 if timeout < 0:
-                    context.log_error('Multiple busy dialogs active'
-                                      ' - Extended busy period')
+                    logging.error('Multiple busy dialogs active'
+                                  ' - Extended busy period')
                     break
                 context.sleep(1)
 
-            context.log_warning('Multiple busy dialogs active'
-                                ' - Reloading playlist...')
+            logging.warning('Multiple busy dialogs active'
+                            ' - Reloading playlist...')
 
             num_items = playlist_player.add_items(items)
             if position:
@@ -145,26 +154,28 @@ class XbmcPlugin(AbstractPlugin):
             while ui.busy_dialog_active() or playlist_player.size() < position:
                 timeout -= 1
                 if timeout < 0:
-                    context.log_error('Multiple busy dialogs active'
-                                      ' - Playback restart failed, retrying...')
+                    logging.error('Multiple busy dialogs active'
+                                  ' - Playback restart failed, retrying...')
                     command = playlist_player.play_playlist_item(position,
                                                                  defer=True)
-                    result, post_run_action = self.uri_action(
+                    result, _post_run_action = self.uri_action(
                         context,
                         command,
                     )
                     succeeded = False
+                    if _post_run_action:
+                        post_run_actions.append(_post_run_action)
                     break
                 context.sleep(1)
             else:
                 playlist_player.play_playlist_item(position)
         else:
-            if post_run_action:
-                self.post_run(context, ui, post_run_action)
+            if post_run_actions:
+                self.post_run(context, ui, *post_run_actions)
             return succeeded
 
         if ui.get_property(PLUGIN_SLEEPING):
-            context.wakeup(PLUGIN_WAKEUP)
+            context.ipc_exec(PLUGIN_WAKEUP)
 
         if ui.pop_property(RELOAD_ACCESS_MANAGER):
             context.reload_access_manager()
@@ -187,34 +198,41 @@ class XbmcPlugin(AbstractPlugin):
             else:
                 result, options = provider.navigate(context)
                 if ui.get_property(REROUTE_PATH):
-                    return
+                    xbmcplugin.endOfDirectory(
+                        handle,
+                        succeeded=False,
+                        updateListing=True,
+                        cacheToDisc=False,
+                    )
+                    return False
         except KodionException as exc:
             result = None
             options = {}
             if not provider.handle_exception(context, exc):
-                msg = ('XbmcRunner.run - Error'
-                       '\n\tException: {exc!r}'
-                       '\n\tStack trace (most recent call last):\n{stack}'
-                       .format(exc=exc,
-                               stack=format_stack()))
-                context.log_error(msg)
+                logging.exception('Error')
                 ui.on_ok('Error in ContentProvider', exc.__str__())
 
-        if not ui.pop_property(REFRESH_CONTAINER) and forced:
+        if not ui.pop_property(REFRESH_CONTAINER, as_bool=True) and forced:
             player_video_id = ui.pop_property(PLAYER_VIDEO_ID)
             if player_video_id:
                 focused_video_id = None
                 played_video_id = player_video_id
             else:
-                focused_video_id = ui.get_property(VIDEO_ID)
+                focused_video_id = None if route else ui.get_property(VIDEO_ID)
                 played_video_id = None
         else:
             focused_video_id = None
             played_video_id = None
+        sync_items = (focused_video_id, played_video_id)
 
-        items = isinstance(result, (list, tuple))
-        item_count = 0
-        if items:
+        play_cancelled = ui.pop_property(PLAY_CANCELLED)
+        if play_cancelled:
+            result = None
+
+        force_resolve = options.get(provider.FORCE_RESOLVE)
+        result_item = None
+        items = None
+        if isinstance(result, (list, tuple)):
             if not result:
                 result = [
                     CommandItem(
@@ -226,50 +244,39 @@ class XbmcPlugin(AbstractPlugin):
                     )
                 ]
 
-            force_resolve = provider.FORCE_RESOLVE
-            if not options.pop(force_resolve, False):
-                force_resolve = False
+            items = []
+            for item in result:
+                item_type = item.__class__.__name__
 
-            items = [
-                self._LIST_ITEM_MAP[item.__class__.__name__](
+                if (force_resolve
+                        and not result_item
+                        and item_type in self._PLAY_ITEM_MAP
+                        and item.playable):
+                    result_item = item
+
+                listitem_type = self._LIST_ITEM_MAP.get(item_type)
+                if (not listitem_type
+                        or (listitem_type == directory_listitem
+                            and not item.available)):
+                    continue
+
+                items.append(listitem_type(
                     context,
                     item,
                     show_fanart=show_fanart,
-                    focused=focused_video_id,
-                    played=played_video_id,
-                )
-                for item in result
-                if self.classify_list_item(item, options, force_resolve)
-            ]
-            item_count = len(items)
+                    to_sync=sync_items,
+                ))
+        else:
+            result_item = result
 
-            if force_resolve:
-                result = options.get(force_resolve)
-
-        if result and result.__class__.__name__ in self._PLAY_ITEM_MAP:
-            if options.get(provider.FORCE_PLAY) or not result.playable:
-                result, post_run_action = self.uri_action(
-                    context,
-                    result.get_uri()
-                )
-            else:
-                item = self._PLAY_ITEM_MAP[result.__class__.__name__](
-                    context,
-                    result,
-                    show_fanart=show_fanart,
-                )
-                xbmcplugin.setResolvedUrl(
-                    handle, succeeded=True, listitem=item
-                )
-
-        if item_count:
+        if items:
             content_type = options.get(provider.CONTENT_TYPE)
             if content_type:
                 context.apply_content(**content_type)
             else:
                 context.apply_content()
             succeeded = xbmcplugin.addDirectoryItems(
-                handle, items, item_count
+                handle, items, len(items)
             )
             cache_to_disc = options.get(provider.CACHE_TO_DISC, True)
             update_listing = options.get(provider.UPDATE_LISTING, False)
@@ -277,74 +284,89 @@ class XbmcPlugin(AbstractPlugin):
             fallback = options.get(provider.FALLBACK)
             if not fallback or fallback != ui.get_property(provider.FALLBACK):
                 ui.clear_property(provider.FALLBACK)
-
-            # set alternative view mode
-            view_manager = ui.get_view_manager()
-            if view_manager.is_override_view_enabled():
-                view_mode = view_manager.get_view_mode()
-                if view_mode is not None:
-                    context.log_debug('Override view mode to "%d"' % view_mode)
-                    context.execute('Container.SetViewMode(%d)' % view_mode)
         else:
             succeeded = bool(result)
-            if not succeeded:
-                ui.clear_property(BUSY_FLAG)
-                for param in FORCE_PLAY_PARAMS:
-                    ui.clear_property(param)
-
-                uri = context.get_uri()
-                fallback = options.get(provider.FALLBACK, True)
-                if isinstance(fallback, string_type) and fallback != uri:
-                    context.parse_uri(fallback, update=True)
-                    return self.run(provider, context, forced=forced)
-                if fallback:
-                    _post_run_action = None
-
-                    if context.is_plugin_folder():
-                        if context.is_plugin_path(
-                                uri, PATHS.PLAY
-                        ):
-                            context.send_notification(
-                                PLAYBACK_FAILED,
-                                {'video_id': context.get_param('video_id')},
-                            )
-                            # None of the following will actually prevent the
-                            # playback attempt from occurring
-                            item = xbmcgui.ListItem(path=uri, offscreen=True)
-                            item.setContentLookup(False)
-                            props = {
-                                'isPlayable': 'false',
-                                'ForceResolvePlugin': 'true',
-                            }
-                            item.setProperties(props)
-                            xbmcplugin.setResolvedUrl(
-                                handle,
-                                succeeded=False,
-                                listitem=item,
-                            )
-                        elif context.is_plugin_path(
-                                context.get_infolabel('Container.FolderPath')
-                        ):
-                            _, _post_run_action = self.uri_action(
-                                context,
-                                context.get_parent_uri(params={
-                                    WINDOW_FALLBACK: True,
-                                    WINDOW_REPLACE: True,
-                                    WINDOW_RETURN: False,
-                                }),
-                            )
-                        else:
-                            _, _post_run_action = self.uri_action(
-                                context,
-                                'command://Action(Back)',
-                            )
-                    if post_run_action and _post_run_action:
-                        post_run_action = (post_run_action, _post_run_action)
-                    else:
-                        post_run_action = _post_run_action
-
             cache_to_disc = options.get(provider.CACHE_TO_DISC, False)
             update_listing = options.get(provider.UPDATE_LISTING, True)
+
+        if result_item:
+            item_type = result_item.__class__.__name__
+            if item_type in self._PLAY_ITEM_MAP:
+                if path != PATHS.PLAY and not forced:
+                    force_play = True
+                else:
+                    force_play = options.get(provider.FORCE_PLAY)
+
+                if force_play or not result_item.playable:
+                    result_item, _post_run_action = self.uri_action(
+                        context,
+                        result_item.get_uri()
+                    )
+                    if _post_run_action:
+                        post_run_actions.append(_post_run_action)
+                else:
+                    item = self._PLAY_ITEM_MAP[item_type](
+                        context,
+                        result_item,
+                        show_fanart=show_fanart,
+                    )
+                    xbmcplugin.setResolvedUrl(
+                        handle, succeeded=True, listitem=item
+                    )
+        elif not items:
+            ui.clear_property(BUSY_FLAG)
+            ui.clear_property(TRAKT_PAUSE_FLAG, raw=True)
+            for param in FORCE_PLAY_PARAMS:
+                ui.clear_property(param)
+
+            fallback = options.get(provider.FALLBACK, True)
+            if isinstance(fallback, string_type) and fallback != uri:
+                context.parse_uri(fallback, update=True)
+                return self.run(provider, context, forced=forced)
+            if fallback:
+                _post_run_action = None
+
+                if play_cancelled:
+                    _, _post_run_action = self.uri_action(context, uri)
+                elif path == PATHS.PLAY:
+                    context.send_notification(
+                        PLAYBACK_FAILED,
+                        {'video_id': context.get_param('video_id')},
+                    )
+                    # None of the following will actually prevent the
+                    # playback attempt from occurring
+                    item = xbmcgui.ListItem(path=uri, offscreen=True)
+                    item.setContentLookup(False)
+                    props = {
+                        'isPlayable': 'false',
+                        'ForceResolvePlugin': 'true',
+                    }
+                    item.setProperties(props)
+                    xbmcplugin.setResolvedUrl(
+                        handle,
+                        succeeded=False,
+                        listitem=item,
+                    )
+                # elif context.is_plugin_folder():
+                else:
+                    if context.is_plugin_path(
+                            context.get_infolabel('Container.FolderPath')
+                    ):
+                        _, _post_run_action = self.uri_action(
+                            context,
+                            context.get_parent_uri(params={
+                                WINDOW_FALLBACK: True,
+                                WINDOW_REPLACE: True,
+                                WINDOW_RETURN: False,
+                            }),
+                        )
+                    else:
+                        _, _post_run_action = self.uri_action(
+                            context,
+                            'command://Action(Back)',
+                        )
+                if _post_run_action:
+                    post_run_actions.append(_post_run_action)
 
         if ui.pop_property(PLAY_FORCED):
             context.set_path(PATHS.PLAY)
@@ -357,15 +379,46 @@ class XbmcPlugin(AbstractPlugin):
             cacheToDisc=cache_to_disc,
         )
 
+        if any(sync_items):
+            context.send_notification(SYNC_LISTITEM, sync_items)
+
         container = ui.pop_property(CONTAINER_ID)
         position = ui.pop_property(CONTAINER_POSITION)
         if container and position:
             context.send_notification(CONTAINER_FOCUS, [container, position])
 
-        if isinstance(post_run_action, tuple):
-            self.post_run(context, ui, *post_run_action)
-        elif post_run_action:
-            self.post_run(context, ui, post_run_action)
+        # set alternative view mode
+        view_manager = ui.get_view_manager()
+        if view_manager.is_override_view_enabled():
+            post_run_actions.append((
+                view_manager.apply_view_mode,
+                {
+                    'context': context,
+                },
+            ))
+
+        sort_method = context.get_param('sort_method')
+        if sort_method is not None:
+            post_run_actions.append((
+                view_manager.apply_sort_method,
+                {
+                    'context': context,
+                    'sort_method': sort_method,
+                },
+            ))
+
+        sort_order = context.get_param('sort_order')
+        if sort_order is not None:
+            post_run_actions.append((
+                view_manager.apply_sort_order,
+                {
+                    'context': context,
+                    'sort_order': sort_order,
+                },
+            ))
+
+        if post_run_actions:
+            self.post_run(context, ui, *post_run_actions)
         return succeeded
 
     @staticmethod
@@ -375,12 +428,22 @@ class XbmcPlugin(AbstractPlugin):
             while ui.busy_dialog_active():
                 timeout -= 1
                 if timeout < 0:
-                    context.log_error('Multiple busy dialogs active'
-                                      ' - Post run action unable to execute')
+                    logging.error('Multiple busy dialogs active'
+                                  ' - Post run action unable to execute')
                     break
-                context.sleep(1)
+                context.sleep(0.1)
             else:
-                context.execute(action)
+                if isinstance(action, tuple):
+                    action, action_kwargs = action
+                else:
+                    action_kwargs = None
+                if callable(action):
+                    if action_kwargs:
+                        action(**action_kwargs)
+                    else:
+                        action()
+                else:
+                    context.execute(action)
 
     @staticmethod
     def uri_action(context, uri):
@@ -444,7 +507,7 @@ class XbmcPlugin(AbstractPlugin):
 
         elif context.is_plugin_path(uri, PATHS.PLAY):
             parts, params, log_uri, _ = parse_and_redact_uri(uri)
-            if params.get('action') == 'list':
+            if params.get('action', [None])[0] == 'list':
                 log_action = 'Redirecting to'
                 action = context.create_uri(
                     (PATHS.ROUTE, parts.path.rstrip('/')),
@@ -479,21 +542,5 @@ class XbmcPlugin(AbstractPlugin):
             result = False
             return result, action
 
-        context.log_debug(''.join((
-            log_action,
-            ': |',
-            log_uri,
-            '|',
-        )))
+        logging.debug('{action}: {uri!r}', action=log_action, uri=log_uri)
         return result, action
-
-    def classify_list_item(self, item, options, force_resolve):
-        item_type = item.__class__.__name__
-        listitem_type = self._LIST_ITEM_MAP.get(item_type)
-        if force_resolve and item_type in self._PLAY_ITEM_MAP:
-            options.setdefault(force_resolve, item)
-        if listitem_type:
-            if listitem_type == directory_listitem:
-                return item.available
-            return True
-        return False

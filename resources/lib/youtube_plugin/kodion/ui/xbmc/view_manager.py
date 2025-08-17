@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -10,11 +10,14 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from ... import logging
 from ...compatibility import xbmc
-from ...constants import CONTENT
+from ...constants import CONTENT, SORT
 
 
 class ViewManager(object):
+    log = logging.getLogger(__name__)
+
     SETTINGS = {
         'override': 'kodion.view.override',  # (bool)
         'view_default': 'kodion.view.default',  # (int)
@@ -176,12 +179,17 @@ class ViewManager(object):
             status = localize(self.STRING_MAP['supported_skin'])
         else:
             status = localize(self.STRING_MAP['unsupported_skin'])
-        prompt_text = localize(self.STRING_MAP['prompt']) % (skin_id, status)
+        prompt_text = localize(self.STRING_MAP['prompt'], (skin_id, status))
 
         step += 1
         if context.get_ui().on_yes_no_input(
-                localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
-                localize('setup_wizard.prompt') % prompt_text,
+                '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                    youtube=localize('youtube'),
+                    setup_wizard=localize('setup_wizard'),
+                    step=step,
+                    steps=steps,
+                ),
+                localize('setup_wizard.prompt.x', prompt_text)
         ):
             for view_type in self.SUPPORTED_TYPES_MAP:
                 self.update_view_mode(skin_id, view_type)
@@ -206,30 +214,27 @@ class ViewManager(object):
 
     def update_view_mode(self, skin_id, view_type='default'):
         view_id = -1
-        log_info = self._context.log_info
         settings = self._context.get_settings()
         ui = self._context.get_ui()
 
         content_type = self.SUPPORTED_TYPES_MAP[view_type]
 
         if content_type not in self.STRING_MAP:
-            log_info('ViewManager: Unsupported content type |{content_type}|'
-                     .format(content_type=content_type))
-            return
+            self.log.warning('Unsupported content type %r', content_type)
+            return False
         title = self._context.localize(self.STRING_MAP[content_type])
 
         view_setting = self.SETTINGS['view_type'].format(content_type)
         current_value = settings.get_int(view_setting)
         if current_value == -1:
-            log_info('ViewManager: No setting for content type |{content_type}|'
-                     .format(content_type=content_type))
+            self.log.warning('No setting for content type %r', content_type)
             return False
 
         skin_data = self.SKIN_DATA.get(skin_id, {})
         view_type_data = skin_data.get(view_type) or skin_data.get(content_type)
         if view_type_data:
             items = []
-            preselect = None
+            preselect = -1
             for view_data in view_type_data:
                 view_id = view_data['id']
                 items.append((view_data['name'], view_id))
@@ -237,8 +242,7 @@ class ViewManager(object):
                     preselect = len(items) - 1
             view_id = ui.on_select(title, items, preselect=preselect)
         else:
-            log_info('ViewManager: Unsupported view |{view_type}|'
-                     .format(view_type=view_type))
+            self.log.warning('Unsupported view %r', view_type)
 
         if view_id == -1:
             result, view_id = ui.on_numeric_input(title, current_value)
@@ -251,3 +255,46 @@ class ViewManager(object):
             return True
 
         return False
+
+    def apply_view_mode(self, context):
+        view_mode = self.get_view_mode()
+        if view_mode is None:
+            return
+
+        self.log.debug(('Setting view mode', 'Mode: %s'), view_mode)
+        context.execute('Container.SetViewMode(%s)' % view_mode)
+
+    @classmethod
+    def apply_sort_method(cls, context, sort_method):
+        _sort_method = context.get_infolabel('Container.SortMethod')
+        _sort_id = SORT.SORT_METHOD_MAPPING.get(_sort_method)
+        if not context.get_infobool('Container.SortMethod(%s)' % _sort_id):
+            cls.log.warning(('Current sort method mismatch',
+                             'Method: {sort_method}',
+                             'ID:     {sort_id}'),
+                            sort_method=_sort_method,
+                            sort_id=_sort_id)
+            return
+
+        sort_id = SORT.SORT_METHOD_MAPPING.get(sort_method)
+        if sort_id is None:
+            cls.log.warning(('Unknown sort method',
+                             'Method: {sort_method}'),
+                            sort_method=sort_method)
+            return
+
+        cls.log.debug(('Setting sort method',
+                       'Method: {sort_method}',
+                       'ID:     {sort_id}'),
+                      sort_method=sort_method,
+                      sort_id=sort_id)
+        context.execute('Container.SetSortMethod(%s)' % sort_id)
+
+    @classmethod
+    def apply_sort_order(cls, context, sort_order):
+        if not context.get_infobool('Container.SortDirection(%s)' % sort_order):
+            cls.log.debug('Setting sort order: %s', sort_order)
+            # This builtin should be Container.SortDirection but has been broken
+            # since Kodi v16
+            # https://github.com/xbmc/xbmc/commit/ac870b64b16dfd0fc2bd0496c14529cf6d563f41
+            context.execute('Container.SetSortDirection')

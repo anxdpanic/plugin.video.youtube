@@ -138,9 +138,11 @@
                         - no HFR at max quality
                         - no fractional framerate hinting
                         - no framerate hinting
+                        - spatial audio
                         - alternate sorting of unselected codecs
+                        - ttml subtitles
                     -->
-                    <default>avc1,vp9,av01,hdr,hfr,vorbis,mp4a,ssa,ac-3,ec-3,dts,filter</default>
+                    <default>avc1,vp9,av01,hdr,hfr,3d,vr,prefer_dub,prefer_auto_dub,vorbis,mp4a,ssa,ac-3,ec-3,dts,vtt,filter</default>
                     <constraints>
                         <options>
                             <option label="30727">avc1</option>
@@ -151,6 +153,10 @@
                             <option label="30768">no_hfr_max</option>
                             <option label="30771">no_frac_fr_hint</option>
                             <option label="30772">no_fr_hint</option>
+                            <option label="30020">3d</option>
+                            <option label="30721">vr</option>
+                            <option label="30713">prefer_dub</option>
+                            <option label="30714">prefer_auto_dub</option>
                             <option label="30750">vorbis</option>
                             <option label="30751">opus</option>
                             <option label="30752">mp4a</option>
@@ -158,6 +164,9 @@
                             <option label="30754">ac-3</option>
                             <option label="30755">ec-3</option>
                             <option label="30756">dts</option>
+                            <option label="30738">spa</option>
+                            <option label="30709">vtt</option>
+                            <option label="30710">ttml</option>
                             <option label="30757">filter</option>
                             <option label="30729">alt_sort</option>
                         </options>
@@ -690,7 +699,7 @@
                 </setting>
                 <setting id="kodion.live_stream.selection.1" type="integer" label="30689" help="30690">
                     <level>0</level>
-                    <default>3</default>  <!-- isa_mpd -->
+                    <default>2</default>  <!-- isa_hls -->
                     <constraints>
                         <options>
                             <option label="30740">0</option>  <!-- mpegts -->
@@ -736,7 +745,7 @@
                 </setting>
                 <setting id="kodion.cache.size" type="integer" label="30024" help="">
                     <level>0</level>
-                    <default>20</default>
+                    <default>50</default>
                     <constraints>
                         <minimum>5</minimum>
                         <step>1</step>
@@ -860,9 +869,12 @@
                     <default>1</default>  <!-- High (4:3) -->
                     <constraints>
                         <options>
-                            <option label="30592">0</option>  <!-- Medium (16:9) -->
-                            <option label="30593">1</option>  <!-- High (4:3) -->
-                            <option label="20049">2</option>  <!-- Best available -->
+                            <option label="30577">3</option>  <!-- Smallest (4:3) (default) -->
+                            <option label="30592">0</option>  <!-- Small (16:9) (mqdefault) -->
+                            <option label="30593">1</option>  <!-- Medium (4:3) (hqdefault) -->
+                            <option label="30598">4</option>  <!-- Large (4:3) (sddefault) -->
+                            <option label="30600">5</option>  <!-- Largest (16:9) (hq720) -->
+                            <option label="20049">2</option>  <!-- Best available (maxresdefault) -->
                         </options>
                     </constraints>
                     <control format="string" type="spinner"/>
@@ -1026,6 +1038,18 @@
                         <formatlabel>14045</formatlabel>
                     </control>
                 </setting>
+                <setting id="requests.cache.size" type="integer" label="30031" help="">
+                    <level>0</level>
+                    <default>20</default>
+                    <constraints>
+                        <minimum>5</minimum>
+                        <step>1</step>
+                        <maximum>100</maximum>
+                    </constraints>
+                    <control format="integer" type="slider">
+                        <popup>false</popup>
+                    </control>
+                </setting>
                 <setting id="requests.proxy.source" type="integer" label="713" help="36380">
                     <level>0</level>
                     <default>1</default>  <!-- Kodi proxy -->
@@ -1168,18 +1192,32 @@
                     <control type="toggle"/>
                 </setting>
             </group>
-            <group id="logging" label="14092">
-                <setting id="kodion.logging.level" type="integer" label="20191" help="36392">
+            <group id="debug" label="14260">
+                <setting id="kodion.debug.log.level" type="integer" label="20191" help="36392">
                     <level>0</level>
                     <default>0</default>
                     <constraints>
                         <options>
                             <option label="13106">0</option> <!-- Disabled -->
                             <option label="305">1</option>   <!-- Enabled -->
-                            <option label="666">2</option>   <!-- Component specific -->
+                            <option label="30621">2</option> <!-- Verbose -->
+                            <!-- <option label="666">4</option> -->   <!-- Component specific -->
                         </options>
                     </constraints>
                     <control format="string" type="spinner"/>
+                </setting>
+                <setting id="kodion.debug.exec.limit" type="integer" label="30563" help="30564">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>
+                        <minimum>0</minimum>
+                        <step>1</step>
+                        <maximum>60</maximum>
+                    </constraints>
+                    <control format="integer" type="slider">
+                        <popup>False</popup>
+                        <formatlabel>14045</formatlabel>
+                    </control>
                 </setting>
             </group>
         </category>
@@ -1199,6 +1237,14 @@
                         <allowempty>true</allowempty>
                     </constraints>
                     <data>RunScript($ID,maintenance/clear?target=data_cache)</data>
+                    <control format="action" type="button"/>
+                </setting>
+                <setting id="kodion.maintain.clear.requests_cache" type="action" label="30522" help="">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <data>RunScript($ID,maintenance/clear?target=requests_cache)</data>
                     <control format="action" type="button"/>
                 </setting>
                 <setting id="kodion.maintain.clear.search_history" type="action" label="30556" help="">
@@ -1257,6 +1303,14 @@
                         <allowempty>true</allowempty>
                     </constraints>
                     <data>RunScript($ID,maintenance/delete?target=data_cache)</data>
+                    <control format="action" type="button"/>
+                </setting>
+                <setting id="kodion.maintain.delete.requests_cache" type="action" label="30521" help="">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <data>RunScript($ID,maintenance/delete?target=requests_cache)</data>
                     <control format="action" type="button"/>
                 </setting>
                 <setting id="kodion.maintain.delete.search_history" type="action" label="30554" help="">

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="7.2.0.3" provider-name="anxdpanic, bromix, MoojMidge">
+<addon id="plugin.video.youtube" name="YouTube" version="7.3.0+beta.1" provider-name="anxdpanic, bromix, MoojMidge">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.requests" version="2.27.1"/>
@@ -108,7 +108,7 @@
         <disclaimer lang="sk_SK">Tento doplnok nie je schválený spoločnosťou Google</disclaimer>
         <disclaimer lang="sv_SE">Denna insticksmodul är inte godkänd av Google</disclaimer>
         <disclaimer lang="tr_TR">Bu eklenti Google tarafından üretilmemiştir</disclaimer>
-        <disclaimer lang="uk_UA">Цей плагін не має відношення до компанії Google</disclaimer>
+        <disclaimer lang="uk_UA">Цей додаток не має відношення до компанії Google</disclaimer>
         <disclaimer lang="vi_VN">Plugin này không được xác nhận bởi Google</disclaimer>
         <disclaimer lang="zh_CN">此插件未被谷歌认可</disclaimer>
         <disclaimer lang="zh_TW">此附加元件未由Google支持</disclaimer>

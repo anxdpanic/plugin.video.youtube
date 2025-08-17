@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -12,31 +12,32 @@ from __future__ import absolute_import, division, unicode_literals
 
 import json
 from datetime import date, datetime
-from hashlib import md5
 
 from .menu_items import separator
 from ..compatibility import (
     datetime_infolabel,
-    parse_qsl,
     string_type,
     to_str,
     unescape,
-    urlsplit,
 )
 from ..constants import MEDIA_PATH
+from ..utils.methods import generate_hash
 
 
 class BaseItem(object):
     _version = 3
     _playable = False
 
-    def __init__(self, name, uri, image=None, fanart=None):
+    def __init__(self, name, uri, image=None, fanart=None, **kwargs):
+        super(BaseItem, self).__init__()
         self._name = None
         self.set_name(name)
 
         self._uri = uri
         self._available = True
         self._callback = None
+        self._filter_reason = None
+        self._special_sort = None
 
         self._image = ''
         if image:
@@ -60,67 +61,54 @@ class BaseItem(object):
         self._artists = None
         self._studios = None
 
+    def __str_parts__(self, as_dict=False):
+        kwargs = {
+            'type': self.__class__.__name__,
+            'name': self._name,
+            'uri': self._uri,
+            'available': self._available,
+            'added': self._added_utc,
+            'filtered': self._filter_reason,
+        }
+        if as_dict:
+            return kwargs
+        out = (
+            '{type}(',
+            'name={name!r}, ',
+            'uri={uri!r}, ',
+            'available={available!r}, ',
+            'added=\'{added!s}\', ',
+            'filtered={filtered!r})',
+        )
+        return out, kwargs
+
     def __str__(self):
-        return ('{type}(name="{name}", uri="{uri}", image="{image}")'
-                .format(type=self.__class__.__name__,
-                        name=self._name,
-                        uri=self._uri,
-                        image=self._image))
+        out, kwargs = self.__str_parts__()
+        return ''.join(out).format(**kwargs)
+
+    def __repr_data__(self):
+        return {'type': self.__class__.__name__, 'data': self.__dict__}
 
     def __repr__(self):
         return json.dumps(
-            {'type': self.__class__.__name__, 'data': self.__dict__},
+            self.__repr_data__(),
             ensure_ascii=False,
             cls=_Encoder
         )
+
+    @staticmethod
+    def generate_id(*args, **kwargs):
+        prefix = kwargs.get('prefix')
+        if prefix:
+            return '%s.%s' % (prefix, generate_hash(*args))
+        return generate_hash(*args)
 
     def get_id(self):
         """
         Returns a unique id of the item.
         :return: unique id of the item.
         """
-        return md5(''.join((self._name, self._uri)).encode('utf-8')).hexdigest()
-
-    def parse_item_ids_from_uri(self):
-        if not self._uri:
-            return None
-
-        item_ids = {}
-
-        uri = urlsplit(self._uri)
-        path = uri.path.rstrip('/')
-        params = dict(parse_qsl(uri.query))
-
-        video_id = params.get('video_id')
-        if video_id:
-            item_ids['video_id'] = video_id
-
-        channel_id = None
-        playlist_id = None
-
-        while path:
-            part, _, next_part = path.partition('/')
-            if not next_part:
-                break
-
-            if part == 'channel':
-                channel_id = next_part.partition('/')[0]
-            elif part == 'playlist':
-                playlist_id = next_part.partition('/')[0]
-            path = next_part
-
-        if channel_id:
-            item_ids['channel_id'] = channel_id
-        if playlist_id:
-            item_ids['playlist_id'] = playlist_id
-
-        for item_id, value in item_ids.items():
-            try:
-                setattr(self, item_id, value)
-            except AttributeError:
-                pass
-
-        return item_ids
+        return self.generate_id(self._name, self._uri)
 
     def set_name(self, name):
         try:
@@ -161,7 +149,7 @@ class BaseItem(object):
 
     @callback.setter
     def callback(self, value):
-        self._callback = value
+        self._callback = value.__get__(self) if callable(value) else None
 
     def set_image(self, image):
         if not image:
@@ -342,6 +330,18 @@ class BaseItem(object):
 
     def get_track_number(self):
         return self._track_number
+
+    def set_filter_reason(self, reason):
+        self._filter_reason = reason
+
+    def get_filter_reason(self):
+        return self._filter_reason
+
+    def set_special_sort(self, position):
+        self._special_sort = position
+
+    def get_special_sort(self):
+        return self._special_sort
 
 
 class _Encoder(json.JSONEncoder):

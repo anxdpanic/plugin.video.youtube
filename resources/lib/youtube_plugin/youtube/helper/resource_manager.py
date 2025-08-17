@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -10,13 +10,19 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from itertools import chain
+
 from .utils import get_thumbnail
+from ...kodion import logging
 
 
 class ResourceManager(object):
-    def __init__(self, provider, context, progress_dialog=None):
+    log = logging.getLogger(__name__)
+
+    def __init__(self, provider, context, client, progress_dialog=None):
         self._provider = provider
         self._context = context
+        self._client = client
         self._progress_dialog = progress_dialog
 
         self.new_data = {}
@@ -31,8 +37,8 @@ class ResourceManager(object):
         self._channel_fanart = fanart_type == settings.FANART_CHANNEL
         self._thumb_size = settings.get_thumbnail_size()
 
-    def context_changed(self, context):
-        return self._context != context
+    def context_changed(self, context, client):
+        return self._context != context or self._client != client
 
     def update_progress_dialog(self, progress_dialog):
         old_progress_dialog = self._progress_dialog
@@ -53,10 +59,18 @@ class ResourceManager(object):
 
     def get_channels(self, ids, suppress_errors=False, defer_cache=False):
         context = self._context
-        client = self._provider.get_client(context)
+        client = self._client
         data_cache = context.get_data_cache()
         function_cache = context.get_function_cache()
+
         refresh = context.refresh_requested()
+        forced_cache = not function_cache.run(
+            client.internet_available,
+            function_cache.ONE_MINUTE * 5,
+            _refresh=refresh,
+        )
+        refresh = not forced_cache and refresh
+
         updated = []
         handles = {}
         for identifier in ids:
@@ -82,18 +96,23 @@ class ResourceManager(object):
         if refresh or not ids:
             result = {}
         else:
-            result = data_cache.get_items(ids, data_cache.ONE_DAY)
+            result = data_cache.get_items(
+                ids,
+                None if forced_cache else data_cache.ONE_DAY,
+                memory_store=self.new_data,
+            )
         to_update = [id_ for id_ in ids
-                     if id_ not in result
-                     or not result[id_]
-                     or result[id_].get('_partial')]
+                     if id_
+                     and (id_ not in result
+                          or not result[id_]
+                          or result[id_].get('_partial'))]
 
         if result:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_channels'
-                ' - Using cached data for {num} channel(s)'
-                '\n\tChannel IDs: {ids}'
-                .format(num=len(result), ids=list(result))
+            self.log.debugging and self.log.debug(
+                ('Using cached data for {num} channel(s)',
+                 'Channel IDs: {ids}'),
+                num=len(result),
+                ids=list(result),
             )
             if self._progress_dialog:
                 self._progress_dialog.update(steps=len(result) - len(to_update))
@@ -118,11 +137,11 @@ class ResourceManager(object):
             new_data = None
 
         if new_data:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_channels'
-                ' - Retrieved new data for {num} channel(s)'
-                '\n\tChannel IDs: {ids}'
-                .format(num=len(to_update), ids=to_update)
+            self.log.debugging and self.log.debug(
+                ('Retrieved new data for {num} channel(s)',
+                 'Channel IDs: {ids}'),
+                num=len(to_update),
+                ids=to_update,
             )
             result.update(new_data)
             self.cache_data(new_data, defer=defer_cache)
@@ -144,37 +163,52 @@ class ResourceManager(object):
                          suppress_errors=False,
                          defer_cache=False):
         context = self._context
+        client = self._client
+        function_cache = context.get_function_cache()
+
         refresh = context.refresh_requested()
+        forced_cache = not function_cache.run(
+            client.internet_available,
+            function_cache.ONE_MINUTE * 5,
+            _refresh=refresh,
+        )
+        refresh = not forced_cache and refresh
+
         if not refresh and channel_data:
             result = channel_data
         else:
             result = {}
 
         to_check = [id_ for id_ in ids
-                    if id_ not in result
-                    or not result[id_]
-                    or result[id_].get('_partial')]
+                    if id_
+                    and (id_ not in result
+                         or not result[id_]
+                         or result[id_].get('_partial'))]
         if to_check:
             data_cache = context.get_data_cache()
-            result.update(data_cache.get_items(to_check, data_cache.ONE_MONTH))
+            result.update(data_cache.get_items(
+                to_check,
+                None if forced_cache else data_cache.ONE_MONTH,
+                memory_store=self.new_data,
+            ))
         to_update = [id_ for id_ in ids
-                     if id_ not in result
-                     or not result[id_]
-                     or result[id_].get('_partial')]
+                     if id_
+                     and (id_ not in result
+                          or not result[id_]
+                          or result[id_].get('_partial'))]
 
         if result:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_channel_info'
-                ' - Using cached data for {num} channel(s)'
-                '\n\tChannel IDs: {ids}'
-                .format(num=len(result), ids=list(result))
+            self.log.debugging and self.log.debug(
+                ('Using cached data for {num} channel(s)',
+                 'Channel IDs: {ids}'),
+                num=len(result),
+                ids=list(result),
             )
             if self._progress_dialog:
                 self._progress_dialog.update(steps=len(result) - len(to_update))
 
         if to_update:
             notify_and_raise = not suppress_errors
-            client = self._provider.get_client(context)
             new_data = [client.get_channels(list_of_50,
                                             max_results=50,
                                             notify=notify_and_raise,
@@ -193,11 +227,11 @@ class ResourceManager(object):
             new_data = None
 
         if new_data:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_channel_info'
-                ' - Retrieved new data for {num} channel(s)'
-                '\n\tChannel IDs: {ids}'
-                .format(num=len(to_update), ids=to_update)
+            self.log.debugging and self.log.debug(
+                ('Retrieved new data for {num} channel(s)',
+                 'Channel IDs: {ids}'),
+                num=len(to_update),
+                ids=to_update,
             )
             result.update(new_data)
             self.cache_data(new_data, defer=defer_cache)
@@ -241,32 +275,47 @@ class ResourceManager(object):
         return result
 
     def get_playlists(self, ids, suppress_errors=False, defer_cache=False):
-        context = self._context
         ids = tuple(ids)
+
+        context = self._context
+        client = self._client
+        function_cache = context.get_function_cache()
+
         refresh = context.refresh_requested()
+        forced_cache = not function_cache.run(
+            client.internet_available,
+            function_cache.ONE_MINUTE * 5,
+            _refresh=refresh,
+        )
+        refresh = not forced_cache and refresh
+
         if refresh or not ids:
             result = {}
         else:
             data_cache = context.get_data_cache()
-            result = data_cache.get_items(ids, data_cache.ONE_DAY)
+            result = data_cache.get_items(
+                ids,
+                None if forced_cache else data_cache.ONE_DAY,
+                memory_store=self.new_data,
+            )
         to_update = [id_ for id_ in ids
-                     if id_ not in result
-                     or not result[id_]
-                     or result[id_].get('_partial')]
+                     if id_
+                     and (id_ not in result
+                          or not result[id_]
+                          or result[id_].get('_partial'))]
 
         if result:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_playlists'
-                ' - Using cached data for {num} playlist(s)'
-                '\n\tPlaylist IDs: {ids}'
-                .format(num=len(result), ids=list(result))
+            self.log.debugging and self.log.debug(
+                ('Using cached data for {num} playlist(s)',
+                 'Playlist IDs: {ids}'),
+                num=len(result),
+                ids=list(result),
             )
             if self._progress_dialog:
                 self._progress_dialog.update(steps=len(result) - len(to_update))
 
         if to_update:
             notify_and_raise = not suppress_errors
-            client = self._provider.get_client(context)
             new_data = [client.get_playlists(list_of_50,
                                              max_results=50,
                                              notify=notify_and_raise,
@@ -285,11 +334,11 @@ class ResourceManager(object):
             new_data = None
 
         if new_data:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_playlists'
-                ' - Retrieved new data for {num} playlist(s)'
-                '\n\tPlaylist IDs: {ids}'
-                .format(num=len(to_update), ids=to_update)
+            self.log.debugging and self.log.debug(
+                ('Retrieved new data for {num} playlist(s)',
+                 'Playlist IDs: {ids}'),
+                num=len(to_update),
+                ids=to_update,
             )
             result.update(new_data)
             self.cache_data(new_data, defer=defer_cache)
@@ -309,16 +358,31 @@ class ResourceManager(object):
                            ids=None,
                            batch_id=None,
                            page_token=None,
-                           defer_cache=False):
+                           defer_cache=False,
+                           flatten=False,
+                           **kwargs):
         if not ids and not batch_id:
             return None
 
         context = self._context
+        client = self._client
+        function_cache = context.get_function_cache()
+
         refresh = context.refresh_requested()
+        forced_cache = (
+                not function_cache.run(
+                    client.internet_available,
+                    function_cache.ONE_MINUTE * 5,
+                    _refresh=refresh,
+                )
+                or (context.get_param('channel_id') == 'mine'
+                    and not client.logged_in)
+        )
+        refresh = not forced_cache and refresh
 
         if batch_id:
             ids = [batch_id[0]]
-            page_token = batch_id[1]
+            page_token = batch_id[1] or page_token
             fetch_next = False
         elif page_token is None:
             fetch_next = True
@@ -342,28 +406,40 @@ class ResourceManager(object):
                 else:
                     batch = data_cache.get_item(
                         '{0},{1}'.format(*batch_id),
-                        data_cache.ONE_HOUR if page_token
-                        else data_cache.ONE_MINUTE * 5
+                        as_dict=True,
                     )
                 if not batch:
                     to_update.append(batch_id)
                     break
-                result[batch_id] = batch
+                age = batch.get('age')
+                batch = batch.get('value')
+                if forced_cache:
+                    result[batch_id] = batch
+                elif page_token:
+                    if age <= data_cache.ONE_DAY:
+                        result[batch_id] = batch
+                    else:
+                        to_update.append(batch_id)
+                        break
+                else:
+                    if age <= data_cache.ONE_MINUTE * 5:
+                        result[batch_id] = batch
+                    else:
+                        to_update.append(batch_id)
                 page_token = batch.get('nextPageToken') if fetch_next else None
-                if page_token is None:
+                if not page_token:
                     break
 
         if result:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_playlist_items'
-                ' - Using cached data for {num} playlist part(s)'
-                '\n\tBatch IDs: {ids}'
-                .format(num=len(result), ids=list(result))
+            self.log.debugging and self.log.debug(
+                ('Using cached data for {num} playlist part(s)',
+                 'Batch IDs: {ids}'),
+                num=len(result),
+                ids=list(result),
             )
             if self._progress_dialog:
                 self._progress_dialog.update(steps=len(result) - len(to_update))
 
-        client = self._provider.get_client(context)
         new_data = {}
         insert_point = 0
         for playlist_id, page_token in to_update:
@@ -372,13 +448,15 @@ class ResourceManager(object):
             insert_point = batch_ids.index(batch_id, insert_point)
             while 1:
                 batch_id = (playlist_id, page_token)
-                batch = client.get_playlist_items(*batch_id)
+                if batch_id in result:
+                    break
+                batch = client.get_playlist_items(*batch_id, **kwargs)
                 if not batch:
                     break
                 new_batch_ids.append(batch_id)
                 new_data[batch_id] = batch
                 page_token = batch.get('nextPageToken') if fetch_next else None
-                if page_token is None:
+                if not page_token:
                     break
 
             if new_batch_ids:
@@ -386,11 +464,11 @@ class ResourceManager(object):
                 insert_point += len(new_batch_ids)
 
         if new_data:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_playlist_items'
-                ' - Retrieved new data for {num} playlist part(s)'
-                '\n\tBatch IDs: {ids}'
-                .format(num=len(new_data), ids=list(new_data))
+            self.log.debugging and self.log.debug(
+                ('Retrieved new data for {num} playlist part(s)',
+                 'Batch IDs: {ids}'),
+                num=len(new_data),
+                ids=list(new_data),
             )
             result.update(new_data)
             self.cache_data({
@@ -409,6 +487,14 @@ class ResourceManager(object):
 
         if not fetch_next:
             return result[batch_ids[0]]
+        if flatten:
+            items = chain.from_iterable(
+                batch.get('items', [])
+                for batch in result.values()
+            )
+            result = result[batch_ids[-1]]
+            result['items'] = list(items)
+            return result
         return result
 
     def get_related_playlists(self, channel_id, defer_cache=False):
@@ -428,10 +514,7 @@ class ResourceManager(object):
         return item.get('contentDetails', {}).get('relatedPlaylists')
 
     def get_my_playlists(self, channel_id, page_token, defer_cache=False):
-        context = self._context
-        client = self._provider.get_client(context)
-
-        result = client.get_playlists_of_channel(channel_id, page_token)
+        result = self._client.get_playlists_of_channel(channel_id, page_token)
         if not result:
             return None
 
@@ -441,11 +524,11 @@ class ResourceManager(object):
             if yt_item
         }
         if new_data:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_my_playlists'
-                ' - Retrieved new data for {num} playlist(s)'
-                '\n\tPlaylist IDs: {ids}'
-                .format(num=len(new_data), ids=list(new_data))
+            self.log.debugging and self.log.debug(
+                ('Retrieved new data for {num} playlist(s)',
+                 'Playlist IDs: {ids}'),
+                num=len(new_data),
+                ids=list(new_data),
             )
             self.cache_data(new_data, defer=defer_cache)
 
@@ -457,14 +540,29 @@ class ResourceManager(object):
                    suppress_errors=False,
                    defer_cache=False,
                    yt_items=None):
-        context = self._context
         ids = tuple(ids)
+
+        context = self._context
+        client = self._client
+        function_cache = context.get_function_cache()
+
         refresh = context.refresh_requested()
+        forced_cache = not function_cache.run(
+            client.internet_available,
+            function_cache.ONE_MINUTE * 5,
+            _refresh=refresh,
+        )
+        refresh = not forced_cache and refresh
+
         if refresh or not ids:
             result = {}
         else:
             data_cache = context.get_data_cache()
-            result = data_cache.get_items(ids, data_cache.ONE_MONTH)
+            result = data_cache.get_items(
+                ids,
+                None if forced_cache else data_cache.ONE_MONTH,
+                memory_store=self.new_data,
+            )
         to_update = [id_ for id_ in ids
                      if id_
                      and (id_ not in result
@@ -472,18 +570,17 @@ class ResourceManager(object):
                           or result[id_].get('_partial'))]
 
         if result:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_videos'
-                ' - Using cached data for {num} video(s)'
-                '\n\tVideo IDs: {ids}'
-                .format(num=len(result), ids=list(result))
+            self.log.debugging and self.log.debug(
+                ('Using cached data for {num} video(s)',
+                 'Video IDs: {ids}'),
+                num=len(result),
+                ids=list(result),
             )
             if self._progress_dialog:
                 self._progress_dialog.update(steps=len(result) - len(to_update))
 
         if to_update:
             notify_and_raise = not suppress_errors
-            client = self._provider.get_client(context)
             new_data = [client.get_videos(list_of_50,
                                           live_details,
                                           max_results=50,
@@ -503,11 +600,11 @@ class ResourceManager(object):
             new_data = None
 
         if new_data:
-            context.debug_log and context.log_debug(
-                'ResourceManager.get_videos'
-                ' - Retrieved new data for {num} video(s)'
-                '\n\tVideo IDs: {ids}'
-                .format(num=len(to_update), ids=to_update)
+            self.log.debugging and self.log.debug(
+                ('Retrieved new data for {num} video(s)',
+                 'Video IDs: {ids}'),
+                num=len(to_update),
+                ids=to_update,
             )
             new_data = dict(dict.fromkeys(to_update, {'_unavailable': True}),
                             **new_data)
@@ -540,26 +637,33 @@ class ResourceManager(object):
         return result
 
     def cache_data(self, data=None, defer=False):
-        if self._incognito:
-            return
-
         if defer:
             if data:
                 self.new_data.update(data)
             return
 
-        flush = False
-        if not data:
-            data = self.new_data
+        if self.new_data:
             flush = True
+            if data:
+                self.new_data.update(data)
+            data = self.new_data
+        else:
+            flush = False
         if data:
-            context = self._context
-            context.get_data_cache().set_items(data)
-            context.debug_log and context.log_debug(
-                'ResourceManager.cache_data'
-                ' - Storing new data to cache for {num} item(s)'
-                '\n\tIDs: {ids}'
-                .format(num=len(data), ids=list(data))
-            )
+            if self._incognito:
+                self.log.debugging and self.log.debug(
+                    ('Incognito mode active - discarded data for {num} item(s)',
+                     'IDs: {ids}'),
+                    num=len(data),
+                    ids=list(data),
+                )
+            else:
+                self.log.debugging and self.log.debug(
+                    ('Storing new data to cache for {num} item(s)',
+                     'IDs: {ids}'),
+                    num=len(data),
+                    ids=list(data),
+                )
+                self._context.get_data_cache().set_items(data)
         if flush:
             self.new_data = {}

@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2025-05-15 12:50+0000\n"
+"PO-Revision-Date: 2025-06-25 02:29+0000\n"
 "Last-Translator: wabisabi926 <liwenliang926@163.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/zh_Hans/>\n"
 "Language: zh_cn\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.11.3\n"
+"X-Generator: Weblate 5.12.2\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -111,7 +111,7 @@ msgstr "允许 3D 播放"
 
 msgctxt "#30021"
 msgid "Show fanart"
-msgstr "显示背景图片"
+msgstr "显示同人画"
 
 msgctxt "#30022"
 msgid "Items per page"
@@ -163,7 +163,7 @@ msgstr "视图：歌曲"
 
 msgctxt "#30034"
 msgid "View: Artists"
-msgstr "视图：艺术家"
+msgstr "视图：艺人"
 
 msgctxt "#30035"
 msgid "View: Albums"
@@ -175,11 +175,11 @@ msgstr "支持使用其他播放器"
 
 msgctxt "#30037"
 msgid "Custom Watch Later playlist id"
-msgstr "定制 “稍后观看” 播放列表 ID"
+msgstr "自定义 “稍后观看” 播放列表 ID"
 
 msgctxt "#30038"
 msgid "Custom History playlist id"
-msgstr "定制 “历史记录” 播放列表 ID"
+msgstr "自定义 “历史记录” 播放列表 ID"
 
 # Kodion Common
 # empty strings from id 30039 to 30099
@@ -313,7 +313,7 @@ msgstr "转到 %s"
 
 msgctxt "#30503"
 msgid "Channel fanart"
-msgstr "频道背景图"
+msgstr "频道同人画"
 
 msgctxt "#30504"
 msgid "Subscriptions"
@@ -457,7 +457,7 @@ msgstr "踩过的视频"
 
 msgctxt "#30539"
 msgid "Play recently added"
-msgstr ""
+msgstr "最近添加的播放"
 
 msgctxt "#30540"
 msgid "Play with..."
@@ -465,7 +465,7 @@ msgstr "选用其他播放器..."
 
 msgctxt "#30541"
 msgid "Show channel name and video details in description"
-msgstr ""
+msgstr "在描述中显示频道名称和视频详细信息"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
@@ -481,15 +481,15 @@ msgstr "符合此描述内容的更多链接"
 
 msgctxt "#30545"
 msgid "No videos found."
-msgstr ""
+msgstr "未找到视频。"
 
 msgctxt "#30546"
 msgid "Please complete all login prompts"
-msgstr ""
+msgstr "请完成所有登录提示"
 
 msgctxt "#30547"
 msgid "You may be prompted to enable two applications so that YouTube is functioning properly."
-msgstr ""
+msgstr "系统可能会提示您启用两个应用程序，以便 YouTube 正常运行。"
 
 msgctxt "#30548"
 msgid ""
@@ -497,7 +497,7 @@ msgstr ""
 
 msgctxt "#30549"
 msgid "No streams found"
-msgstr ""
+msgstr "未找到流"
 
 msgctxt "#30550"
 msgid ""
@@ -549,7 +549,7 @@ msgstr ""
 
 msgctxt "#30562"
 msgid "View all"
-msgstr ""
+msgstr "查看所有"
 
 msgctxt "#30563"
 msgid ""
@@ -577,11 +577,11 @@ msgstr "从稍后观看中移除"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
-msgstr ""
+msgstr "您确定要将\"%s \"从稍后观看列表中删除吗？"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
-msgstr ""
+msgstr "您确定要用\"%s \"替换当前的稍后观看列表吗？"
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -593,11 +593,11 @@ msgstr "从历史记录中移除"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove \"%s\" as your History list?"
-msgstr ""
+msgstr "您确定要删除历史列表中的\"%s \"吗？"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with \"%s\"?"
-msgstr ""
+msgstr "您确定要用\"%s \"替换当前的历史记录列表吗？"
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -617,7 +617,7 @@ msgstr "强制 SSL 证书验证"
 
 msgctxt "#30579"
 msgid "InputStream.Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream.Adaptive now?"
-msgstr ""
+msgstr "在 YouTube 设置中已激活 InputStream.Adaptive，但该插件已被禁用。现在要启用 InputStream.Adaptive 吗？"
 
 msgctxt "#30580"
 msgid "Reset access manager"
@@ -633,7 +633,7 @@ msgstr "自动播放推荐的视频"
 
 msgctxt "#30583"
 msgid "Filters can be channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel', and/or custom video filters in the form '{ATTR}{OP}{VALUE}' eg. '{duration}{>=}{180}{artists_string}{=}{\"The Best Channel\"},{duration}{<}{180}'"
-msgstr ""
+msgstr "过滤器可以是用逗号分隔的频道名称，例如 \"最佳频道、第二最佳频道\"，和/或\"{ATTR}{OP}{VALUE}\"形式的自定义视频过滤器，例如\"{duration}{>=}{180}{artists_string}{=}{\"最佳频道\"},{duration}{<}{180}\""
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
@@ -641,7 +641,7 @@ msgstr "订阅内容（已过滤）"
 
 msgctxt "#30585"
 msgid "Enable Blacklist to exclude channel names in Filters from My Subscriptions, disable to include channel names"
-msgstr ""
+msgstr "启用黑名单以从我的订阅中排除过滤器中的频道名称，禁用以包含频道名称"
 
 msgctxt "#30586"
 msgid "Blacklist"
@@ -705,7 +705,7 @@ msgstr ""
 
 msgctxt "#30601"
 msgid "%s with Original/%s fallback"
-msgstr ""
+msgstr "% s 采用原始 /% s 回退机制"
 
 msgctxt "#30602"
 msgid "No auto-generated"
@@ -769,15 +769,15 @@ msgstr ""
 
 msgctxt "#30617"
 msgid "InputStream.Adaptive"
-msgstr ""
+msgstr "InputStream.Adaptive"
 
 msgctxt "#30618"
 msgid "Stream redirect"
-msgstr ""
+msgstr "流重定向"
 
 msgctxt "#30619"
 msgid "Enable to reduce resource usage on less powerful devices, but could lead to IP bans. Use at own risk."
-msgstr ""
+msgstr "启用此选项可减少功能较弱设备的资源占用，但可能导致 IP 禁止。使用风险自负。"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
@@ -893,15 +893,15 @@ msgstr "已结束的直播"
 
 msgctxt "#30648"
 msgid "API Key is incorrect. Settings > API > API Key"
-msgstr ""
+msgstr "API 密钥不正确。设置 > API > API 密钥"
 
 msgctxt "#30649"
 msgid "Client Id is incorrect. Settings > API > API Id"
-msgstr ""
+msgstr "客户端 ID 不正确。设置 > API > API Id"
 
 msgctxt "#30650"
 msgid "Client Secret is incorrect. Settings > API > API Secret"
-msgstr ""
+msgstr "客户端密钥不正确。设置 > API > API 密钥"
 
 msgctxt "#30651"
 msgid "Location"
@@ -913,7 +913,7 @@ msgstr "位置半径 (km)"
 
 msgctxt "#30653"
 msgid "My Location using IP geolocation lookup"
-msgstr ""
+msgstr "使用 IP 地理定位查找我的位置"
 
 msgctxt "#30654"
 msgid "My Location"
@@ -937,7 +937,7 @@ msgstr "输入该用户的名称"
 
 msgctxt "#30659"
 msgid "User is now \"%s\""
-msgstr ""
+msgstr "用户现在是 \"%s\""
 
 msgctxt "#30660"
 msgid "Users"
@@ -961,15 +961,15 @@ msgstr "切换用户"
 
 msgctxt "#30665"
 msgid "Switch to \"%s\" now?"
-msgstr ""
+msgstr "现在切换到 “%s” ？"
 
 msgctxt "#30666"
 msgid "\"%s\" removed"
-msgstr ""
+msgstr "“%s”已删除"
 
 msgctxt "#30667"
 msgid "Renamed \"%s\" to \"%s\""
-msgstr ""
+msgstr "将 “%s” 重命名为 “%s”"
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -989,7 +989,7 @@ msgstr "清除播放历史"
 
 msgctxt "#30672"
 msgid "Delete playback history database"
-msgstr ""
+msgstr "删除播放历史数据库"
 
 msgctxt "#30673"
 msgid "playback history"
@@ -1001,7 +1001,7 @@ msgstr "重置恢复点"
 
 msgctxt "#30675"
 msgid "Use local playback history (watched, resume tracking)"
-msgstr ""
+msgstr "使用本地播放历史（已观看、恢复跟踪）"
 
 msgctxt "#30676"
 msgid "Just now"
@@ -1053,7 +1053,7 @@ msgstr "数据缓存"
 
 msgctxt "#30688"
 msgid "Use MPEG-DASH for videos"
-msgstr ""
+msgstr "将 MPEG-DASH 用于视频"
 
 msgctxt "#30689"
 msgid "Use for live streams"
@@ -1061,7 +1061,7 @@ msgstr "用于直播流"
 
 msgctxt "#30690"
 msgid "InputStream.Adaptive >= 2.0.12 is required for adaptive live streams"
-msgstr ""
+msgstr "自适应直播流要求 InputStream.Adaptive >= 2.0.12"
 
 msgctxt "#30691"
 msgid "Airing now"
@@ -1117,7 +1117,7 @@ msgstr ""
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
-msgstr ""
+msgstr "在默认播放器中使用 YouTube 网站网址"
 
 msgctxt "#30705"
 msgid "Download subtitles"
@@ -1189,19 +1189,19 @@ msgstr ""
 
 msgctxt "#30722"
 msgid "Enable HDR video"
-msgstr ""
+msgstr "启用 HDR 视频"
 
 msgctxt "#30723"
 msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream.Adaptive >= 2.3.14"
-msgstr ""
+msgstr "MPEG-DASH VOD 需要代理（请参阅高级 > HTTP 服务器）[CR]HDR 和 >1080p 视频要求 InputStream.Adaptive >= 2.3.14"
 
 msgctxt "#30724"
 msgid "Enable high framerate video"
-msgstr ""
+msgstr "启用高帧率视频"
 
 msgctxt "#30725"
 msgid "1440p (QHD)"
-msgstr ""
+msgstr "1440p (QHD)"
 
 msgctxt "#30726"
 msgid "Uploads"
@@ -1209,15 +1209,15 @@ msgstr "上传"
 
 msgctxt "#30727"
 msgid "Enable H.264 video"
-msgstr ""
+msgstr "启用 H.264 视频"
 
 msgctxt "#30728"
 msgid "Enable VP9 video"
-msgstr ""
+msgstr "启用 VP9 视频"
 
 msgctxt "#30729"
 msgid "Prefer lower resolution streams for unselected codecs"
-msgstr ""
+msgstr "对于未选择的编解码器，优先选择较低分辨率的数据流"
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
@@ -1245,11 +1245,11 @@ msgstr "已编辑"
 
 msgctxt "#30736"
 msgid "Shorts"
-msgstr ""
+msgstr "短片"
 
 msgctxt "#30737"
 msgid "Shorts - Max duration"
-msgstr ""
+msgstr "短片 - 最大持续时间"
 
 msgctxt "#30738"
 msgid ""
@@ -1257,331 +1257,331 @@ msgstr ""
 
 msgctxt "#30739"
 msgid "Subscribers"
-msgstr ""
+msgstr "订阅者"
 
 msgctxt "#30740"
 msgid "HLS"
-msgstr ""
+msgstr "HLS"
 
 msgctxt "#30741"
 msgid "Multi-stream HLS"
-msgstr ""
+msgstr "多流 HLS"
 
 msgctxt "#30742"
 msgid "Adaptive HLS"
-msgstr ""
+msgstr "自适应 HLS"
 
 msgctxt "#30743"
 msgid "MPEG-DASH"
-msgstr ""
+msgstr "MPEG-DASH"
 
 msgctxt "#30744"
 msgid "Original"
-msgstr ""
+msgstr "原始"
 
 msgctxt "#30745"
 msgid "Dubbed"
-msgstr ""
+msgstr "被称为"
 
 msgctxt "#30746"
 msgid "Descriptive"
-msgstr ""
+msgstr "描述性"
 
 msgctxt "#30747"
 msgid "Alternate"
-msgstr ""
+msgstr "替代"
 
 msgctxt "#30748"
 msgid "Stream features"
-msgstr ""
+msgstr "流特征"
 
 msgctxt "#30749"
 msgid "Enable AV1 video"
-msgstr ""
+msgstr "启用 AV1 视频"
 
 msgctxt "#30750"
 msgid "Enable Vorbis audio"
-msgstr ""
+msgstr "启用 Vorbis 音频"
 
 msgctxt "#30751"
 msgid "Enable Opus audio"
-msgstr ""
+msgstr "启用 Opus 音频"
 
 msgctxt "#30752"
 msgid "Enable AAC audio"
-msgstr ""
+msgstr "启用 AAC 音频"
 
 msgctxt "#30753"
 msgid "Enable surround sound audio"
-msgstr ""
+msgstr "启用环绕声音频"
 
 msgctxt "#30754"
 msgid "Enable AC-3 audio"
-msgstr ""
+msgstr "启用 AC-3 音频"
 
 msgctxt "#30755"
 msgid "Enable EAC-3 audio"
-msgstr ""
+msgstr "启用 EAC-3 音频"
 
 msgctxt "#30756"
 msgid "Enable DTS audio"
-msgstr ""
+msgstr "启用 DTS 音频"
 
 msgctxt "#30757"
 msgid "Remove similar/duplicate streams"
-msgstr ""
+msgstr "删除相似/重复的流"
 
 msgctxt "#30758"
 msgid "Stream selection"
-msgstr ""
+msgstr "流选择"
 
 msgctxt "#30759"
 msgid "Quality selection"
-msgstr ""
+msgstr "质量选择"
 
 msgctxt "#30760"
 msgid "Automatic + Quality selection"
-msgstr ""
+msgstr "自动 + 质量选择"
 
 msgctxt "#30761"
 msgid "Update playback history on Youtube"
-msgstr ""
+msgstr "更新 Youtube 上的播放历史"
 
 msgctxt "#30762"
 msgid "Multi-language"
-msgstr ""
+msgstr "多语言"
 
 msgctxt "#30763"
 msgid "Multi-audio"
-msgstr ""
+msgstr "多音频"
 
 msgctxt "#30764"
 msgid "Requests connect timeout"
-msgstr ""
+msgstr "请求连接超时"
 
 msgctxt "#30765"
 msgid "Requests read timeout"
-msgstr ""
+msgstr "请求读取超时"
 
 msgctxt "#30766"
 msgid "Premieres"
-msgstr ""
+msgstr "首映"
 
 msgctxt "#30767"
 msgid "Views"
-msgstr ""
+msgstr "视图"
 
 msgctxt "#30768"
 msgid "Disable high framerate video at maximum video quality"
-msgstr ""
+msgstr "在最高视频质量下禁用高帧率视频"
 
 msgctxt "#30769"
 msgid "Clear Watch Later list"
-msgstr ""
+msgstr "清除稍后观看列表"
 
 msgctxt "#30770"
 msgid "Are you sure you want to clear your Watch Later list?"
-msgstr ""
+msgstr "您确定要清除稍后观看列表吗？"
 
 msgctxt "#30771"
 msgid "Disable fractional framerate hinting"
-msgstr ""
+msgstr "禁用分数帧速率提示"
 
 msgctxt "#30772"
 msgid "Disable all framerate hinting"
-msgstr ""
+msgstr "禁用所有帧速率提示"
 
 msgctxt "#30773"
 msgid "Show video details in video lists"
-msgstr ""
+msgstr "在视频列表中显示视频详细信息"
 
 msgctxt "#30774"
 msgid "All available"
-msgstr ""
+msgstr "全部可用"
 
 msgctxt "#30775"
 msgid "%s (translation)"
-msgstr ""
+msgstr "%s（翻译）"
 
 msgctxt "#30776"
 msgid "Ask + Automatic + Quality selection"
-msgstr ""
+msgstr "询问 + 自动 + 质量选择"
 
 msgctxt "#30777"
 msgid "Views for %s (%s)"
-msgstr ""
+msgstr "%s (%s) 视图"
 
 msgctxt "#30778"
 msgid "Import old playback history?"
-msgstr ""
+msgstr "是否导入旧的播放历史记录？"
 
 msgctxt "#30779"
 msgid "Import old search history?"
-msgstr ""
+msgstr "是否导入旧的搜索历史记录？"
 
 msgctxt "#30780"
 msgid "Clear local watch later list"
-msgstr ""
+msgstr "清除本地稍后观看列表"
 
 msgctxt "#30781"
 msgid "Delete watch later database"
-msgstr ""
+msgstr "删除稍后观看数据库"
 
 msgctxt "#30782"
 msgid "local watch later list"
-msgstr ""
+msgstr "本地稍后观看列表"
 
 msgctxt "#30783"
 msgid "settings to recommended values"
-msgstr ""
+msgstr "设置为建议值"
 
 msgctxt "#30784"
 msgid "listings to show minimal details"
-msgstr ""
+msgstr "列表显示最少的细节"
 
 msgctxt "#30785"
 msgid "performance settings"
-msgstr ""
+msgstr "性能设置"
 
 msgctxt "#30786"
 msgid "Choose device capabilities"
-msgstr ""
+msgstr "选择设备功能"
 
 msgctxt "#30787"
 msgid "720p, H.264 only | Limited or older devices"
-msgstr ""
+msgstr "720p，仅限 H.264 | 受限或旧版设备"
 
 msgctxt "#30788"
 msgid "1080p/30 fps | Raspberry Pi 3, or similar"
-msgstr ""
+msgstr "1080p/30 fps | Raspberry Pi 3 或类似设备"
 
 msgctxt "#30789"
 msgid "4K/30 fps or 1080p/60 fps, HDR if compatible | Raspberry Pi 5, or similar"
-msgstr ""
+msgstr "4K/30 fps 或 1080p/60 fps，HDR（如果兼容） | Raspberry Pi 5 或类似设备"
 
 msgctxt "#30790"
 msgid "4K/60 fps, HDR if compatible | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1, or similar"
-msgstr ""
+msgstr "4K/60 fps，HDR（如果兼容） | Fire TV Cube Gen 2、Shield TV、Fire TV Stick 4K Gen 1 或类似设备"
 
 msgctxt "#30791"
 msgid "4K/60 fps, HDR, using AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V, or similar"
-msgstr ""
+msgstr "4K/60 fps、HDR，使用 AV1 | Fire TV Cube Gen 3、Fire TV Stick 4K Max、Vero V 或类似设备"
 
 msgctxt "#30792"
 msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities"
-msgstr ""
+msgstr "8K/60 fps、HDR，使用 AV1 | 具有完整功能的现代设备或个人电脑"
 
 msgctxt "#30793"
 msgid "Views count display colour"
-msgstr ""
+msgstr "观看次数显示颜色"
 
 msgctxt "#30794"
 msgid "Subscriber/Likes count display colour"
-msgstr ""
+msgstr "订阅者/点赞数显示颜色"
 
 msgctxt "#30795"
 msgid "Videos/Comments count display colour"
-msgstr ""
+msgstr "视频/评论数显示颜色"
 
 msgctxt "#30796"
 msgid "1080p/60 fps | Raspberry Pi 4, or similar"
-msgstr ""
+msgstr "1080p/60 fps | Raspberry Pi 4 或类似设备"
 
 msgctxt "#30797"
 msgid "1080p/30 fps or 720p/30 fps, H.264 only | Raspberry Pi 1/2, or similar"
-msgstr ""
+msgstr "1080p/30 fps 或 720p/30 fps，仅 H.264 | Raspberry Pi 1/2 或类似设备"
 
 msgctxt "#30798"
 msgid "Clear bookmarks list"
-msgstr ""
+msgstr "清除书签列表"
 
 msgctxt "#30799"
 msgid "Delete bookmarks database"
-msgstr ""
+msgstr "删除书签数据库"
 
 msgctxt "#30800"
 msgid "bookmarks list"
-msgstr ""
+msgstr "书签列表"
 
 msgctxt "#30801"
 msgid "Clear Bookmarks list"
-msgstr ""
+msgstr "清除书签列表"
 
 msgctxt "#30802"
 msgid "Are you sure you want to clear your Bookmarks list?"
-msgstr ""
+msgstr "您确定要清除书签列表吗？"
 
 msgctxt "#30803"
 msgid "Bookmark %s"
-msgstr ""
+msgstr "书签 %s"
 
 msgctxt "#30804"
 msgid "Use YouTube website urls with external player"
-msgstr ""
+msgstr "通过外部播放器使用 YouTube 网站网址"
 
 msgctxt "#30805"
 msgid "Use MPEG-DASH with external player"
-msgstr ""
+msgstr "通过外部播放器使用 MPEG-DASH"
 
 msgctxt "#30806"
 msgid "Jump to page..."
-msgstr ""
+msgstr "跳转到页面..."
 
 msgctxt "#30807"
 msgid "Use channel name as"
-msgstr ""
+msgstr "使用频道名称作为"
 
 msgctxt "#30808"
 msgid "Hide videos from listings"
-msgstr ""
+msgstr "隐藏列表中的视频"
 
 msgctxt "#30809"
 msgid "All upcoming videos"
-msgstr ""
+msgstr "所有即将播出的视频"
 
 msgctxt "#30810"
 msgid "All previously streamed (completed) videos"
-msgstr ""
+msgstr "所有先前播放（已完成）的视频"
 
 msgctxt "#30811"
 msgid "Filter Live folders"
-msgstr ""
+msgstr "过滤实时文件夹"
 
 msgctxt "#30812"
 msgid "Clear subscription feed history"
-msgstr ""
+msgstr "清除订阅信息历史记录"
 
 msgctxt "#30813"
 msgid "Delete subscription feed history database"
-msgstr ""
+msgstr "删除订阅信息历史数据库"
 
 msgctxt "#30814"
 msgid "feed history"
-msgstr ""
+msgstr "源历史记录"
 
 msgctxt "#30815"
 msgid "Go back..."
-msgstr ""
+msgstr "回去..."
 
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
-msgstr ""
+msgstr "列表为空。[CR][CR]从上下文菜单刷新或稍后再试。"
 
 msgctxt "#30817"
 msgid "Refresh settings.xml"
-msgstr ""
+msgstr "刷新 settings.xml"
 
 msgctxt "#30818"
 msgid "Are you sure you want to refresh settings.xml?"
-msgstr ""
+msgstr "您确定要刷新 settings.xml？"
 
 msgctxt "#30819"
 msgid "Play from start"
-msgstr ""
+msgstr "从头开始播放"
 
 msgctxt "#30820"
 msgid "Podcast"
-msgstr ""
+msgstr "播客"
 
 #~ msgctxt "#30545"
 #~ msgid "No further links found."

@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -94,7 +94,7 @@ def process(provider, context, re_match):
 
     # we need a login
     client = provider.get_client(context)
-    if not provider.is_logged_in():
+    if not client.logged_in:
         return UriItem(context.create_uri(('sign', 'in')))
 
     if command == 'list':

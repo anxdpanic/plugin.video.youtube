@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -40,6 +40,7 @@ SUBSCRIPTIONS = '/subscriptions/list'
 TRENDING = '/special/popular_right_now'
 VIDEO_COMMENTS = '/special/parent_comments'
 VIDEO_COMMENTS_THREAD = '/special/child_comments'
+VIRTUAL_PLAYLIST = '/special/playlist'
 
 API = '/youtube/api'
 API_SUBMIT = '/youtube/api/submit'

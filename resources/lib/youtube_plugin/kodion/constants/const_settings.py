@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -45,6 +45,34 @@ API_ID = 'youtube.api.id'  # (str)
 API_SECRET = 'youtube.api.secret'  # (str)
 ALLOW_DEV_KEYS = 'youtube.allow.dev.keys'  # (bool)
 
+SHOW_SIGN_IN = 'youtube.folder.sign.in.show'  # (bool)
+SHOW_MY_SUBSCRIPTIONS = 'youtube.folder.my_subscriptions.show'  # (bool)
+SHOW_MY_SUBSCRIPTIONS_FILTERED = 'youtube.folder.my_subscriptions_filtered.show'  # (bool)
+SHOW_RECOMMENDATIONS = 'youtube.folder.recommendations.show'  # (bool)
+SHOW_RELATED = 'youtube.folder.related.show'  # (bool)
+SHOW_TRENDING = 'youtube.folder.popular_right_now.show'  # (bool)
+SHOW_SEARCH = 'youtube.folder.search.show'  # (bool)
+SHOW_QUICK_SEARCH = 'youtube.folder.quick_search.show'  # (bool)
+SHOW_INCOGNITO_SEARCH = 'youtube.folder.quick_search_incognito.show'  # (bool)
+SHOW_MY_LOCATION = 'youtube.folder.my_location.show'  # (bool)
+SHOW_MY_CHANNEL = 'youtube.folder.my_channel.show'  # (bool)
+SHOW_WATCH_LATER = 'youtube.folder.watch_later.show'  # (bool)
+SHOW_LIKED = 'youtube.folder.liked_videos.show'  # (bool)
+SHOW_DISLIKED = 'youtube.folder.disliked_videos.show'  # (bool)
+SHOW_HISTORY = 'youtube.folder.history.show'  # (bool)
+SHOW_PLAYLISTS = 'youtube.folder.playlists.show'  # (bool)
+SHOW_SAVED_PLAYLISTS = 'youtube.folder.saved.playlists.show'  # (bool)
+SHOW_SUBSCRIPTIONS = 'youtube.folder.subscriptions.show'  # (bool)
+SHOW_BOOKMARKS = 'youtube.folder.bookmarks.show'  # (bool)
+SHOW_BROWSE_CHANNELS = 'youtube.folder.browse_channels.show'  # (bool)
+SHOW_COMPlETED_LIVE = 'youtube.folder.completed.live.show'  # (bool)
+SHOW_UPCOMING_LIVE = 'youtube.folder.upcoming.live.show'  # (bool)
+SHOW_LIVE = 'youtube.folder.live.show'  # (bool)
+SHOW_SWITCH_USER = 'youtube.folder.switch.user.show'  # (bool)
+SHOW_SIGN_OUT = 'youtube.folder.sign.out.show'  # (bool)
+SHOW_SETUP_WIZARD = 'youtube.folder.settings.show'  # (bool)
+SHOW_SETTINGS = 'youtube.folder.settings.advanced.show'  # (bool)
+
 WATCH_LATER_PLAYLIST = 'youtube.folder.watch_later.playlist'  # (str)
 HISTORY_PLAYLIST = 'youtube.folder.history.playlist'  # (str)
 
@@ -78,11 +106,20 @@ REGION = 'youtube.region'  # (str)
 LOCATION = 'youtube.location'  # (str)
 LOCATION_RADIUS = 'youtube.location.radius'  # (int)
 
+PLAY_SUGGESTED = 'youtube.suggested_videos'  # (bool)
+
 PLAY_COUNT_MIN_PERCENT = 'kodion.play_count.percent'  # (int)
+
+RATE_VIDEOS = 'youtube.post.play.rate'  # (bool)
+RATE_PLAYLISTS = 'youtube.post.play.rate.playlists'  # (bool)
+PLAY_REFRESH = 'youtube.post.play.refresh'  # (bool)
+
+WATCH_LATER_REMOVE = 'youtube.playlist.watchlater.autoremove'  # (bool)
 
 VERIFY_SSL = 'requests.ssl.verify'  # (bool)
 CONNECT_TIMEOUT = 'requests.timeout.connect'  # (int)
 READ_TIMEOUT = 'requests.timeout.read'  # (int)
+REQUESTS_CACHE_SIZE = 'requests.cache.size'  # (int)
 
 PROXY_SOURCE = 'requests.proxy.source'  # (int)
 PROXY_ENABLED = 'requests.proxy.enabled'  # (bool)
@@ -98,4 +135,5 @@ HTTPD_WHITELIST = 'kodion.http.ip.whitelist'  # (str)
 HTTPD_IDLE_SLEEP = 'youtube.http.idle_sleep'  # (bool)
 HTTPD_STREAM_REDIRECT = 'youtube.http.stream_redirect'  # (bool)
 
-LOGGING_ENABLED = 'kodion.logging.level'  # (int)
+LOG_LEVEL = 'kodion.debug.log.level'  # (int)
+EXEC_LIMIT = 'kodion.debug.exec.limit'  # (int)

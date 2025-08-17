@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -10,15 +10,17 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from . import logging
 from .constants import (
     ABORT_FLAG,
+    MARK_AS_LABEL,
     PLUGIN_SLEEPING,
     TEMP_PATH,
     VIDEO_ID,
 )
 from .context import XbmcContext
 from .monitors import PlayerMonitor, ServiceMonitor
-from .utils import rm_dir
+from .utils.file_system import rm_dir
 from ..youtube.provider import Provider
 
 
@@ -29,13 +31,18 @@ def run():
     context = XbmcContext()
     provider = Provider()
 
+    monitor = ServiceMonitor(context=context)
+    player = PlayerMonitor(provider=provider,
+                           context=context,
+                           monitor=monitor)
+
     system_version = context.get_system_version()
-    context.log_notice('Service: Starting v{version}'
-                       '\n\tKodi:   v{kodi}'
-                       '\n\tPython: v{python}'
-                       .format(version=context.get_version(),
-                               kodi=str(system_version),
-                               python=system_version.get_python_version()))
+    logging.info(('Starting v{version}',
+                  'Kodi:    v{kodi}',
+                  'Python:  v{python}'),
+                 version=context.get_version(),
+                 kodi=str(system_version),
+                 python=system_version.get_python_version())
 
     get_listitem_info = context.get_listitem_info
     get_listitem_property = context.get_listitem_property
@@ -45,11 +52,6 @@ def run():
     set_property = ui.set_property
 
     clear_property(ABORT_FLAG)
-
-    monitor = ServiceMonitor(context=context)
-    player = PlayerMonitor(provider=provider,
-                           context=context,
-                           monitor=monitor)
 
     # wipe add-on temp folder on updates/restarts (subtitles, and mpd files)
     rm_dir(TEMP_PATH)
@@ -133,8 +135,7 @@ def run():
                 monitor.interrupt = True
 
             if monitor.refresh and all(container.values()):
-                monitor.refresh_container(force=True)
-                monitor.refresh = False
+                monitor.refresh_container(deferred=True)
                 break
 
             if monitor.interrupt:
@@ -154,6 +155,10 @@ def run():
                     if video_id != new_video_id:
                         video_id = new_video_id
                         set_property(VIDEO_ID, video_id)
+                        set_property(MARK_AS_LABEL,
+                                     context.localize('history.mark.unwatched')
+                                     if get_listitem_info('PlayCount') else
+                                     context.localize('history.mark.watched'))
                 elif video_id and get_listitem_info('Label'):
                     video_id = None
                     clear_property(VIDEO_ID)
