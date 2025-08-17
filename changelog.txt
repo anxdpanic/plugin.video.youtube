@@ -1,3 +1,8 @@
+## v7.3.0+beta.2
+### Fixed
+- Fix not parsing infolabels used as plugin url query params #1239
+- Fix unnecessarily processing window properties #1238
+
 ## v7.3.0+beta.1
 ### Fixed
 - Workaround for distributions that patch Kodi to disable System.InternetState #1224
