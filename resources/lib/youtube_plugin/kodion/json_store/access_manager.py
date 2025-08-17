@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -10,13 +10,11 @@
 
 import time
 import uuid
-from hashlib import md5
 
 from .json_store import JSONStore
+from ..compatibility import string_type
 from ..constants import ADDON_ID
-
-
-__author__ = 'bromix'
+from ..utils.methods import generate_hash
 
 
 class AccessManager(JSONStore):
@@ -26,112 +24,156 @@ class AccessManager(JSONStore):
         'token_expires': -1,
         'last_key_hash': '',
         'name': 'Default',
+        'id': None,
         'watch_later': 'WL',
         'watch_history': 'HL'
     }
+    DEFAULT_NEW_DEVELOPER = {
+        'access_token': '',
+        'refresh_token': '',
+        'token_expires': -1,
+        'last_key_hash': ''
+    }
 
     def __init__(self, context):
-        super(AccessManager, self).__init__('access_manager.json')
-        self._context = context
+        super(AccessManager, self).__init__('access_manager.json', context)
         access_manager_data = self._data['access_manager']
         self._user = access_manager_data.get('current_user', 0)
         self._last_origin = access_manager_data.get('last_origin', ADDON_ID)
 
     def set_defaults(self, reset=False):
         data = {} if reset else self.get_data()
-        if 'access_manager' not in data:
-            data = {
-                'access_manager': {
-                    'users': {
-                        0: self.DEFAULT_NEW_USER.copy()
-                    }
+
+        access_manager = data.get('access_manager')
+        if not access_manager or not isinstance(access_manager, dict):
+            users = {
+                0: self.DEFAULT_NEW_USER.copy(),
+            }
+            access_manager = {
+                'users': users,
+                'current_user': 0,
+                'last_origin': ADDON_ID,
+                'developers': {},
+            }
+        else:
+            users = access_manager.get('users')
+            if not users or not isinstance(users, dict):
+                users = {
+                    0: self.DEFAULT_NEW_USER.copy(),
                 }
-            }
-        if 'users' not in data['access_manager']:
-            data['access_manager']['users'] = {
-                0: self.DEFAULT_NEW_USER.copy()
-            }
-        if 0 not in data['access_manager']['users']:
-            data['access_manager']['users'][0] = self.DEFAULT_NEW_USER.copy()
-        if 'current_user' not in data['access_manager']:
-            data['access_manager']['current_user'] = 0
-        if 'last_origin' not in data['access_manager']:
-            data['access_manager']['last_origin'] = ADDON_ID
-        if 'developers' not in data['access_manager']:
-            data['access_manager']['developers'] = {}
+            elif any(not isinstance(user_id, int) for user_id in users):
+                new_users = {}
+                old_users = {}
+                for user_id, user in users.items():
+                    if isinstance(user_id, int):
+                        new_users[user_id] = user
+                    else:
+                        try:
+                            user_id = int(user_id)
+                            if user_id in users:
+                                raise ValueError
+                            new_users[user_id] = user
+                        except (TypeError, ValueError):
+                            old_users[user_id] = user
+                if new_users:
+                    users = new_users
+                if old_users:
+                    new_user_id = max(users) + 1 if users else 0
+                    for user in old_users.values():
+                        users[new_user_id] = user
+                        new_user_id += 1
+            access_manager['users'] = users
 
-        # clean up
-        if data['access_manager']['current_user'] == 'default':
-            data['access_manager']['current_user'] = 0
-        if 'access_token' in data['access_manager']:
-            del data['access_manager']['access_token']
-        if 'refresh_token' in data['access_manager']:
-            del data['access_manager']['refresh_token']
-        if 'token_expires' in data['access_manager']:
-            del data['access_manager']['token_expires']
-        if 'default' in data['access_manager']:
-            if ((data['access_manager']['default'].get('access_token')
-                 or data['access_manager']['default'].get('refresh_token'))
-                    and not data['access_manager']['users'][0].get(
-                        'access_token')
-                    and not data['access_manager']['users'][0].get(
-                        'refresh_token')):
-                if 'name' not in data['access_manager']['default']:
-                    data['access_manager']['default']['name'] = 'Default'
-                data['access_manager']['users'][0] = data['access_manager'][
-                    'default']
-            del data['access_manager']['default']
-        # end clean up
+            current_id = access_manager.get('current_user')
+            if (not current_id
+                    or current_id == 'default'
+                    or current_id not in users):
+                current_id = min(users)
+            else:
+                if not isinstance(current_id, int):
+                    try:
+                        current_id = int(current_id)
+                        if current_id not in users:
+                            raise ValueError
+                    except (TypeError, ValueError):
+                        current_id = min(users)
+            access_manager['current_user'] = current_id
+            current_user = users[current_id]
+            current_user.setdefault('watch_later', 'WL')
+            current_user.setdefault('watch_history', 'HL')
 
-        current_user = data['access_manager']['current_user']
-        if 'watch_later' not in data['access_manager']['users'][current_user]:
-            data['access_manager']['users'][current_user]['watch_later'] = 'WL'
-        if 'watch_history' not in data['access_manager']['users'][current_user]:
-            data['access_manager']['users'][current_user][
-                'watch_history'] = 'HL'
+            if 'default' in access_manager:
+                default_user = access_manager['default']
+                if (isinstance(default_user, dict)
+                        and (default_user.get('access_token')
+                             or default_user.get('refresh_token'))
+                        and not current_user.get('access_token')
+                        and not current_user.get('refresh_token')):
+                    default_user.setdefault('name', 'Default')
+                    users[current_id] = default_user
+                del access_manager['default']
+
+            if 'access_token' in access_manager:
+                del access_manager['access_token']
+
+            if 'refresh_token' in access_manager:
+                del access_manager['refresh_token']
+
+            if 'token_expires' in access_manager:
+                del access_manager['token_expires']
+
+            last_origin = access_manager.get('last_origin')
+            if not last_origin or not isinstance(last_origin, string_type):
+                access_manager['last_origin'] = ADDON_ID
+
+            developers = access_manager.get('developers')
+            if not developers or not isinstance(developers, dict):
+                access_manager['developers'] = {}
+        data['access_manager'] = access_manager
 
         # ensure all users have uuid
         uuids = set()
-        for user in data['access_manager']['users'].values():
-            c_uuid = user.get('id')
-            while not c_uuid or c_uuid in uuids:
-                c_uuid = uuid.uuid4().hex
-            uuids.add(c_uuid)
-            user['id'] = c_uuid
+        for user in users.values():
+            user_uuid = user.get('id')
+            if user_uuid:
+                if user_uuid in uuids:
+                    user['old_id'] = user_uuid
+                    user_uuid = None
+                else:
+                    uuids.add(user_uuid)
+                    continue
+            while not user_uuid or user_uuid in uuids:
+                user_uuid = uuid.uuid4().hex
+            uuids.add(user_uuid)
+            user['id'] = user_uuid
         # end uuid check
 
-        self.save(data)
+        return self.save(data)
 
     @staticmethod
     def _process_data(data):
-        # process users, change str keys (old format) to int (current format)
-        users = data['access_manager']['users']
-        if '0' in users:
-            data['access_manager']['users'] = {
-                int(key): value
-                for key, value in users.items()
-            }
-        current_user = data['access_manager']['current_user']
-        try:
-            data['access_manager']['current_user'] = int(current_user)
-        except (TypeError, ValueError):
-            pass
-        return data
-
-    def get_data(self, process=_process_data.__func__):
-        return super(AccessManager, self).get_data(process)
-
-    def load(self, process=_process_data.__func__):
-        return super(AccessManager, self).load(process)
-
-    def save(self, data, update=False, process=_process_data.__func__):
-        return super(AccessManager, self).save(data, update, process)
+        output = {}
+        for key, value in data:
+            if key in output:
+                continue
+            if key.isdigit():
+                try:
+                    key = int(key)
+                except (TypeError, ValueError):
+                    continue
+            elif key == 'current_user':
+                try:
+                    value = int(value)
+                except (TypeError, ValueError):
+                    value = 0
+            output[key] = value
+        return output
 
     def get_current_user_details(self, addon_id=None):
         """
         :return: current user
         """
-        if addon_id:
+        if addon_id and addon_id != ADDON_ID:
             return self.get_developers().get(addon_id, {})
         return self.get_users()[self._user]
 
@@ -153,16 +195,9 @@ class AccessManager(JSONStore):
         new_uuid = None
         while not new_uuid or new_uuid in uuids:
             new_uuid = uuid.uuid4().hex
-        return {
-            'access_token': '',
-            'refresh_token': '',
-            'token_expires': -1,
-            'last_key_hash': '',
-            'name': username,
-            'id': new_uuid,
-            'watch_later': 'WL',
-            'watch_history': 'HL'
-        }
+        return dict(self.DEFAULT_NEW_USER,
+                    name=username,
+                    id=new_uuid)
 
     def get_users(self):
         """
@@ -283,21 +318,23 @@ class AccessManager(JSONStore):
         Returns the current users watch later playlist id
         :return: the current users watch later playlist id
         """
-        current_id = (self.get_current_user_details().get('watch_later')
-                      or 'WL').strip()
+        current_id = self.get_current_user_details().get('watch_later', '')
+        current_id = current_id.strip()
+        current_id_lower = current_id.lower()
 
         settings = self._context.get_settings()
         settings_id = settings.get_watch_later_playlist()
+        settings_id_lower = settings_id.lower()
 
-        if settings_id.lower() == 'wl':
+        if settings_id_lower == 'local':
             current_id = self.set_watch_later_id(None)
-        elif settings_id and settings_id != current_id:
+        elif settings_id and settings_id_lower != current_id_lower:
             current_id = self.set_watch_later_id(settings_id)
-        elif current_id:
-            if current_id.lower() == 'wl':
-                current_id = ''
-            elif settings_id:
-                settings.set_watch_later_playlist('')
+        elif current_id_lower == 'local':
+            current_id = ''
+
+        if settings_id:
+            settings.set_watch_later_playlist('')
 
         return current_id
 
@@ -334,21 +371,24 @@ class AccessManager(JSONStore):
         Returns the current users watch history playlist id
         :return: the current users watch history playlist id
         """
-        current_id = (self.get_current_user_details().get('watch_history')
-                      or 'HL').strip()
+
+        current_id = self.get_current_user_details().get('watch_history', '')
+        current_id = current_id.strip()
+        current_id_lower = current_id.lower()
 
         settings = self._context.get_settings()
         settings_id = settings.get_history_playlist()
+        settings_id_lower = settings_id.lower()
 
-        if settings_id.lower() == 'hl':
+        if settings_id_lower == 'local':
             current_id = self.set_watch_history_id(None)
-        elif settings_id and settings_id != current_id:
+        elif settings_id and settings_id_lower != current_id_lower:
             current_id = self.set_watch_history_id(settings_id)
-        elif current_id:
-            if current_id.lower() == 'hl':
-                current_id = ''
-            elif settings_id:
-                settings.set_history_playlist('')
+        elif current_id_lower == 'local':
+            current_id = ''
+
+        if settings_id:
+            settings.set_history_playlist('')
 
         return current_id
 
@@ -417,20 +457,20 @@ class AccessManager(JSONStore):
         details = self.get_current_user_details(addon_id)
         return details.get('refresh_token', '').split('|')
 
-    def is_access_token_expired(self, addon_id=None):
+    def access_token_status(self, addon_id=None):
         """
-        Returns True if the access_token is expired otherwise False.
-        If no expiration date was provided and an access_token exists
-        this method will always return True
+        Returns tuple containing the number of access tokens and whether they
+        are expired.
         :return:
         """
         details = self.get_current_user_details(addon_id)
-        access_token = details.get('access_token')
+        access_tokens = details.get('access_token').split('|')
+        num_access_tokens = len([1 for token in access_tokens if token])
         expires = int(details.get('token_expires', -1))
 
-        if access_token and expires <= int(time.time()):
-            return True
-        return False
+        if num_access_tokens:
+            return num_access_tokens, expires <= int(time.time())
+        return 0, False
 
     def update_access_token(self,
                             addon_id,
@@ -475,7 +515,7 @@ class AccessManager(JSONStore):
                 'developers': {
                     addon_id: details,
                 },
-            } if addon_id else {
+            } if addon_id and addon_id != ADDON_ID else {
                 'users': {
                     self._user: details,
                 },
@@ -495,7 +535,7 @@ class AccessManager(JSONStore):
                         'last_key_hash': key_hash,
                     },
                 },
-            } if addon_id else {
+            } if addon_id and addon_id != ADDON_ID else {
                 'users': {
                     self._user: {
                         'last_key_hash': key_hash,
@@ -505,18 +545,6 @@ class AccessManager(JSONStore):
         }
         self.save(data, update=True)
 
-    @staticmethod
-    def get_new_developer():
-        """
-        :return: a new developer dict
-        """
-        return {
-            'access_token': '',
-            'refresh_token': '',
-            'token_expires': -1,
-            'last_key_hash': ''
-        }
-
     def get_developers(self):
         """
         Returns developers
@@ -524,30 +552,36 @@ class AccessManager(JSONStore):
         """
         return self._data['access_manager'].get('developers', {})
 
-    def set_developers(self, developers):
+    def add_new_developer(self, addon_id):
         """
-        Updates the users
-        :param developers: dict, developers
+        Updates the developer users
+        :param addon_id: str
         :return:
         """
         data = self.get_data()
-        data['access_manager']['developers'] = developers
-        self.save(data)
-
-    def dev_keys_changed(self, addon_id, api_key, client_id, client_secret):
-        last_hash = self.get_last_key_hash(addon_id)
-        current_hash = self.calc_key_hash(api_key, client_id, client_secret)
-
-        if not last_hash and current_hash:
-            self.set_last_key_hash(current_hash, addon_id)
-            return False
-
-        if last_hash != current_hash:
-            self.set_last_key_hash(current_hash, addon_id)
-            return True
-
+        developers = data['access_manager'].get('developers', {})
+        if addon_id not in developers:
+            developers[addon_id] = self.DEFAULT_NEW_DEVELOPER.copy()
+            data['access_manager']['developers'] = developers
+            return self.save(data)
         return False
 
-    @staticmethod
-    def calc_key_hash(key, id, secret, **_kwargs):
-        return md5(''.join((key, id, secret)).encode('utf-8')).hexdigest()
+    def keys_changed(self,
+                     addon_id,
+                     api_key,
+                     client_id,
+                     client_secret,
+                     update_hash=True):
+        last_hash = self.get_last_key_hash(addon_id)
+        current_hash = generate_hash(api_key, client_id, client_secret)
+
+        keys_changed = False
+        if not last_hash and current_hash:
+            if update_hash:
+                self.set_last_key_hash(current_hash, addon_id)
+        elif (not current_hash and last_hash
+              or last_hash != current_hash):
+            if update_hash:
+                self.set_last_key_hash(current_hash, addon_id)
+            keys_changed = True
+        return keys_changed

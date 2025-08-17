@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -88,6 +88,7 @@ class NewSearchItem(DirectoryItem):
     def __init__(self,
                  context,
                  name=None,
+                 title=None,
                  image=None,
                  fanart=None,
                  incognito=False,
@@ -95,7 +96,9 @@ class NewSearchItem(DirectoryItem):
                  addon_id='',
                  location=False):
         if not name:
-            name = context.get_ui().bold(context.localize('search.new'))
+            name = context.get_ui().bold(
+                title or context.localize('search.new')
+            )
 
         if image is None:
             image = '{media}/new_search.png'

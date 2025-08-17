@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -13,12 +13,9 @@ from __future__ import absolute_import, division, unicode_literals
 import sys
 
 from ..constants import SETTINGS
-from ..utils import (
-    current_system_version,
-    get_kodi_setting_bool,
-    get_kodi_setting_value,
-)
 from ..network.http_server import validate_ip_address
+from ..utils.methods import get_kodi_setting_bool, get_kodi_setting_value
+from ..utils.system_version import current_system_version
 
 
 class AbstractSettings(object):
@@ -27,7 +24,7 @@ class AbstractSettings(object):
         _vars[name] = value
     del _vars
 
-    _echo = False
+    _echo_level = 0
     _cache = {}
     _check_set = True
 
@@ -35,28 +32,28 @@ class AbstractSettings(object):
     def flush(cls, xbmc_addon):
         raise NotImplementedError()
 
-    def get_bool(self, setting, default=None, echo=None):
+    def get_bool(self, setting, default=None, echo_level=2):
         raise NotImplementedError()
 
-    def set_bool(self, setting, value, echo=None):
+    def set_bool(self, setting, value, echo_level=2):
         raise NotImplementedError()
 
-    def get_int(self, setting, default=-1, converter=None, echo=None):
+    def get_int(self, setting, default=-1, converter=None, echo_level=2):
         raise NotImplementedError()
 
-    def set_int(self, setting, value, echo=None):
+    def set_int(self, setting, value, echo_level=2):
         raise NotImplementedError()
 
-    def get_string(self, setting, default='', echo=None):
+    def get_string(self, setting, default='', echo_level=2):
         raise NotImplementedError()
 
-    def set_string(self, setting, value, echo=None):
+    def set_string(self, setting, value, echo_level=2):
         raise NotImplementedError()
 
-    def get_string_list(self, setting, default=None, echo=None):
+    def get_string_list(self, setting, default=None, echo_level=2):
         raise NotImplementedError()
 
-    def set_string_list(self, setting, value, echo=None):
+    def set_string_list(self, setting, value, echo_level=2):
         raise NotImplementedError()
 
     def open_settings(self):
@@ -171,13 +168,25 @@ class AbstractSettings(object):
         return self.set_bool(SETTINGS.SUBTITLE_DOWNLOAD, value)
 
     _THUMB_SIZES = {
-        0: {  # Medium (16:9)
+        3: {  # default (4:3)
+            'size': 120 * 90,
+            'ratio': 120 / 90,
+        },
+        0: {  # mqdefault (16:9)
             'size': 320 * 180,
             'ratio': 320 / 180,
         },
-        1: {  # High (4:3)
+        1: {  # hqdefault (4:3)
             'size': 480 * 360,
             'ratio': 480 / 360,
+        },
+        4: {  # sddefault (4:3)
+            'size': 640 * 480,
+            'ratio': 640 / 480,
+        },
+        5: {  # hq720 (16:9)
+            'size': 1280 * 720,
+            'ratio': 1280 / 720,
         },
         2: {  # Best available
             'size': 0,
@@ -225,6 +234,12 @@ class AbstractSettings(object):
         connect_timeout = self.get_int(SETTINGS.CONNECT_TIMEOUT, 9) + 0.5
         read_timout = self.get_int(SETTINGS.READ_TIMEOUT, 27)
         return connect_timeout, read_timout
+
+    def requests_cache_size(self, value=None):
+        if value is not None:
+            self.set_int(SETTINGS.REQUESTS_CACHE_SIZE, value)
+            return value
+        return self.get_int(SETTINGS.REQUESTS_CACHE_SIZE, 20)
 
     _PROXY_TYPE_SCHEME = {
         0: 'http',
@@ -303,12 +318,13 @@ class AbstractSettings(object):
                     setting.get('kodi_name'),
                     process=setting_type,
                 ) or setting_default
-            elif setting_type is int:
-                setting_value = self.get_int(setting_name, setting_default)
-            elif setting_type is str:
-                setting_value = self.get_string(setting_name, setting_default)
             else:
-                setting_value = self.get_bool(setting_name, setting_default)
+                setting_method = (
+                    self.get_int if setting_type is int else
+                    self.get_string if setting_type is str else
+                    self.get_bool
+                )
+                setting_value = setting_method(setting_name, setting_default)
 
             settings[setting_name] = {
                 'value': setting_value,
@@ -390,7 +406,7 @@ class AbstractSettings(object):
 
     def live_stream_type(self, value=None):
         if self.use_isa():
-            default = 3
+            default = 2
             setting = SETTINGS.LIVE_STREAMS + '.1'
         else:
             default = 1
@@ -487,7 +503,7 @@ class AbstractSettings(object):
         return self.get_string(SETTINGS.API_SECRET)
 
     def get_location(self):
-        location = self.get_string(SETTINGS.LOCATION, '').replace(' ', '').strip()
+        location = self.get_string(SETTINGS.LOCATION).replace(' ', '').strip()
         coords = location.split(',')
         latitude = longitude = None
         if len(coords) == 2:
@@ -508,7 +524,10 @@ class AbstractSettings(object):
         self.set_string(SETTINGS.LOCATION, value)
 
     def get_location_radius(self):
-        return ''.join((self.get_int(SETTINGS.LOCATION_RADIUS, 500, str), 'km'))
+        return ''.join((
+            self.get_int(SETTINGS.LOCATION_RADIUS, 500, str),
+            'km'
+        ))
 
     def get_play_count_min_percent(self):
         return self.get_int(SETTINGS.PLAY_COUNT_MIN_PERCENT, 0)
@@ -516,22 +535,24 @@ class AbstractSettings(object):
     def use_local_history(self):
         return self.get_bool(SETTINGS.USE_LOCAL_HISTORY, False)
 
-    def use_remote_history(self):
+    def use_remote_history(self, value=None):
+        if value is not None:
+            return self.set_bool(SETTINGS.USE_REMOTE_HISTORY, value)
         return self.get_bool(SETTINGS.USE_REMOTE_HISTORY, False)
 
     # Selections based on max width and min height at common (utra-)wide aspect ratios
     _QUALITY_SELECTIONS = {                                                                         # Setting | Resolution
-        7:   {'width': 7680, 'min_height': 3148, 'nom_height': 4320, 'label': '{0}p{1} (8K){2}'},   #   7     |   4320p 8K
-        6:   {'width': 3840, 'min_height': 1080, 'nom_height': 2160, 'label': '{0}p{1} (4K){2}'},   #   6     |   2160p 4K
-        5:   {'width': 2560, 'min_height': 984,  'nom_height': 1440, 'label': '{0}p{1} (QHD){2}'},  #   5     |   1440p 2.5K / QHD
-        4.1: {'width': 2048, 'min_height': 858,  'nom_height': 1152, 'label': '{0}p{1} (2K){2}'},   #   N/A   |   1152p 2K / QWXGA
-        4:   {'width': 1920, 'min_height': 787,  'nom_height': 1080, 'label': '{0}p{1} (FHD){2}'},  #   4     |   1080p FHD
-        3:   {'width': 1280, 'min_height': 525,  'nom_height': 720,  'label': '{0}p{1} (HD){2}'},   #   3     |   720p  HD
-        2:   {'width': 854,  'min_height': 350,  'nom_height': 480,  'label': '{0}p{1}{2}'},        #   2     |   480p
-        1:   {'width': 640,  'min_height': 263,  'nom_height': 360,  'label': '{0}p{1}{2}'},        #   1     |   360p
-        0:   {'width': 426,  'min_height': 175,  'nom_height': 240,  'label': '{0}p{1}{2}'},        #   0     |   240p
-        -1:  {'width': 256,  'min_height': 105,  'nom_height': 144,  'label': '{0}p{1}{2}'},        #   N/A   |   144p
-        -2:  {'width': 0,    'min_height': 0,    'nom_height': 0,    'label': '{0}p{1}{2}'},        #   N/A   |   Custom
+        7:   {'width': 7680, 'min_height': 3148, 'nom_height': 4320, 'label': '{0}p{1} (8K){2}{3}{4}'},   #   7     |   4320p 8K
+        6:   {'width': 3840, 'min_height': 1080, 'nom_height': 2160, 'label': '{0}p{1} (4K){2}{3}{4}'},   #   6     |   2160p 4K
+        5:   {'width': 2560, 'min_height': 984,  'nom_height': 1440, 'label': '{0}p{1} (QHD){2}{3}{4}'},  #   5     |   1440p 2.5K / QHD
+        4.1: {'width': 2048, 'min_height': 858,  'nom_height': 1152, 'label': '{0}p{1} (2K){2}{3}{4}'},   #   N/A   |   1152p 2K / QWXGA
+        4:   {'width': 1920, 'min_height': 787,  'nom_height': 1080, 'label': '{0}p{1} (FHD){2}{3}{4}'},  #   4     |   1080p FHD
+        3:   {'width': 1280, 'min_height': 525,  'nom_height': 720,  'label': '{0}p{1} (HD){2}{3}{4}'},   #   3     |   720p  HD
+        2:   {'width': 854,  'min_height': 350,  'nom_height': 480,  'label': '{0}p{1}{2}{3}{4}'},        #   2     |   480p
+        1:   {'width': 640,  'min_height': 263,  'nom_height': 360,  'label': '{0}p{1}{2}{3}{4}'},        #   1     |   360p
+        0:   {'width': 426,  'min_height': 175,  'nom_height': 240,  'label': '{0}p{1}{2}{3}{4}'},        #   0     |   240p
+        -1:  {'width': 256,  'min_height': 105,  'nom_height': 144,  'label': '{0}p{1}{2}{3}{4}'},        #   N/A   |   144p
+        -2:  {'width': 0,    'min_height': 0,    'nom_height': 0,    'label': '{0}p{1}{2}{3}{4}'},        #   N/A   |   Custom
     }
 
     def mpd_video_qualities(self, value=None):
@@ -587,8 +608,7 @@ class AbstractSettings(object):
         if override is None:
             override = self.get_string_list(SETTINGS.HIDE_VIDEOS)
             override = dict.fromkeys(override, False)
-            override['custom'] = (self.get_string(SETTINGS.FILTER_LIST)
-                                  .split(','))
+            override['custom'] = self.get_string(SETTINGS.FILTER_LIST).split(',')
         elif isinstance(override, (list, tuple)):
             _override = {'custom': []}
             for value in override:
@@ -603,13 +623,14 @@ class AbstractSettings(object):
             if 'live_folder' in update:
                 if 'live_folder' not in types:
                     update.update((
-                        ('vod', False),
                         ('upcoming', True),
                         ('upcoming_live', True),
                         ('live', True),
                         ('premieres', True),
                         ('completed', True),
                     ))
+                if 'vod' not in update:
+                    update['vod'] = False
             types.update(update)
 
         if exclude:
@@ -632,9 +653,9 @@ class AbstractSettings(object):
             if isinstance(value, (list, tuple, set)):
                 value = ','.join(value).lstrip(',')
             return self.set_string(SETTINGS.SUBSCRIPTIONS_FILTER_LIST, value)
-        return self.get_string(
-            SETTINGS.SUBSCRIPTIONS_FILTER_LIST, ''
-        ).replace(', ', ',')
+        return self.get_string(SETTINGS.SUBSCRIPTIONS_FILTER_LIST).replace(
+            ', ', ','
+        )
 
     def shorts_duration(self, value=None):
         if value is not None:
@@ -664,13 +685,13 @@ class AbstractSettings(object):
         return self.set_string(SETTINGS.REGION, region_id)
 
     def get_watch_later_playlist(self):
-        return self.get_string(SETTINGS.WATCH_LATER_PLAYLIST, '').strip()
+        return self.get_string(SETTINGS.WATCH_LATER_PLAYLIST).strip()
 
     def set_watch_later_playlist(self, value):
         return self.set_string(SETTINGS.WATCH_LATER_PLAYLIST, value)
 
     def get_history_playlist(self):
-        return self.get_string(SETTINGS.HISTORY_PLAYLIST, '').strip()
+        return self.get_string(SETTINGS.HISTORY_PLAYLIST).strip()
 
     def set_history_playlist(self, value):
         return self.set_string(SETTINGS.HISTORY_PLAYLIST, value)
@@ -701,6 +722,13 @@ class AbstractSettings(object):
     def get_channel_name_aliases(self):
         return frozenset(self.get_string_list(SETTINGS.CHANNEL_NAME_ALIASES))
 
-    def logging_enabled(self):
-        return (self.get_int(SETTINGS.LOGGING_ENABLED, 0)
+    def log_level(self, value=None):
+        if value is not None:
+            return self.set_int(SETTINGS.LOG_LEVEL, value)
+        return (self.get_int(SETTINGS.LOG_LEVEL, 0)
                 or get_kodi_setting_bool('debug.showloginfo'))
+
+    def exec_limit(self, value=None):
+        if value is not None:
+            return self.set_int(SETTINGS.EXEC_LIMIT, value)
+        return self.get_int(SETTINGS.EXEC_LIMIT, 0)

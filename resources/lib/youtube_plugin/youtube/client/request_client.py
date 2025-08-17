@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 
-    Copyright (C) 2023-present plugin.video.youtube
+    Copyright (C) 2023-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 from ..youtube_exceptions import YouTubeException
 from ...kodion.compatibility import range_type
 from ...kodion.network import BaseRequestsClass
-from ...kodion.utils import merge_dicts
+from ...kodion.utils.methods import merge_dicts
 
 
 class YouTubeRequestClient(BaseRequestsClass):
@@ -25,8 +25,8 @@ class YouTubeRequestClient(BaseRequestsClass):
         'web': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
     }
     _PLAYER_PARAMS = {
-        'android': 'CgIIAdgDAQ==',
-        'android_testsuite': '2AMB',
+        'default': '8AEB',
+        'testsuite': '2AMB',
     }
 
     CLIENTS = {
@@ -57,8 +57,11 @@ class YouTubeRequestClient(BaseRequestsClass):
                         'platform': '{_id[platform]}',
                     },
                 },
+                'cpn': '{_cpn}',
+                'params': _PLAYER_PARAMS['default'],
             },
             'headers': {
+                'Origin': 'https://m.youtube.com',
                 'User-Agent': (
                     '{_id[package_id]}/{_id[client_version]}'
                     ' (Linux; U;'
@@ -98,6 +101,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 },
             },
             'headers': {
+                'Origin': 'https://www.youtube.com',
                 'User-Agent': (
                     '{_id[package_id]}/{_id[client_version]}'
                     ' (Linux; U;'
@@ -126,7 +130,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'platform': 'TV',
             },
             '_auth_required': True,
-            '_auth_type': 'personal',
+            '_auth_type': 'user',
             '_query_subtitles': True,
             'json': {
                 'context': {
@@ -141,6 +145,46 @@ class YouTubeRequestClient(BaseRequestsClass):
                 },
             },
             'headers': {
+                'Origin': 'https://m.youtube.com',
+                'User-Agent': (
+                    '{_id[package_id]}/{_id[client_version]}'
+                    ' (Linux; U;'
+                    ' {_id[os_name]} {_id[os_version]}'
+                    ') gzip'
+                ),
+                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Version': '{_id[client_version]}',
+            },
+        },
+        'android_testsuite_params': {
+            '_id': {
+                'client_id': 3,
+                'client_name': 'ANDROID',
+                'client_version': '20.10.38',
+                'android_sdk_version': '32',
+                'os_name': 'Android',
+                'os_version': '15',
+                'package_id': 'com.google.android.youtube',
+                'platform': 'MOBILE',
+            },
+            '_auth_type': False,
+            '_query_subtitles': 'optional',
+            'json': {
+                'context': {
+                    'client': {
+                        'clientName': '{_id[client_name]}',
+                        'clientVersion': '{_id[client_version]}',
+                        'androidSdkVersion': '{_id[android_sdk_version]}',
+                        'osName': '{_id[os_name]}',
+                        'osVersion': '{_id[os_version]}',
+                        'platform': '{_id[platform]}',
+                    },
+                },
+                'cpn': '{_cpn}',
+                'params': _PLAYER_PARAMS['testsuite'],
+            },
+            'headers': {
+                'Origin': 'https://m.youtube.com',
                 'User-Agent': (
                     '{_id[package_id]}/{_id[client_version]}'
                     ' (Linux; U;'
@@ -156,31 +200,43 @@ class YouTubeRequestClient(BaseRequestsClass):
         # 4k no VP9 HDR
         # Limited subtitle availability
         'android_testsuite': {
-            '_id': 30,
             '_disabled': True,
+            '_id': {
+                'client_id': 30,
+                'client_name': 'ANDROID_TESTSUITE',
+                'client_version': '1.9',
+                'android_sdk_version': '32',
+                'os_name': 'Android',
+                'os_version': '15',
+                'package_id': 'com.google.android.youtube',
+                'platform': 'MOBILE',
+            },
+            '_auth_type': False,
             '_query_subtitles': True,
             'json': {
-                # 'params': _PLAYER_PARAMS['android_testsuite'],
                 'context': {
                     'client': {
-                        'clientName': 'ANDROID_TESTSUITE',
-                        'clientVersion': '1.9',
-                        'androidSdkVersion': '30',
-                        'osName': 'Android',
-                        'osVersion': '11',
-                        'platform': 'MOBILE',
+                        'clientName': '{_id[client_name]}',
+                        'clientVersion': '{_id[client_version]}',
+                        'androidSdkVersion': '{_id[android_sdk_version]}',
+                        'osName': '{_id[os_name]}',
+                        'osVersion': '{_id[os_version]}',
+                        'platform': '{_id[platform]}',
                     },
                 },
+                'cpn': '{_cpn}',
+                'params': _PLAYER_PARAMS['testsuite'],
             },
             'headers': {
+                'Origin': 'https://m.youtube.com',
                 'User-Agent': (
-                    'com.google.android.youtube/'
-                    '{json[context][client][clientVersion]}'
-                    ' (Linux; U; {json[context][client][osName]}'
-                    ' {json[context][client][osVersion]}) gzip'
+                    '{_id[package_id]}/{_id[client_version]}'
+                    ' (Linux; U;'
+                    ' {_id[os_name]} {_id[os_version]}'
+                    ') gzip'
                 ),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
+                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Version': '{_id[client_version]}',
             },
         },
         # Disabled - requires PO token
@@ -188,19 +244,29 @@ class YouTubeRequestClient(BaseRequestsClass):
         # Only for videos that allow embedding
         # Limited to 720p on some videos
         'android_embedded': {
-            '_id': 55,
             '_disabled': True,
+            '_id': {
+                'client_id': 55,
+                'client_name': 'ANDROID_EMBEDDED_PLAYER',
+                'client_version': '20.10.38',
+                'android_sdk_version': '32',
+                'os_name': 'Android',
+                'os_version': '15',
+                'package_id': 'com.google.android.youtube',
+                'platform': 'MOBILE',
+            },
+            '_auth_type': False,
             '_query_subtitles': 'optional',
             'json': {
                 'context': {
                     'client': {
-                        'clientName': 'ANDROID_EMBEDDED_PLAYER',
+                        'clientName': '{_id[client_name]}',
                         'clientScreen': 'EMBED',
-                        'clientVersion': '19.29.37',
-                        'androidSdkVersion': '30',
-                        'osName': 'Android',
-                        'osVersion': '11',
-                        'platform': 'MOBILE',
+                        'clientVersion': '{_id[client_version]}',
+                        'androidSdkVersion': '{_id[android_sdk_version]}',
+                        'osName': '{_id[os_name]}',
+                        'osVersion': '{_id[os_version]}',
+                        'platform': '{_id[platform]}',
                     },
                 },
                 'thirdParty': {
@@ -209,13 +275,13 @@ class YouTubeRequestClient(BaseRequestsClass):
             },
             'headers': {
                 'User-Agent': (
-                    'com.google.android.youtube/'
-                    '{json[context][client][clientVersion]}'
-                    ' (Linux; U; {json[context][client][osName]}'
-                    ' {json[context][client][osVersion]}) gzip'
+                    '{_id[package_id]}/{_id[client_version]}'
+                    ' (Linux; U;'
+                    ' {_id[os_name]} {_id[os_version]}'
+                    ') gzip'
                 ),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
+                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Version': '{_id[client_version]}',
             },
         },
         'ios': {
@@ -251,8 +317,59 @@ class YouTubeRequestClient(BaseRequestsClass):
                         'platform': '{_id[platform]}',
                     },
                 },
+                'cpn': '{_cpn}',
             },
             'headers': {
+                'Origin': 'https://m.youtube.com',
+                'User-Agent': (
+                    '{_id[package_id]}/{_id[client_version]}'
+                    ' ({_id[device_model]}; U; CPU'
+                    ' {_id[os_name]}'
+                    ' {_id[os_major]}_{_id[os_minor]}_{_id[os_patch]}'
+                    ' like Mac OS X)'
+                ),
+                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Version': '{_id[client_version]}',
+            },
+        },
+        'ios_testsuite_params': {
+            '_id': {
+                'client_id': 5,
+                'client_name': 'IOS',
+                'client_version': '20.20.7',
+                'device_make': 'Apple',
+                'device_model': 'iPhone16,2',
+                'os_name': 'iOS',
+                'os_major': '18',
+                'os_minor': '5',
+                'os_patch': '0',
+                'os_build': '22F76',
+                'package_id': 'com.google.ios.youtube',
+                'platform': 'MOBILE',
+            },
+            '_auth_type': False,
+            'json': {
+                'context': {
+                    'client': {
+                        'clientName': '{_id[client_name]}',
+                        'clientVersion': '{_id[client_version]}',
+                        'deviceMake': '{_id[device_make]}',
+                        'deviceModel': '{_id[device_model]}',
+                        'osName': '{_id[os_name]}',
+                        'osVersion': (
+                            '{_id[os_major]}'
+                            '.{_id[os_minor]}'
+                            '.{_id[os_patch]}'
+                            '.{_id[os_build]}'
+                        ),
+                        'platform': '{_id[platform]}',
+                    },
+                },
+                'cpn': '{_cpn}',
+                'params': _PLAYER_PARAMS['testsuite'],
+            },
+            'headers': {
+                'Origin': 'https://m.youtube.com',
                 'User-Agent': (
                     '{_id[package_id]}/{_id[client_version]}'
                     ' ({_id[device_model]}; U; CPU'
@@ -279,8 +396,13 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'package_id': 'com.google.ios.youtubeunplugged',
                 'platform': 'MOBILE',
             },
-            '_auth_required': True,
-            '_auth_type': 'personal',
+            # Authorised requests required for this client, but try request even
+            # if not authorised as visitorData is required for subsequent client
+            # requests
+            # '_auth_required': True,
+            '_auth_required': 'ignore_fail',
+            '_auth_type': 'user',
+            '_query_subtitles': True,
             'json': {
                 'context': {
                     'client': {
@@ -300,6 +422,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 },
             },
             'headers': {
+                'Origin': 'https://m.youtube.com',
                 'User-Agent': (
                     '{_id[package_id]}/{_id[client_version]}'
                     ' ({_id[device_model]}; U; CPU'
@@ -373,7 +496,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             },
         },
         'v3': {
-            '_auth_requested': 'personal',
+            '_auth_type': 'user',
             'url': 'https://www.googleapis.com/youtube/v3/{_endpoint}',
             'method': None,
             'headers': {
@@ -493,7 +616,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
         'watch_history': {
             '_auth_required': True,
-            '_auth_type': 'personal',
+            '_auth_type': 'user',
             '_video_id': None,
             'headers': {
                 'Host': 's.youtube.com',
@@ -508,6 +631,23 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'volume': '100',
                 'muted': '0',
             },
+        },
+        'generate_204': {
+            'url': 'https://www.youtube.com/generate_204',
+            'method': 'HEAD',
+            'headers': {
+                'Accept-Encoding': 'gzip, deflate',
+                'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+                'Accept': '*/*',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'User-Agent': (
+                    'Mozilla/5.0 (Linux; Android 10; SM-G981B)'
+                    ' AppleWebKit/537.36 (KHTML, like Gecko)'
+                    ' Chrome/80.0.3987.162'
+                    ' Mobile Safari/537.36'
+                ),
+            },
+            'cache': False,
         },
         '_common': {
             '_access_token': None,
@@ -551,29 +691,40 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
     }
 
-    def __init__(self,
-                 context,
-                 language=None,
-                 region=None,
-                 exc_type=None,
-                 **_kwargs):
-        common_client = self.CLIENTS['_common']['json']['context']['client']
-        # the default language is always en_US (like YouTube on the WEB)
-        language = language.replace('-', '_') if language else 'en_US'
-        self._language = common_client['hl'] = language
-        self._region = common_client['gl'] = region if region else 'US'
+    _language = 'en_US'
+    _region = 'US'
 
-        if isinstance(exc_type, tuple):
-            exc_type = (YouTubeException,) + exc_type
-        elif exc_type:
-            exc_type = (YouTubeException, exc_type)
-        else:
-            exc_type = (YouTubeException,)
-
+    def __init__(self, language='en_US', region='US', exc_type=None, **kwargs):
         super(YouTubeRequestClient, self).__init__(
-            context=context,
-            exc_type=exc_type,
-        )
+            exc_type=(
+                (YouTubeException,) + exc_type
+                if isinstance(exc_type, tuple) else
+                (YouTubeException, exc_type)
+                if exc_type else
+                (YouTubeException,)
+            ),
+            **kwargs)
+        YouTubeRequestClient.init(language=language, region=region)
+
+    @classmethod
+    def init(cls,
+             language='en_US',
+             region='US',
+             **_kwargs):
+        common_client = cls.CLIENTS['_common']['json']['context']['client']
+        # the default language is always en_US (like YouTube on the WEB)
+        cls._language = common_client['hl'] = language.replace('-', '_')
+        cls._region = common_client['gl'] = region
+
+    def reinit(self, **kwargs):
+        super(YouTubeRequestClient, self).reinit(**kwargs)
+        self.__init__(**kwargs)
+
+    def get_language(self):
+        return self._language
+
+    def get_region(self):
+        return self._region
 
     @classmethod
     def json_traverse(cls, json_data, path, default=None):
@@ -655,27 +806,31 @@ class YouTubeRequestClient(BaseRequestsClass):
         base_client = None
         if client_name:
             base_client = cls.CLIENTS.get(client_name)
-            if base_client and base_client.get('_disabled'):
+            if not base_client or base_client.get('_disabled'):
                 return None
         if not base_client:
             base_client = YouTubeRequestClient.CLIENTS['web']
 
         auth_required = base_client.get('_auth_required')
         auth_requested = base_client.get('_auth_requested')
+        auth_type = base_client.get('_auth_type')
 
         if data:
             base_client = merge_dicts(base_client, data)
         client = merge_dicts(cls.CLIENTS['_common'], base_client, templates)
         client['_name'] = client_name
 
-        if auth_required:
+        if auth_required is not None:
             client['_auth_required'] = auth_required
-        if auth_requested:
+        if auth_requested is not None:
             client['_auth_requested'] = auth_requested
+        if auth_type is not None:
+            client['_auth_type'] = auth_type
 
         visitor_data = client.get('_visitor_data')
         if visitor_data:
             client['json']['context']['client']['visitorData'] = visitor_data
+            client['headers']['X-Goog-Visitor-Id'] = visitor_data
 
         for values, template_id, template in templates.values():
             if template_id in values:
@@ -687,7 +842,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             auth_required = client.get('_auth_required')
             auth_requested = client.get('_auth_requested')
             auth_type = client.get('_auth_type')
-            if auth_type == 'tv' and auth_requested != 'personal':
+            if auth_type == 'tv':
                 auth_token = client.get('_access_token_tv')
                 api_key = client.get('_api_key_tv')
             elif auth_type is not False:
@@ -710,7 +865,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                     params = params.copy()
                     del params['key']
                     client['params'] = params
-            elif auth_required:
+            elif auth_required and auth_required != 'ignore_fail':
                 return None
             else:
                 headers = client['headers']
@@ -732,3 +887,11 @@ class YouTubeRequestClient(BaseRequestsClass):
         client['_has_auth'] = has_auth
 
         return client
+
+    def internet_available(self):
+        with self.request(**self.CLIENTS['generate_204']) as response:
+            if response is None:
+                return False
+            if response.status_code == 204:
+                return True
+        return False

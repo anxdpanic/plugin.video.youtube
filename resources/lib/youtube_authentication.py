@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 
-    Copyright (C) 2018-2018 plugin.video.youtube
+    Copyright (C) 2018-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -9,6 +9,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from youtube_plugin.kodion import logging
 from youtube_plugin.kodion.constants import ADDON_ID
 from youtube_plugin.kodion.context import XbmcContext
 from youtube_plugin.youtube.helper import yt_login
@@ -23,27 +24,8 @@ __all__ = (
     'sign_out',
 )
 
-_SIGN_IN = 'in'
-_SIGN_OUT = 'out'
 
-
-def __add_new_developer(addon_id):
-    """
-
-    :param addon_id: id of the add-on being added
-    :return:
-    """
-    context = XbmcContext(params={'addon_id': addon_id})
-
-    access_manager = context.get_access_manager()
-    developers = access_manager.get_developers()
-    if not developers.get(addon_id, None):
-        developers[addon_id] = access_manager.get_new_developer()
-        access_manager.set_developers(developers)
-        context.log_debug('Creating developer user: |%s|' % addon_id)
-
-
-def __auth(addon_id, mode=_SIGN_IN):
+def _auth(addon_id, mode=yt_login.SIGN_IN):
     """
 
     :param addon_id: id of the add-on being signed in
@@ -51,38 +33,35 @@ def __auth(addon_id, mode=_SIGN_IN):
     :return: addon provider, context and client
     """
     if not addon_id or addon_id == ADDON_ID:
-        context = XbmcContext()
-        context.log_error('Developer authentication: |%s| Invalid addon_id' % addon_id)
-        return
-    __add_new_developer(addon_id)
+        logging.error_trace('Invalid addon_id: %r', addon_id)
+        return False
+
     provider = Provider()
     context = XbmcContext(params={'addon_id': addon_id})
 
-    _ = provider.get_client(context=context)
-    logged_in = provider.is_logged_in()
-    if mode == _SIGN_IN:
-        if logged_in:
-            return True
-        else:
-            provider.reset_client()
-            yt_login.process(mode, provider, context, sign_out_refresh=False)
-    elif mode == _SIGN_OUT:
-        if not logged_in:
-            return True
-        else:
-            provider.reset_client()
-            try:
-                yt_login.process(mode, provider, context, sign_out_refresh=False)
-            except LoginException:
-                reset_access_tokens(addon_id)
-    else:
-        raise Exception('Unknown mode: |%s|' % mode)
+    access_manager = context.get_access_manager()
+    if access_manager.add_new_developer(addon_id):
+        logging.debug('Creating developer user: %r', addon_id)
 
-    _ = provider.get_client(context=context)
-    if mode == _SIGN_IN:
-        return provider.is_logged_in()
-    else:
-        return not provider.is_logged_in()
+    client = provider.get_client(context=context)
+
+    if mode == yt_login.SIGN_IN:
+        if client.logged_in:
+            yt_login.process(yt_login.SIGN_OUT,
+                             provider,
+                             context,
+                             client=client,
+                             refresh=False)
+            client = None
+    elif mode != yt_login.SIGN_OUT:
+        raise Exception('Unknown mode: %r' % mode)
+
+    yt_login.process(mode, provider, context, client=client, refresh=False)
+
+    logged_in = provider.get_client(context=context).logged_in
+    if mode == yt_login.SIGN_IN:
+        return logged_in
+    return not logged_in
 
 
 def sign_in(addon_id):
@@ -120,7 +99,7 @@ def sign_in(addon_id):
     :return: boolean, True when signed in
     """
 
-    return __auth(addon_id, mode=_SIGN_IN)
+    return _auth(addon_id, mode=yt_login.SIGN_IN)
 
 
 def sign_out(addon_id):
@@ -151,7 +130,7 @@ def sign_out(addon_id):
     :return: boolean, True when signed out
     """
 
-    return __auth(addon_id, mode=_SIGN_OUT)
+    return _auth(addon_id, mode=yt_login.SIGN_OUT)
 
 
 def reset_access_tokens(addon_id):
@@ -161,10 +140,9 @@ def reset_access_tokens(addon_id):
     :return:
     """
     if not addon_id or addon_id == ADDON_ID:
-        context = XbmcContext()
-        context.log_error('Reset addon access tokens - invalid addon_id: |{0}|'
-                          .format(addon_id))
+        logging.error_trace('Invalid addon_id: %r', addon_id)
         return
+
     context = XbmcContext(params={'addon_id': addon_id})
     context.get_access_manager().update_access_token(
         addon_id, access_token='', expiry=-1, refresh_token=''

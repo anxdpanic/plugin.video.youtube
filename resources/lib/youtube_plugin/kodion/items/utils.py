@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -13,15 +13,18 @@ from __future__ import absolute_import, division, unicode_literals
 import json
 from datetime import date, datetime
 
+from .bookmark_item import BookmarkItem
 from .directory_item import DirectoryItem
 from .image_item import ImageItem
 from .media_item import AudioItem, VideoItem
+from .. import logging
 from ..compatibility import string_type, to_str
 from ..utils.datetime_parser import strptime
 
 
 _ITEM_TYPES = {
     'AudioItem': AudioItem,
+    'BookmarkItem': BookmarkItem,
     'DirectoryItem': DirectoryItem,
     'ImageItem': ImageItem,
     'VideoItem': VideoItem,
@@ -67,13 +70,16 @@ def from_json(json_data, *args):
 
     item_type = json_data.get('type')
     if not item_type or item_type not in _ITEM_TYPES:
+        logging.warning_trace(('Unsupported item type', 'Data: {data!r}'),
+                              data=json_data)
+        return None
+
+    item_data = json_data.get('data')
+    if not item_data:
         return None
 
     item = _ITEM_TYPES[item_type](name='', uri='')
-
-    for key, value in json_data.get('data', {}).items():
-        if hasattr(item, key):
-            setattr(item, key, value)
+    item.__dict__.update(item_data)
 
     if bookmark_id:
         item.bookmark_id = bookmark_id

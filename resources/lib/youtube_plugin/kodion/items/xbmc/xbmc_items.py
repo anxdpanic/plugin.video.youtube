@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -19,19 +19,25 @@ from .. import (
     MediaItem,
     VideoItem,
 )
+from ... import logging
 from ...compatibility import to_str, xbmc, xbmcgui
 from ...constants import (
+    BOOKMARK_ID,
     CHANNEL_ID,
-    PLAYLISTITEM_ID,
+    PATHS,
+    PLAYLIST_ITEM_ID,
     PLAYLIST_ID,
     PLAY_COUNT,
     PLAY_STRM,
     PLAY_TIMESHIFT,
-    PLAY_WITH,
+    PLAY_USING,
     SUBSCRIPTION_ID,
+    VALUE_TO_STR,
     VIDEO_ID,
 )
-from ...utils import current_system_version, datetime_parser, redact_ip_in_uri
+from ...utils.datetime_parser import datetime_to_since, utc_to_local
+from ...utils.redact import redact_ip_in_uri
+from ...utils.system_version import current_system_version
 
 
 def set_info(list_item, item, properties, set_play_count=True, resume=True):
@@ -104,15 +110,13 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
                 info_labels['year'] = value
 
             resume_time = resume and item.get_start_time()
-            if resume_time:
+            if resume_time is not None:
                 properties['ResumeTime'] = str(resume_time)
             duration = item.get_duration()
-            if duration:
+            if duration > 0:
                 properties['TotalTime'] = str(duration)
                 if info_type == 'video':
                     list_item.addStreamInfo(info_type, {'duration': duration})
-
-            if duration is not None:
                 info_labels['duration'] = duration
 
         elif isinstance(item, DirectoryItem):
@@ -305,25 +309,26 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
         resume_time = resume and item.get_start_time()
         duration = item.get_duration()
         if info_type == 'video':
-            if resume_time and duration:
-                info_tag.setResumePoint(resume_time, float(duration))
-            elif resume_time:
-                info_tag.setResumePoint(resume_time)
-            if duration:
+            if resume_time is not None:
+                if duration > 0:
+                    info_tag.setResumePoint(resume_time, float(duration))
+                else:
+                    info_tag.setResumePoint(resume_time)
+            if duration > 0:
                 info_tag.addVideoStream(xbmc.VideoStreamDetail(
                     duration=duration,
                 ))
         elif info_type == 'music':
             # These properties are deprecated but there is no other way to set
             # these details for a ListItem with a MusicInfoTag
-            if resume_time:
+            if resume_time is not None:
                 properties['ResumeTime'] = str(resume_time)
-            if duration:
+            if duration > 0:
                 properties['TotalTime'] = str(duration)
 
         # duration: int
         # As seconds
-        if duration is not None:
+        if duration > 0:
             info_tag.setDuration(duration)
 
     elif isinstance(item, DirectoryItem):
@@ -406,14 +411,15 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
 
 def playback_item(context, media_item, show_fanart=None, **_kwargs):
     uri = media_item.get_uri()
-    context.log_debug('Converting %s |%s|' % (media_item.__class__.__name__,
-                                              redact_ip_in_uri(uri)))
+    logging.debug('Converting %s for playback: %r',
+                  media_item.__class__.__name__,
+                  redact_ip_in_uri(uri))
 
     params = context.get_params()
     settings = context.get_settings()
     ui = context.get_ui()
 
-    is_external = ui.get_property(PLAY_WITH)
+    is_external = ui.get_property(PLAY_USING)
     is_strm = params.get(PLAY_STRM)
     mime_type = None
 
@@ -431,9 +437,10 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
             'offscreen': True,
         }
         props = {
-            'isPlayable': str(media_item.playable).lower(),
+            'isPlayable': VALUE_TO_STR[media_item.playable],
             'playlist_type_hint': (
-                xbmc.PLAYLIST_MUSIC if isinstance(media_item, AudioItem) else
+                xbmc.PLAYLIST_MUSIC
+                if isinstance(media_item, AudioItem) else
                 xbmc.PLAYLIST_VIDEO
             ),
         }
@@ -531,7 +538,15 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
 
 def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
     uri = directory_item.get_uri()
-    context.log_debug('Converting DirectoryItem |%s|' % uri)
+    is_action = directory_item.is_action()
+    if not is_action:
+        path, params = context.parse_uri(uri)
+        if path.rstrip('/') == PATHS.PLAY and params.get('action') != 'list':
+            is_action = True
+    if is_action:
+        logging.debug('Converting DirectoryItem action: %r', uri)
+    else:
+        logging.debug('Converting DirectoryItem: %r', uri)
 
     kwargs = {
         'label': directory_item.get_name(),
@@ -546,7 +561,11 @@ def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
     if directory_item.next_page:
         props['specialSort'] = 'bottom'
     else:
-        special_sort = 'top'
+        special_sort = directory_item.get_special_sort()
+        if special_sort is None:
+            special_sort = 'top'
+        elif special_sort is False:
+            special_sort = None
 
         prop_value = directory_item.subscription_id
         if prop_value:
@@ -562,6 +581,11 @@ def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
         if prop_value:
             special_sort = None
             props[PLAYLIST_ID] = prop_value
+
+        prop_value = directory_item.bookmark_id
+        if prop_value:
+            special_sort = None
+            props[BOOKMARK_ID] = prop_value
 
         if special_sort:
             props['specialSort'] = special_sort
@@ -581,29 +605,16 @@ def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
 
     set_info(list_item, directory_item, props)
 
-    """
-    ListItems that do not open a lower level list should have the isFolder
-    parameter of the xbmcplugin.addDirectoryItem set to False, however this
-    now appears to mark the ListItem as playable, even if the IsPlayable
-    property is not set or set to "false".
-    Set isFolder to True as a workaround, regardless of whether the ListItem
-    is actually a folder.
-    """
-    # Workaround:
-    # is_folder = True
-    # Test correctly setting isFolder:
-    is_folder = not directory_item.is_action()
-
     context_menu = directory_item.get_context_menu()
     if context_menu is not None:
         list_item.addContextMenuItems(context_menu)
 
-    return uri, list_item, is_folder
+    return uri, list_item, not is_action
 
 
 def image_listitem(context, image_item, show_fanart=None, **_kwargs):
     uri = image_item.get_uri()
-    context.log_debug('Converting ImageItem |%s|' % uri)
+    logging.debug('Converting ImageItem: %r', uri)
 
     kwargs = {
         'label': image_item.get_name(),
@@ -611,7 +622,7 @@ def image_listitem(context, image_item, show_fanart=None, **_kwargs):
         'offscreen': True,
     }
     props = {
-        'isPlayable': str(image_item.playable).lower(),
+        'isPlayable': VALUE_TO_STR[image_item.playable],
         'ForceResolvePlugin': 'true',
     }
 
@@ -636,9 +647,9 @@ def image_listitem(context, image_item, show_fanart=None, **_kwargs):
     return uri, list_item, False
 
 
-def uri_listitem(context, uri_item, **_kwargs):
+def uri_listitem(_context, uri_item, **_kwargs):
     uri = uri_item.get_uri()
-    context.log_debug('Converting UriItem |%s|' % uri)
+    logging.debug('Converting UriItem: %r', uri)
 
     kwargs = {
         'label': uri_item.get_name(),
@@ -646,7 +657,7 @@ def uri_listitem(context, uri_item, **_kwargs):
         'offscreen': True,
     }
     props = {
-        'isPlayable': str(uri_item.playable).lower(),
+        'isPlayable': VALUE_TO_STR[uri_item.playable],
         'ForceResolvePlugin': 'true',
     }
 
@@ -658,12 +669,10 @@ def uri_listitem(context, uri_item, **_kwargs):
 def media_listitem(context,
                    media_item,
                    show_fanart=None,
-                   focused=None,
-                   played=None,
+                   to_sync=None,
                    **_kwargs):
     uri = media_item.get_uri()
-    context.log_debug('Converting %s |%s|' % (media_item.__class__.__name__,
-                                              uri))
+    logging.debug('Converting %s: %r', media_item.__class__.__name__, uri)
 
     kwargs = {
         'label': media_item.get_name(),
@@ -672,10 +681,11 @@ def media_listitem(context,
         'offscreen': True,
     }
     props = {
-        'isPlayable': str(media_item.playable).lower(),
+        'isPlayable': VALUE_TO_STR[media_item.playable],
         'ForceResolvePlugin': 'true',
         'playlist_type_hint': (
-            xbmc.PLAYLIST_MUSIC if isinstance(media_item, AudioItem) else
+            xbmc.PLAYLIST_MUSIC
+            if isinstance(media_item, AudioItem) else
             xbmc.PLAYLIST_VIDEO
         ),
     }
@@ -685,12 +695,12 @@ def media_listitem(context,
     datetime = scheduled_start or published_at
     local_datetime = None
     if datetime:
-        local_datetime = datetime_parser.utc_to_local(datetime)
+        local_datetime = utc_to_local(datetime)
         props['PublishedLocal'] = to_str(local_datetime)
     if media_item.live:
         props['PublishedSince'] = context.localize('live')
     elif local_datetime:
-        props['PublishedSince'] = to_str(datetime_parser.datetime_to_since(
+        props['PublishedSince'] = to_str(datetime_to_since(
             context, local_datetime
         ))
 
@@ -698,13 +708,10 @@ def media_listitem(context,
     resume = True
     prop_value = media_item.video_id
     if prop_value:
-        if focused and prop_value == focused:
-            set_play_count = False
-            resume = False
-        if played and prop_value == played:
-            set_play_count = 'forced'
-            resume = False
         props[VIDEO_ID] = prop_value
+
+        if to_sync and prop_value in to_sync:
+            set_play_count = False
 
     # make channel_id property available for keymapping
     prop_value = media_item.channel_id
@@ -724,7 +731,12 @@ def media_listitem(context,
     # make playlist_item_id property available for keymapping
     prop_value = media_item.playlist_item_id
     if prop_value:
-        props[PLAYLISTITEM_ID] = prop_value
+        props[PLAYLIST_ITEM_ID] = prop_value
+
+    # make bookmark_id property available for keymapping
+    prop_value = media_item.bookmark_id
+    if prop_value:
+        props[BOOKMARK_ID] = prop_value
 
     list_item = xbmcgui.ListItem(**kwargs)
 
@@ -744,18 +756,8 @@ def media_listitem(context,
     set_info(list_item,
              media_item,
              props,
-             set_play_count=set_play_count and set_play_count != 'forced',
+             set_play_count=set_play_count,
              resume=resume)
-
-    if not set_play_count:
-        video_id = media_item.video_id
-        playback_history = context.get_playback_history()
-        playback_history.set_item(video_id, dict(
-            playback_history.get_item(video_id) or {},
-            play_count=int(not media_item.get_play_count()),
-            played_time=0.0,
-            played_percent=0,
-        ))
 
     context_menu = media_item.get_context_menu()
     if context_menu:

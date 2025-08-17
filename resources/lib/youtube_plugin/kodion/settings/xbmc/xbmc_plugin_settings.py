@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -13,9 +13,9 @@ from __future__ import absolute_import, division, unicode_literals
 from weakref import ref
 
 from ..abstract_settings import AbstractSettings
+from ... import logging
 from ...compatibility import xbmcaddon
-from ...constants import ADDON_ID, VALUE_FROM_STR
-from ...logger import Logger
+from ...constants import ADDON_ID, BOOL_FROM_STR
 from ...utils.system_version import current_system_version
 
 
@@ -93,7 +93,9 @@ class SettingsProxy(object):
                 del self._ref
 
 
-class XbmcPluginSettings(AbstractSettings, Logger):
+class XbmcPluginSettings(AbstractSettings):
+    log = logging.getLogger(__name__)
+
     _instances = set()
     _proxy = None
 
@@ -132,9 +134,9 @@ class XbmcPluginSettings(AbstractSettings, Logger):
                 self.__class__._instances.add(xbmc_addon)
             self._proxy = SettingsProxy(xbmc_addon)
 
-        self._echo = self.logging_enabled()
+        self._echo_level = self.log_level()
 
-    def get_bool(self, setting, default=None, echo=None):
+    def get_bool(self, setting, default=None, echo_level=2):
         if setting in self._cache:
             return self._cache[setting]
 
@@ -144,8 +146,8 @@ class XbmcPluginSettings(AbstractSettings, Logger):
         except (TypeError, ValueError) as exc:
             error = exc
             try:
-                value = self.get_string(setting, echo=False)
-                value = VALUE_FROM_STR.get(value, default)
+                value = self.get_string(setting, echo_level=0)
+                value = BOOL_FROM_STR.get(value, default)
             except TypeError as exc:
                 error = exc
                 value = default
@@ -153,15 +155,17 @@ class XbmcPluginSettings(AbstractSettings, Logger):
             error = exc
             value = default
 
-        if self._echo and echo is not False:
-            self.log_debug('Get |{setting}|: {value} (bool, {status})'
-                           .format(setting=setting,
-                                   value=value,
-                                   status=error if error else 'success'))
+        if echo_level and self._echo_level:
+            self.log.debug_trace('Get setting {name!r}:'
+                                 ' {value!r} (bool, {state})',
+                                 name=setting,
+                                 value=value,
+                                 state=(error if error else 'success'),
+                                 stacklevel=echo_level)
         self._cache[setting] = value
         return value
 
-    def set_bool(self, setting, value, echo=None):
+    def set_bool(self, setting, value, echo_level=2):
         try:
             error = not self._proxy.set_bool(setting, value)
             if error and self._check_set:
@@ -172,14 +176,16 @@ class XbmcPluginSettings(AbstractSettings, Logger):
         except (RuntimeError, TypeError) as exc:
             error = exc
 
-        if self._echo and echo is not False:
-            self.log_debug('Set |{setting}|: {value} (bool, {status})'
-                           .format(setting=setting,
-                                   value=value,
-                                   status=error if error else 'success'))
+        if echo_level and self._echo_level:
+            self.log.debug_trace('Set setting {name!r}:'
+                                 ' {value!r} (bool, {state})',
+                                 name=setting,
+                                 value=value,
+                                 state=(error if error else 'success'),
+                                 stacklevel=echo_level)
         return not error
 
-    def get_int(self, setting, default=-1, process=None, echo=None):
+    def get_int(self, setting, default=-1, process=None, echo_level=2):
         if setting in self._cache:
             return self._cache[setting]
 
@@ -191,7 +197,7 @@ class XbmcPluginSettings(AbstractSettings, Logger):
         except (TypeError, ValueError) as exc:
             error = exc
             try:
-                value = self.get_string(setting, echo=False)
+                value = self.get_string(setting, echo_level=0)
                 value = int(value)
             except (TypeError, ValueError) as exc:
                 error = exc
@@ -200,15 +206,17 @@ class XbmcPluginSettings(AbstractSettings, Logger):
             error = exc
             value = default
 
-        if self._echo and echo is not False:
-            self.log_debug('Get |{setting}|: {value} (int, {status})'
-                           .format(setting=setting,
-                                   value=value,
-                                   status=error if error else 'success'))
+        if echo_level and self._echo_level:
+            self.log.debug_trace('Get setting {name!r}:'
+                                 ' {value!r} (int, {state})',
+                                 name=setting,
+                                 value=value,
+                                 state=(error if error else 'success'),
+                                 stacklevel=echo_level)
         self._cache[setting] = value
         return value
 
-    def set_int(self, setting, value, echo=None):
+    def set_int(self, setting, value, echo_level=2):
         try:
             error = not self._proxy.set_int(setting, value)
             if error and self._check_set:
@@ -219,14 +227,16 @@ class XbmcPluginSettings(AbstractSettings, Logger):
         except (RuntimeError, TypeError) as exc:
             error = exc
 
-        if self._echo and echo is not False:
-            self.log_debug('Set |{setting}|: {value} (int, {status})'
-                           .format(setting=setting,
-                                   value=value,
-                                   status=error if error else 'success'))
+        if echo_level and self._echo_level:
+            self.log.debug_trace('Set setting {name!r}:'
+                                 ' {value!r} (int, {state})',
+                                 name=setting,
+                                 value=value,
+                                 state=(error if error else 'success'),
+                                 stacklevel=echo_level)
         return not error
 
-    def get_string(self, setting, default='', echo=None):
+    def get_string(self, setting, default='', echo_level=2):
         if setting in self._cache:
             return self._cache[setting]
 
@@ -237,23 +247,29 @@ class XbmcPluginSettings(AbstractSettings, Logger):
             error = exc
             value = default
 
-        if self._echo and echo is not False:
-            if setting == 'youtube.location':
-                echo = 'xx.xxxx,xx.xxxx'
-            elif setting == 'youtube.api.id':
-                echo = '...'.join((value[:3], value[-5:]))
-            elif setting in {'youtube.api.key', 'youtube.api.secret'}:
-                echo = '...'.join((value[:3], value[-3:]))
+        if echo_level and self._echo_level:
+            if setting == self.LOCATION:
+                log_value = 'xx.xxxx,xx.xxxx'
+            elif setting == self.API_ID:
+                log_value = ('...'.join((value[:3], value[-5:]))
+                             if len(value) > 11 else
+                             '...')
+            elif setting in {self.API_KEY, self.API_SECRET}:
+                log_value = ('...'.join((value[:3], value[-3:]))
+                             if len(value) > 9 else
+                             '...')
             else:
-                echo = value
-            self.log_debug('Get |{setting}|: "{echo}" (str, {status})'
-                           .format(setting=setting,
-                                   echo=echo,
-                                   status=error if error else 'success'))
+                log_value = value
+            self.log.debug_trace('Get setting {name!r}:'
+                                 ' {value!r} (str, {state})',
+                                 name=setting,
+                                 value=log_value,
+                                 state=(error if error else 'success'),
+                                 stacklevel=echo_level)
         self._cache[setting] = value
         return value
 
-    def set_string(self, setting, value, echo=None):
+    def set_string(self, setting, value, echo_level=2):
         try:
             error = not self._proxy.set_str(setting, value)
             if error and self._check_set:
@@ -264,22 +280,28 @@ class XbmcPluginSettings(AbstractSettings, Logger):
         except (RuntimeError, TypeError) as exc:
             error = exc
 
-        if self._echo and echo is not False:
-            if setting == 'youtube.location':
-                echo = 'xx.xxxx,xx.xxxx'
-            elif setting == 'youtube.api.id':
-                echo = '...'.join((value[:3], value[-5:]))
-            elif setting in {'youtube.api.key', 'youtube.api.secret'}:
-                echo = '...'.join((value[:3], value[-3:]))
+        if echo_level and self._echo_level:
+            if setting == self.LOCATION:
+                log_value = 'xx.xxxx,xx.xxxx'
+            elif setting == self.API_ID:
+                log_value = ('...'.join((value[:3], value[-5:]))
+                             if len(value) > 11 else
+                             '...')
+            elif setting in {self.API_KEY, self.API_SECRET}:
+                log_value = ('...'.join((value[:3], value[-3:]))
+                             if len(value) > 9 else
+                             '...')
             else:
-                echo = value
-            self.log_debug('Set |{setting}|: "{echo}" (str, {status})'
-                           .format(setting=setting,
-                                   echo=echo,
-                                   status=error if error else 'success'))
+                log_value = value
+            self.log.debug_trace('Set setting {name!r}:'
+                                 ' {value!r} (str, {state})',
+                                 name=setting,
+                                 value=log_value,
+                                 state=(error if error else 'success'),
+                                 stacklevel=echo_level)
         return not error
 
-    def get_string_list(self, setting, default=None, echo=None):
+    def get_string_list(self, setting, default=None, echo_level=2):
         if setting in self._cache:
             return self._cache[setting]
 
@@ -290,17 +312,19 @@ class XbmcPluginSettings(AbstractSettings, Logger):
                 value = [] if default is None else default
         except (RuntimeError, TypeError) as exc:
             error = exc
-            value = default
+            value = [] if default is None else default
 
-        if self._echo and echo is not False:
-            self.log_debug('Get |{setting}|: "{value}" (str list, {status})'
-                           .format(setting=setting,
-                                   value=value,
-                                   status=error if error else 'success'))
+        if echo_level and self._echo_level:
+            self.log.debug_trace('Get setting {name!r}:'
+                                 ' {value} (list[str], {state})',
+                                 name=setting,
+                                 value=value,
+                                 state=(error if error else 'success'),
+                                 stacklevel=echo_level)
         self._cache[setting] = value
         return value
 
-    def set_string_list(self, setting, value, echo=None):
+    def set_string_list(self, setting, value, echo_level=2):
         try:
             error = not self._proxy.set_str_list(setting, value)
             if error and self._check_set:
@@ -311,9 +335,11 @@ class XbmcPluginSettings(AbstractSettings, Logger):
         except (RuntimeError, TypeError) as exc:
             error = exc
 
-        if self._echo and echo is not False:
-            self.log_debug('Set |{setting}|: "{value}" (str list, {status})'
-                           .format(setting=setting,
-                                   value=value,
-                                   status=error if error else 'success'))
+        if echo_level and self._echo_level:
+            self.log.debug_trace('Set setting {name!r}:'
+                                 ' {value} (list[str], {state})',
+                                 name=setting,
+                                 value=value,
+                                 state=(error if error else 'success'),
+                                 stacklevel=echo_level)
         return not error

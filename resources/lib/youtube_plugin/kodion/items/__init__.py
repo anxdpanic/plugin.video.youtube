@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -12,6 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from . import menu_items
 from .base_item import BaseItem
+from .bookmark_item import BookmarkItem
 from .command_item import CommandItem
 from .directory_item import DirectoryItem
 from .image_item import ImageItem
@@ -33,6 +34,7 @@ from .xbmc.xbmc_items import (
 __all__ = (
     'AudioItem',
     'BaseItem',
+    'BookmarkItem',
     'CommandItem',
     'DirectoryItem',
     'ImageItem',

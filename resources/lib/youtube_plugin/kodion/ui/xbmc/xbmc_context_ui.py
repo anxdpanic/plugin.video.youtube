@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -13,12 +13,15 @@ from __future__ import absolute_import, division, unicode_literals
 from weakref import proxy
 
 from ..abstract_context_ui import AbstractContextUI
+from ... import logging
 from ...compatibility import string_type, xbmc, xbmcgui
-from ...constants import ADDON_ID, REFRESH_CONTAINER
-from ...utils import to_unicode
+from ...constants import ADDON_ID, BOOL_FROM_STR, REFRESH_CONTAINER
+from ...utils.convert_format import to_unicode
 
 
 class XbmcContextUI(AbstractContextUI):
+    log = logging.getLogger(__name__)
+
     def __init__(self, context):
         super(XbmcContextUI, self).__init__()
         self._context = context
@@ -29,7 +32,8 @@ class XbmcContextUI(AbstractContextUI):
                                total=None,
                                background=False,
                                message_template=None,
-                               template_params=None):
+                               template_params=None,
+                               hide_progress=None):
         if not message_template and background:
             message_template = '{_message} {_current}/{_total}'
 
@@ -44,7 +48,11 @@ class XbmcContextUI(AbstractContextUI):
             total=int(total) if total is not None else 0,
             message_template=message_template,
             template_params=template_params,
-            hide=self._context.get_param('hide_progress'),
+            hide=(
+                self._context.get_param('hide_progress')
+                if hide_progress is None else
+                hide_progress
+            ),
         )
 
     def on_keyboard_input(self, title, default='', hidden=False):
@@ -78,19 +86,19 @@ class XbmcContextUI(AbstractContextUI):
     def on_remove_content(self, name):
         return self.on_yes_no_input(
             self._context.localize('content.remove'),
-            self._context.localize('content.remove.check') % to_unicode(name),
+            self._context.localize('content.remove.check.x', to_unicode(name)),
         )
 
     def on_delete_content(self, name):
         return self.on_yes_no_input(
             self._context.localize('content.delete'),
-            self._context.localize('content.delete.check') % to_unicode(name),
+            self._context.localize('content.delete.check.x', to_unicode(name)),
         )
 
     def on_clear_content(self, name):
         return self.on_yes_no_input(
             self._context.localize('content.clear'),
-            self._context.localize('content.clear.check') % to_unicode(name),
+            self._context.localize('content.clear.check.x', to_unicode(name)),
         )
 
     def on_select(self, title, items=None, preselect=-1, use_details=False):
@@ -161,33 +169,82 @@ class XbmcContextUI(AbstractContextUI):
     def refresh_container(self):
         self._context.send_notification(REFRESH_CONTAINER)
 
-    def set_property(self, property_id, value='true'):
-        self._context.log_debug('Set property |{id}|: {value!r}'
-                                .format(id=property_id, value=value))
-        _property_id = '-'.join((ADDON_ID, property_id))
+    def set_property(self,
+                     property_id,
+                     value='true',
+                     stacklevel=2,
+                     process=None,
+                     log_value=None,
+                     log_process=None,
+                     raw=False):
+        if log_value is None:
+            log_value = value
+        if log_process:
+            log_value = log_process(log_value)
+        self.log.debug_trace('Set property {property_id!r}: {value!r}',
+                             property_id=property_id,
+                             value=log_value,
+                             stacklevel=stacklevel)
+        _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
+        if process:
+            value = process(value)
         xbmcgui.Window(10000).setProperty(_property_id, value)
         return value
 
-    def get_property(self, property_id):
-        _property_id = '-'.join((ADDON_ID, property_id))
+    def get_property(self,
+                     property_id,
+                     stacklevel=2,
+                     process=None,
+                     log_value=None,
+                     log_process=None,
+                     raw=False,
+                     as_bool=False,
+                     default=False):
+        _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
         value = xbmcgui.Window(10000).getProperty(_property_id)
-        self._context.log_debug('Get property |{id}|: {value!r}'
-                                .format(id=property_id, value=value))
-        return value
+        if log_value is None:
+            log_value = value
+        if log_process:
+            log_value = log_process(log_value)
+        self.log.debug_trace('Get property {property_id!r}: {value!r}',
+                             property_id=property_id,
+                             value=log_value,
+                             stacklevel=stacklevel)
+        if process:
+            value = process(value)
+        return BOOL_FROM_STR.get(value, default) if as_bool else value
 
-    def pop_property(self, property_id):
-        _property_id = '-'.join((ADDON_ID, property_id))
+    def pop_property(self,
+                     property_id,
+                     stacklevel=2,
+                     process=None,
+                     log_value=None,
+                     log_process=None,
+                     raw=False,
+                     as_bool=False,
+                     default=False):
+        _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
         window = xbmcgui.Window(10000)
         value = window.getProperty(_property_id)
         if value:
             window.clearProperty(_property_id)
-        self._context.log_debug('Pop property |{id}|: {value!r}'
-                                .format(id=property_id, value=value))
-        return value
+        if process:
+            value = process(value)
+        if log_value is None:
+            log_value = value
+        if log_process:
+            log_value = log_process(log_value)
+        self.log.debug_trace('Pop property {property_id!r}: {value!r}',
+                             property_id=property_id,
+                             value=log_value,
+                             stacklevel=stacklevel)
+        return BOOL_FROM_STR.get(value, default) if as_bool else value
 
-    def clear_property(self, property_id):
-        self._context.log_debug('Clear property |{id}|'.format(id=property_id))
-        _property_id = '-'.join((ADDON_ID, property_id))
+    def clear_property(self, property_id, stacklevel=2, raw=False):
+        self.log.debug_trace('Clear property {property_id!r}',
+                             property_id=property_id,
+                             stacklevel=stacklevel)
+        _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
         xbmcgui.Window(10000).clearProperty(_property_id)
         return None
 
@@ -442,6 +499,10 @@ class XbmcBusyDialog(object):
 
     def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
         self.close()
+        if exc_val:
+            logging.exception('Error',
+                              exc_info=(exc_type, exc_val, exc_tb),
+                              stacklevel=2)
 
     @staticmethod
     def close():

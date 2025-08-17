@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 
-    Copyright (C) 2018-2018 plugin.video.youtube
+    Copyright (C) 2018-2025 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -10,27 +10,40 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import json
-import threading
+from io import open
+from threading import Event, Lock, Thread
 
+from .. import logging
 from ..compatibility import urlsplit, xbmc, xbmcgui
 from ..constants import (
     ADDON_ID,
+    BOOL_FROM_STR,
+    BUSY_FLAG,
     CHECK_SETTINGS,
     CONTAINER_FOCUS,
+    FILE_READ,
+    FILE_WRITE,
+    MARK_AS_LABEL,
     PATHS,
     PLAYBACK_STOPPED,
     PLAYER_VIDEO_ID,
+    PLAY_CANCELLED,
     PLAY_FORCED,
     PLUGIN_WAKEUP,
     REFRESH_CONTAINER,
     RELOAD_ACCESS_MANAGER,
     SERVER_WAKEUP,
-    WAKEUP,
+    SERVICE_IPC,
+    SYNC_LISTITEM,
+    VIDEO_ID,
 )
 from ..network import get_connect_address, get_http_server, httpd_status
+from ..utils.methods import jsonrpc
 
 
 class ServiceMonitor(xbmc.Monitor):
+    log = logging.getLogger(__name__)
+
     _settings_changes = 0
     _settings_collect = False
     get_idle_time = xbmc.getGlobalIdleTime
@@ -54,6 +67,8 @@ class ServiceMonitor(xbmc.Monitor):
         self.system_sleep = False
         self.refresh = False
         self.interrupt = False
+
+        self.file_access = {}
 
         self.onSettingsChanged(force=True)
 
@@ -95,25 +110,109 @@ class ServiceMonitor(xbmc.Monitor):
             'is_active': is_plugin and not _busy(),
         }
 
-    def clear_property(self, property_id):
-        self._context.log_debug('Clear property |{id}|'.format(id=property_id))
-        _property_id = '-'.join((ADDON_ID, property_id))
-        xbmcgui.Window(10000).clearProperty(_property_id)
-        return None
+    @staticmethod
+    def send_notification(method,
+                          data=True,
+                          sender='.'.join((ADDON_ID, 'service'))):
+        jsonrpc(method='JSONRPC.NotifyAll',
+                params={'sender': sender,
+                        'message': method,
+                        'data': data})
 
-    def set_property(self, property_id, value='true'):
-        self._context.log_debug('Set property |{id}|: {value!r}'
-                                .format(id=property_id, value=value))
-        _property_id = '-'.join((ADDON_ID, property_id))
+    def set_property(self,
+                     property_id,
+                     value='true',
+                     stacklevel=2,
+                     process=None,
+                     log_value=None,
+                     log_process=None,
+                     raw=False):
+        if log_value is None:
+            log_value = value
+        if log_process:
+            log_value = log_process(log_value)
+        self.log.debug_trace('Set property {property_id!r}: {value!r}',
+                             property_id=property_id,
+                             value=log_value,
+                             stacklevel=stacklevel)
+        _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
+        if process:
+            value = process(value)
         xbmcgui.Window(10000).setProperty(_property_id, value)
         return value
 
-    def refresh_container(self, force=False):
-        self.set_property(REFRESH_CONTAINER)
-        if force or self.is_plugin_container(check_all=True):
-            xbmc.executebuiltin('Container.Refresh')
+    def get_property(self,
+                     property_id,
+                     stacklevel=2,
+                     process=None,
+                     log_value=None,
+                     log_process=None,
+                     raw=False,
+                     as_bool=False,
+                     default=False):
+        _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
+        value = xbmcgui.Window(10000).getProperty(_property_id)
+        if log_value is None:
+            log_value = value
+        if log_process:
+            log_value = log_process(log_value)
+        self.log.debug_trace('Get property {property_id!r}: {value!r}',
+                             property_id=property_id,
+                             value=log_value,
+                             stacklevel=stacklevel)
+        if process:
+            value = process(value)
+        return BOOL_FROM_STR.get(value, default) if as_bool else value
+
+    def pop_property(self,
+                     property_id,
+                     stacklevel=2,
+                     process=None,
+                     log_value=None,
+                     log_process=None,
+                     raw=False,
+                     as_bool=False,
+                     default=False):
+        _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
+        window = xbmcgui.Window(10000)
+        value = window.getProperty(_property_id)
+        if value:
+            window.clearProperty(_property_id)
+        if process:
+            value = process(value)
+        if log_value is None:
+            log_value = value
+        if log_process:
+            log_value = log_process(log_value)
+        self.log.debug_trace('Pop property {property_id!r}: {value!r}',
+                             property_id=property_id,
+                             value=log_value,
+                             stacklevel=stacklevel)
+        return BOOL_FROM_STR.get(value, default) if as_bool else value
+
+    def clear_property(self, property_id, stacklevel=2, raw=False):
+        self.log.debug_trace('Clear property {property_id!r}',
+                             property_id=property_id,
+                             stacklevel=stacklevel)
+        _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
+        xbmcgui.Window(10000).clearProperty(_property_id)
+        return None
+
+    def refresh_container(self, deferred=False):
+        if deferred:
+            self.refresh = False
+            if self.get_property(REFRESH_CONTAINER) == BUSY_FLAG:
+                self.set_property(REFRESH_CONTAINER)
+                xbmc.executebuiltin('Container.Refresh')
         else:
-            self.refresh = True
+            container = self.is_plugin_container()
+            if all(container.values()):
+                self.set_property(REFRESH_CONTAINER)
+                xbmc.executebuiltin('Container.Refresh')
+            elif container['is_loaded']:
+                self.set_property(REFRESH_CONTAINER, BUSY_FLAG)
+                self.log.debug('Plugin window not active - deferring refresh')
+                self.refresh = True
 
     def onNotification(self, sender, method, data):
         if sender == 'xbmc':
@@ -155,15 +254,27 @@ class ServiceMonitor(xbmc.Monitor):
 
                 data = json.loads(data)
                 position = data.get('position', 0)
-                item_path = context.get_infolabel(
-                    'Player.position({0}).FilenameAndPath'.format(position)
-                )
+                playlist_player = context.get_playlist_player()
+                item_uri = playlist_player.get_item_path(position)
 
-                if context.is_plugin_path(item_path):
-                    if not context.is_plugin_path(item_path, PATHS.PLAY):
-                        context.log_warning('Playlist.OnAdd - non-playable path'
-                                            '\n\tPath: {0}'.format(item_path))
+                if context.is_plugin_path(item_uri):
+                    path, params = context.parse_uri(item_uri)
+                    if path.rstrip('/') != PATHS.PLAY:
+                        self.log.warning(('Playlist.OnAdd item is not playable',
+                                          'Path:   {path}',
+                                          'Params: {params}'),
+                                         path=path,
+                                         params=params)
                         self.set_property(PLAY_FORCED)
+                    elif params.get('action') == 'list':
+                        playlist_player.stop()
+                        playlist_player.clear()
+                        self.log.warning(('Playlist.OnAdd item is a listing',
+                                          'Path:   {path}',
+                                          'Params: {params}'),
+                                         path=path,
+                                         params=params)
+                        self.set_property(PLAY_CANCELLED)
 
             return
 
@@ -172,7 +283,7 @@ class ServiceMonitor(xbmc.Monitor):
 
         group, separator, event = method.partition('.')
 
-        if event == WAKEUP:
+        if event == SERVICE_IPC:
             if not isinstance(data, dict):
                 data = json.loads(data)
             if not data:
@@ -200,14 +311,60 @@ class ServiceMonitor(xbmc.Monitor):
                     self._settings_collect = True
                 elif state == 'process':
                     self.onSettingsChanged(force=True)
+                elif state == 'ignore':
+                    self._settings_collect = -1
                 response = True
+
+            elif target in {FILE_READ, FILE_WRITE}:
+                response = None
+                filepath = data.get('filepath')
+                if filepath:
+                    if filepath not in self.file_access:
+                        read_access = Event()
+                        read_access.set()
+                        write_access = Lock()
+                        self.file_access[filepath] = (read_access, write_access)
+                    else:
+                        read_access, write_access = self.file_access[filepath]
+
+                    if target == FILE_READ:
+                        try:
+                            with open(filepath, mode='r',
+                                      encoding='utf-8') as file:
+                                read_access.wait()
+                                self.set_property(
+                                    '-'.join((FILE_READ, filepath)),
+                                    file.read(),
+                                    log_value='<redacted>',
+                                )
+                                response = True
+                        except (IOError, OSError):
+                            response = False
+                    else:
+                        with write_access:
+                            content = self.pop_property(
+                                '-'.join((FILE_WRITE, filepath)),
+                                log_value='<redacted>',
+                            )
+                            response = None
+                            if content:
+                                read_access.clear()
+                                try:
+                                    with open(filepath, mode='w',
+                                              encoding='utf-8') as file:
+                                        file.write(content)
+                                    response = True
+                                except (IOError, OSError):
+                                    response = False
+                                finally:
+                                    read_access.set()
 
             else:
                 return
 
             if data.get('response_required'):
                 data['response'] = response
-                self.set_property(WAKEUP, json.dumps(data, ensure_ascii=False))
+                self.send_notification(SERVICE_IPC, data)
 
         elif event == REFRESH_CONTAINER:
             self.refresh_container()
@@ -232,6 +389,44 @@ class ServiceMonitor(xbmc.Monitor):
             if data.get('play_data', {}).get('play_count'):
                 self.set_property(PLAYER_VIDEO_ID, data.get('video_id'))
 
+        elif event == SYNC_LISTITEM:
+            video_ids = json.loads(data) if data else None
+            if not video_ids:
+                return
+
+            context = self._context
+            focused_video_id = context.get_listitem_property(VIDEO_ID)
+            if not focused_video_id:
+                return
+
+            playback_history = context.get_playback_history()
+            for video_id in video_ids:
+                if not video_id or video_id != focused_video_id:
+                    continue
+
+                play_count = context.get_listitem_info('PlayCount')
+                resumable = context.get_listitem_bool('IsResumable')
+
+                self.set_property(MARK_AS_LABEL,
+                                  context.localize('history.mark.unwatched')
+                                  if play_count else
+                                  context.localize('history.mark.watched'))
+
+                item_history = playback_history.get_item(video_id)
+                if item_history:
+                    item_history = dict(
+                        item_history,
+                        play_count=int(play_count) if play_count else 0,
+                    )
+                    if not resumable:
+                        item_history['played_time'] = 0
+                        item_history['played_percent'] = 0
+                    playback_history.update_item(video_id, item_history)
+                else:
+                    playback_history.set_item(video_id, {
+                        'play_count': int(play_count) if play_count else 0,
+                    })
+
     def onSettingsChanged(self, force=False):
         context = self._context
 
@@ -241,6 +436,8 @@ class ServiceMonitor(xbmc.Monitor):
         else:
             self._settings_changes += 1
             if self._settings_collect:
+                if self._settings_collect == -1:
+                    self._settings_collect = False
                 return
 
             total = self._settings_changes
@@ -248,14 +445,23 @@ class ServiceMonitor(xbmc.Monitor):
             if total != self._settings_changes:
                 return
 
-            context.log_debug('onSettingsChanged: {0} change(s)'.format(total))
+            self.log.debug('onSettingsChanged: %d change(s)', total)
             self._settings_changes = 0
 
         settings = context.get_settings(refresh=True)
-        if settings.logging_enabled():
-            context.debug_log(on=True)
+        log_level = settings.log_level()
+        if log_level:
+            self.log.debugging = True
+            if log_level & 2:
+                self.log.stack_info = True
+                self.log.verbose_logging = True
+            else:
+                self.log.stack_info = False
+                self.log.verbose_logging = False
         else:
-            context.debug_log(off=True)
+            self.log.debugging = False
+            self.log.stack_info = False
+            self.log.verbose_logging = False
 
         self.set_property(CHECK_SETTINGS)
         self.refresh_container()
@@ -300,9 +506,9 @@ class ServiceMonitor(xbmc.Monitor):
             return True
 
         context = self._context
-        context.log_debug('HTTPServer: Starting |{ip}:{port}|'
-                          .format(ip=self._httpd_address,
-                                  port=self._httpd_port))
+        self.log.debug('HTTPServer: Starting {ip}:{port}',
+                       ip=self._httpd_address,
+                       port=self._httpd_port)
         self.httpd_address_sync()
         self.httpd = get_http_server(address=self._httpd_address,
                                      port=self._httpd_port,
@@ -311,14 +517,13 @@ class ServiceMonitor(xbmc.Monitor):
             self._httpd_error = True
             return False
 
-        self.httpd_thread = threading.Thread(target=self.httpd.serve_forever)
+        self.httpd_thread = Thread(target=self.httpd.serve_forever)
         self.httpd_thread.daemon = True
         self.httpd_thread.start()
 
         address = self.httpd.socket.getsockname()
-        context.log_debug('HTTPServer: Listening on |{ip}:{port}|'
-                          .format(ip=address[0],
-                                  port=address[1]))
+        self.log.debug('HTTPServer: Listening on {address[0]}:{address[1]}',
+                       address=address)
         self._httpd_error = False
         return True
 
@@ -328,12 +533,12 @@ class ServiceMonitor(xbmc.Monitor):
                     and (on_idle or self.system_idle)
                     and self.httpd_required(on_idle=True, player=player))):
             return
-        self._context.log_debug('HTTPServer: Shutting down |{ip}:{port}|'
-                                .format(ip=self._old_httpd_address,
-                                        port=self._old_httpd_port))
+        self.log.debug('HTTPServer: Shutting down {ip}:{port}',
+                       ip=self._old_httpd_address,
+                       port=self._old_httpd_port)
         self.httpd_address_sync()
 
-        shutdown_thread = threading.Thread(target=self.httpd.shutdown)
+        shutdown_thread = Thread(target=self.httpd.shutdown)
         shutdown_thread.daemon = True
         shutdown_thread.start()
 
@@ -351,12 +556,12 @@ class ServiceMonitor(xbmc.Monitor):
         self.httpd = None
 
     def restart_httpd(self):
-        self._context.log_debug('HTTPServer: Restarting'
-                                ' |{old_ip}:{old_port}| > |{ip}:{port}|'
-                                .format(old_ip=self._old_httpd_address,
-                                        old_port=self._old_httpd_port,
-                                        ip=self._httpd_address,
-                                        port=self._httpd_port))
+        self.log.debug('HTTPServer: Restarting'
+                       ' {old_ip}:{old_port} > {ip}:{port}',
+                       old_ip=self._old_httpd_address,
+                       old_port=self._old_httpd_port,
+                       ip=self._httpd_address,
+                       port=self._httpd_port)
         self.shutdown_httpd(terminate=True)
         self.start_httpd()
 
