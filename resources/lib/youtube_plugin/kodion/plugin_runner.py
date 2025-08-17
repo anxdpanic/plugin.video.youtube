@@ -83,9 +83,13 @@ def run(context=_context,
         #         forced = True
         # elif current_handle == -1 and not current_path and not current_params:
         #     forced = True
+
+    new_params = {}
     if forced:
         refresh = context.refresh_requested(force=True, off=True)
-        context.set_params(refresh=refresh if refresh else 0)
+        new_params['refresh'] = refresh if refresh else 0
+    if new_params:
+        context.set_params(**new_params)
 
     log_params = context.get_params().copy()
     for key in ('api_key', 'client_id', 'client_secret'):
