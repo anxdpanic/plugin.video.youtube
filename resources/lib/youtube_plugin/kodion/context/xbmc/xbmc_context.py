@@ -694,17 +694,21 @@ class XbmcContext(AbstractContext):
 
         # Label mask token details:
         # https://github.com/xbmc/xbmc/blob/master/xbmc/utils/LabelFormatter.cpp#L33-L105
+        # SORT.TRACKNUM is always included after SORT.UNSORTED to allow for
+        # manual/automatic setting of default sort method
         detailed_labels = self.get_settings().show_detailed_labels()
         if sub_type == 'history':
             self.add_sort_method(
                 (SORT.LASTPLAYED,       '%T \u2022 %P',           '%D | %J'),
                 (SORT.PLAYCOUNT,        '%T \u2022 %P',           '%D | %J'),
                 (SORT.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
+                (SORT.TRACKNUM,         '[%N. ]%T \u2022 %P',     '%D | %J'),
                 (SORT.LABEL,            '%T \u2022 %P',           '%D | %J'),
             ) if detailed_labels else self.add_sort_method(
                 (SORT.LASTPLAYED,),
                 (SORT.PLAYCOUNT,),
                 (SORT.UNSORTED,),
+                (SORT.TRACKNUM,         '[%N. ]%T '),
                 (SORT.LABEL,),
             )
         elif sub_type == 'comments':
@@ -724,9 +728,11 @@ class XbmcContext(AbstractContext):
         else:
             self.add_sort_method(
                 (SORT.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
+                (SORT.TRACKNUM,         '[%N. ]%T \u2022 %P',     '%D | %J'),
                 (SORT.LABEL,            '%T \u2022 %P',           '%D | %J'),
             ) if detailed_labels else self.add_sort_method(
                 (SORT.UNSORTED,),
+                (SORT.TRACKNUM,         '[%N. ]%T '),
                 (SORT.LABEL,),
             )
 
@@ -739,7 +745,6 @@ class XbmcContext(AbstractContext):
                 (SORT.DATE,             '%T \u2022 %P | %D',      '%J'),
                 (SORT.DATEADDED,        '%T \u2022 %P | %D',      '%a'),
                 (SORT.VIDEO_RUNTIME,    '%T \u2022 %P | %J',      '%D'),
-                (SORT.TRACKNUM,         '[%N. ]%T \u2022 %P',     '%D | %J'),
             ) if detailed_labels else self.add_sort_method(
                 (SORT.CHANNEL,          '[%A - ]%T'),
                 (SORT.ARTIST,),
@@ -748,7 +753,6 @@ class XbmcContext(AbstractContext):
                 (SORT.DATE,),
                 (SORT.DATEADDED,),
                 (SORT.VIDEO_RUNTIME,),
-                (SORT.TRACKNUM,         '[%N. ]%T '),
             )
 
     if current_system_version.compatible(19):
