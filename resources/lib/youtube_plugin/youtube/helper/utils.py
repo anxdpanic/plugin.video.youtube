@@ -1326,7 +1326,7 @@ def get_thumbnail(thumb_size, thumbnails, default_thumb=None):
     url = (thumbnail[1] if is_dict else thumbnail).get('url')
     if not url:
         return default_thumb
-    if '/vi_webp/' not in url:
+    if '/vi_webp/' not in url and '?' not in url:
         url = url.replace('/vi/', '/vi_webp/', 1).replace('.jpg', '.webp', 1)
     if url.startswith('//'):
         url = 'https:' + url
