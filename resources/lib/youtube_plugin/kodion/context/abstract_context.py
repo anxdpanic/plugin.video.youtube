@@ -395,14 +395,18 @@ class AbstractContext(object):
     def get_parent_uri(self, **kwargs):
         return self.create_uri(self._path_parts[:-1], **kwargs)
 
-    @staticmethod
-    def create_path(*args, **kwargs):
+    def create_path(self, *args, **kwargs):
         include_parts = kwargs.get('parts')
+        parse_parts = kwargs.get('parse')
         parts = [
-            part for part in [
+            self.get_infolabel(part[6:-1])
+            if parse_parts and part.startswith('$INFO[') else
+            part
+            for part in [
                 to_str(arg).strip('/').replace('\\', '/').replace('//', '/')
                 for arg in args
-            ] if part
+            ]
+            if part
         ]
         if parts:
             path = '/'.join(parts).join(('/', '/'))
@@ -430,7 +434,7 @@ class AbstractContext(object):
             path = unquote(path[0])
             if parts is None:
                 path = path.split('/')
-                path, parts = self.create_path(*path, parts=True)
+                path, parts = self.create_path(*path, parts=True, parse=True)
         else:
             path, parts = self.create_path(*path, parts=True)
 
@@ -488,7 +492,7 @@ class AbstractContext(object):
                 elif param in self._STRING_PARAMS:
                     parsed_value = to_str(value)
                     if parsed_value.startswith('$INFO['):
-                        parsed_value = self.get_infolabel(parsed_value)
+                        parsed_value = self.get_infolabel(parsed_value[6:-1])
                     if param in self._STRING_BOOL_PARAMS:
                         parsed_value = BOOL_FROM_STR.get(
                             parsed_value, parsed_value
