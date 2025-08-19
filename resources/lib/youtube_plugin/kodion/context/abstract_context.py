@@ -452,16 +452,22 @@ class AbstractContext(object):
     def get_param(self, name, default=None):
         return self._params.get(name, default)
 
-    def parse_uri(self, uri, update=False):
+    def pop_param(self, name, default=None):
+        return self._params.pop(name, default)
+
+    def parse_uri(self, uri, parse_params=True, update=False):
         uri = urlsplit(uri)
         path = uri.path
-        params = self.parse_params(
-            dict(parse_qsl(uri.query, keep_blank_values=True)),
-            update=False,
-        )
-        if update:
-            self._params = params
-            self.set_path(path)
+        if parse_params:
+            params = self.parse_params(
+                dict(parse_qsl(uri.query, keep_blank_values=True)),
+                update=False,
+            )
+            if update:
+                self._params = params
+                self.set_path(path)
+        else:
+            params = uri.query
         return path, params
 
     def parse_params(self, params, update=True):
