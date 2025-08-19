@@ -257,8 +257,9 @@ class AbstractProvider(object):
             )
         else:
             page_token = ''
-        if 'exclude' in params:
-            del params['exclude']
+        for param in NextPageItem.JUMP_PAGE_PARAM_EXCLUSIONS:
+            if param in params:
+                del params[param]
         params = dict(params, page=page, page_token=page_token)
 
         if (not ui.busy_dialog_active()

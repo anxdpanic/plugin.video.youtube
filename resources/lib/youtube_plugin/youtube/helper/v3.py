@@ -886,13 +886,6 @@ def response_to_items(provider,
         yt_click_tracking = json_data.get('clickTracking')
         if yt_click_tracking:
             new_params['click_tracking'] = yt_click_tracking
-    else:
-        if 'exclude' in new_params:
-            del new_params['exclude']
-        if 'click_tracking' in new_params:
-            del new_params['click_tracking']
-        if 'visitor' in new_params:
-            del new_params['visitor']
 
     next_page_item = NextPageItem(context, new_params)
     items.append(next_page_item)
