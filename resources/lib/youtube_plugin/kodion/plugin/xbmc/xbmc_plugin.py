@@ -76,7 +76,12 @@ class XbmcPlugin(AbstractPlugin):
     def __init__(self):
         super(XbmcPlugin, self).__init__()
 
-    def run(self, provider, context, forced=None):
+    def run(self,
+            provider,
+            context,
+            forced=False,
+            is_same_path=False,
+            **kwargs):
         handle = context.get_handle()
         ui = context.get_ui()
 
@@ -386,7 +391,6 @@ class XbmcPlugin(AbstractPlugin):
         position = ui.pop_property(CONTAINER_POSITION)
         if container and position:
             context.send_notification(CONTAINER_FOCUS, [container, position])
-
 
         if post_run_actions:
             self.post_run(context, ui, *post_run_actions)

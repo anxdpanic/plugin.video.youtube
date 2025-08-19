@@ -326,6 +326,8 @@ class AbstractProvider(object):
                     on=True,
                     params=params,
                 )
+        else:
+            params['refresh'] = 0
 
         ui = context.get_ui()
         result = None
