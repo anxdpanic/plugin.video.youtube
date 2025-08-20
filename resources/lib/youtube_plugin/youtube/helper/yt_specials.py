@@ -96,7 +96,7 @@ def _process_comments(provider, context, client):
     options = {
         provider.CONTENT_TYPE: {
             'content_type': CONTENT.LIST_CONTENT,
-            'sub_type': 'comments',
+            'sub_type': CONTENT.COMMENTS,
             'category_label': params.get('item_name', video_id),
         },
     }

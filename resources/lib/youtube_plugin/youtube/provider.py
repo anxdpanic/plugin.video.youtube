@@ -1230,7 +1230,7 @@ class Provider(AbstractProvider):
             options = {
                 provider.CONTENT_TYPE: {
                     'content_type': CONTENT.VIDEO_CONTENT,
-                    'sub_type': 'history',
+                    'sub_type': CONTENT.HISTORY,
                     'category_label': None,
                 },
             }

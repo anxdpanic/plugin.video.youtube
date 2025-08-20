@@ -697,7 +697,7 @@ class XbmcContext(AbstractContext):
         # SORT.TRACKNUM is always included after SORT.UNSORTED to allow for
         # manual/automatic setting of default sort method
         detailed_labels = self.get_settings().show_detailed_labels()
-        if sub_type == 'history':
+        if sub_type == CONTENT.HISTORY:
             self.add_sort_method(
                 (SORT.LASTPLAYED,       '%T \u2022 %P',           '%D | %J'),
                 (SORT.PLAYCOUNT,        '%T \u2022 %P',           '%D | %J'),
@@ -711,7 +711,7 @@ class XbmcContext(AbstractContext):
                 (SORT.TRACKNUM,         '[%N. ]%T '),
                 (SORT.LABEL,),
             )
-        elif sub_type == 'comments':
+        elif sub_type == CONTENT.COMMENTS:
             self.add_sort_method(
                 (SORT.CHANNEL,          '[%A - ]%P \u2022 %T',       '%J'),
                 (SORT.TRACKNUM,         '[%N. ][%A - ]%P \u2022 %T', '%J'),
