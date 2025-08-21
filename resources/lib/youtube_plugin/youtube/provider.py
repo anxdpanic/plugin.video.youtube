@@ -50,7 +50,6 @@ from ..kodion.items import (
 )
 from ..kodion.utils.convert_format import strip_html_from_text, to_unicode
 from ..kodion.utils.datetime_parser import now, since_epoch
-from ..kodion.utils.methods import parse_item_ids
 
 
 class Provider(AbstractProvider):
@@ -1716,6 +1715,7 @@ class Provider(AbstractProvider):
 
         ui = context.get_ui()
         localize = context.localize
+        parse_item_ids = context.parse_item_ids
 
         if command in {'list', 'play'}:
             bookmarks_list = context.get_bookmarks_list()
@@ -1832,7 +1832,7 @@ class Provider(AbstractProvider):
                             kind = 'youtube#channel'
                             continue
 
-                    item_ids = parse_item_ids(item_uri)
+                    item_ids = parse_item_ids(item_uri, from_listitem=False)
                     for _kind in ('video', 'playlist', 'channel'):
                         id_type = _kind + '_id'
                         _yt_id = item_ids.get(id_type)

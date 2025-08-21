@@ -28,10 +28,13 @@ from ...compatibility import (
 from ...constants import (
     ABORT_FLAG,
     ADDON_ID,
+    CHANNEL_ID,
     CONTENT,
+    PLAYLIST_ID,
     PLAY_FORCE_AUDIO,
     SERVICE_IPC,
     SORT,
+    VIDEO_ID,
 )
 from ...json_store import APIKeyStore, AccessManager
 from ...player import XbmcPlaylistPlayer
@@ -1059,3 +1062,39 @@ class XbmcContext(AbstractContext):
             refresh += 1
 
         return refresh
+
+    def parse_item_ids(self,
+                       uri='',
+                       from_listitem=True,
+                       _ids={'video': VIDEO_ID,
+                             'channel': CHANNEL_ID,
+                             'playlist': PLAYLIST_ID}):
+        item_ids = {}
+        if not uri and from_listitem:
+            uri = self.get_listitem_info('FileNameAndPath')
+        if not self.is_plugin_path(uri):
+            return item_ids
+        uri = urlsplit(uri)
+
+        path = uri.path.rstrip('/')
+        while path:
+            id_type, _, next_part = path.partition('/')
+            if not next_part:
+                break
+
+            if id_type in _ids:
+                id_value = next_part.partition('/')[0]
+                if id_value:
+                    item_ids[_ids[id_type]] = id_value
+
+            path = next_part
+
+        params = dict(parse_qsl(uri.query))
+        for name in _ids.values():
+            id_value = params.get(name)
+            if not id_value and from_listitem:
+                id_value = self.get_listitem_property(name)
+            if id_value:
+                item_ids[name] = id_value
+
+        return item_ids

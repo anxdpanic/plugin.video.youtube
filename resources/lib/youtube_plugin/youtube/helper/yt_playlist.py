@@ -17,11 +17,10 @@ from ...kodion.constants import (
     CONTEXT_MENU,
     KEYMAP,
     PATHS,
-    PLAYLIST_ITEM_ID,
     PLAYLIST_ID,
+    PLAYLIST_ITEM_ID,
     VIDEO_ID,
 )
-from ...kodion.utils.methods import parse_item_ids
 
 
 def _process_add_video(provider, context):
@@ -46,8 +45,7 @@ def _process_add_video(provider, context):
 
     video_id = params.get(VIDEO_ID, listitem_video_id)
     if not video_id:
-        if context.is_plugin_path(listitem_path):
-            video_id = parse_item_ids(listitem_path).get(VIDEO_ID)
+        video_id = context.parse_item_ids(listitem_path).get(VIDEO_ID)
         if not video_id:
             raise KodionException('Playlist/Add: missing video_id')
 
@@ -236,12 +234,10 @@ def _process_select_playlist(provider, context):
 
     video_id = params.get(VIDEO_ID, listitem_video_id)
     if not video_id:
-        if context.is_plugin_path(listitem_path):
-            item_ids = parse_item_ids(listitem_path)
-            video_id = item_ids.get(VIDEO_ID)
-            if video_id:
-                context.set_params(**item_ids)
-        if not video_id:
+        item_ids = context.parse_item_ids(listitem_path)
+        if item_ids and VIDEO_ID in item_ids:
+            context.set_params(**item_ids)
+        else:
             raise KodionException('Playlist/Select: missing video_id')
 
     function_cache = context.get_function_cache()
@@ -455,8 +451,7 @@ def _process_rate_playlist(provider,
     localize = context.localize
 
     if not playlist_id:
-        if context.is_plugin_path(listitem_path):
-            playlist_id = parse_item_ids(listitem_path).get(PLAYLIST_ID)
+        playlist_id = context.parse_item_ids(listitem_path).get(PLAYLIST_ID)
         if not playlist_id:
             raise KodionException('Playlist/Rate: missing playlist_id')
 

@@ -12,13 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import json
 
-from ..compatibility import (
-    generate_hash,
-    parse_qsl,
-    string_type,
-    urlsplit,
-    xbmc,
-)
+from ..compatibility import generate_hash, string_type, xbmc
 
 
 __all__ = (
@@ -28,42 +22,12 @@ __all__ = (
     'jsonrpc',
     'loose_version',
     'merge_dicts',
-    'parse_item_ids',
     'wait',
 )
 
 
 def loose_version(v):
     return [point.zfill(8) for point in v.split('.')]
-
-
-def parse_item_ids(uri,
-                   _ids={'video': 'video_id',
-                         'channel': 'channel_id',
-                         'playlist': 'playlist_id'}):
-    item_ids = {}
-    uri = urlsplit(uri)
-
-    path = uri.path.rstrip('/')
-    while path:
-        id_type, _, next_part = path.partition('/')
-        if not next_part:
-            break
-
-        if id_type in _ids:
-            id_value = next_part.partition('/')[0]
-            if id_value:
-                item_ids[_ids[id_type]] = id_value
-
-        path = next_part
-
-    params = dict(parse_qsl(uri.query))
-    for id_type in _ids.values():
-        id_value = params.get(id_type)
-        if id_value:
-            item_ids[id_type] = id_value
-
-    return item_ids
 
 
 def merge_dicts(item1, item2, templates=None, compare_str=False, _=Ellipsis):

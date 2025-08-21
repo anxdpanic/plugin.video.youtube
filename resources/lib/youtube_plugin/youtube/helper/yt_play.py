@@ -40,7 +40,6 @@ from ...kodion.constants import (
 from ...kodion.items import AudioItem, UriItem, VideoItem
 from ...kodion.network import get_connect_address
 from ...kodion.utils.datetime_parser import datetime_to_since
-from ...kodion.utils.methods import parse_item_ids
 from ...kodion.utils.redact import redact_params
 
 
@@ -190,11 +189,20 @@ def _play_playlist(provider, context):
     if not action and context.get_handle() == -1:
         action = 'play'
 
-    playlist_id = params.get(PLAYLIST_ID)
     playlist_ids = params.get('playlist_ids')
+    if not playlist_ids:
+        playlist_id = params.get(PLAYLIST_ID)
+        if playlist_id:
+            playlist_ids = [playlist_id]
+
     video_ids = params.get('video_ids')
-    if not playlist_ids and playlist_id:
-        playlist_ids = [playlist_id]
+    if not playlist_ids and not video_ids:
+        video_id = params.get(VIDEO_ID)
+        if video_id:
+            video_ids = [video_id]
+        else:
+            logging.warning_trace('No playlist found to play')
+            return False, None
 
     resource_manager = provider.get_resource_manager(context)
     ui = context.get_ui()
@@ -505,20 +513,15 @@ def process(provider, context, **_kwargs):
 
     if ({CHANNEL_ID, PLAYLIST_ID, 'playlist_ids', VIDEO_ID, 'video_ids'}
             .isdisjoint(param_keys)):
-        listitem_path = context.get_listitem_info('FileNameAndPath')
-        if context.is_plugin_path(listitem_path, PATHS.PLAY):
-            item_ids = parse_item_ids(listitem_path)
-            if VIDEO_ID in item_ids:
-                context.set_params(**item_ids)
-            else:
-                return False
+        item_ids = context.parse_item_ids()
+        if item_ids and VIDEO_ID in item_ids:
+            context.set_params(**item_ids)
         else:
             return False
 
     video_id = params.get(VIDEO_ID)
     video_ids = params.get('video_ids')
-    playlist_id = params.get(PLAYLIST_ID,
-                             context.get_listitem_property(PLAYLIST_ID))
+    playlist_id = params.get(PLAYLIST_ID)
 
     force_play_params = FORCE_PLAY_PARAMS.intersection(param_keys)
 

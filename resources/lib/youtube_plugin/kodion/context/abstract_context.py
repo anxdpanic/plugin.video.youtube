@@ -28,8 +28,8 @@ from ..constants import (
     CONTEXT_MENU,
     KEYMAP,
     PATHS,
-    PLAYLIST_ITEM_ID,
     PLAYLIST_ID,
+    PLAYLIST_ITEM_ID,
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
     PLAY_PROMPT_SUBTITLES,
@@ -651,3 +651,11 @@ class AbstractContext(object):
 
     def refresh_requested(self, force=False, on=False, off=False, params=None):
         raise NotImplementedError
+
+    def parse_item_ids(self,
+                       uri=None,
+                       from_listitem=True,
+                       _ids={'video': VIDEO_ID,
+                             'channel': CHANNEL_ID,
+                             'playlist': PLAYLIST_ID}):
+        raise NotImplementedError()
