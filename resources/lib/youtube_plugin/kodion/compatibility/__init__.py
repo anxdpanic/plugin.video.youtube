@@ -281,10 +281,12 @@ except ImportError:
     string_type = basestring
 
 
-    def to_str(value):
+    def to_str(value, _format='{0!s}'.format):
+        if not isinstance(value, basestring):
+            value = _format(value)
         if isinstance(value, unicode):
-            return value.encode('utf-8')
-        return str(value)
+            value = value.encode('utf-8')
+        return value
 
 
     def entity_escape(text,

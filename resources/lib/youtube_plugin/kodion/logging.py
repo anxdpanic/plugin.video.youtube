@@ -293,6 +293,17 @@ class LogRecord(logging.LogRecord):
                                         **kwargs)
         self.stack_info = stack_info
 
+    if not current_system_version.compatible(19):
+        def getMessage(self):
+            msg = self.msg
+            if isinstance(msg, MessageFormatter):
+                msg = msg.__str__()
+            else:
+                msg = to_str(msg)
+            if self.args:
+                msg = msg % self.args
+            return msg
+
 
 class KodiLogger(logging.Logger):
     _verbose_logging = False
