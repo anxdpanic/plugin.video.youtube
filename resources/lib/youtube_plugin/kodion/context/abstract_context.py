@@ -496,9 +496,10 @@ class AbstractContext(object):
                         [unquote(val) for val in value.split(',') if val]
                     )
                 elif param in self._STRING_PARAMS:
-                    parsed_value = to_str(value)
-                    if parsed_value.startswith('$INFO['):
-                        parsed_value = self.get_infolabel(parsed_value[6:-1])
+                    if value.startswith('$INFO['):
+                        parsed_value = self.get_infolabel(value[6:-1])
+                    else:
+                        parsed_value = value
                     if param in self._STRING_BOOL_PARAMS:
                         parsed_value = BOOL_FROM_STR.get(
                             parsed_value, parsed_value
@@ -519,22 +520,19 @@ class AbstractContext(object):
                         to_delete.append(param)
                         param = 'playlist_id'
                 elif param in self._NON_EMPTY_STRING_PARAMS:
-                    parsed_value = to_str(value)
-                    parsed_value = BOOL_FROM_STR.get(
-                        parsed_value, parsed_value
-                    )
+                    parsed_value = BOOL_FROM_STR.get(value, value)
                     if not parsed_value:
                         raise ValueError
                 else:
-                    self.log.debug('Unknown parameter - {param!r}: {value!r}',
+                    self.log.debug('Unknown parameter {param!r}: {value!r}',
                                    param=param,
                                    value=value)
                     to_delete.append(param)
                     continue
             except (TypeError, ValueError):
-                self.log.error('Invalid parameter value - {param!r}: {value!r}',
-                               param=param,
-                               value=value)
+                self.log.exception('Invalid value for {param!r}: {value!r}',
+                                   param=param,
+                                   value=value)
                 to_delete.append(param)
                 continue
 

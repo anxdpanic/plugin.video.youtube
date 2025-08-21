@@ -458,7 +458,7 @@ class XbmcContext(AbstractContext):
     def init(self):
         num_args = len(sys.argv)
         if num_args:
-            uri = sys.argv[0]
+            uri = to_unicode(sys.argv[0])
             if uri.startswith('plugin://'):
                 self._plugin_handle = int(sys.argv[1])
             else:
@@ -473,7 +473,7 @@ class XbmcContext(AbstractContext):
 
         # after that try to get the params
         if num_args > 2:
-            params = sys.argv[2][1:]
+            params = to_unicode(sys.argv[2][1:])
             self._param_string = params
             self._params = {}
             if params:
