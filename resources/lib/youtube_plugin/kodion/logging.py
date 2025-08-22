@@ -210,6 +210,11 @@ class PrettyPrintFormatter(Formatter):
                 for literal_text, field_name, format_spec, conversion in output
             )
 
+        def format_field(self, *args, **kwargs):
+            return to_str(
+                super(PrettyPrintFormatter, self).format_field(*args, **kwargs)
+            )
+
 
 class MessageFormatter(object):
     _formatter = PrettyPrintFormatter()
