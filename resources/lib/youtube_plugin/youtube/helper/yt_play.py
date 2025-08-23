@@ -39,7 +39,7 @@ from ...kodion.constants import (
 )
 from ...kodion.items import AudioItem, UriItem, VideoItem
 from ...kodion.network import get_connect_address
-from ...kodion.utils.datetime_parser import datetime_to_since
+from ...kodion.utils.datetime import datetime_to_since
 from ...kodion.utils.redact import redact_params
 
 

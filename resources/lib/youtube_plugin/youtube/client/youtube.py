@@ -27,7 +27,7 @@ from ...kodion import logging
 from ...kodion.compatibility import available_cpu_count, string_type
 from ...kodion.items import DirectoryItem
 from ...kodion.utils.convert_format import strip_html_from_text
-from ...kodion.utils.datetime_parser import (
+from ...kodion.utils.datetime import (
     since_epoch,
     strptime,
     yt_datetime_offset,

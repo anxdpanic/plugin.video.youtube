@@ -37,7 +37,7 @@ from ...kodion.compatibility import (
 )
 from ...kodion.constants import PATHS, TEMP_PATH, VALUE_TO_STR
 from ...kodion.network import get_connect_address
-from ...kodion.utils.datetime_parser import fromtimestamp
+from ...kodion.utils.datetime import fromtimestamp
 from ...kodion.utils.file_system import make_dirs
 from ...kodion.utils.methods import merge_dicts
 from ...kodion.utils.redact import redact_ip_in_uri

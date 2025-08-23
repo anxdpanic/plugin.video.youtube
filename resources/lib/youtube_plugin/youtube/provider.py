@@ -49,7 +49,7 @@ from ..kodion.items import (
     menu_items,
 )
 from ..kodion.utils.convert_format import strip_html_from_text, to_unicode
-from ..kodion.utils.datetime_parser import now, since_epoch
+from ..kodion.utils.datetime import now, since_epoch
 
 
 class Provider(AbstractProvider):

@@ -44,7 +44,7 @@ from ...kodion.items import (
     menu_items,
 )
 from ...kodion.utils.convert_format import strip_html_from_text
-from ...kodion.utils.datetime_parser import parse_to_dt, utc_to_local
+from ...kodion.utils.datetime import parse_to_dt, utc_to_local
 
 
 _log = logging.getLogger(__name__)

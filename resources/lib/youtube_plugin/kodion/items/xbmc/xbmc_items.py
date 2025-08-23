@@ -35,7 +35,7 @@ from ...constants import (
     VALUE_TO_STR,
     VIDEO_ID,
 )
-from ...utils.datetime_parser import datetime_to_since, utc_to_local
+from ...utils.datetime import datetime_to_since, utc_to_local
 from ...utils.redact import redact_ip_in_uri
 from ...utils.system_version import current_system_version
 

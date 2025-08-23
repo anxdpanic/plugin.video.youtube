@@ -19,7 +19,7 @@ from requests.utils import DEFAULT_CA_BUNDLE_PATH, extract_zipped_paths
 from urllib3.util.ssl_ import create_urllib3_context
 
 from .. import logging
-from ..utils.datetime_parser import imf_fixdate
+from ..utils.datetime import imf_fixdate
 from ..utils.methods import generate_hash
 
 

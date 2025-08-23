@@ -32,7 +32,7 @@ from ...kodion.compatibility import string_type, unquote, urlsplit
 from ...kodion.constants import CONTENT, PATHS
 from ...kodion.items import AudioItem, CommandItem, DirectoryItem, menu_items
 from ...kodion.utils.convert_format import friendly_number, strip_html_from_text
-from ...kodion.utils.datetime_parser import (
+from ...kodion.utils.datetime import (
     get_scheduled_start,
     parse_to_dt,
     utc_to_local,
