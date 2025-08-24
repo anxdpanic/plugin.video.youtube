@@ -14,6 +14,7 @@ from ..abstract_plugin import AbstractPlugin
 from ... import logging
 from ...compatibility import string_type, xbmc, xbmcgui, xbmcplugin
 from ...constants import (
+    ACTION,
     BUSY_FLAG,
     CONTAINER_FOCUS,
     CONTAINER_ID,
@@ -336,7 +337,7 @@ class XbmcPlugin(AbstractPlugin):
                 elif path == PATHS.PLAY:
                     context.send_notification(
                         PLAYBACK_FAILED,
-                        {'video_id': context.get_param('video_id')},
+                        {VIDEO_ID: context.get_param(VIDEO_ID)},
                     )
                     # None of the following will actually prevent the
                     # playback attempt from occurring
@@ -482,7 +483,7 @@ class XbmcPlugin(AbstractPlugin):
 
         elif context.is_plugin_path(uri, PATHS.PLAY):
             parts, params, log_uri, _ = parse_and_redact_uri(uri)
-            if params.get('action', [None])[0] == 'list':
+            if params.get(ACTION, [None])[0] == 'list':
                 log_action = 'Redirecting to'
                 action = context.create_uri(
                     (PATHS.ROUTE, parts.path.rstrip('/')),

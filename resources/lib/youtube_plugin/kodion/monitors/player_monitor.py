@@ -16,6 +16,7 @@ from .. import logging
 from ..compatibility import xbmc
 from ..constants import (
     BUSY_FLAG,
+    CHANNEL_ID,
     PATHS,
     PLAYBACK_STARTED,
     PLAYBACK_STOPPED,
@@ -23,6 +24,7 @@ from ..constants import (
     PLAY_USING,
     REFRESH_CONTAINER,
     TRAKT_PAUSE_FLAG,
+    VIDEO_ID,
 )
 from ..utils.redact import redact_params
 
@@ -30,9 +32,9 @@ from ..utils.redact import redact_params
 class PlayerMonitorThread(threading.Thread):
     def __init__(self, player, provider, context, monitor, player_data):
         self.player_data = player_data
-        video_id = player_data.get('video_id')
+        video_id = player_data.get(VIDEO_ID)
         self.video_id = video_id
-        self.channel_id = player_data.get('channel_id')
+        self.channel_id = player_data.get(CHANNEL_ID)
         self.video_status = player_data.get('video_status')
 
         self._stopped = threading.Event()
@@ -95,8 +97,8 @@ class PlayerMonitorThread(threading.Thread):
             waited += wait_interval
         else:
             context.send_notification(PLAYBACK_STARTED, {
-                'video_id': video_id,
-                'channel_id': self.channel_id,
+                VIDEO_ID: video_id,
+                CHANNEL_ID: self.channel_id,
                 'status': self.video_status,
             })
 

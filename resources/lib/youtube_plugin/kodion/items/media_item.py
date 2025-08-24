@@ -15,7 +15,7 @@ from re import compile as re_compile
 
 from . import BaseItem
 from ..compatibility import datetime_infolabel, to_str, unescape, urlencode
-from ..constants import CONTENT
+from ..constants import CHANNEL_ID, CONTENT, PLAYLIST_ID, VIDEO_ID
 from ..utils.convert_format import duration_to_seconds, seconds_to_duration
 
 
@@ -85,11 +85,11 @@ class MediaItem(BaseItem):
             'type': self.__class__.__name__,
             'name': self._name,
             'uri': self._uri,
-            'video_id': self._video_id,
-            'channel_id': self._channel_id,
-            'playlist_id': self._playlist_id,
-            # 'playlist_item_id': self._playlist_item_id,
-            # 'subscription_id': self._subscription_id,
+            VIDEO_ID: self._video_id,
+            CHANNEL_ID: self._channel_id,
+            PLAYLIST_ID: self._playlist_id,
+            # PLAYLIST_ITEM_ID: self._playlist_item_id,
+            # SUBSCRIPTION_ID: self._subscription_id,
             'available': self._available,
             'vod': self._vod,
             'live': self._live,

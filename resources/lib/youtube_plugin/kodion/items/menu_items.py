@@ -15,7 +15,9 @@ from ..constants import (
     BOOKMARK_ID,
     CHANNEL_ID,
     CONTEXT_MENU,
+    INCOGNITO,
     MARK_AS_LABEL,
+    ORDER,
     PATHS,
     PLAYLIST_ITEM_ID,
     PLAYLIST_ID,
@@ -810,7 +812,7 @@ def search_clear(context):
 
 
 def search_sort_by(context, params, order):
-    selected = params.get('order', 'relevance') == order
+    selected = params.get(ORDER, 'relevance') == order
     order_label = context.localize('search.sort.' + order)
     return (
         context.localize('search.sort').format(
@@ -854,9 +856,9 @@ def goto_quick_search(context, params=None, incognito=None):
     if params is None:
         params = {}
     if incognito is None:
-        incognito = params.get('incognito')
+        incognito = params.get(INCOGNITO)
     else:
-        params['incognito'] = incognito
+        params[INCOGNITO] = incognito
     return (
         context.localize('search.quick.incognito'
                          if incognito else

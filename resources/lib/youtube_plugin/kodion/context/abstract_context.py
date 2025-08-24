@@ -23,12 +23,32 @@ from ..compatibility import (
     urlsplit,
 )
 from ..constants import (
+    ACTION,
     BOOL_FROM_STR,
     CHANNEL_ID,
+    CHANNEL_IDS,
+    CLIP,
     CONTEXT_MENU,
+    END,
+    FANART_TYPE,
+    HIDE_FOLDERS,
+    HIDE_LIVE,
+    HIDE_NEXT_PAGE,
+    HIDE_PLAYLISTS,
+    HIDE_PROGRESS,
+    HIDE_SEARCH,
+    HIDE_SHORTS,
+    HIDE_VIDEOS,
+    INCOGNITO,
+    ITEMS_PER_PAGE,
+    ITEM_FILTER,
     KEYMAP,
+    LIVE,
+    ORDER,
+    PAGE,
     PATHS,
     PLAYLIST_ID,
+    PLAYLIST_IDS,
     PLAYLIST_ITEM_ID,
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
@@ -36,8 +56,12 @@ from ..constants import (
     PLAY_STRM,
     PLAY_TIMESHIFT,
     PLAY_USING,
+    SCREENSAVER,
+    SEEK,
+    START,
     SUBSCRIPTION_ID,
     VIDEO_ID,
+    VIDEO_IDS,
     WINDOW_CACHE,
     WINDOW_FALLBACK,
     WINDOW_REPLACE,
@@ -73,54 +97,54 @@ class AbstractContext(object):
         PLAY_TIMESHIFT,
         PLAY_USING,
         'confirmed',
-        'clip',
+        CLIP,
         'enable',
-        'hide_folders',
-        'hide_live',
-        'hide_next_page',
-        'hide_playlists',
-        'hide_progress',
-        'hide_search',
-        'hide_shorts',
-        'hide_videos',
-        'incognito',
+        HIDE_FOLDERS,
+        HIDE_LIVE,
+        HIDE_NEXT_PAGE,
+        HIDE_PLAYLISTS,
+        HIDE_PROGRESS,
+        HIDE_SEARCH,
+        HIDE_SHORTS,
+        HIDE_VIDEOS,
+        INCOGNITO,
         'location',
         'logged_in',
         'resume',
-        'screensaver',
+        SCREENSAVER,
         WINDOW_CACHE,
         WINDOW_FALLBACK,
         WINDOW_REPLACE,
         WINDOW_RETURN,
     ))
     _INT_PARAMS = frozenset((
-        'fanart_type',
+        FANART_TYPE,
         'filtered',
-        'items_per_page',
-        'live',
+        ITEMS_PER_PAGE,
+        LIVE,
         'next_page_token',
-        'page',
+        PAGE,
         'refresh',
     ))
     _INT_BOOL_PARAMS = frozenset((
         'refresh',
     ))
     _FLOAT_PARAMS = frozenset((
-        'end',
+        END,
         'recent_days',
-        'seek',
-        'start',
+        SEEK,
+        START,
     ))
     _LIST_PARAMS = frozenset((
-        'channel_ids',
+        CHANNEL_IDS,
         'exclude',
-        'item_filter',
-        'playlist_ids',
-        'video_ids',
+        ITEM_FILTER,
+        PLAYLIST_IDS,
+        VIDEO_IDS,
     ))
     _STRING_PARAMS = frozenset((
         'api_key',
-        'action',
+        ACTION,
         'addon_id',
         'category_label',
         CHANNEL_ID,
@@ -131,7 +155,7 @@ class AbstractContext(object):
         'item',
         'item_id',
         'item_name',
-        'order',
+        ORDER,
         'page_token',
         'parent_id',
         'playlist',  # deprecated
@@ -515,10 +539,10 @@ class AbstractContext(object):
                             continue
                     elif param == 'videoid':
                         to_delete.append(param)
-                        param = 'video_id'
+                        param = VIDEO_ID
                     elif params == 'playlist':
                         to_delete.append(param)
-                        param = 'playlist_id'
+                        param = PLAYLIST_ID
                 elif param in self._NON_EMPTY_STRING_PARAMS:
                     parsed_value = BOOL_FROM_STR.get(value, value)
                     if not parsed_value:

@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from . import menu_items
 from .directory_item import DirectoryItem
-from ..constants import PATHS
+from ..constants import ITEMS_PER_PAGE, PAGE, PATHS
 
 
 class NextPageItem(DirectoryItem):
@@ -31,10 +31,10 @@ class NextPageItem(DirectoryItem):
     def __init__(self, context, params, image=None, fanart=None):
         path = context.get_path()
 
-        page = params.get('page') or 2
+        page = params.get(PAGE) or 2
         is_first_page_link = page < 2
 
-        items_per_page = params.get('items_per_page') or 50
+        items_per_page = params.get(ITEMS_PER_PAGE) or 50
         can_jump = ('next_page_token' not in params
                     and not path.startswith(('/channel',
                                              PATHS.RECOMMENDATIONS,

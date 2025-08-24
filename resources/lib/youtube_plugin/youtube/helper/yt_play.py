@@ -23,19 +23,24 @@ from ...kodion.constants import (
     CHANNEL_ID,
     CONTENT,
     FORCE_PLAY_PARAMS,
+    INCOGNITO,
+    ORDER,
     PATHS,
     PLAYBACK_INIT,
     PLAYER_DATA,
     PLAYLIST_ID,
+    PLAYLIST_IDS,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
     PLAY_STRM,
     PLAY_USING,
+    SCREENSAVER,
     SERVER_WAKEUP,
     TRAKT_PAUSE_FLAG,
     VIDEO_ID,
+    VIDEO_IDS,
 )
 from ...kodion.items import AudioItem, UriItem, VideoItem
 from ...kodion.network import get_connect_address
@@ -54,8 +59,8 @@ def _play_stream(provider, context):
     client = provider.get_client(context)
     settings = context.get_settings()
 
-    incognito = params.get('incognito', False)
-    screensaver = params.get('screensaver', False)
+    incognito = params.get(INCOGNITO, False)
+    screensaver = params.get(SCREENSAVER, False)
 
     audio_only = False
     is_external = ui.get_property(PLAY_USING)
@@ -189,13 +194,13 @@ def _play_playlist(provider, context):
     if not action and context.get_handle() == -1:
         action = 'play'
 
-    playlist_ids = params.get('playlist_ids')
+    playlist_ids = params.get(PLAYLIST_IDS)
     if not playlist_ids:
         playlist_id = params.get(PLAYLIST_ID)
         if playlist_id:
             playlist_ids = [playlist_id]
 
-    video_ids = params.get('video_ids')
+    video_ids = params.get(VIDEO_IDS)
     if not playlist_ids and not video_ids:
         video_id = params.get(VIDEO_ID)
         if video_id:
@@ -390,7 +395,7 @@ def process_items_for_playlist(context,
     if num_items > 1:
         # select order
         if order is None:
-            order = params.get('order')
+            order = params.get(ORDER)
         if not order and play_from is None and recent_days is None:
             order = 'ask'
         if order == 'ask':
@@ -511,7 +516,7 @@ def process(provider, context, **_kwargs):
     params = context.get_params()
     param_keys = params.keys()
 
-    if ({CHANNEL_ID, PLAYLIST_ID, 'playlist_ids', VIDEO_ID, 'video_ids'}
+    if ({CHANNEL_ID, PLAYLIST_ID, PLAYLIST_IDS, VIDEO_ID, VIDEO_IDS}
             .isdisjoint(param_keys)):
         item_ids = context.parse_item_ids()
         if item_ids and VIDEO_ID in item_ids:
@@ -520,7 +525,7 @@ def process(provider, context, **_kwargs):
             return False
 
     video_id = params.get(VIDEO_ID)
-    video_ids = params.get('video_ids')
+    video_ids = params.get(VIDEO_IDS)
     playlist_id = params.get(PLAYLIST_ID)
 
     force_play_params = FORCE_PLAY_PARAMS.intersection(param_keys)
@@ -565,7 +570,7 @@ def process(provider, context, **_kwargs):
 
         return media_item
 
-    if playlist_id or video_ids or 'playlist_ids' in params:
+    if playlist_id or video_ids or PLAYLIST_IDS in params:
         return _play_playlist(provider, context)
 
     if CHANNEL_ID in params:

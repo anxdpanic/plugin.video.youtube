@@ -21,6 +21,7 @@ from .constants import (
     CONTAINER_ID,
     CONTAINER_POSITION,
     CONTENT,
+    ITEMS_PER_PAGE,
     PATHS,
     REROUTE_PATH,
     WINDOW_CACHE,
@@ -253,7 +254,7 @@ class AbstractProvider(object):
         params = context.get_params()
         if 'page_token' in params:
             page_token = NextPageItem.create_page_token(
-                page, params.get('items_per_page', 50)
+                page, params.get(ITEMS_PER_PAGE, 50)
             )
         else:
             page_token = ''

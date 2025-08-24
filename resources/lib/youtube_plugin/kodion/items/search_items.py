@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from . import menu_items
 from .directory_item import DirectoryItem
-from ..constants import PATHS
+from ..constants import CHANNEL_ID, INCOGNITO, PATHS
 
 
 class SearchItem(DirectoryItem):
@@ -107,9 +107,9 @@ class NewSearchItem(DirectoryItem):
         if addon_id:
             params['addon_id'] = addon_id
         if incognito:
-            params['incognito'] = incognito
+            params[INCOGNITO] = incognito
         if channel_id:
-            params['channel_id'] = channel_id
+            params[CHANNEL_ID] = channel_id
         if location:
             params['location'] = location
 

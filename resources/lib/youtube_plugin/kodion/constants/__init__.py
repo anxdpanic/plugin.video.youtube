@@ -125,6 +125,32 @@ WINDOW_FALLBACK = 'window_fallback'
 WINDOW_REPLACE = 'window_replace'
 WINDOW_RETURN = 'window_return'
 
+# Plugin url query parameters
+ACTION = 'action'
+CHANNEL_IDS = 'channel_ids'
+CLIP = 'clip'
+END = 'end'
+FANART_TYPE = 'fanart_type'
+HIDE_FOLDERS = 'hide_folders'
+HIDE_LIVE = 'hide_live'
+HIDE_NEXT_PAGE = 'hide_next_page'
+HIDE_PLAYLISTS = 'hide_playlists'
+HIDE_PROGRESS = 'hide_progress'
+HIDE_SEARCH = 'hide_search'
+HIDE_SHORTS = 'hide_shorts'
+HIDE_VIDEOS = 'hide_videos'
+INCOGNITO = 'incognito'
+ITEM_FILTER = 'item_filter'
+ITEMS_PER_PAGE = 'items_per_page'
+LIVE = 'live'
+ORDER = 'order'
+PAGE = 'page'
+PLAYLIST_IDS = 'playlist_ids'
+SCREENSAVER = 'screensaver'
+SEEK = 'seek'
+START = 'start'
+VIDEO_IDS = 'video_ids'
+
 __all__ = (
     # Addon paths
     'ADDON_ID',
@@ -203,6 +229,32 @@ __all__ = (
     'WINDOW_FALLBACK',
     'WINDOW_REPLACE',
     'WINDOW_RETURN',
+
+    # Plugin url query parameters
+    'ACTION',
+    'CHANNEL_IDS',
+    'CLIP',
+    'END',
+    'FANART_TYPE',
+    'HIDE_FOLDERS',
+    'HIDE_LIVE',
+    'HIDE_NEXT_PAGE',
+    'HIDE_PLAYLISTS',
+    'HIDE_PROGRESS',
+    'HIDE_SEARCH',
+    'HIDE_SHORTS',
+    'HIDE_VIDEOS',
+    'INCOGNITO',
+    'ITEM_FILTER',
+    'ITEMS_PER_PAGE',
+    'LIVE',
+    'ORDER',
+    'PAGE',
+    'PLAYLIST_IDS',
+    'SCREENSAVER',
+    'SEEK',
+    'START',
+    'VIDEO_IDS',
 
     # Other constants
     'CONTENT',

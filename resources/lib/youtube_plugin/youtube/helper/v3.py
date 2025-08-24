@@ -26,12 +26,19 @@ from .utils import (
 )
 from ...kodion import KodionException, logging
 from ...kodion.constants import (
+    CHANNEL_ID,
+    FANART_TYPE,
+    HIDE_NEXT_PAGE,
+    ITEM_FILTER,
+    PAGE,
     PATHS,
+    PLAYLIST_ID,
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
     PLAY_PROMPT_SUBTITLES,
     PLAY_TIMESHIFT,
     PLAY_USING,
+    VIDEO_ID,
 )
 from ...kodion.items import (
     BookmarkItem,
@@ -94,7 +101,7 @@ def _process_list_response(provider,
     settings = context.get_settings()
     thumb_re = re_compile(r'[^/._]+?(?=(?:_live)?\.(?:jpg|webp))')
     thumb_size = settings.get_thumbnail_size()
-    fanart_type = params.get('fanart_type')
+    fanart_type = params.get(FANART_TYPE)
     if fanart_type is None:
         fanart_type = settings.fanart_selection()
     if fanart_type == settings.FANART_THUMBNAIL:
@@ -207,7 +214,7 @@ def _process_list_response(provider,
             video_id = item_id
             channel_id = (snippet.get('videoOwnerChannelId')
                           or snippet.get('channelId'))
-            item_params['video_id'] = video_id
+            item_params[VIDEO_ID] = video_id
             item_uri = context.create_uri(
                 (PATHS.PLAY,),
                 item_params,
@@ -266,13 +273,13 @@ def _process_list_response(provider,
                                  subscription_id=subscription_id)
 
         elif kind_type == 'searchfolder':
-            channel_id = item_params['channel_id']
+            channel_id = item_params[CHANNEL_ID]
             item = NewSearchItem(context, **item_params)
             channel_items = channel_items_dict.setdefault(channel_id, [])
             channel_items.append(item)
 
         elif kind_type == 'playlistfolder':
-            channel_id = item_params['channel_id']
+            channel_id = item_params[CHANNEL_ID]
             item_params['uri'] = context.create_uri(
                 (PATHS.CHANNEL, channel_id, 'playlists',),
             )
@@ -297,7 +304,7 @@ def _process_list_response(provider,
             else:
                 video_id = snippet.get('resourceId', {}).get('videoId')
                 if video_id:
-                    item_params['video_id'] = video_id
+                    item_params[VIDEO_ID] = video_id
                 item_uri = context.create_uri(
                     (PATHS.PLAYLIST, playlist_id,),
                     item_params,
@@ -318,7 +325,7 @@ def _process_list_response(provider,
             channel_id = (snippet.get('videoOwnerChannelId')
                           or snippet.get('channelId'))
             playlist_id = snippet.get('playlistId')
-            item_params['video_id'] = video_id
+            item_params[VIDEO_ID] = video_id
             item_uri = context.create_uri(
                 (PATHS.PLAY,),
                 item_params,
@@ -350,7 +357,7 @@ def _process_list_response(provider,
                 video_id = details['upload']['videoId']
             else:
                 continue
-            item_params['video_id'] = video_id
+            item_params[VIDEO_ID] = video_id
             item_uri = context.create_uri(
                 (PATHS.PLAY,),
                 item_params,
@@ -395,14 +402,14 @@ def _process_list_response(provider,
         if not item:
             continue
 
-        if not video_id and 'video_id' in item_params:
-            video_id = item_params['video_id']
+        if not video_id and VIDEO_ID in item_params:
+            video_id = item_params[VIDEO_ID]
         if not playlist_id:
-            if 'playlist_id' in item_params:
-                playlist_id = item_params['playlist_id']
+            if PLAYLIST_ID in item_params:
+                playlist_id = item_params[PLAYLIST_ID]
             elif not video_id and not channel_id:
-                if 'channel_id' in item_params:
-                    channel_id = item_params['channel_id']
+                if CHANNEL_ID in item_params:
+                    channel_id = item_params[CHANNEL_ID]
 
         for item_id, new_dict, complete_dict, allow_types, allow_kinds in (
                 (
@@ -684,8 +691,8 @@ def response_to_items(provider,
     settings = context.get_settings()
 
     items_per_page = settings.items_per_page()
-    item_filter_param = params.get('item_filter')
-    current_page = params.get('page') or 1
+    item_filter_param = params.get(ITEM_FILTER)
+    current_page = params.get(PAGE) or 1
     exclude_current = params.get('exclude')
     if exclude_current:
         exclude_current = exclude_current[:]
@@ -829,7 +836,7 @@ def response_to_items(provider,
             items.sort(key=sort, reverse=reverse)
 
     # no processing of next page item
-    if not json_data or not process_next_page or params.get('hide_next_page'):
+    if not json_data or not process_next_page or params.get(HIDE_NEXT_PAGE):
         return items
 
     # next page

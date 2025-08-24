@@ -22,6 +22,7 @@ from .. import (
 from ... import logging
 from ...compatibility import to_str, xbmc, xbmcgui
 from ...constants import (
+    ACTION,
     BOOKMARK_ID,
     CHANNEL_ID,
     PATHS,
@@ -541,7 +542,7 @@ def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
     is_action = directory_item.is_action()
     if not is_action:
         path, params = context.parse_uri(uri)
-        if path.rstrip('/') == PATHS.PLAY and params.get('action') != 'list':
+        if path.rstrip('/') == PATHS.PLAY and params.get(ACTION) != 'list':
             is_action = True
     if is_action:
         logging.debug('Converting DirectoryItem action: %r', uri)

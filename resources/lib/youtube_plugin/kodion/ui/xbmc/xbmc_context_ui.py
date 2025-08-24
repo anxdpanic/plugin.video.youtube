@@ -15,7 +15,12 @@ from weakref import proxy
 from ..abstract_context_ui import AbstractContextUI
 from ... import logging
 from ...compatibility import string_type, xbmc, xbmcgui
-from ...constants import ADDON_ID, BOOL_FROM_STR, REFRESH_CONTAINER
+from ...constants import (
+    ADDON_ID,
+    BOOL_FROM_STR,
+    HIDE_PROGRESS,
+    REFRESH_CONTAINER,
+)
 from ...utils.convert_format import to_unicode
 
 
@@ -49,7 +54,7 @@ class XbmcContextUI(AbstractContextUI):
             message_template=message_template,
             template_params=template_params,
             hide=(
-                self._context.get_param('hide_progress')
+                self._context.get_param(HIDE_PROGRESS)
                 if hide_progress is None else
                 hide_progress
             ),

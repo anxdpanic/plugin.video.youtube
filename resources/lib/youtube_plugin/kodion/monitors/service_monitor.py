@@ -16,6 +16,7 @@ from threading import Event, Lock, Thread
 from .. import logging
 from ..compatibility import urlsplit, xbmc, xbmcgui
 from ..constants import (
+    ACTION,
     ADDON_ID,
     BOOL_FROM_STR,
     BUSY_FLAG,
@@ -266,7 +267,7 @@ class ServiceMonitor(xbmc.Monitor):
                                          path=path,
                                          params=params)
                         self.set_property(PLAY_FORCED)
-                    elif params.get('action') == 'list':
+                    elif params.get(ACTION) == 'list':
                         playlist_player.stop()
                         playlist_player.clear()
                         self.log.warning(('Playlist.OnAdd item is a listing',
@@ -387,7 +388,7 @@ class ServiceMonitor(xbmc.Monitor):
                 return
 
             if data.get('play_data', {}).get('play_count'):
-                self.set_property(PLAYER_VIDEO_ID, data.get('video_id'))
+                self.set_property(PLAYER_VIDEO_ID, data.get(VIDEO_ID))
 
         elif event == SYNC_LISTITEM:
             video_ids = json.loads(data) if data else None

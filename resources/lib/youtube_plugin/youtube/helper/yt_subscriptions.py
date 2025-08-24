@@ -66,7 +66,7 @@ def _process_remove(_provider, context, client):
     if not subscription_id and listitem_subscription_id:
         subscription_id = listitem_subscription_id
 
-    channel_id = context.get_param('channel_id', '')
+    channel_id = context.get_param(CHANNEL_ID)
     if not channel_id and listitem_channel_id:
         channel_id = listitem_channel_id
 
