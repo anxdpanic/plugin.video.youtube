@@ -131,6 +131,7 @@ CHANNEL_IDS = 'channel_ids'
 CLIP = 'clip'
 END = 'end'
 FANART_TYPE = 'fanart_type'
+HIDE_CHANNELS = 'hide_channels'
 HIDE_FOLDERS = 'hide_folders'
 HIDE_LIVE = 'hide_live'
 HIDE_NEXT_PAGE = 'hide_next_page'
@@ -236,6 +237,7 @@ __all__ = (
     'CLIP',
     'END',
     'FANART_TYPE',
+    'HIDE_CHANNELS',
     'HIDE_FOLDERS',
     'HIDE_LIVE',
     'HIDE_NEXT_PAGE',

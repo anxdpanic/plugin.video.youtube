@@ -397,7 +397,7 @@ class Provider(AbstractProvider):
                         }},
                     },
                     '_partial': True,
-                },
+                } if not params.get(HIDE_SHORTS) else None,
                 {
                     'kind': 'youtube#playlist',
                     'id': uploads.replace('UU', 'UULV', 1),
@@ -409,7 +409,7 @@ class Provider(AbstractProvider):
                         }},
                     },
                     '_partial': True,
-                },
+                } if not params.get(HIDE_LIVE) else None,
             ]
         else:
             result = False
@@ -996,7 +996,8 @@ class Provider(AbstractProvider):
         }
 
         if params.get(PAGE, 1) == 1 and not params.get(HIDE_FOLDERS):
-            if event_type or search_type != 'video':
+            if ((event_type or search_type != 'video')
+                    and not params.get(HIDE_VIDEOS)):
                 video_params = dict(params,
                                     search_type='video',
                                     event_type='')
@@ -1009,7 +1010,10 @@ class Provider(AbstractProvider):
                 )
                 result.append(video_item)
 
-            if not channel_id and not location and search_type != 'channel':
+            if (not channel_id
+                    and not location
+                    and search_type != 'channel'
+                    and not params.get(HIDE_CHANNELS)):
                 channel_params = dict(params,
                                       search_type='channel',
                                       event_type='')
@@ -1022,7 +1026,9 @@ class Provider(AbstractProvider):
                 )
                 result.append(channel_item)
 
-            if not location and search_type != 'playlist':
+            if (not location
+                    and search_type != 'playlist'
+                    and not params.get(HIDE_PLAYLISTS)):
                 playlist_params = dict(params,
                                        search_type='playlist',
                                        event_type='')
@@ -1035,7 +1041,9 @@ class Provider(AbstractProvider):
                 )
                 result.append(playlist_item)
 
-            if not channel_id and event_type != 'live':
+            if (not channel_id
+                    and event_type != 'live'
+                    and not params.get(HIDE_LIVE)):
                 live_params = dict(params,
                                    search_type='video',
                                    event_type='live')
@@ -1048,7 +1056,9 @@ class Provider(AbstractProvider):
                 )
                 result.append(live_item)
 
-            if event_type and event_type != 'upcoming':
+            if (event_type
+                    and event_type != 'upcoming'
+                    and not params.get(HIDE_LIVE)):
                 upcoming_params = dict(params,
                                        search_type='video',
                                        event_type='upcoming')
@@ -1061,7 +1071,9 @@ class Provider(AbstractProvider):
                 )
                 result.append(upcoming_item)
 
-            if event_type and event_type != 'completed':
+            if (event_type
+                    and event_type != 'completed'
+                    and not params.get(HIDE_LIVE)):
                 completed_params = dict(params,
                                         search_type='video',
                                         event_type='completed')
