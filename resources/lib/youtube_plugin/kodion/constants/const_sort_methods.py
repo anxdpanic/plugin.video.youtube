@@ -12,6 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import sys
 
+from . import const_content_types as CONTENT
 from ..compatibility import (
     xbmcplugin,
 )
@@ -83,8 +84,101 @@ for name, label_id, sort_by in methods:
     sort_method = getattr(xbmcplugin, 'SORT_METHOD_' + name, 0)
     setattr(SORT, name, sort_method)
 
+# Label mask token details:
+# https://github.com/xbmc/xbmc/blob/master/xbmc/utils/LabelFormatter.cpp#L33-L105
+
+# SORT.TRACKNUM is always included after SORT.UNSORTED to allow for
+# manual/automatic setting of default sort method
+
+LIST_CONTENT_DETAILED = (
+    (SORT.UNSORTED,      '%T \u2022 %P',           '%D | %J'),
+    (SORT.TRACKNUM,      '[%N. ]%T \u2022 %P',     '%D | %J'),
+    (SORT.LABEL,         '%T \u2022 %P',           '%D | %J'),
+)
+LIST_CONTENT_SIMPLE = (
+    (SORT.UNSORTED,      '%T',        '%D | %J'),
+    (SORT.TRACKNUM,      '[%N. ]%T',  '%D | %J'),
+    (SORT.LABEL,         '%T',        '%D | %J'),
+)
+
+PLAYLIST_CONTENT_DETAILED = (
+    (SORT.TRACKNUM,      '[%N. ]%T \u2022 %P',           '%D | %J'),
+    (SORT.LABEL,         '[%N. ]%T \u2022 %P',           '%D | %J'),
+    (SORT.CHANNEL,       '[%N. ][%A - ]%T \u2022 %P',    '%D | %J'),
+    (SORT.ARTIST,        '[%N. ]%T \u2022 %P | %D | %J', '%A'),
+    (SORT.PROGRAM_COUNT, '[%N. ]%T \u2022 %P | %D | %J', '%C'),
+    (SORT.VIDEO_RATING,  '[%N. ]%T \u2022 %P | %D | %J', '%R'),
+    (SORT.DATE,          '[%N. ]%T \u2022 %P | %D',      '%J'),
+    (SORT.DATEADDED,     '[%N. ]%T \u2022 %P | %D',      '%a'),
+    (SORT.VIDEO_RUNTIME, '[%N. ]%T \u2022 %P | %J',      '%D'),
+)
+PLAYLIST_CONTENT_SIMPLE = (
+    (SORT.TRACKNUM,      '[%N. ]%T',        '%D | %J'),
+    (SORT.LABEL,         '[%N. ]%T',        '%D | %J'),
+    (SORT.CHANNEL,       '[%N. ][%A - ]%T', '%D | %J'),
+    (SORT.ARTIST,        '[%N. ]%T',        '%A'),
+    (SORT.PROGRAM_COUNT, '[%N. ]%T',        '%C'),
+    (SORT.VIDEO_RATING,  '[%N. ]%T',        '%R'),
+    (SORT.DATE,          '[%N. ]%T',        '%J'),
+    (SORT.DATEADDED,     '[%N. ]%T',        '%a'),
+    (SORT.VIDEO_RUNTIME, '[%N. ]%T',        '%D'),
+)
+
+VIDEO_CONTENT_DETAILED = (
+    (SORT.UNSORTED,      '%T \u2022 %P',           '%D | %J'),
+    (SORT.TRACKNUM,      '[%N. ]%T \u2022 %P',     '%D | %J'),
+    (SORT.LABEL,         '%T \u2022 %P',           '%D | %J'),
+    (SORT.CHANNEL,       '[%A - ]%T \u2022 %P',    '%D | %J'),
+    (SORT.ARTIST,        '%T \u2022 %P | %D | %J', '%A'),
+    (SORT.PROGRAM_COUNT, '%T \u2022 %P | %D | %J', '%C'),
+    (SORT.VIDEO_RATING,  '%T \u2022 %P | %D | %J', '%R'),
+    (SORT.DATE,          '%T \u2022 %P | %D',      '%J'),
+    (SORT.DATEADDED,     '%T \u2022 %P | %D',      '%a'),
+    (SORT.VIDEO_RUNTIME, '%T \u2022 %P | %J',      '%D'),
+)
+VIDEO_CONTENT_SIMPLE = (
+    (SORT.UNSORTED,      '%T',        '%D | %J'),
+    (SORT.TRACKNUM,      '[%N. ]%T',  '%D | %J'),
+    (SORT.LABEL,         '%T',        '%D | %J'),
+    (SORT.CHANNEL,       '[%A - ]%T', '%D | %J'),
+    (SORT.ARTIST,        '%T',        '%A'),
+    (SORT.PROGRAM_COUNT, '%T',        '%C'),
+    (SORT.VIDEO_RATING,  '%T',        '%R'),
+    (SORT.DATE,          '%T',        '%J'),
+    (SORT.DATEADDED,     '%T',        '%a'),
+    (SORT.VIDEO_RUNTIME, '%T',        '%D'),
+)
+
+HISTORY_CONTENT_DETAILED = (
+    (SORT.LASTPLAYED, '%T \u2022 %P | %J', '%D | %p'),
+    (SORT.PLAYCOUNT,  '%T \u2022 %P | %J', '%D | %V'),
+)
+HISTORY_CONTENT_DETAILED += VIDEO_CONTENT_DETAILED
+
+HISTORY_CONTENT_SIMPLE = (
+    (SORT.LASTPLAYED, '%T', '%D | %p'),
+    (SORT.PLAYCOUNT,  '%T', '%D | %V'),
+)
+HISTORY_CONTENT_SIMPLE += VIDEO_CONTENT_SIMPLE
+
+COMMENTS_CONTENT_DETAILED = (
+    (SORT.CHANNEL,       '[%A - ]%P \u2022 %T',       '%J'),
+    (SORT.TRACKNUM,      '[%N. ][%A - ]%P \u2022 %T', '%J'),
+    (SORT.ARTIST,        '[%J - ]%P \u2022 %T',       '%A'),
+    (SORT.PROGRAM_COUNT, '[%A - ]%P | %J \u2022 %T',  '%C'),
+    (SORT.DATE,          '[%A - ]%P \u2022 %T',       '%J'),
+)
+COMMENTS_CONTENT_SIMPLE = (
+    (SORT.CHANNEL,       '[%A - ]%T',       '%J'),
+    (SORT.TRACKNUM,      '[%N. ][%A - ]%T', '%J'),
+    (SORT.ARTIST,        '[%A - ]%T',       '%A'),
+    (SORT.PROGRAM_COUNT, '[%A - ]%T',       '%C'),
+    (SORT.DATE,          '[%A - ]%T',       '%J'),
+)
+
 del (
     sys,
+    CONTENT,
     xbmcplugin,
     methods,
     SORT,

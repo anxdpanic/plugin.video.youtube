@@ -600,7 +600,7 @@ def _process_virtual_list(provider, context, _client, playlist_id=None):
     options = {
         provider.CONTENT_TYPE: {
             'content_type': CONTENT.VIDEO_CONTENT,
-            'sub_type': None,
+            'sub_type': CONTENT.HISTORY if playlist_id == 'HL' else None,
             'category_label': None,
         },
     }

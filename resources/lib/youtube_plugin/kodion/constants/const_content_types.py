@@ -16,6 +16,7 @@ LIST_CONTENT = 'files'
 
 COMMENTS = 'comments'
 HISTORY = 'history'
+PLAYLIST = 'playlist'
 
 AUDIO_TYPE = 'music'
 VIDEO_TYPE = 'video'

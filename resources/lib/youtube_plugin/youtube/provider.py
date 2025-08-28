@@ -648,7 +648,7 @@ class Provider(AbstractProvider):
         options = {
             provider.CONTENT_TYPE: {
                 'content_type': CONTENT.VIDEO_CONTENT,
-                'sub_type': None,
+                'sub_type': CONTENT.PLAYLIST,
                 'category_label': None,
             },
         }

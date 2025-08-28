@@ -696,82 +696,53 @@ class XbmcContext(AbstractContext):
             self.log.debug('Applying content-type: {type!r} for {path!r}',
                            type=(sub_type or content_type),
                            path=self.get_path())
-            xbmcplugin.setContent(self._plugin_handle, content_type)
+            if content_type != 'default':
+                xbmcplugin.setContent(self._plugin_handle, content_type)
 
         if category_label is None:
             category_label = self.get_param('category_label')
         if category_label:
             xbmcplugin.setPluginCategory(self._plugin_handle, category_label)
 
-        # Label mask token details:
-        # https://github.com/xbmc/xbmc/blob/master/xbmc/utils/LabelFormatter.cpp#L33-L105
-        # SORT.TRACKNUM is always included after SORT.UNSORTED to allow for
-        # manual/automatic setting of default sort method
         detailed_labels = self.get_settings().show_detailed_labels()
-        if sub_type == CONTENT.HISTORY:
-            self.add_sort_method(
-                (SORT.LASTPLAYED,       '%T \u2022 %P',           '%D | %J'),
-                (SORT.PLAYCOUNT,        '%T \u2022 %P',           '%D | %J'),
-                (SORT.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
-                (SORT.TRACKNUM,         '[%N. ]%T \u2022 %P',     '%D | %J'),
-                (SORT.LABEL,            '%T \u2022 %P',           '%D | %J'),
-            ) if detailed_labels else self.add_sort_method(
-                (SORT.LASTPLAYED,),
-                (SORT.PLAYCOUNT,),
-                (SORT.UNSORTED,),
-                (SORT.TRACKNUM,         '[%N. ]%T '),
-                (SORT.LABEL,),
-            )
-        elif sub_type == CONTENT.COMMENTS:
-            self.add_sort_method(
-                (SORT.CHANNEL,          '[%A - ]%P \u2022 %T',       '%J'),
-                (SORT.TRACKNUM,         '[%N. ][%A - ]%P \u2022 %T', '%J'),
-                (SORT.ARTIST,           '[%J - ]%P \u2022 %T',       '%A'),
-                (SORT.PROGRAM_COUNT,    '[%A - ]%P | %J \u2022 %T',  '%C'),
-                (SORT.DATE,             '[%A - ]%P \u2022 %T',       '%J'),
-            ) if detailed_labels else self.add_sort_method(
-                (SORT.CHANNEL,          '[%A - ]%T'),
-                (SORT.TRACKNUM,         '[%N. ][%A - ]%T '),
-                (SORT.ARTIST,           '[%A - ]%T'),
-                (SORT.PROGRAM_COUNT,    '[%A - ]%T'),
-                (SORT.DATE,             '[%A - ]%T'),
-            )
+        if content_type == CONTENT.VIDEO_CONTENT:
+            if sub_type == CONTENT.HISTORY:
+                self.add_sort_method(
+                    SORT.HISTORY_CONTENT_DETAILED
+                    if detailed_labels else
+                    SORT.HISTORY_CONTENT_SIMPLE
+                )
+            elif sub_type == CONTENT.COMMENTS:
+                self.add_sort_method(
+                    SORT.COMMENTS_CONTENT_DETAILED
+                    if detailed_labels else
+                    SORT.COMMENTS_CONTENT_SIMPLE
+                )
+            elif sub_type == CONTENT.PLAYLIST:
+                self.add_sort_method(
+                    SORT.PLAYLIST_CONTENT_DETAILED
+                    if detailed_labels else
+                    SORT.PLAYLIST_CONTENT_SIMPLE
+                )
+            else:
+                self.add_sort_method(
+                    SORT.VIDEO_CONTENT_DETAILED
+                    if detailed_labels else
+                    SORT.VIDEO_CONTENT_SIMPLE
+                )
         else:
             self.add_sort_method(
-                (SORT.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
-                (SORT.TRACKNUM,         '[%N. ]%T \u2022 %P',     '%D | %J'),
-                (SORT.LABEL,            '%T \u2022 %P',           '%D | %J'),
-            ) if detailed_labels else self.add_sort_method(
-                (SORT.UNSORTED,),
-                (SORT.TRACKNUM,         '[%N. ]%T '),
-                (SORT.LABEL,),
-            )
-
-        if content_type == CONTENT.VIDEO_CONTENT:
-            self.add_sort_method(
-                (SORT.CHANNEL,          '[%A - ]%T \u2022 %P',    '%D | %J'),
-                (SORT.ARTIST,           '%T \u2022 %P | %D | %J', '%A'),
-                (SORT.PROGRAM_COUNT,    '%T \u2022 %P | %D | %J', '%C'),
-                (SORT.VIDEO_RATING,     '%T \u2022 %P | %D | %J', '%R'),
-                (SORT.DATE,             '%T \u2022 %P | %D',      '%J'),
-                (SORT.DATEADDED,        '%T \u2022 %P | %D',      '%a'),
-                (SORT.VIDEO_RUNTIME,    '%T \u2022 %P | %J',      '%D'),
-            ) if detailed_labels else self.add_sort_method(
-                (SORT.CHANNEL,          '[%A - ]%T'),
-                (SORT.ARTIST,),
-                (SORT.PROGRAM_COUNT,),
-                (SORT.VIDEO_RATING,),
-                (SORT.DATE,),
-                (SORT.DATEADDED,),
-                (SORT.VIDEO_RUNTIME,),
+                SORT.LIST_CONTENT_DETAILED
+                if detailed_labels else
+                SORT.LIST_CONTENT_SIMPLE
             )
 
     if current_system_version.compatible(19):
-        def add_sort_method(self, *sort_methods):
+        def add_sort_method(self, sort_methods):
             for sort_method in sort_methods:
                 xbmcplugin.addSortMethod(self._plugin_handle, *sort_method)
     else:
-        def add_sort_method(self, *sort_methods):
+        def add_sort_method(self, sort_methods):
             for sort_method in sort_methods:
                 xbmcplugin.addSortMethod(self._plugin_handle, *sort_method[:2])
 
