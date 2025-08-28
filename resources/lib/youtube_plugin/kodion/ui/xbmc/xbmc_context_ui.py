@@ -18,7 +18,15 @@ from ...compatibility import string_type, xbmc, xbmcgui
 from ...constants import (
     ADDON_ID,
     BOOL_FROM_STR,
+    CONTAINER_ID,
+    CONTAINER_LISTITEM_INFO,
+    CONTAINER_LISTITEM_PROP,
+    CURRENT_CONTAINER_INFO,
     HIDE_PROGRESS,
+    LISTITEM_INFO,
+    LISTITEM_PROP,
+    PLUGIN_CONTAINER_INFO,
+    PROPERTY,
     REFRESH_CONTAINER,
 )
 from ...utils.convert_format import to_unicode
@@ -60,7 +68,8 @@ class XbmcContextUI(AbstractContextUI):
             ),
         )
 
-    def on_keyboard_input(self, title, default='', hidden=False):
+    @staticmethod
+    def on_keyboard_input(title, default='', hidden=False):
         # Starting with Gotham (13.X > ...)
         dialog = xbmcgui.Dialog()
         result = dialog.input(title,
@@ -72,7 +81,8 @@ class XbmcContextUI(AbstractContextUI):
 
         return False, ''
 
-    def on_numeric_input(self, title, default=''):
+    @staticmethod
+    def on_numeric_input(title, default=''):
         dialog = xbmcgui.Dialog()
         result = dialog.input(title, str(default), type=xbmcgui.INPUT_NUMERIC)
         if result:
@@ -80,11 +90,13 @@ class XbmcContextUI(AbstractContextUI):
 
         return False, None
 
-    def on_yes_no_input(self, title, text, nolabel='', yeslabel=''):
+    @staticmethod
+    def on_yes_no_input(title, text, nolabel='', yeslabel=''):
         dialog = xbmcgui.Dialog()
         return dialog.yesno(title, text, nolabel=nolabel, yeslabel=yeslabel)
 
-    def on_ok(self, title, text):
+    @staticmethod
+    def on_ok(title, text):
         dialog = xbmcgui.Dialog()
         return dialog.ok(title, text)
 
@@ -106,7 +118,8 @@ class XbmcContextUI(AbstractContextUI):
             self._context.localize('content.clear.check.x', to_unicode(name)),
         )
 
-    def on_select(self, title, items=None, preselect=-1, use_details=False):
+    @staticmethod
+    def on_select(title, items=None, preselect=-1, use_details=False):
         if isinstance(items, (list, tuple)):
             items = enumerate(items)
         elif isinstance(items, dict):
@@ -168,13 +181,135 @@ class XbmcContextUI(AbstractContextUI):
                                       time_ms,
                                       audible)
 
-    def on_busy(self):
+    @staticmethod
+    def on_busy():
         return XbmcBusyDialog()
 
     def refresh_container(self):
         self._context.send_notification(REFRESH_CONTAINER)
 
-    def set_property(self,
+    @staticmethod
+    def get_infobool(name, _bool=xbmc.getCondVisibility):
+        return _bool(name)
+
+    @staticmethod
+    def get_infolabel(name, _label=xbmc.getInfoLabel):
+        return _label(name)
+
+    @classmethod
+    def get_container_bool(cls,
+                           name,
+                           container_id=None,
+                           strict=True,
+                           stacklevel=2,
+                           _bool=xbmc.getCondVisibility,
+                           _label=xbmc.getInfoLabel):
+        if container_id is None:
+            container_id = _label(PROPERTY % CONTAINER_ID)
+        if container_id:
+            return _bool(PLUGIN_CONTAINER_INFO % (container_id, name))
+        if strict:
+            cls.log.warning('Plugin container not found for %r', name,
+                            stacklevel=stacklevel)
+            return False
+        out = _bool(CURRENT_CONTAINER_INFO % name)
+        cls.log.warning('Current container used for {name!r}: {out!r}',
+                        name=name,
+                        out=out,
+                        stacklevel=stacklevel)
+        return out
+
+    @classmethod
+    def get_container_info(cls,
+                           name,
+                           container_id=None,
+                           strict=True,
+                           stacklevel=2,
+                           _label=xbmc.getInfoLabel):
+        if container_id is None:
+            container_id = _label(PROPERTY % CONTAINER_ID)
+        if container_id:
+            return _label(PLUGIN_CONTAINER_INFO % (container_id, name))
+        if strict:
+            cls.log.warning('Plugin container not found for %r', name,
+                            stacklevel=stacklevel)
+            return ''
+        out = _label(CURRENT_CONTAINER_INFO % name)
+        cls.log.warning('Current container used for {name!r}: {out!r}',
+                        name=name,
+                        out=out,
+                        stacklevel=stacklevel)
+        return out
+
+    @classmethod
+    def get_listitem_bool(cls,
+                          name,
+                          container_id=None,
+                          strict=True,
+                          stacklevel=2,
+                          _bool=xbmc.getCondVisibility,
+                          _label=xbmc.getInfoLabel):
+        if container_id is None:
+            container_id = _label(PROPERTY % CONTAINER_ID)
+        if container_id:
+            return _bool(CONTAINER_LISTITEM_INFO % (container_id, name))
+        if strict:
+            cls.log.warning('Plugin container not found for %r', name,
+                            stacklevel=stacklevel)
+            return False
+        out = _bool(LISTITEM_INFO % name)
+        cls.log.warning('Current container used for {name!r}: {out!r}',
+                        name=name,
+                        out=out,
+                        stacklevel=stacklevel)
+        return out
+
+    @classmethod
+    def get_listitem_property(cls,
+                              name,
+                              container_id=None,
+                              strict=True,
+                              stacklevel=2,
+                              _label=xbmc.getInfoLabel):
+        if container_id is None:
+            container_id = _label(PROPERTY % CONTAINER_ID)
+        if container_id:
+            return _label(CONTAINER_LISTITEM_PROP % (container_id, name))
+        if strict:
+            cls.log.warning('Plugin container not found for %r', name,
+                            stacklevel=stacklevel)
+            return ''
+        out = _label(LISTITEM_PROP % name)
+        cls.log.warning('Current container used for {name!r}: {out!r}',
+                        name=name,
+                        out=out,
+                        stacklevel=stacklevel)
+        return out
+
+    @classmethod
+    def get_listitem_info(cls,
+                          name,
+                          container_id=None,
+                          strict=True,
+                          stacklevel=2,
+                          _label=xbmc.getInfoLabel):
+        if container_id is None:
+            container_id = _label(PROPERTY % CONTAINER_ID)
+        if container_id:
+            return _label(CONTAINER_LISTITEM_INFO % (container_id, name))
+        if strict:
+            cls.log.warning('Plugin container not found for %r', name,
+                            stacklevel=stacklevel)
+            return ''
+        out = _label(LISTITEM_INFO % name)
+        cls.log.warning('Current container used for {name!r}: {out!r}',
+                        name=name,
+                        out=out,
+                        stacklevel=stacklevel)
+        return out
+
+    @classmethod
+    def set_property(cls,
                      property_id,
                      value='true',
                      stacklevel=2,
@@ -186,17 +321,18 @@ class XbmcContextUI(AbstractContextUI):
             log_value = value
         if log_process:
             log_value = log_process(log_value)
-        self.log.debug_trace('Set property {property_id!r}: {value!r}',
-                             property_id=property_id,
-                             value=log_value,
-                             stacklevel=stacklevel)
+        cls.log.debug_trace('Set property {property_id!r}: {value!r}',
+                            property_id=property_id,
+                            value=log_value,
+                            stacklevel=stacklevel)
         _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
         if process:
             value = process(value)
         xbmcgui.Window(10000).setProperty(_property_id, value)
         return value
 
-    def get_property(self,
+    @classmethod
+    def get_property(cls,
                      property_id,
                      stacklevel=2,
                      process=None,
@@ -211,15 +347,16 @@ class XbmcContextUI(AbstractContextUI):
             log_value = value
         if log_process:
             log_value = log_process(log_value)
-        self.log.debug_trace('Get property {property_id!r}: {value!r}',
-                             property_id=property_id,
-                             value=log_value,
-                             stacklevel=stacklevel)
+        cls.log.debug_trace('Get property {property_id!r}: {value!r}',
+                            property_id=property_id,
+                            value=log_value,
+                            stacklevel=stacklevel)
         if process:
             value = process(value)
         return BOOL_FROM_STR.get(value, default) if as_bool else value
 
-    def pop_property(self,
+    @classmethod
+    def pop_property(cls,
                      property_id,
                      stacklevel=2,
                      process=None,
@@ -239,16 +376,17 @@ class XbmcContextUI(AbstractContextUI):
             log_value = value
         if log_value and log_process:
             log_value = log_process(log_value)
-        self.log.debug_trace('Pop property {property_id!r}: {value!r}',
-                             property_id=property_id,
-                             value=log_value,
-                             stacklevel=stacklevel)
+        cls.log.debug_trace('Pop property {property_id!r}: {value!r}',
+                            property_id=property_id,
+                            value=log_value,
+                            stacklevel=stacklevel)
         return BOOL_FROM_STR.get(value, default) if as_bool else value
 
-    def clear_property(self, property_id, stacklevel=2, raw=False):
-        self.log.debug_trace('Clear property {property_id!r}',
-                             property_id=property_id,
-                             stacklevel=stacklevel)
+    @classmethod
+    def clear_property(cls, property_id, stacklevel=2, raw=False):
+        cls.log.debug_trace('Clear property {property_id!r}',
+                            property_id=property_id,
+                            stacklevel=stacklevel)
         _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
         xbmcgui.Window(10000).clearProperty(_property_id)
         return None

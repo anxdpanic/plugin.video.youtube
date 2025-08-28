@@ -19,6 +19,7 @@ from ...constants import (
     CONTAINER_FOCUS,
     CONTAINER_ID,
     CONTAINER_POSITION,
+    FOLDER_URI,
     FORCE_PLAY_PARAMS,
     PATHS,
     PLAYBACK_FAILED,
@@ -353,10 +354,9 @@ class XbmcPlugin(AbstractPlugin):
                         succeeded=False,
                         listitem=item,
                     )
-                # elif context.is_plugin_folder():
                 else:
                     if context.is_plugin_path(
-                            context.get_infolabel('Container.FolderPath')
+                            ui.get_container_info(FOLDER_URI, strict=False)
                     ):
                         _, _post_run_action = self.uri_action(
                             context,

@@ -30,10 +30,12 @@ from ...constants import (
     ADDON_ID,
     CHANNEL_ID,
     CONTENT,
+    FOLDER_NAME,
     PLAYLIST_ID,
     PLAY_FORCE_AUDIO,
     SERVICE_IPC,
     SORT,
+    URI,
     VIDEO_ID,
 )
 from ...json_store import APIKeyStore, AccessManager
@@ -469,7 +471,12 @@ class XbmcContext(AbstractContext):
             return
 
         # first the path of the uri
-        self.set_path(urlsplit(uri).path, force=True, update_uri=False)
+        self.set_path(
+            urlsplit(uri).path,
+            force=True,
+            parser=XbmcContextUI.get_infolabel,
+            update_uri=False,
+        )
 
         # after that try to get the params
         if num_args > 2:
@@ -478,7 +485,8 @@ class XbmcContext(AbstractContext):
             self._params = {}
             if params:
                 self.parse_params(
-                    dict(parse_qsl(params, keep_blank_values=True))
+                    dict(parse_qsl(params, keep_blank_values=True)),
+                    parser=XbmcContextUI.get_infolabel,
                 )
 
         # then Kodi resume status
@@ -957,27 +965,6 @@ class XbmcContext(AbstractContext):
             ABORT_FLAG, stacklevel=3, as_bool=True
         )
 
-    @staticmethod
-    def get_infobool(name):
-        return xbmc.getCondVisibility(name)
-
-    @staticmethod
-    def get_infolabel(name):
-        return xbmc.getInfoLabel(name)
-
-    @staticmethod
-    def get_listitem_bool(detail_name):
-        return xbmc.getCondVisibility('Container.ListItem(0).' + detail_name)
-
-    @staticmethod
-    def get_listitem_property(detail_name):
-        return xbmc.getInfoLabel('Container.ListItem(0).Property({0})'
-                                 .format(detail_name))
-
-    @staticmethod
-    def get_listitem_info(detail_name):
-        return xbmc.getInfoLabel('Container.ListItem(0).' + detail_name)
-
     def tear_down(self):
         self.clear_settings()
         attrs = (
@@ -1041,7 +1028,7 @@ class XbmcContext(AbstractContext):
 
     def is_plugin_folder(self, folder_name=None):
         if folder_name is None:
-            folder_name = xbmc.getInfoLabel('Container.FolderName')
+            folder_name = XbmcContextUI.get_container_info(FOLDER_NAME)
         return folder_name == self._plugin_name
 
     def refresh_requested(self, force=False, on=False, off=False, params=None):
@@ -1071,8 +1058,8 @@ class XbmcContext(AbstractContext):
                              'playlist': PLAYLIST_ID}):
         item_ids = {}
         if not uri and from_listitem:
-            uri = self.get_listitem_info('FileNameAndPath')
-        if not self.is_plugin_path(uri):
+            uri = XbmcContextUI.get_listitem_info(URI)
+        if not uri or not self.is_plugin_path(uri):
             return item_ids
         uri = urlsplit(uri)
 
@@ -1093,7 +1080,7 @@ class XbmcContext(AbstractContext):
         for name in _ids.values():
             id_value = params.get(name)
             if not id_value and from_listitem:
-                id_value = self.get_listitem_property(name)
+                id_value = XbmcContextUI.get_listitem_property(name)
             if id_value:
                 item_ids[name] = id_value
 

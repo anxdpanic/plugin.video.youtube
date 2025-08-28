@@ -21,7 +21,9 @@ from .constants import (
     CONTAINER_ID,
     CONTAINER_POSITION,
     CONTENT,
+    CURRENT_ITEM,
     ITEMS_PER_PAGE,
+    FOLDER_URI,
     PATHS,
     REROUTE_PATH,
     WINDOW_CACHE,
@@ -264,10 +266,7 @@ class AbstractProvider(object):
         params = dict(params, page=page, page_token=page_token)
 
         if (not ui.busy_dialog_active()
-                and context.is_plugin_path(
-                    context.get_infolabel('Container.FolderPath'),
-                    partial=True,
-                )):
+                and ui.get_container_info(FOLDER_URI)):
             return provider.reroute(context=context, path=path, params=params)
         return provider.navigate(context.clone(path, params))
 
@@ -280,8 +279,10 @@ class AbstractProvider(object):
         )
 
     def reroute(self, context, path=None, params=None, uri=None):
-        container_uri = context.get_infolabel('Container.FolderPath')
-        current_path, current_params = context.parse_uri(container_uri)
+        ui = context.get_ui()
+        current_path, current_params = context.parse_uri(
+            ui.get_container_info(FOLDER_URI, strict=False)
+        )
 
         if uri is None:
             if path is None:
@@ -306,8 +307,7 @@ class AbstractProvider(object):
         window_return = params.pop(WINDOW_RETURN, True)
 
         if window_fallback:
-            container_uri = context.get_infolabel('Container.FolderPath')
-            if context.is_plugin_path(container_uri):
+            if ui.get_container_info(FOLDER_URI):
                 self.log.debug('Rerouting - Fallback route not required')
                 return False, {self.FALLBACK: False}
 
@@ -321,8 +321,8 @@ class AbstractProvider(object):
             if refresh and refresh < 0:
                 del params['refresh']
             else:
-                container = context.get_infolabel('System.CurrentControlId')
-                position = context.get_infolabel('Container.CurrentItem')
+                container = ui.get_property(CONTAINER_ID)
+                position = ui.get_container_info(CURRENT_ITEM)
                 params['refresh'] = context.refresh_requested(
                     force=True,
                     on=True,
@@ -331,7 +331,6 @@ class AbstractProvider(object):
         else:
             params['refresh'] = 0
 
-        ui = context.get_ui()
         result = None
         uri = context.create_uri(path, params)
         if window_cache:
@@ -486,7 +485,7 @@ class AbstractProvider(object):
             #  user doesn't want to input on this path
             fallback = True
             old_path, old_params = context.parse_uri(
-                context.get_infolabel('Container.FolderPath')
+                ui.get_container_info(FOLDER_URI, strict=False)
             )
             old_uri = context.create_uri(old_path, old_params)
             if (not context.refresh_requested()

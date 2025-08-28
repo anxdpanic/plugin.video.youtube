@@ -29,10 +29,12 @@ from ..constants import (
     PLAYBACK_STOPPED,
     PLAYER_VIDEO_ID,
     PLAY_CANCELLED,
+    PLAY_COUNT,
     PLAY_FORCED,
     PLUGIN_WAKEUP,
     REFRESH_CONTAINER,
     RELOAD_ACCESS_MANAGER,
+    RESUMABLE,
     SERVER_WAKEUP,
     SERVICE_IPC,
     SYNC_LISTITEM,
@@ -100,14 +102,24 @@ class ServiceMonitor(xbmc.Monitor):
                             _bool=xbmc.getCondVisibility,
                             _busy=busy_dialog_active.__func__,
                             _label=xbmc.getInfoLabel):
+        control_id = _label('System.CurrentControlID')
+        if control_id:
+            is_plugin = _label(
+                'Container(%s).ListItem(0).FilenameAndPath' % control_id
+            ).startswith(url)
+        else:
+            is_plugin = False
+
         if check_all:
-            return (not _bool('Container.IsUpdating')
-                    and not _busy()
-                    and _label('Container.FolderPath').startswith(url))
-        is_plugin = _label('Container.FolderPath').startswith(url)
+            return (is_plugin
+                    and not _bool('Container(%s).IsUpdating' % control_id)
+                    and not _busy())
         return {
             'is_plugin': is_plugin,
-            'is_loaded': is_plugin and not _bool('Container.IsUpdating'),
+            'id': is_plugin and control_id,
+            'is_loaded': is_plugin and not _bool(
+                'Container(%s).IsUpdating' % control_id
+            ),
             'is_active': is_plugin and not _busy(),
         }
 
@@ -396,7 +408,8 @@ class ServiceMonitor(xbmc.Monitor):
                 return
 
             context = self._context
-            focused_video_id = context.get_listitem_property(VIDEO_ID)
+            ui = context.get_ui()
+            focused_video_id = ui.get_listitem_property(VIDEO_ID)
             if not focused_video_id:
                 return
 
@@ -405,8 +418,8 @@ class ServiceMonitor(xbmc.Monitor):
                 if not video_id or video_id != focused_video_id:
                     continue
 
-                play_count = context.get_listitem_info('PlayCount')
-                resumable = context.get_listitem_bool('IsResumable')
+                play_count = ui.get_listitem_info(PLAY_COUNT)
+                resumable = ui.get_listitem_bool(RESUMABLE)
 
                 self.set_property(MARK_AS_LABEL,
                                   context.localize('history.mark.unwatched')

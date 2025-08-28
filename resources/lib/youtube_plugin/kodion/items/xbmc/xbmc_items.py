@@ -28,7 +28,7 @@ from ...constants import (
     PATHS,
     PLAYLIST_ITEM_ID,
     PLAYLIST_ID,
-    PLAY_COUNT,
+    PLAY_COUNT_PROP,
     PLAY_STRM,
     PLAY_TIMESHIFT,
     PLAY_USING,
@@ -92,7 +92,7 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
             if value is not None:
                 if set_play_count:
                     info_labels['playcount'] = value
-                properties[PLAY_COUNT] = value
+                properties[PLAY_COUNT_PROP] = value
 
             value = item.get_rating()
             if value is not None:
@@ -281,7 +281,7 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
                     info_tag.setPlaycount(value)
                 elif info_type == 'music':
                     info_tag.setPlayCount(value)
-            properties[PLAY_COUNT] = value
+            properties[PLAY_COUNT_PROP] = value
 
         # rating: float
         value = item.get_rating()

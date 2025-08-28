@@ -47,6 +47,7 @@ from ..kodion.constants import (
     PAGE,
     PATHS,
     PLAYLIST_ID,
+    PLAY_COUNT,
     VIDEO_ID,
 )
 from ..kodion.items import (
@@ -666,7 +667,7 @@ class Provider(AbstractProvider):
         * ID_TYPE: channel|handle|user
         * ID: YouTube ID
         """
-        listitem_channel_id = context.get_listitem_property(CHANNEL_ID)
+        li_channel_id = context.get_ui().get_listitem_property(CHANNEL_ID)
 
         client = provider.get_client(context)
         create_uri = context.create_uri
@@ -678,11 +679,11 @@ class Provider(AbstractProvider):
         if (command == 'channel'
                 and identifier
                 and identifier.lower() == 'property'
-                and listitem_channel_id
-                and listitem_channel_id.lower().startswith(('mine', 'uc'))):
+                and li_channel_id
+                and li_channel_id.lower().startswith(('mine', 'uc'))):
             context.execute('ActivateWindow(Videos, {channel}, return)'.format(
                 channel=create_uri(
-                    (PATHS.CHANNEL, listitem_channel_id,),
+                    (PATHS.CHANNEL, li_channel_id,),
                 )
             ))
 
@@ -1328,7 +1329,7 @@ class Provider(AbstractProvider):
             }
 
         if command == 'mark_as':
-            if context.get_listitem_info('PlayCount'):
+            if ui.get_listitem_info(PLAY_COUNT):
                 play_data['play_count'] = 0
                 play_data['played_time'] = 0
                 play_data['played_percent'] = 0

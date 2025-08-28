@@ -11,7 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from ...kodion import KodionException
-from ...kodion.constants import VIDEO_ID
+from ...kodion.constants import URI, VIDEO_ID
 from ...kodion.items import menu_items
 
 
@@ -21,9 +21,9 @@ def _process_rate_video(provider,
                         video_id=None,
                         current_rating=None,
                         _ratings=('like', 'dislike', 'none')):
-    listitem_path = context.get_listitem_info('FileNameAndPath')
-
     ui = context.get_ui()
+    li_path = ui.get_listitem_info(URI)
+
     localize = context.localize
 
     rating_param = context.get_param('rating', '')
@@ -38,9 +38,11 @@ def _process_rate_video(provider,
         try:
             video_id = re_match.group(VIDEO_ID)
         except IndexError:
-            video_id = context.parse_item_ids(listitem_path).get(VIDEO_ID)
-            if not video_id:
-                raise KodionException('video/rate/: missing video_id')
+            pass
+    if not video_id and li_path:
+        video_id = context.parse_item_ids(li_path).get(VIDEO_ID)
+    if not video_id:
+        raise KodionException('video/rate/: missing video_id')
 
     if current_rating is None:
         try:

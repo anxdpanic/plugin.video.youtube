@@ -31,6 +31,7 @@ from ...kodion.constants import (
     HIDE_NEXT_PAGE,
     ITEM_FILTER,
     PAGE,
+    FOLDER_URI,
     PATHS,
     PLAYLIST_ID,
     PLAY_FORCE_AUDIO,
@@ -689,6 +690,7 @@ def response_to_items(provider,
                       log=_log):
     params = context.get_params()
     settings = context.get_settings()
+    ui = context.get_ui()
 
     items_per_page = settings.items_per_page()
     item_filter_param = params.get(ITEM_FILTER)
@@ -711,7 +713,7 @@ def response_to_items(provider,
     playlist_id_dict = {}
     subscription_id_dict = {}
 
-    with context.get_ui().create_progress_dialog(
+    with ui.create_progress_dialog(
             heading=context.localize('loading.directory'),
             message_template=context.localize('loading.directory.progress'),
             background=True,
@@ -877,10 +879,7 @@ def response_to_items(provider,
 
         if (next_page - 1) * yt_results_per_page < yt_total_results:
             new_params['items_per_page'] = yt_results_per_page
-        elif context.is_plugin_path(
-                context.get_infolabel('Container.FolderPath'),
-                partial=True,
-        ):
+        elif ui.get_container_info(FOLDER_URI):
             next_page = 1
             new_params['page'] = 1
         else:

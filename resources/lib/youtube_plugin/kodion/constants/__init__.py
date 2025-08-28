@@ -59,10 +59,29 @@ BUSY_FLAG = 'busy'
 WAIT_END_FLAG = 'builtin_completed'
 TRAKT_PAUSE_FLAG = 'script.trakt.paused'
 
+# Container Info
+CURRENT_CONTAINER_INFO = 'Container.%s'
+PLUGIN_CONTAINER_INFO = 'Container(%s).%s'
+CURRENT_ITEM = 'CurrentItem'
+FOLDER_NAME = 'FolderName'
+FOLDER_URI = 'FolderPath'
+
+# ListItem Info
+CONTAINER_LISTITEM_INFO = 'Container(%s).ListItem(0).%s'
+LISTITEM_INFO = 'ListItem.%s'
+ARTIST = 'Artist'
+LABEL = 'Label'
+PLAY_COUNT = 'PlayCount'
+RESUMABLE = 'IsResumable'
+TITLE = 'Title'
+URI = 'FileNameAndPath'
+
 # ListItem Properties
+CONTAINER_LISTITEM_PROP = 'Container(%s).ListItem(0).Property(%s)'
+LISTITEM_PROP = 'ListItem.Property(%s)'
 BOOKMARK_ID = 'bookmark_id'
 CHANNEL_ID = 'channel_id'
-PLAY_COUNT = 'video_play_count'
+PLAY_COUNT_PROP = 'video_play_count'
 PLAYLIST_ID = 'playlist_id'
 PLAYLIST_ITEM_ID = 'playlist_item_id'
 SUBSCRIPTION_ID = 'subscription_id'
@@ -106,6 +125,8 @@ FORCE_PLAY_PARAMS = frozenset((
 ))
 
 # Stored data
+PROPERTY = 'Window(home).Property(%s-%%s)' % ADDON_ID
+PROPERTY_AS_LABEL = '$INFO[Window(home).Property(%s-%%s)]' % ADDON_ID
 CONTAINER_ID = 'container_id'
 CONTAINER_FOCUS = 'container_focus'
 CONTAINER_POSITION = 'container_position'
@@ -171,10 +192,29 @@ __all__ = (
     'TRAKT_PAUSE_FLAG',
     'WAIT_END_FLAG',
 
-    # ListItem properties
+    # Container Info
+    'CURRENT_CONTAINER_INFO',
+    'PLUGIN_CONTAINER_INFO',
+    'CURRENT_ITEM',
+    'FOLDER_NAME',
+    'FOLDER_URI',
+
+    # ListItem Info
+    'CONTAINER_LISTITEM_INFO',
+    'LISTITEM_INFO',
+    'ARTIST',
+    'LABEL',
+    'PLAY_COUNT',
+    'RESUMABLE',
+    'TITLE',
+    'URI',
+
+    # ListItem Properties
+    'CONTAINER_LISTITEM_PROP',
+    'LISTITEM_PROP',
     'BOOKMARK_ID',
     'CHANNEL_ID',
-    'PLAY_COUNT',
+    'PLAY_COUNT_PROP',
     'PLAYLIST_ID',
     'PLAYLIST_ITEM_ID',
     'SUBSCRIPTION_ID',
@@ -212,6 +252,8 @@ __all__ = (
     'FORCE_PLAY_PARAMS',
 
     # Stored data
+    'PROPERTY',
+    'PROPERTY_AS_LABEL',
     'CONTAINER_ID',
     'CONTAINER_FOCUS',
     'CONTAINER_POSITION',

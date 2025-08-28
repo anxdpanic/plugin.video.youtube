@@ -15,6 +15,7 @@ import gc
 from . import logging
 from .constants import (
     CHECK_SETTINGS,
+    FOLDER_URI,
     PATHS,
 )
 from .context import XbmcContext
@@ -42,7 +43,9 @@ def run(context=_context,
         profiler=_profiler):
     gc.disable()
 
-    if context.get_ui().pop_property(CHECK_SETTINGS):
+    ui = context.get_ui()
+
+    if ui.pop_property(CHECK_SETTINGS):
         provider.reset_client()
         settings = context.get_settings(refresh=True)
     else:
@@ -65,7 +68,7 @@ def run(context=_context,
         profiler.disable()
 
     old_path, old_params = context.parse_uri(
-        context.get_infolabel('Container.FolderPath'),
+        ui.get_container_info(FOLDER_URI, strict=False),
         parse_params=False,
     )
     old_path = old_path.rstrip('/')

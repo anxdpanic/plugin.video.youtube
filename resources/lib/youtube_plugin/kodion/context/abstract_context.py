@@ -421,12 +421,13 @@ class AbstractContext(object):
     def get_parent_uri(self, **kwargs):
         return self.create_uri(self._path_parts[:-1], **kwargs)
 
-    def create_path(self, *args, **kwargs):
+    @staticmethod
+    def create_path(*args, **kwargs):
         include_parts = kwargs.get('parts')
-        parse_parts = kwargs.get('parse')
+        parser = kwargs.get('parser')
         parts = [
-            self.get_infolabel(part[6:-1])
-            if parse_parts and part.startswith('$INFO[') else
+            parser(part[6:-1])
+            if parser and part.startswith('$INFO[') else
             part
             for part in [
                 to_str(arg).strip('/').replace('\\', '/').replace('//', '/')
@@ -460,7 +461,11 @@ class AbstractContext(object):
             path = unquote(path[0])
             if parts is None:
                 path = path.split('/')
-                path, parts = self.create_path(*path, parts=True, parse=True)
+                path, parts = self.create_path(
+                    *path,
+                    parts=True,
+                    parser=kwargs.get('parser'),
+                )
         else:
             path, parts = self.create_path(*path, parts=True)
 
@@ -496,7 +501,7 @@ class AbstractContext(object):
             params = uri.query
         return path, params
 
-    def parse_params(self, params, update=True):
+    def parse_params(self, params, update=True, parser=None):
         to_delete = []
         output = self._params if update else {}
 
@@ -522,8 +527,8 @@ class AbstractContext(object):
                         [unquote(val) for val in value.split(',') if val]
                     )
                 elif param in self._STRING_PARAMS:
-                    if value.startswith('$INFO['):
-                        parsed_value = self.get_infolabel(value[6:-1])
+                    if parser and value.startswith('$INFO['):
+                        parsed_value = parser(value[6:-1])
                     else:
                         parsed_value = value
                     if param in self._STRING_BOOL_PARAMS:
@@ -643,26 +648,6 @@ class AbstractContext(object):
     def sleep(timeout=None):
         raise NotImplementedError()
 
-    @staticmethod
-    def get_infobool(name):
-        raise NotImplementedError()
-
-    @staticmethod
-    def get_infolabel(name):
-        raise NotImplementedError()
-
-    @staticmethod
-    def get_listitem_bool(detail_name):
-        raise NotImplementedError()
-
-    @staticmethod
-    def get_listitem_property(detail_name):
-        raise NotImplementedError()
-
-    @staticmethod
-    def get_listitem_info(detail_name):
-        raise NotImplementedError()
-
     def tear_down(self):
         pass
 
@@ -678,8 +663,5 @@ class AbstractContext(object):
 
     def parse_item_ids(self,
                        uri=None,
-                       from_listitem=True,
-                       _ids={'video': VIDEO_ID,
-                             'channel': CHANNEL_ID,
-                             'playlist': PLAYLIST_ID}):
+                       from_listitem=True):
         raise NotImplementedError()
