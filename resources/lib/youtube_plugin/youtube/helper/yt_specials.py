@@ -123,10 +123,10 @@ def _process_recommendations(provider, context, client):
     params = context.get_params()
 
     browse_id = 'FEwhat_to_watch'
-    # browse_client = 'tv'
-    # browse_paths = client.JSON_PATHS['tv_shelf_horizontal']
-    browse_client = 'android_vr'
-    browse_paths = client.JSON_PATHS['vr_shelf']
+    browse_client = 'tv'
+    browse_paths = client.JSON_PATHS['tv_shelf_horizontal']
+    # browse_client = 'android_vr'
+    # browse_paths = client.JSON_PATHS['vr_shelf']
 
     json_data = function_cache.run(
         client.get_browse_items,
