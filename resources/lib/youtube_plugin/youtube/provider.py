@@ -959,9 +959,9 @@ class Provider(AbstractProvider):
         if query.startswith(('https://', 'http://')):
             return self.on_uri2addon(provider=self, context=context, uri=query)
         if context.is_plugin_path(query):
-            return UriItem(query), {
+            return False, {
                 self.CACHE_TO_DISC: False,
-                self.FALLBACK: False,
+                self.FALLBACK: query,
             }
 
         result = self._search_channel_or_playlist(context, query)

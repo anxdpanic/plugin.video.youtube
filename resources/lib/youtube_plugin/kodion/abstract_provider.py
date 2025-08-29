@@ -493,7 +493,6 @@ class AbstractProvider(object):
                     and context.is_plugin_path(old_uri,
                                                PATHS.SEARCH,
                                                partial=True)):
-
                 query = old_params.get('q')
                 if not query:
                     fallback = ui.pop_property(provider.FALLBACK)
@@ -510,6 +509,7 @@ class AbstractProvider(object):
                             context.create_path(PATHS.SEARCH, 'query'),
                         )
                     if old_path.startswith(history_blacklist):
+                        fallback = True
                         query = False
 
             if query:
