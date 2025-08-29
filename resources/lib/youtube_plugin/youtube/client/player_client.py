@@ -1586,9 +1586,9 @@ class PlayerClient(LoginClient):
             'not available',
         }
         reauth_reasons = {
-            'age',
+            'confirm your age',
             'inappropriate',
-            'sign in',
+            'please sign in',
         }
         skip_reasons = {
             'latest version',
@@ -1598,6 +1598,7 @@ class PlayerClient(LoginClient):
             'try again later',
             'unavailable',
             'unknown',
+            'not a bot',
         }
         abort = False
 
