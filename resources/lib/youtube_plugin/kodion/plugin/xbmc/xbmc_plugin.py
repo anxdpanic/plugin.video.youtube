@@ -388,7 +388,7 @@ class XbmcPlugin(AbstractPlugin):
         if any(sync_items):
             context.send_notification(SYNC_LISTITEM, sync_items)
 
-        container = ui.pop_property(CONTAINER_ID)
+        container = ui.get_property(CONTAINER_ID)
         position = ui.pop_property(CONTAINER_POSITION)
         if container and position:
             context.send_notification(CONTAINER_FOCUS, [container, position])

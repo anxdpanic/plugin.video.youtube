@@ -23,6 +23,7 @@ from .constants import (
     PLAYLIST_ITEM_ID,
     PLAY_COUNT,
     PLUGIN_SLEEPING,
+    SCROLLING,
     SUBSCRIPTION_ID,
     TEMP_PATH,
     TITLE,
@@ -56,6 +57,7 @@ def run():
                  python=system_version.get_python_version())
 
     ui = context.get_ui()
+    get_container_bool = ui.get_container_bool
     get_listitem_info = ui.get_listitem_info
     get_listitem_property = ui.get_listitem_property
     clear_property = ui.clear_property
@@ -171,7 +173,8 @@ def run():
                 monitor.refresh_container(deferred=True)
                 break
 
-            if monitor.interrupt:
+            if (monitor.interrupt
+                    or (not check_item and wait_time_ms >= idle_interval_ms)):
                 monitor.interrupt = False
                 container = monitor.is_plugin_container()
                 if check_item != container['is_plugin']:
@@ -187,8 +190,8 @@ def run():
                     container_id = container['id']
                     set_property(CONTAINER_ID, container_id)
 
-                label = get_listitem_info(LABEL, container_id)
-                if label:
+                scrolling = get_container_bool(SCROLLING, container_id)
+                if not scrolling and get_listitem_info(LABEL, container_id):
                     item_has_id = None
                     for name, detail in plugin_item_details.items():
                         value = detail['value']

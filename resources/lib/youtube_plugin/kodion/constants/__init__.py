@@ -65,6 +65,7 @@ PLUGIN_CONTAINER_INFO = 'Container(%s).%s'
 CURRENT_ITEM = 'CurrentItem'
 FOLDER_NAME = 'FolderName'
 FOLDER_URI = 'FolderPath'
+SCROLLING = 'Scrolling'
 
 # ListItem Info
 CONTAINER_LISTITEM_INFO = 'Container(%s).ListItem(0).%s'
@@ -198,6 +199,7 @@ __all__ = (
     'CURRENT_ITEM',
     'FOLDER_NAME',
     'FOLDER_URI',
+    'SCROLLING',
 
     # ListItem Info
     'CONTAINER_LISTITEM_INFO',
