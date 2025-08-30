@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from time import strftime, gmtime
 from datetime import date, datetime, time as dt_time, timedelta
 from importlib import import_module
 from re import compile as re_compile
@@ -312,3 +313,33 @@ def yt_datetime_offset(**kwargs):
         _now = datetime.utcnow()
 
     return (_now - timedelta(**kwargs)).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+
+def imf_fixdate(seconds,
+                _days=(
+                        'Mon',
+                        'Tue',
+                        'Wed',
+                        'Thu',
+                        'Fri',
+                        'Sat',
+                        'Sun',
+                ),
+                _months=(
+                        None,
+                        'Jan',
+                        'Feb',
+                        'Mar',
+                        'Apr',
+                        'May',
+                        'Jun',
+                        'Jul',
+                        'Aug',
+                        'Sep',
+                        'Oct',
+                        'Nov',
+                        'Dec',
+                )):
+    _time = gmtime(seconds)
+    out = strftime('{weekday}, %d {month} %Y %H:%M:%S GMT', _time)
+    return out.format(weekday=_days[_time.tm_wday], month=_months[_time.tm_mon])

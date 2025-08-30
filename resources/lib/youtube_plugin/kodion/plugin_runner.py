@@ -13,7 +13,13 @@ from __future__ import absolute_import, division, unicode_literals
 import gc
 
 from . import logging
-from .constants import CHECK_SETTINGS, PATHS
+from .constants import (
+    CHECK_SETTINGS,
+    FOLDER_URI,
+    PATHS,
+    SORT_DIR,
+    SORT_METHOD,
+)
 from .context import XbmcContext
 from .debug import Profiler
 from .plugin import XbmcPlugin
@@ -38,7 +44,10 @@ def run(context=_context,
         provider=_provider,
         profiler=_profiler):
     gc.disable()
-    if context.get_ui().pop_property(CHECK_SETTINGS):
+
+    ui = context.get_ui()
+
+    if ui.pop_property(CHECK_SETTINGS):
         provider.reset_client()
         settings = context.get_settings(refresh=True)
     else:
@@ -60,45 +69,47 @@ def run(context=_context,
         log.verbose_logging = False
         profiler.disable()
 
-    sort_method = context.get_infolabel('Container.SortMethod')
-    sort_order = context.get_infolabel('Container.SortOrder')
+    old_path, old_params = context.parse_uri(
+        ui.get_container_info(FOLDER_URI, strict=False),
+        parse_params=False,
+    )
+    old_path = old_path.rstrip('/')
+    context.init()
     current_path = context.get_path().rstrip('/')
     current_params = context.get_original_params()
     current_handle = context.get_handle()
-    context.init()
-    new_path = context.get_path().rstrip('/')
-    new_params = context.get_original_params()
-    new_handle = context.get_handle()
-
-    forced = False
-    if new_handle != -1:
-        if current_path == PATHS.PLAY:
-            forced = True
-        elif current_path == new_path:
-            if current_path:
-                if current_params == new_params:
-                    forced = True
-        # The following conditions will be true in some forced refresh scenarios
-        # e.g. addon disabling/enabling, but will also be true for a number of
-        # non-forced refreshes such as when a new language invoker thread starts
-        # for a non-plugin context.
-        #     elif not current_params:
-        #         forced = True
-        # elif current_handle == -1 and not current_path and not current_params:
-        #     forced = True
 
     new_params = {}
+    new_kwargs = {}
+    params = context.get_params()
+
+    refresh = context.refresh_requested(params=params)
+    is_same_path = refresh != 0 and current_path == old_path
+    forced = (current_handle != -1
+              and (old_path == PATHS.PLAY
+                   or (is_same_path and current_params == old_params)))
     if forced:
-        refresh = context.refresh_requested(force=True, off=True)
+        refresh = context.refresh_requested(force=True, off=True, params=params)
         new_params['refresh'] = refresh if refresh else 0
+
+    sort_method = (
+            params.get(SORT_METHOD)
+            or ui.get_infolabel('Container.SortMethod')
+    )
     if sort_method:
-        new_params['sort_method'] = sort_method
-    if sort_order:
-        new_params['sort_order'] = sort_order
+        new_kwargs[SORT_METHOD] = sort_method.lower()
+
+    sort_dir = (
+            params.get(SORT_DIR)
+            or ui.get_infolabel('Container.SortOrder')
+    )
+    if sort_dir:
+        new_kwargs[SORT_DIR] = sort_dir.lower()
+
     if new_params:
         context.set_params(**new_params)
 
-    log_params = context.get_params().copy()
+    log_params = params.copy()
     for key in ('api_key', 'client_id', 'client_secret'):
         if key in log_params:
             log_params[key] = '<redacted>'
@@ -108,20 +119,26 @@ def run(context=_context,
               'Kodi:   v{kodi}',
               'Python: v{python}',
               'Handle: {handle}',
-              'Path:   {path!r}',
+              'Path:   {path!r} ({path_link})',
               'Params: {params!r}',
               'Forced: {forced!r}'),
              version=context.get_version(),
              kodi=str(system_version),
              python=system_version.get_python_version(),
-             handle=new_handle,
-             path=new_path,
+             handle=current_handle,
+             path=current_path,
+             path_link='linked' if is_same_path else 'new',
              params=log_params,
              forced=forced)
 
-    plugin.run(provider, context, forced=forced)
+    plugin.run(provider,
+               context,
+               forced=forced,
+               is_same_path=is_same_path,
+               **new_kwargs)
 
     if log_level:
         profiler.print_stats()
+
     gc.enable()
     gc.collect()

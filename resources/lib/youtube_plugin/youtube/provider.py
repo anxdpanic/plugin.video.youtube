@@ -36,7 +36,19 @@ from ..kodion.constants import (
     ADDON_ID,
     CHANNEL_ID,
     CONTENT,
+    HIDE_CHANNELS,
+    HIDE_FOLDERS,
+    HIDE_LIVE,
+    HIDE_PLAYLISTS,
+    HIDE_SEARCH,
+    HIDE_SHORTS,
+    HIDE_VIDEOS,
+    INCOGNITO,
+    PAGE,
     PATHS,
+    PLAYLIST_ID,
+    PLAY_COUNT,
+    VIDEO_ID,
 )
 from ..kodion.items import (
     BaseItem,
@@ -49,8 +61,7 @@ from ..kodion.items import (
     menu_items,
 )
 from ..kodion.utils.convert_format import strip_html_from_text, to_unicode
-from ..kodion.utils.datetime_parser import now, since_epoch
-from ..kodion.utils.methods import parse_item_ids
+from ..kodion.utils.datetime import now, since_epoch
 
 
 class Provider(AbstractProvider):
@@ -61,30 +72,35 @@ class Provider(AbstractProvider):
         self._resource_manager = None
         self._client = None
 
-        self.on_video_x = self.register_path(
-            '^/video/(?P<command>[^/]+)/?$',
-            yt_video.process,
-        )
+        self.on_video_x = self.register_path(r''.join((
+            '^',
+            PATHS.VIDEO,
+            '/(?P<command>[^/]+)/?$',
+        )), yt_video.process)
 
-        self.on_playlist_x = self.register_path(
-            '^/playlist/(?P<command>[^/]+)/(?P<category>[^/]+)/?$',
-            yt_playlist.process,
-        )
+        self.on_playlist_x = self.register_path(r''.join((
+            '^',
+            PATHS.PLAYLIST,
+            '/(?P<command>[^/]+)/(?P<category>[^/]+)/?$',
+        )), yt_playlist.process)
 
-        self.register_path(
-            '^/play/?$',
-            yt_play.process,
-        )
+        self.register_path(r''.join((
+            '^',
+            PATHS.PLAY,
+            '/?$',
+        )), yt_play.process)
 
-        self.on_specials_x = self.register_path(
-            '^/special/(?P<category>[^/]+)(?:/(?P<sub_category>[^/]+))?/?$',
-            yt_specials.process,
-        )
+        self.on_specials_x = self.register_path(r''.join((
+            '^',
+            PATHS.SPECIAL,
+            '/(?P<category>[^/]+)(?:/(?P<sub_category>[^/]+))?/?$',
+        )), yt_specials.process)
 
-        self.register_path(
-            '^/subscriptions/(?P<command>[^/]+)/?$',
-            yt_subscriptions.process,
-        )
+        self.register_path(r''.join((
+            '^',
+            PATHS.SUBSCRIPTIONS,
+            '/(?P<command>[^/]+)/?$',
+        )), yt_subscriptions.process)
 
         atexit_register(self.tear_down)
 
@@ -345,9 +361,9 @@ class Provider(AbstractProvider):
 
         * CHANNEL_ID: YouTube Channel ID
         """
-        channel_id = re_match.group('channel_id')
+        channel_id = re_match.group(CHANNEL_ID)
         new_params = {
-            'channel_id': channel_id,
+            CHANNEL_ID: channel_id,
         }
         context.parse_params(new_params)
         params = context.get_params()
@@ -355,7 +371,7 @@ class Provider(AbstractProvider):
         resource_manager = provider.get_resource_manager(context)
         playlists = resource_manager.get_related_playlists(channel_id)
         uploads = playlists.get('uploads') if playlists else None
-        if (params.get('page', 1) == 1 and not params.get('hide_folders')
+        if (params.get(PAGE, 1) == 1 and not params.get(HIDE_FOLDERS)
                 and uploads and uploads.startswith('UU')):
             result = [
                 {
@@ -382,7 +398,7 @@ class Provider(AbstractProvider):
                         }},
                     },
                     '_partial': True,
-                },
+                } if not params.get(HIDE_SHORTS) else None,
                 {
                     'kind': 'youtube#playlist',
                     'id': uploads.replace('UU', 'UULV', 1),
@@ -394,7 +410,7 @@ class Provider(AbstractProvider):
                         }},
                     },
                     '_partial': True,
-                },
+                } if not params.get(HIDE_LIVE) else None,
             ]
         else:
             result = False
@@ -418,10 +434,14 @@ class Provider(AbstractProvider):
         }
         return result, options
 
-    @AbstractProvider.register_path(
-        r'^/channel/(?P<channel_id>[^/]+)'
-        r'/(?:live|playlist/(?P<playlist_id>UULV[^/]+))/?$'
-    )
+    @AbstractProvider.register_path(r''.join((
+            '^',
+            PATHS.CHANNEL,
+            '/(?P<', CHANNEL_ID, '>[^/]+)',
+            '(?:/live|',
+            PATHS.PLAYLIST,
+            '/(?P<', PLAYLIST_ID, '>UULV[^/]+))/?$',
+    )))
     @staticmethod
     def on_channel_live(provider,
                         context,
@@ -443,8 +463,8 @@ class Provider(AbstractProvider):
         resource_manager = provider.get_resource_manager(context)
 
         if re_match:
-            channel_id = re_match.group('channel_id')
-            playlist_id = re_match.group('playlist_id')
+            channel_id = re_match.group(CHANNEL_ID)
+            playlist_id = re_match.group(PLAYLIST_ID)
             if not playlist_id:
                 playlists = resource_manager.get_related_playlists(channel_id)
                 playlist_id = playlists.get('uploads') if playlists else None
@@ -454,8 +474,8 @@ class Provider(AbstractProvider):
             return False, None
 
         new_params = {
-            'channel_id': channel_id,
-            'playlist_id': playlist_id,
+            CHANNEL_ID: channel_id,
+            PLAYLIST_ID: playlist_id,
         }
         context.parse_params(new_params)
 
@@ -522,10 +542,14 @@ class Provider(AbstractProvider):
         }
         return result, options
 
-    @AbstractProvider.register_path(
-        r'^/channel/(?P<channel_id>[^/]+)'
-        r'/(?:shorts|playlist/(?P<playlist_id>UUSH[^/]+))/?$'
-    )
+    @AbstractProvider.register_path(r''.join((
+            '^',
+            PATHS.CHANNEL,
+            '/(?P<', CHANNEL_ID, '>[^/]+)',
+            '(?:/shorts|',
+            PATHS.PLAYLIST,
+            '/(?P<', PLAYLIST_ID, '>UUSH[^/]+))/?$',
+    )))
     @staticmethod
     def on_channel_shorts(provider,
                           context,
@@ -547,8 +571,8 @@ class Provider(AbstractProvider):
         resource_manager = provider.get_resource_manager(context)
 
         if re_match:
-            channel_id = re_match.group('channel_id')
-            playlist_id = re_match.group('playlist_id')
+            channel_id = re_match.group(CHANNEL_ID)
+            playlist_id = re_match.group(PLAYLIST_ID)
             if not playlist_id:
                 playlists = resource_manager.get_related_playlists(channel_id)
                 playlist_id = playlists.get('uploads') if playlists else None
@@ -558,8 +582,8 @@ class Provider(AbstractProvider):
             return False, None
 
         new_params = {
-            'channel_id': channel_id,
-            'playlist_id': playlist_id,
+            CHANNEL_ID: channel_id,
+            PLAYLIST_ID: playlist_id,
         }
         context.parse_params(new_params)
 
@@ -583,10 +607,13 @@ class Provider(AbstractProvider):
         }
         return result, options
 
-    @AbstractProvider.register_path(
-        r'^(?:/channel/(?P<channel_id>[^/]+))?'
-        r'/playlist/(?P<playlist_id>[^/]+)/?$'
-    )
+    @AbstractProvider.register_path(r''.join((
+            '^(?:',
+            PATHS.CHANNEL,
+            '/(?P<', CHANNEL_ID, '>[^/]+))?',
+            PATHS.PLAYLIST,
+            '/(?P<', PLAYLIST_ID, '>[^/]+)/?$',
+    )))
     @staticmethod
     def on_playlist(provider, context, re_match):
         """
@@ -601,13 +628,13 @@ class Provider(AbstractProvider):
         * CHANNEL_ID: ['mine'|YouTube Channel ID]
         * PLAYLIST_ID: YouTube Playlist ID
         """
-        playlist_id = re_match.group('playlist_id')
+        playlist_id = re_match.group(PLAYLIST_ID)
         new_params = {
-            'playlist_id': playlist_id,
+            PLAYLIST_ID: playlist_id,
         }
-        channel_id = re_match.group('channel_id')
+        channel_id = re_match.group(CHANNEL_ID)
         if channel_id:
-            new_params['channel_id'] = channel_id
+            new_params[CHANNEL_ID] = channel_id
         context.parse_params(new_params)
 
         resource_manager = provider.get_resource_manager(context)
@@ -621,7 +648,7 @@ class Provider(AbstractProvider):
         options = {
             provider.CONTENT_TYPE: {
                 'content_type': CONTENT.VIDEO_CONTENT,
-                'sub_type': None,
+                'sub_type': CONTENT.PLAYLIST,
                 'category_label': None,
             },
         }
@@ -640,7 +667,7 @@ class Provider(AbstractProvider):
         * ID_TYPE: channel|handle|user
         * ID: YouTube ID
         """
-        listitem_channel_id = context.get_listitem_property(CHANNEL_ID)
+        li_channel_id = context.get_ui().get_listitem_property(CHANNEL_ID)
 
         client = provider.get_client(context)
         create_uri = context.create_uri
@@ -652,11 +679,11 @@ class Provider(AbstractProvider):
         if (command == 'channel'
                 and identifier
                 and identifier.lower() == 'property'
-                and listitem_channel_id
-                and listitem_channel_id.lower().startswith(('mine', 'uc'))):
+                and li_channel_id
+                and li_channel_id.lower().startswith(('mine', 'uc'))):
             context.execute('ActivateWindow(Videos, {channel}, return)'.format(
                 channel=create_uri(
-                    (PATHS.CHANNEL, listitem_channel_id,),
+                    (PATHS.CHANNEL, li_channel_id,),
                 )
             ))
 
@@ -691,7 +718,7 @@ class Provider(AbstractProvider):
                 return False
 
         context.parse_params({
-            'channel_id': channel_id,
+            CHANNEL_ID: channel_id,
         })
 
         resource_manager = provider.get_resource_manager(context)
@@ -709,7 +736,7 @@ class Provider(AbstractProvider):
         if uploads and not uploads.startswith('UU'):
             uploads = None
 
-        if params.get('page', 1) == 1 and not params.get('hide_folders'):
+        if params.get(PAGE, 1) == 1 and not params.get(HIDE_FOLDERS):
             v3_response = {
                 'kind': 'plugin#pluginListResponse',
                 'items': [
@@ -718,17 +745,17 @@ class Provider(AbstractProvider):
                         '_params': {
                             'title': context.localize('playlists'),
                             'image': '{media}/playlist.png',
-                            'channel_id': channel_id,
+                            CHANNEL_ID: channel_id,
                         },
-                    } if not params.get('hide_playlists') else None,
+                    } if not params.get(HIDE_PLAYLISTS) else None,
                     {
                         'kind': 'plugin#searchFolder',
                         '_params': {
                             'title': context.localize('search'),
                             'image': '{media}/search.png',
-                            'channel_id': channel_id,
+                            CHANNEL_ID: channel_id,
                         },
-                    } if not params.get('hide_search') else None,
+                    } if not params.get(HIDE_SEARCH) else None,
                     {
                         'kind': 'youtube#playlist',
                         'id': uploads.replace('UU', 'UUSH', 1),
@@ -740,7 +767,7 @@ class Provider(AbstractProvider):
                             }},
                         },
                         '_partial': True,
-                    } if uploads and not params.get('hide_shorts') else None,
+                    } if uploads and not params.get(HIDE_SHORTS) else None,
                     {
                         'kind': 'youtube#playlist',
                         'id': uploads.replace('UU', 'UULV', 1),
@@ -752,7 +779,7 @@ class Provider(AbstractProvider):
                             }},
                         },
                         '_partial': True,
-                    } if uploads and not params.get('hide_live') else None,
+                    } if uploads and not params.get(HIDE_LIVE) else None,
                 ],
             }
             result.extend(v3.response_to_items(provider, context, v3_response))
@@ -784,7 +811,7 @@ class Provider(AbstractProvider):
                 return result, options
 
             context.parse_params({
-                'playlist_id': filtered_uploads or uploads,
+                PLAYLIST_ID: filtered_uploads or uploads,
             })
 
             if not filtered_uploads:
@@ -932,9 +959,9 @@ class Provider(AbstractProvider):
         if query.startswith(('https://', 'http://')):
             return self.on_uri2addon(provider=self, context=context, uri=query)
         if context.is_plugin_path(query):
-            return UriItem(query), {
+            return False, {
                 self.CACHE_TO_DISC: False,
-                self.FALLBACK: False,
+                self.FALLBACK: query,
             }
 
         result = self._search_channel_or_playlist(context, query)
@@ -950,7 +977,7 @@ class Provider(AbstractProvider):
             }
         result = []
 
-        channel_id = params.get('channel_id') or params.get('channelId')
+        channel_id = params.get(CHANNEL_ID) or params.get('channelId')
         event_type = params.get('event_type') or params.get('eventType')
         location = params.get('location')
         page_token = params.get('page_token') or params.get('pageToken') or ''
@@ -969,8 +996,9 @@ class Provider(AbstractProvider):
             },
         }
 
-        if params.get('page', 1) == 1 and not params.get('hide_folders'):
-            if event_type or search_type != 'video':
+        if params.get(PAGE, 1) == 1 and not params.get(HIDE_FOLDERS):
+            if ((event_type or search_type != 'video')
+                    and not params.get(HIDE_VIDEOS)):
                 video_params = dict(params,
                                     search_type='video',
                                     event_type='')
@@ -983,7 +1011,10 @@ class Provider(AbstractProvider):
                 )
                 result.append(video_item)
 
-            if not channel_id and not location and search_type != 'channel':
+            if (not channel_id
+                    and not location
+                    and search_type != 'channel'
+                    and not params.get(HIDE_CHANNELS)):
                 channel_params = dict(params,
                                       search_type='channel',
                                       event_type='')
@@ -996,7 +1027,9 @@ class Provider(AbstractProvider):
                 )
                 result.append(channel_item)
 
-            if not location and search_type != 'playlist':
+            if (not location
+                    and search_type != 'playlist'
+                    and not params.get(HIDE_PLAYLISTS)):
                 playlist_params = dict(params,
                                        search_type='playlist',
                                        event_type='')
@@ -1009,7 +1042,9 @@ class Provider(AbstractProvider):
                 )
                 result.append(playlist_item)
 
-            if not channel_id and event_type != 'live':
+            if (not channel_id
+                    and event_type != 'live'
+                    and not params.get(HIDE_LIVE)):
                 live_params = dict(params,
                                    search_type='video',
                                    event_type='live')
@@ -1022,7 +1057,9 @@ class Provider(AbstractProvider):
                 )
                 result.append(live_item)
 
-            if event_type and event_type != 'upcoming':
+            if (event_type
+                    and event_type != 'upcoming'
+                    and not params.get(HIDE_LIVE)):
                 upcoming_params = dict(params,
                                        search_type='video',
                                        event_type='upcoming')
@@ -1035,7 +1072,9 @@ class Provider(AbstractProvider):
                 )
                 result.append(upcoming_item)
 
-            if event_type and event_type != 'completed':
+            if (event_type
+                    and event_type != 'completed'
+                    and not params.get(HIDE_LIVE)):
                 completed_params = dict(params,
                                         search_type='video',
                                         event_type='completed')
@@ -1072,7 +1111,7 @@ class Provider(AbstractProvider):
             return False, None
 
         # Store current search query
-        if not params.get('incognito') and not params.get('channel_id'):
+        if not params.get(INCOGNITO) and not params.get(CHANNEL_ID):
             context.get_search_history().add_item(search_params)
 
         result.extend(v3.response_to_items(
@@ -1148,11 +1187,12 @@ class Provider(AbstractProvider):
                                                'my_subscriptions.filtered')))
         return True, None
 
-    @AbstractProvider.register_path(
-        r'^/maintenance'
-        r'/(?P<action>[^/]+)'
-        r'/(?P<target>[^/]+)/?$'
-    )
+    @AbstractProvider.register_path(r''.join((
+            '^',
+            PATHS.MAINTENANCE,
+            '/(?P<action>[^/]+)',
+            '/(?P<target>[^/]+)/?$',
+    )))
     @staticmethod
     def on_maintenance_actions(provider, context, re_match):
         target = re_match.group('target')
@@ -1230,7 +1270,7 @@ class Provider(AbstractProvider):
             options = {
                 provider.CONTENT_TYPE: {
                     'content_type': CONTENT.VIDEO_CONTENT,
-                    'sub_type': 'history',
+                    'sub_type': CONTENT.HISTORY,
                     'category_label': None,
                 },
             }
@@ -1253,7 +1293,7 @@ class Provider(AbstractProvider):
             )
             return True
 
-        video_id = params.get('video_id')
+        video_id = params.get(VIDEO_ID)
         if not video_id:
             return False
 
@@ -1289,7 +1329,7 @@ class Provider(AbstractProvider):
             }
 
         if command == 'mark_as':
-            if context.get_listitem_info('PlayCount'):
+            if ui.get_listitem_info(PLAY_COUNT):
                 play_data['play_count'] = 0
                 play_data['played_time'] = 0
                 play_data['played_percent'] = 0
@@ -1435,7 +1475,7 @@ class Provider(AbstractProvider):
         if logged_in and settings_bool(settings.SHOW_MY_CHANNEL, True):
             my_channel_item = DirectoryItem(
                 localize('my_channel'),
-                create_uri((PATHS.CHANNEL, 'mine')),
+                create_uri(PATHS.MY_CHANNEL),
                 image='{media}/user.png',
             )
             result.append(my_channel_item)
@@ -1448,7 +1488,7 @@ class Provider(AbstractProvider):
                     create_uri(
                         (PATHS.VIRTUAL_PLAYLIST, watch_later_id)
                         if watch_later_id.lower() == 'wl' else
-                        (PATHS.CHANNEL, 'mine', PATHS.PLAYLIST, watch_later_id)
+                        (PATHS.MY_PLAYLIST, watch_later_id)
                     ),
                     image='{media}/watch_later.png',
                 )
@@ -1535,7 +1575,7 @@ class Provider(AbstractProvider):
                     create_uri(
                         (PATHS.VIRTUAL_PLAYLIST, history_id)
                         if history_id.lower() == 'hl' else
-                        (PATHS.CHANNEL, 'mine', PATHS.PLAYLIST, history_id)
+                        (PATHS.MY_PLAYLIST, history_id)
                     ),
                     image='{media}/history.png',
                 )
@@ -1583,9 +1623,7 @@ class Provider(AbstractProvider):
         if logged_in and settings_bool(settings.SHOW_PLAYLISTS, True):
             playlists_item = DirectoryItem(
                 localize('playlists'),
-                create_uri(
-                    (PATHS.CHANNEL, 'mine', 'playlists',),
-                ),
+                create_uri(PATHS.MY_PLAYLISTS),
                 image='{media}/playlist.png',
             )
             result.append(playlists_item)
@@ -1603,7 +1641,7 @@ class Provider(AbstractProvider):
         if logged_in and settings_bool(settings.SHOW_SUBSCRIPTIONS, True):
             subscriptions_item = DirectoryItem(
                 localize('subscriptions'),
-                create_uri(('subscriptions', 'list')),
+                create_uri((PATHS.SUBSCRIPTIONS, 'list')),
                 image='{media}/channels.png',
             )
             result.append(subscriptions_item)
@@ -1637,7 +1675,7 @@ class Provider(AbstractProvider):
         if logged_in and settings_bool(settings.SHOW_BROWSE_CHANNELS, True):
             browse_channels_item = DirectoryItem(
                 localize('browse_channels'),
-                create_uri(('special', 'browse_channels')),
+                create_uri((PATHS.SPECIAL, 'browse_channels')),
                 image='{media}/browse_channels.png',
             )
             result.append(browse_channels_item)
@@ -1716,6 +1754,7 @@ class Provider(AbstractProvider):
 
         ui = context.get_ui()
         localize = context.localize
+        parse_item_ids = context.parse_item_ids
 
         if command in {'list', 'play'}:
             bookmarks_list = context.get_bookmarks_list()
@@ -1822,17 +1861,17 @@ class Provider(AbstractProvider):
                             yt_id = item.video_id
                             continue
 
-                        yt_id = getattr(item, 'playlist_id', None)
+                        yt_id = getattr(item, PLAYLIST_ID, None)
                         if yt_id:
                             kind = 'youtube#playlist'
                             continue
 
-                        yt_id = getattr(item, 'channel_id', None)
+                        yt_id = getattr(item, CHANNEL_ID, None)
                         if yt_id:
                             kind = 'youtube#channel'
                             continue
 
-                    item_ids = parse_item_ids(item_uri)
+                    item_ids = parse_item_ids(item_uri, from_listitem=False)
                     for _kind in ('video', 'playlist', 'channel'):
                         id_type = _kind + '_id'
                         _yt_id = item_ids.get(id_type)
@@ -2071,7 +2110,7 @@ class Provider(AbstractProvider):
             )
             return True
 
-        video_id = params.get('video_id')
+        video_id = params.get(VIDEO_ID)
         if not video_id:
             return False
 

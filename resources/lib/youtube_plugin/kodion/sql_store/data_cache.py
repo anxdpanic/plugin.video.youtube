@@ -30,13 +30,14 @@ class DataCache(Storage):
                   values_only=True,
                   memory_store=None):
         if memory_store:
-            memory_ids = memory_store.keys()
-            in_memory_result = {
-                key: value
-                for key, value in memory_store.items()
-                if key in memory_ids & content_ids
-            }
-            content_ids = content_ids - memory_ids
+            in_memory_result = {}
+            _content_ids = []
+            for key in content_ids:
+                if key in memory_store:
+                    in_memory_result[key] = memory_store[key]
+                else:
+                    _content_ids.append(key)
+            content_ids = _content_ids
         else:
             in_memory_result = None
         result = self._get_by_ids(content_ids,

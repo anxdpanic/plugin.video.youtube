@@ -13,9 +13,21 @@ from __future__ import absolute_import, division, unicode_literals
 from . import logging
 from .constants import (
     ABORT_FLAG,
+    ARTIST,
+    BOOKMARK_ID,
+    CHANNEL_ID,
+    CONTAINER_ID,
+    LABEL,
     MARK_AS_LABEL,
+    PLAYLIST_ID,
+    PLAYLIST_ITEM_ID,
+    PLAY_COUNT,
     PLUGIN_SLEEPING,
+    SCROLLING,
+    SUBSCRIPTION_ID,
     TEMP_PATH,
+    TITLE,
+    URI,
     VIDEO_ID,
 )
 from .context import XbmcContext
@@ -44,12 +56,14 @@ def run():
                  kodi=str(system_version),
                  python=system_version.get_python_version())
 
-    get_listitem_info = context.get_listitem_info
-    get_listitem_property = context.get_listitem_property
-
     ui = context.get_ui()
+    get_container_bool = ui.get_container_bool
+    get_listitem_info = ui.get_listitem_info
+    get_listitem_property = ui.get_listitem_property
     clear_property = ui.clear_property
     set_property = ui.set_property
+
+    localize = context.localize
 
     clear_property(ABORT_FLAG)
 
@@ -72,7 +86,28 @@ def run():
     active_interval_ms = 100
     idle_interval_ms = 1000
 
-    video_id = None
+    def _get_mark_as_label(_name,
+                           container_id,
+                           unwatched_label=localize('history.mark.unwatched'),
+                           watched_label=localize('history.mark.watched')):
+        if get_listitem_info(PLAY_COUNT, container_id):
+            return unwatched_label
+        return watched_label
+
+    container_id = None
+    plugin_item_details = {
+        VIDEO_ID: {'getter': get_listitem_property, 'value': None},
+        BOOKMARK_ID: {'getter': get_listitem_property, 'value': None},
+        CHANNEL_ID: {'getter': get_listitem_property, 'value': None},
+        PLAYLIST_ID: {'getter': get_listitem_property, 'value': None},
+        PLAYLIST_ITEM_ID: {'getter': get_listitem_property, 'value': None},
+        SUBSCRIPTION_ID: {'getter': get_listitem_property, 'value': None},
+        '__has_id__': {'getter': None, 'value': TypeError},
+        URI: {'getter': get_listitem_info, 'value': None},
+        TITLE: {'getter': get_listitem_info, 'value': None},
+        ARTIST: {'getter': get_listitem_info, 'value': None},
+        MARK_AS_LABEL: {'getter': _get_mark_as_label, 'value': None},
+    }
     container = monitor.is_plugin_container()
 
     while not monitor.abortRequested():
@@ -138,7 +173,8 @@ def run():
                 monitor.refresh_container(deferred=True)
                 break
 
-            if monitor.interrupt:
+            if (monitor.interrupt
+                    or (not check_item and wait_time_ms >= idle_interval_ms)):
                 monitor.interrupt = False
                 container = monitor.is_plugin_container()
                 if check_item != container['is_plugin']:
@@ -150,18 +186,32 @@ def run():
                     wait_interval = wait_interval_ms / 1000
 
             if check_item:
-                new_video_id = get_listitem_property(VIDEO_ID)
-                if new_video_id:
-                    if video_id != new_video_id:
-                        video_id = new_video_id
-                        set_property(VIDEO_ID, video_id)
-                        set_property(MARK_AS_LABEL,
-                                     context.localize('history.mark.unwatched')
-                                     if get_listitem_info('PlayCount') else
-                                     context.localize('history.mark.watched'))
-                elif video_id and get_listitem_info('Label'):
-                    video_id = None
-                    clear_property(VIDEO_ID)
+                if container_id != container['id']:
+                    container_id = container['id']
+                    set_property(CONTAINER_ID, container_id)
+
+                scrolling = get_container_bool(SCROLLING, container_id)
+                if not scrolling and get_listitem_info(LABEL, container_id):
+                    item_has_id = None
+                    for name, detail in plugin_item_details.items():
+                        value = detail['value']
+                        if value is TypeError:
+                            if item_has_id is None:
+                                item_has_id = False
+                            continue
+                        if item_has_id is not False:
+                            new_value = detail['getter'](name, container_id)
+                        else:
+                            new_value = None
+                        if new_value:
+                            if new_value != value:
+                                detail['value'] = new_value
+                                set_property(name, new_value)
+                            item_has_id = True
+                        elif value:
+                            detail['value'] = None
+                            clear_property(name)
+
             elif not plugin_is_idle and not container['is_plugin']:
                 plugin_is_idle = set_property(PLUGIN_SLEEPING)
 

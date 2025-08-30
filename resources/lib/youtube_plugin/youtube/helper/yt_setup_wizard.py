@@ -17,7 +17,7 @@ from ...kodion.constants import ADDON_ID, DATA_PATH, WAIT_END_FLAG
 from ...kodion.network import get_listen_addresses, httpd_status
 from ...kodion.sql_store import PlaybackHistory, SearchHistory
 from ...kodion.utils.convert_format import to_unicode
-from ...kodion.utils.datetime_parser import since_epoch, strptime
+from ...kodion.utils.datetime import since_epoch, strptime
 
 
 def process_pre_run(context):

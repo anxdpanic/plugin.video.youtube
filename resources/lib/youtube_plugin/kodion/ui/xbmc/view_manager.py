@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from ... import logging
 from ...compatibility import xbmc
-from ...constants import CONTENT, SORT
+from ...constants import CONTENT, SORT, SORT_DIR, SORT_METHOD
 
 
 class ViewManager(object):
@@ -220,14 +220,14 @@ class ViewManager(object):
         content_type = self.SUPPORTED_TYPES_MAP[view_type]
 
         if content_type not in self.STRING_MAP:
-            self.log.warning('Unsupported content type %r', content_type)
+            self.log.warning('Unsupported content type: %r', content_type)
             return False
         title = self._context.localize(self.STRING_MAP[content_type])
 
         view_setting = self.SETTINGS['view_type'].format(content_type)
         current_value = settings.get_int(view_setting)
         if current_value == -1:
-            self.log.warning('No setting for content type %r', content_type)
+            self.log.warning('No setting for content type: %r', content_type)
             return False
 
         skin_data = self.SKIN_DATA.get(skin_id, {})
@@ -242,7 +242,7 @@ class ViewManager(object):
                     preselect = len(items) - 1
             view_id = ui.on_select(title, items, preselect=preselect)
         else:
-            self.log.warning('Unsupported view %r', view_type)
+            self.log.warning('Unsupported view: %r', view_type)
 
         if view_id == -1:
             result, view_id = ui.on_numeric_input(title, current_value)
@@ -261,39 +261,60 @@ class ViewManager(object):
         if view_mode is None:
             return
 
-        self.log.debug(('Setting view mode', 'Mode: %s'), view_mode)
+        self.log.debug('Applying view mode: %r', view_mode)
         context.execute('Container.SetViewMode(%s)' % view_mode)
 
     @classmethod
-    def apply_sort_method(cls, context, sort_method):
-        _sort_method = context.get_infolabel('Container.SortMethod')
-        _sort_id = SORT.SORT_METHOD_MAPPING.get(_sort_method)
-        if not context.get_infobool('Container.SortMethod(%s)' % _sort_id):
-            cls.log.warning(('Current sort method mismatch',
-                             'Method: {sort_method}',
-                             'ID:     {sort_id}'),
-                            sort_method=_sort_method,
-                            sort_id=_sort_id)
-            return
+    def apply_sort_method(cls, context, **kwargs):
+        sort_method = (kwargs.get(SORT_METHOD)
+                       or CONTENT.VIDEO_CONTENT.join(('__', '__')))
+        execute = context.execute
+        get_infolabel = xbmc.getInfoLabel
 
-        sort_id = SORT.SORT_METHOD_MAPPING.get(sort_method)
+        _sort_method = get_infolabel('Container.SortMethod').lower()
+        _sort_id = SORT.SORT_ID_MAPPING.get(_sort_method)
+        # Check if hardcoded sort method to ID mapping has changed
+        if not xbmc.getCondVisibility('Container.SortMethod(%s)' % _sort_id):
+            cls.log.warning('Sort method mismatch: {method!r} ID is not {id}',
+                            method=_sort_method,
+                            id=_sort_id)
+            sort_method = get_infolabel('Container.SortMethod')
+
+        sort_method = sort_method.lower()
+        sort_id = SORT.SORT_ID_MAPPING.get(sort_method)
         if sort_id is None:
-            cls.log.warning(('Unknown sort method',
-                             'Method: {sort_method}'),
-                            sort_method=sort_method)
+            cls.log.warning('Unknown sort method: %r', sort_method)
             return
 
-        cls.log.debug(('Setting sort method',
-                       'Method: {sort_method}',
-                       'ID:     {sort_id}'),
-                      sort_method=sort_method,
-                      sort_id=sort_id)
-        context.execute('Container.SetSortMethod(%s)' % sort_id)
+        # Workaround for Container.SetSortMethod failing for some sort methods
+        num_attempts_remaining = 3
+        while num_attempts_remaining and not context.sleep(0.1):
+            cls.log.debug('Applying sort method: {method!r} ({id})',
+                          method=sort_method,
+                          id=sort_id)
+            # Workaround for Container.SetSortMethod(0) being a noop
+            # https://github.com/xbmc/xbmc/blob/7e1a55cb861342cd9062745161d88aca08dcead1/xbmc/windows/GUIMediaWindow.cpp#L502
+            if sort_id == 0:
+                # Sort by track number to reset sort order to default order
+                execute('Container.SetSortMethod(%s)' % 8)
+                # Then switch to previous sort method which is default/unsorted
+                # as per the order set in XbmcContext.apply_content
+                execute('Container.PreviousSortMethod')
+            else:
+                execute('Container.SetSortMethod(%s)' % sort_id)
+            if get_infolabel('Container.SortMethod').lower() == sort_method:
+                break
+            num_attempts_remaining -= 1
+        else:
+            cls.log.warning('Unable to apply sort method: {method!r} ({id})',
+                            method=sort_method,
+                            id=sort_id)
 
     @classmethod
-    def apply_sort_order(cls, context, sort_order):
-        if not context.get_infobool('Container.SortDirection(%s)' % sort_order):
-            cls.log.debug('Setting sort order: %s', sort_order)
+    def apply_sort_dir(cls, context, **kwargs):
+        sort_dir = kwargs.get(SORT_DIR, 'ascending')
+        if not xbmc.getCondVisibility('Container.SortDirection(%s)' % sort_dir):
+            cls.log.debug('Applying sort direction: %r', sort_dir)
             # This builtin should be Container.SortDirection but has been broken
             # since Kodi v16
             # https://github.com/xbmc/xbmc/commit/ac870b64b16dfd0fc2bd0496c14529cf6d563f41

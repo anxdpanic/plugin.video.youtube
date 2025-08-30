@@ -29,10 +29,16 @@ from re import (
 
 from ...kodion import logging
 from ...kodion.compatibility import string_type, unquote, urlsplit
-from ...kodion.constants import CONTENT, PATHS
+from ...kodion.constants import (
+    CHANNEL_ID,
+    CONTENT,
+    FANART_TYPE,
+    PATHS,
+    PLAYLIST_ID,
+)
 from ...kodion.items import AudioItem, CommandItem, DirectoryItem, menu_items
 from ...kodion.utils.convert_format import friendly_number, strip_html_from_text
-from ...kodion.utils.datetime_parser import (
+from ...kodion.utils.datetime import (
     get_scheduled_start,
     parse_to_dt,
     utc_to_local,
@@ -220,7 +226,7 @@ def update_channel_items(provider, context, channel_id_dict,
                 settings.subscriptions_filter()
             )
 
-    fanart_type = context.get_param('fanart_type')
+    fanart_type = context.get_param(FANART_TYPE)
     if fanart_type is None:
         fanart_type = settings.fanart_selection()
     thumb_size = settings.get_thumbnail_size()
@@ -395,7 +401,7 @@ def update_playlist_items(provider, context, playlist_id_dict,
     show_details = settings.show_detailed_description()
     item_count_color = settings.get_label_color('itemCount')
 
-    fanart_type = context.get_param('fanart_type')
+    fanart_type = context.get_param(FANART_TYPE)
     if fanart_type is None:
         fanart_type = settings.fanart_selection()
     thumb_size = settings.get_thumbnail_size()
@@ -637,7 +643,7 @@ def update_video_items(provider, context, video_id_dict,
     use_play_data = settings.use_local_history()
 
     params = context.get_params()
-    fanart_type = params.get('fanart_type')
+    fanart_type = params.get(FANART_TYPE)
     if fanart_type is None:
         fanart_type = settings.fanart_selection()
     thumb_size = settings.get_thumbnail_size()
@@ -671,7 +677,7 @@ def update_video_items(provider, context, video_id_dict,
     elif path.startswith(PATHS.BOOKMARKS):
         in_bookmarks_list = True
     elif path.startswith(PATHS.VIRTUAL_PLAYLIST):
-        playlist_id = params.get('playlist_id')
+        playlist_id = params.get(PLAYLIST_ID)
         playlist_channel_id = 'mine'
         if playlist_id:
             playlist_id_upper = playlist_id.upper()
@@ -682,8 +688,8 @@ def update_video_items(provider, context, video_id_dict,
     else:
         playlist_match = __RE_PLAYLIST.match(path)
         if playlist_match:
-            playlist_id = playlist_match.group('playlist_id')
-            playlist_channel_id = playlist_match.group('channel_id')
+            playlist_id = playlist_match.group(PLAYLIST_ID)
+            playlist_channel_id = playlist_match.group(CHANNEL_ID)
 
     cxm_remove_from_playlist = menu_items.playlist_remove_from(
         context,
@@ -1196,7 +1202,7 @@ def update_channel_info(provider,
 
     settings = context.get_settings()
     channel_name_aliases = settings.get_channel_name_aliases()
-    fanart_type = context.get_param('fanart_type')
+    fanart_type = context.get_param(FANART_TYPE)
     if fanart_type is None:
         fanart_type = settings.fanart_selection()
     use_channel_fanart = fanart_type == settings.FANART_CHANNEL
@@ -1326,7 +1332,7 @@ def get_thumbnail(thumb_size, thumbnails, default_thumb=None):
     url = (thumbnail[1] if is_dict else thumbnail).get('url')
     if not url:
         return default_thumb
-    if '/vi_webp/' not in url:
+    if '/vi_webp/' not in url and '?' not in url:
         url = url.replace('/vi/', '/vi_webp/', 1).replace('.jpg', '.webp', 1)
     if url.startswith('//'):
         url = 'https:' + url

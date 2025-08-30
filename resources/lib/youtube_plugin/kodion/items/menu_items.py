@@ -11,11 +11,13 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from ..constants import (
-    ADDON_ID,
+    ARTIST,
     BOOKMARK_ID,
     CHANNEL_ID,
     CONTEXT_MENU,
+    INCOGNITO,
     MARK_AS_LABEL,
+    ORDER,
     PATHS,
     PLAYLIST_ITEM_ID,
     PLAYLIST_ID,
@@ -24,21 +26,24 @@ from ..constants import (
     PLAY_PROMPT_SUBTITLES,
     PLAY_TIMESHIFT,
     PLAY_USING,
+    PROPERTY_AS_LABEL,
     SUBSCRIPTION_ID,
+    TITLE,
+    URI,
     VIDEO_ID,
     WINDOW_RETURN,
 )
 
 
-ARTIST_INFOLABEL = '$INFO[ListItem.Artist]'
-BOOKMARK_ID_INFOLABEL = '$INFO[ListItem.Property(%s)]' % BOOKMARK_ID
-CHANNEL_ID_INFOLABEL = '$INFO[ListItem.Property(%s)]' % CHANNEL_ID
-PLAYLIST_ID_INFOLABEL = '$INFO[ListItem.Property(%s)]' % PLAYLIST_ID
-PLAYLIST_ITEM_ID_INFOLABEL = '$INFO[ListItem.Property(%s)]' % PLAYLIST_ITEM_ID
-SUBSCRIPTION_ID_INFOLABEL = '$INFO[ListItem.Property(%s)]' % SUBSCRIPTION_ID
-TITLE_INFOLABEL = '$INFO[ListItem.Title]'
-URI_INFOLABEL = '$INFO[ListItem.FileNameAndPath]'
-VIDEO_ID_INFOLABEL = '$INFO[ListItem.Property(%s)]' % VIDEO_ID
+ARTIST_INFOLABEL = PROPERTY_AS_LABEL % ARTIST
+BOOKMARK_ID_INFOLABEL = PROPERTY_AS_LABEL % BOOKMARK_ID
+CHANNEL_ID_INFOLABEL = PROPERTY_AS_LABEL % CHANNEL_ID
+PLAYLIST_ID_INFOLABEL = PROPERTY_AS_LABEL % PLAYLIST_ID
+PLAYLIST_ITEM_ID_INFOLABEL = PROPERTY_AS_LABEL % PLAYLIST_ITEM_ID
+SUBSCRIPTION_ID_INFOLABEL = PROPERTY_AS_LABEL % SUBSCRIPTION_ID
+TITLE_INFOLABEL = PROPERTY_AS_LABEL % TITLE
+URI_INFOLABEL = PROPERTY_AS_LABEL % URI
+VIDEO_ID_INFOLABEL = PROPERTY_AS_LABEL % VIDEO_ID
 
 
 def context_menu_uri(context, path, params=None):
@@ -643,10 +648,7 @@ def history_local_clear(context):
 
 def history_local_mark_as(context, video_id=VIDEO_ID_INFOLABEL):
     return (
-        '$INFO[Window(Home).Property({addon_id}-{label_property})]'.format(
-            addon_id=ADDON_ID,
-            label_property=MARK_AS_LABEL,
-        ),
+        PROPERTY_AS_LABEL % MARK_AS_LABEL,
         context_menu_uri(
             context,
             (PATHS.HISTORY, 'mark_as',),
@@ -810,7 +812,7 @@ def search_clear(context):
 
 
 def search_sort_by(context, params, order):
-    selected = params.get('order', 'relevance') == order
+    selected = params.get(ORDER, 'relevance') == order
     order_label = context.localize('search.sort.' + order)
     return (
         context.localize('search.sort').format(
@@ -854,9 +856,9 @@ def goto_quick_search(context, params=None, incognito=None):
     if params is None:
         params = {}
     if incognito is None:
-        incognito = params.get('incognito')
+        incognito = params.get(INCOGNITO)
     else:
-        params['incognito'] = incognito
+        params[INCOGNITO] = incognito
     return (
         context.localize('search.quick.incognito'
                          if incognito else

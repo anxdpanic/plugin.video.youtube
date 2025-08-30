@@ -25,16 +25,20 @@ class AbstractContextUI(object):
     def get_view_manager(self):
         raise NotImplementedError()
 
-    def on_keyboard_input(self, title, default='', hidden=False):
+    @staticmethod
+    def on_keyboard_input(title, default='', hidden=False):
         raise NotImplementedError()
 
-    def on_numeric_input(self, title, default=''):
+    @staticmethod
+    def on_numeric_input(title, default=''):
         raise NotImplementedError()
 
-    def on_yes_no_input(self, title, text, nolabel='', yeslabel=''):
+    @staticmethod
+    def on_yes_no_input(title, text, nolabel='', yeslabel=''):
         raise NotImplementedError()
 
-    def on_ok(self, title, text):
+    @staticmethod
+    def on_ok(title, text):
         raise NotImplementedError()
 
     def on_remove_content(self, name):
@@ -46,14 +50,16 @@ class AbstractContextUI(object):
     def on_clear_content(self, name):
         raise NotImplementedError()
 
-    def on_select(self, title, items=None, preselect=-1, use_details=False):
+    @staticmethod
+    def on_select(title, items=None, preselect=-1, use_details=False):
         raise NotImplementedError()
 
     def show_notification(self, message, header='', image_uri='',
                           time_ms=5000, audible=True):
         raise NotImplementedError()
 
-    def on_busy(self):
+    @staticmethod
+    def on_busy():
         raise NotImplementedError()
 
     @staticmethod
@@ -63,4 +69,52 @@ class AbstractContextUI(object):
         This will refresh the current container or list.
         :return:
         """
+        raise NotImplementedError()
+
+    @staticmethod
+    def get_infobool(name):
+        raise NotImplementedError()
+
+    @staticmethod
+    def get_infolabel(name):
+        raise NotImplementedError()
+
+    @classmethod
+    def get_container_bool(cls,
+                           name,
+                           container_id=None,
+                           strict=True,
+                           stacklevel=2):
+        raise NotImplementedError()
+
+    @classmethod
+    def get_container_info(cls,
+                           name,
+                           container_id=None,
+                           strict=True,
+                           stacklevel=2):
+        raise NotImplementedError()
+
+    @classmethod
+    def get_listitem_bool(cls,
+                          name,
+                          container_id=None,
+                          strict=True,
+                          stacklevel=2):
+        raise NotImplementedError()
+
+    @classmethod
+    def get_listitem_property(cls,
+                              name,
+                              container_id=None,
+                              strict=True,
+                              stacklevel=2):
+        raise NotImplementedError()
+
+    @classmethod
+    def get_listitem_info(cls,
+                          name,
+                          container_id=None,
+                          strict=True,
+                          stacklevel=2):
         raise NotImplementedError()
