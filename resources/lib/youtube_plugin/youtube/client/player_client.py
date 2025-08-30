@@ -816,12 +816,18 @@ class PlayerClient(LoginClient):
         self._language_prefer_default = prefer_default
 
         self._player_js = None
-        self._calculate_n = True
-        self._cipher = None
+        # signatureCipher and nsig handling currently broken and disabled
+        # self._calculate_n = True
+        # self._cipher = None
+        self._calculate_n = False
+        self._cipher = False
 
         self._auth_client = {}
         self._client_groups = (
             ('custom', clients if clients else ()),
+            ('auth_enabled_no_usable_streams', (
+                'tv',
+            )),
             ('auth_required_limited_content', (
                 'ios_youtube_tv',
                 'android_youtube_tv',
@@ -1291,9 +1297,9 @@ class PlayerClient(LoginClient):
                 else:
                     new_url = url
 
+                new_url = self._process_url_params(new_url, mpd=False)
                 if not new_url:
                     continue
-                new_url = self._process_url_params(new_url, mpd=False)
 
                 stream_map['itag'] = itag
                 yt_format = self._get_stream_format(
@@ -1353,6 +1359,7 @@ class PlayerClient(LoginClient):
                 self._player_js = self._get_player_js()
             self._cipher = Cipher(self._context, javascript=self._player_js)
         if not self._cipher:
+            self.log.warning('signatureCipher handling disabled')
             return None
 
         signature_cipher = parse_qs(stream_map['signatureCipher'])
@@ -1395,18 +1402,23 @@ class PlayerClient(LoginClient):
         params = parse_qs(parts.query)
         new_params = {}
 
-        if self._calculate_n and 'n' in params:
+        if 'n' not in params:
+            pass
+        elif not self._calculate_n:
+            self.log.debug('Decoding of nsig value disabled')
+            return None
+        else:
             if self._player_js is None:
                 self._player_js = self._get_player_js()
             if self._calculate_n is True:
-                self.log.debug('nsig detected')
+                self.log.debug('Detected nsig in stream url')
                 self._calculate_n = ratebypass.CalculateN(self._player_js)
 
             # Cipher n to get the updated value
-            new_n = self._calculate_n.calculate_n(params['n'])
+            new_n = self._calculate_n.calculate_n(params['n'][0])
             if new_n:
                 new_params['n'] = new_n
-                new_params['ratebypass'] = 'yes'
+                new_params['ratebypass'] = ['yes']
             else:
                 self.log.error('nsig handling failed')
                 self._calculate_n = False
@@ -1451,7 +1463,7 @@ class PlayerClient(LoginClient):
                 query=query_str,
             ).geturl()
 
-        elif 'range' not in params:
+        elif 'ratebypass' not in params and 'range' not in params:
             content_length = params.get('clen', [''])[0]
             new_params['range'] = '0-{0}'.format(content_length)
 
@@ -2737,6 +2749,8 @@ class PlayerClient(LoginClient):
                     subtitle['url'],
                     headers=headers,
                 )))
+                if not url:
+                    continue
 
                 output.extend((
                     '\t\t<AdaptationSet'

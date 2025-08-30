@@ -515,6 +515,8 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'client_name': 'TVHTML5',
                 'client_version': '7.20250312.16.00',
             },
+            '_auth_required': 'ignore_fail',
+            '_auth_type': 'user',
             'url': 'https://www.youtube.com/youtubei/v1/{_endpoint}',
             'method': None,
             'json': {
