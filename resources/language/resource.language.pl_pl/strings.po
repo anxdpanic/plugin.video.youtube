@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2025-05-10 22:41+0000\n"
+"PO-Revision-Date: 2025-08-22 19:29+0000\n"
 "Last-Translator: Marek Adamski <fevbew@wp.pl>\n"
 "Language-Team: Polish <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/pl_pl/>\n"
 "Language: pl_pl\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.11.3\n"
+"X-Generator: Weblate 5.13\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -107,7 +107,7 @@ msgstr "144p"
 
 msgctxt "#30020"
 msgid "Enable Stereoscopic 3D video"
-msgstr ""
+msgstr "Włącz stereoskopowe wideo 3D"
 
 msgctxt "#30021"
 msgid "Show fanart"
@@ -151,7 +151,7 @@ msgstr "Skonfigurować %s?"
 
 msgctxt "#30031"
 msgid "Requests cache size (MB)"
-msgstr ""
+msgstr "Rozmiar pamięci podręcznej żądań (MB)"
 
 msgctxt "#30032"
 msgid "View: TV Shows"
@@ -217,11 +217,11 @@ msgstr "Do obejrzenia"
 
 msgctxt "#30108"
 msgid "Enter the name of the bookmark"
-msgstr ""
+msgstr "Wprowadź nazwę zakładki"
 
 msgctxt "#30109"
 msgid "Enter a valid YouTube or plugin URL for the bookmark"
-msgstr ""
+msgstr "Wprowadź prawidłowy adres URL serwisu YouTube lub wtyczki dla zakładki"
 
 msgctxt "#30110"
 msgid "New Search"
@@ -301,11 +301,11 @@ msgstr ""
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
 msgid "%s failed"
-msgstr ""
+msgstr "%s nie powiodło się"
 
 msgctxt "#30501"
 msgid "Edit %s"
-msgstr ""
+msgstr "Edytuj %s"
 
 msgctxt "#30502"
 msgid "Go to %s"
@@ -361,7 +361,7 @@ msgstr "Powiązane"
 
 msgctxt "#30515"
 msgid "Auto-Remove from Watch Later"
-msgstr ""
+msgstr "Automatyczne usuwanie z listy „Do obejrzenia”"
 
 msgctxt "#30516"
 msgid "Folders"
@@ -373,7 +373,7 @@ msgstr "Subskrybuj %s"
 
 msgctxt "#30518"
 msgid "Feeds"
-msgstr ""
+msgstr "Kanały"
 
 msgctxt "#30519"
 msgid "and enter the following code:"
@@ -385,15 +385,15 @@ msgstr "Dodaj do..."
 
 msgctxt "#30521"
 msgid "Delete requests cache database"
-msgstr ""
+msgstr "Usuń bazę danych pamięci podręcznej żądań"
 
 msgctxt "#30522"
 msgid "Clear requests cache"
-msgstr ""
+msgstr "Wyczyść pamięć podręczną żądań"
 
 msgctxt "#30523"
 msgid "requests cache"
-msgstr ""
+msgstr "pamięć podręczna żądań"
 
 msgctxt "#30524"
 msgid "Select language"
@@ -553,11 +553,11 @@ msgstr "Zobacz wszystkie"
 
 msgctxt "#30563"
 msgid "Plugin execution timeout"
-msgstr ""
+msgstr "Przekroczono limit czasu wykonania wtyczki"
 
 msgctxt "#30564"
 msgid "For testing only - forcibly terminate plugin execution after set time limit. Set to 0 seconds (default) to disable."
-msgstr ""
+msgstr "Tylko do testów – wymuś przerwanie działania wtyczki po upływie określonego czasu. Ustaw na 0 sekund (domyślnie), aby wyłączyć."
 
 msgctxt "#30565"
 msgid ""
@@ -577,11 +577,11 @@ msgstr "Odłącz od listy Do obejrzenia"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
-msgstr ""
+msgstr "Czy na pewno chcesz usunąć „%s” z listy „Do obejrzenia”?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
-msgstr ""
+msgstr "Czy na pewno chcesz zastąpić obecną listę „Do obejrzenia” listą „%s”?"
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -593,11 +593,11 @@ msgstr "Odłącz od listy Historia"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove \"%s\" as your History list?"
-msgstr ""
+msgstr "Czy na pewno chcesz usunąć „%s” z listy Historia?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with \"%s\"?"
-msgstr ""
+msgstr "Czy na pewno chcesz zastąpić obecną listę Historia listą „%s”?"
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -609,7 +609,7 @@ msgstr "Zakończone niepowodzeniem"
 
 msgctxt "#30577"
 msgid "Smallest (4:3)"
-msgstr ""
+msgstr "Najmniejszy (4:3)"
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
@@ -669,11 +669,11 @@ msgstr "Rozmiar miniatur"
 
 msgctxt "#30592"
 msgid "Small (16:9)"
-msgstr ""
+msgstr "Mały (16:9)"
 
 msgctxt "#30593"
 msgid "Medium (4:3)"
-msgstr ""
+msgstr "Średni (4:3)"
 
 msgctxt "#30594"
 msgid "Safe search"
@@ -693,7 +693,7 @@ msgstr ""
 
 msgctxt "#30598"
 msgid "Large (4:3)"
-msgstr ""
+msgstr "Duży (4:3)"
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
@@ -701,7 +701,7 @@ msgstr "Aktywacja osobistych kluczy API zakończona niepowodzeniem. Brakuje: %s"
 
 msgctxt "#30600"
 msgid "Largest (16:9)"
-msgstr ""
+msgstr "Największy (16:9)"
 
 msgctxt "#30601"
 msgid "%s with Original/%s fallback"
@@ -753,19 +753,19 @@ msgstr "Ponów"
 
 msgctxt "#30613"
 msgid "Add to %s"
-msgstr ""
+msgstr "Dodaj do %s"
 
 msgctxt "#30614"
 msgid "Remove from %s"
-msgstr ""
+msgstr "Usuń z %s"
 
 msgctxt "#30615"
 msgid "Added to %s"
-msgstr ""
+msgstr "Dodano do %s"
 
 msgctxt "#30616"
 msgid "Removed from %s"
-msgstr ""
+msgstr "Usunięto z %s"
 
 msgctxt "#30617"
 msgid "InputStream.Adaptive"
@@ -785,7 +785,7 @@ msgstr "Port %s jest aktualnie w użyciu. Nie można uruchomić serwera http."
 
 msgctxt "#30621"
 msgid "Verbose"
-msgstr ""
+msgstr "Rozwlekły"
 
 msgctxt "#30622"
 msgid "Purchases"
@@ -937,7 +937,7 @@ msgstr "Wprowadź nazwę dla użytkownika"
 
 msgctxt "#30659"
 msgid "User is now \"%s\""
-msgstr ""
+msgstr "Użytkownik to teraz „%s”"
 
 msgctxt "#30660"
 msgid "Users"
@@ -961,15 +961,15 @@ msgstr "Zmień użytkownika"
 
 msgctxt "#30665"
 msgid "Switch to \"%s\" now?"
-msgstr ""
+msgstr "Czy chcesz teraz przełączyć się na „%s”?"
 
 msgctxt "#30666"
 msgid "\"%s\" removed"
-msgstr ""
+msgstr "Usunięto „%s”"
 
 msgctxt "#30667"
 msgid "Renamed \"%s\" to \"%s\""
-msgstr ""
+msgstr "Zmieniono nazwę „%s” na „%s”"
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -977,11 +977,11 @@ msgstr "Minimalny procent obejrzenia"
 
 msgctxt "#30669"
 msgid "%s removed"
-msgstr ""
+msgstr "Usunięto %s"
 
 msgctxt "#30670"
 msgid "Added %s"
-msgstr ""
+msgstr "Dodano %s"
 
 msgctxt "#30671"
 msgid "Clear playback history"
@@ -1137,11 +1137,11 @@ msgstr "Odtwarzaj tylko dźwięk"
 
 msgctxt "#30709"
 msgid "WebVTT subtitles"
-msgstr ""
+msgstr "Napisy WebVTT"
 
 msgctxt "#30710"
 msgid "TTML subtitles"
-msgstr ""
+msgstr "Napisy TTML"
 
 msgctxt "#30711"
 msgid ""
@@ -1153,15 +1153,15 @@ msgstr "Oceń wideo na listach"
 
 msgctxt "#30713"
 msgid "Prefer dubbed audio over original audio"
-msgstr ""
+msgstr "Wolę przetłumaczone audio od oryginalnego dźwięku"
 
 msgctxt "#30714"
 msgid "Prefer automatically translated dubbed audio over original audio"
-msgstr ""
+msgstr "Wolisz automatycznie przetłumaczoną ścieżkę dźwiękową zamiast oryginalnej ścieżki dźwiękowej"
 
 msgctxt "#30715"
 msgid "Use YouTube internal list for Watch History?[CR][CR]Requires signing-in via the addon and activating history tracking on YouTube."
-msgstr ""
+msgstr "Czy używać wewnętrznej listy YouTube do historii oglądania?[CR][CR]Wymaga zalogowania się za pomocą dodatku i aktywowania śledzenia historii w YouTube."
 
 msgctxt "#30716"
 msgid "Liked video"
@@ -1173,7 +1173,7 @@ msgstr "Nie polubiono"
 
 msgctxt "#30718"
 msgid "Use YouTube internal list for Watch Later?[CR][CR]Requires signing-in via the addon."
-msgstr ""
+msgstr "Czy użyć wewnętrznej listy YouTube do obejrzenia później?[CR][CR]Wymagane jest zalogowanie się za pomocą dodatku."
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
@@ -1185,7 +1185,7 @@ msgstr "Anulowano subskrypcję kanału"
 
 msgctxt "#30721"
 msgid "Enable Panoramic/180/360/VR video"
-msgstr ""
+msgstr "Włącz wideo panoramiczne/180/360/VR"
 
 msgctxt "#30722"
 msgid "Enable HDR video"
@@ -1253,7 +1253,7 @@ msgstr "Shorts - maksymalny czas trwania"
 
 msgctxt "#30738"
 msgid "Enable spatial audio"
-msgstr ""
+msgstr "Włącz dźwięk przestrzenny (spatial)"
 
 msgctxt "#30739"
 msgid "Subscribers"
