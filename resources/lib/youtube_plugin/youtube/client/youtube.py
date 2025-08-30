@@ -25,9 +25,10 @@ from ..helper.v3 import pre_fill
 from ..youtube_exceptions import InvalidJSON, YouTubeException
 from ...kodion import logging
 from ...kodion.compatibility import available_cpu_count, string_type
+from ...kodion.constants import CHANNEL_ID, PLAYLIST_ID
 from ...kodion.items import DirectoryItem
 from ...kodion.utils.convert_format import strip_html_from_text
-from ...kodion.utils.datetime_parser import (
+from ...kodion.utils.datetime import (
     since_epoch,
     strptime,
     yt_datetime_offset,
@@ -2268,11 +2269,11 @@ class YouTube(LoginClient):
             playlist_ids = threaded_output['playlist_ids']
             for item_id, item in bookmarks.items():
                 if isinstance(item, DirectoryItem):
-                    item_id = getattr(item, 'playlist_id', None)
+                    item_id = getattr(item, PLAYLIST_ID, None)
                     if item_id:
                         playlist_ids.append(item_id)
                         continue
-                    item_id = getattr(item, 'channel_id', None)
+                    item_id = getattr(item, CHANNEL_ID, None)
                 elif not isinstance(item, float):
                     continue
                 if item_id:
@@ -2862,7 +2863,7 @@ class YouTube(LoginClient):
         else:
             request_channel_id = None
 
-        uri_channel_id = self._context.get_param('channel_id')
+        uri_channel_id = self._context.get_param(CHANNEL_ID)
         if uri_channel_id == 'mine':
             return True
 

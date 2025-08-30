@@ -167,6 +167,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'package_id': 'com.google.android.youtube',
                 'platform': 'MOBILE',
             },
+            '_auth_required': 'ignore_fail',
             '_auth_type': False,
             '_query_subtitles': 'optional',
             'json': {
@@ -299,6 +300,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'package_id': 'com.google.ios.youtube',
                 'platform': 'MOBILE',
             },
+            '_auth_required': 'ignore_fail',
             '_auth_type': False,
             'json': {
                 'context': {
@@ -347,6 +349,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'package_id': 'com.google.ios.youtube',
                 'platform': 'MOBILE',
             },
+            '_auth_required': 'ignore_fail',
             '_auth_type': False,
             'json': {
                 'context': {

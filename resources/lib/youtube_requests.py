@@ -477,7 +477,7 @@ def get_live(channel_id=None, user=None, url=None, addon_id=None):
         for pattern in patterns:
             match = re.search(pattern, url)
             if match:
-                matched_id = match.group('channel_id')
+                matched_id = match.group(CHANNEL_ID)
                 matched_type = match.group('type')
                 break
 

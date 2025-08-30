@@ -11,7 +11,6 @@ from __future__ import absolute_import, division, unicode_literals
 
 import atexit
 import socket
-import time
 
 from requests import Request, Session
 from requests.adapters import HTTPAdapter, Retry
@@ -20,6 +19,7 @@ from requests.utils import DEFAULT_CA_BUNDLE_PATH, extract_zipped_paths
 from urllib3.util.ssl_ import create_urllib3_context
 
 from .. import logging
+from ..utils.datetime import imf_fixdate
 from ..utils.methods import generate_hash
 
 
@@ -246,10 +246,7 @@ class BaseRequestsClass(object):
                         # Etag is meant to be enclosed in double quotes, but the
                         # Google servers don't seem to support this
                         headers['If-None-Match'] = '"{0}", {0}'.format(etag)
-                    timestamp = time.strftime(
-                        '%a, %d %b %Y %H:%M:%S GMT',
-                        time.gmtime(cached_request['timestamp']),
-                    )
+                    timestamp = imf_fixdate(cached_request['timestamp'])
                     headers['If-Modified-Since'] = timestamp
                     self.log.debug(('Cached response',
                                     'Request ID: {request_id}',

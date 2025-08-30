@@ -19,7 +19,7 @@ from .image_item import ImageItem
 from .media_item import AudioItem, VideoItem
 from .. import logging
 from ..compatibility import string_type, to_str
-from ..utils.datetime_parser import strptime
+from ..utils.datetime import strptime
 
 
 _ITEM_TYPES = {

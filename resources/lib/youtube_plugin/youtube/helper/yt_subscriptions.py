@@ -35,13 +35,14 @@ def _process_list(provider, context, client):
 
 
 def _process_add(_provider, context, client):
-    listitem_subscription_id = context.get_listitem_property(SUBSCRIPTION_ID)
+    ui = context.get_ui()
+    li_subscription_id = ui.get_listitem_property(SUBSCRIPTION_ID)
 
-    subscription_id = context.get_param('subscription_id', '')
+    subscription_id = context.get_param(SUBSCRIPTION_ID)
     if (not subscription_id
-            and listitem_subscription_id
-            and listitem_subscription_id.lower().startswith('uc')):
-        subscription_id = listitem_subscription_id
+            and li_subscription_id
+            and li_subscription_id.lower().startswith('uc')):
+        subscription_id = li_subscription_id
 
     if not subscription_id:
         return False
@@ -50,7 +51,7 @@ def _process_add(_provider, context, client):
     if not json_data:
         return False
 
-    context.get_ui().show_notification(
+    ui.show_notification(
         context.localize('subscribed.to.channel'),
         time_ms=2500,
         audible=False,
@@ -59,16 +60,17 @@ def _process_add(_provider, context, client):
 
 
 def _process_remove(_provider, context, client):
-    listitem_subscription_id = context.get_listitem_property(SUBSCRIPTION_ID)
-    listitem_channel_id = context.get_listitem_property(CHANNEL_ID)
+    ui = context.get_ui()
+    li_subscription_id = ui.get_listitem_property(SUBSCRIPTION_ID)
+    li_channel_id = ui.get_listitem_property(CHANNEL_ID)
 
-    subscription_id = context.get_param('subscription_id', '')
-    if not subscription_id and listitem_subscription_id:
-        subscription_id = listitem_subscription_id
+    subscription_id = context.get_param(SUBSCRIPTION_ID)
+    if not subscription_id and li_subscription_id:
+        subscription_id = li_subscription_id
 
-    channel_id = context.get_param('channel_id', '')
-    if not channel_id and listitem_channel_id:
-        channel_id = listitem_channel_id
+    channel_id = context.get_param(CHANNEL_ID)
+    if not channel_id and li_channel_id:
+        channel_id = li_channel_id
 
     if subscription_id:
         success = client.unsubscribe(subscription_id)
@@ -80,8 +82,8 @@ def _process_remove(_provider, context, client):
     if not success:
         return False
 
-    context.get_ui().refresh_container()
-    context.get_ui().show_notification(
+    ui.refresh_container()
+    ui.show_notification(
         context.localize('unsubscribed.from.channel'),
         time_ms=2500,
         audible=False,

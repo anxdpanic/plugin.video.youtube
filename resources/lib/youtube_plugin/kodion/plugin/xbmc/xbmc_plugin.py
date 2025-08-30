@@ -14,10 +14,12 @@ from ..abstract_plugin import AbstractPlugin
 from ... import logging
 from ...compatibility import string_type, xbmc, xbmcgui, xbmcplugin
 from ...constants import (
+    ACTION,
     BUSY_FLAG,
     CONTAINER_FOCUS,
     CONTAINER_ID,
     CONTAINER_POSITION,
+    FOLDER_URI,
     FORCE_PLAY_PARAMS,
     PATHS,
     PLAYBACK_FAILED,
@@ -76,7 +78,12 @@ class XbmcPlugin(AbstractPlugin):
     def __init__(self):
         super(XbmcPlugin, self).__init__()
 
-    def run(self, provider, context, forced=None):
+    def run(self,
+            provider,
+            context,
+            forced=False,
+            is_same_path=False,
+            **kwargs):
         handle = context.get_handle()
         ui = context.get_ui()
 
@@ -331,7 +338,7 @@ class XbmcPlugin(AbstractPlugin):
                 elif path == PATHS.PLAY:
                     context.send_notification(
                         PLAYBACK_FAILED,
-                        {'video_id': context.get_param('video_id')},
+                        {VIDEO_ID: context.get_param(VIDEO_ID)},
                     )
                     # None of the following will actually prevent the
                     # playback attempt from occurring
@@ -347,10 +354,9 @@ class XbmcPlugin(AbstractPlugin):
                         succeeded=False,
                         listitem=item,
                     )
-                # elif context.is_plugin_folder():
                 else:
                     if context.is_plugin_path(
-                            context.get_infolabel('Container.FolderPath')
+                            ui.get_container_info(FOLDER_URI, strict=False)
                     ):
                         _, _post_run_action = self.uri_action(
                             context,
@@ -382,11 +388,10 @@ class XbmcPlugin(AbstractPlugin):
         if any(sync_items):
             context.send_notification(SYNC_LISTITEM, sync_items)
 
-        container = ui.pop_property(CONTAINER_ID)
+        container = ui.get_property(CONTAINER_ID)
         position = ui.pop_property(CONTAINER_POSITION)
         if container and position:
             context.send_notification(CONTAINER_FOCUS, [container, position])
-
 
         if post_run_actions:
             self.post_run(context, ui, *post_run_actions)
@@ -478,7 +483,7 @@ class XbmcPlugin(AbstractPlugin):
 
         elif context.is_plugin_path(uri, PATHS.PLAY):
             parts, params, log_uri, _ = parse_and_redact_uri(uri)
-            if params.get('action', [None])[0] == 'list':
+            if params.get(ACTION, [None])[0] == 'list':
                 log_action = 'Redirecting to'
                 action = context.create_uri(
                     (PATHS.ROUTE, parts.path.rstrip('/')),

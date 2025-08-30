@@ -14,6 +14,10 @@ from __future__ import absolute_import, division, unicode_literals
 VIDEO_CONTENT = 'videos'
 LIST_CONTENT = 'files'
 
+COMMENTS = 'comments'
+HISTORY = 'history'
+PLAYLIST = 'playlist'
+
 AUDIO_TYPE = 'music'
 VIDEO_TYPE = 'video'
 

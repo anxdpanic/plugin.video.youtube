@@ -12,25 +12,46 @@ from __future__ import absolute_import, division, unicode_literals
 
 from . import menu_items
 from .directory_item import DirectoryItem
-from ..constants import PATHS
+from ..constants import ITEMS_PER_PAGE, PAGE, PATHS
 
 
 class NextPageItem(DirectoryItem):
-    def __init__(self, context, params, image=None, fanart=None):
-        if 'refresh' in params:
-            del params['refresh']
+    NEXT_PAGE_PARAM_EXCLUSIONS = (
+        'refresh',
+    )
+    JUMP_PAGE_PARAM_EXCLUSIONS = (
+        'click_tracking',
+        'exclude',
+        'filtered',
+        'page',
+        'refresh',
+        'visitor',
+    )
 
+    def __init__(self, context, params, image=None, fanart=None):
         path = context.get_path()
-        page = params.get('page') or 2
-        items_per_page = params.get('items_per_page') or 50
+
+        page = params.get(PAGE) or 2
+        is_first_page_link = page < 2
+
+        items_per_page = params.get(ITEMS_PER_PAGE) or 50
         can_jump = ('next_page_token' not in params
                     and not path.startswith(('/channel',
                                              PATHS.RECOMMENDATIONS,
                                              PATHS.RELATED_VIDEOS,
                                              PATHS.VIRTUAL_PLAYLIST)))
-        can_search = not path.startswith(PATHS.SEARCH)
-        if 'page_token' not in params and can_jump:
+        if can_jump and not is_first_page_link and 'page_token' not in params:
             params['page_token'] = self.create_page_token(page, items_per_page)
+
+        can_search = not path.startswith(PATHS.SEARCH)
+
+        for param in (
+                self.JUMP_PAGE_PARAM_EXCLUSIONS
+                if is_first_page_link else
+                self.NEXT_PAGE_PARAM_EXCLUSIONS
+        ):
+            if param in params:
+                del params[param]
 
         name = context.localize('page.next', page)
         filtered = params.get('filtered')

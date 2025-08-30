@@ -17,7 +17,7 @@ from threading import RLock, Timer
 
 from .. import logging
 from ..compatibility import pickle, to_str
-from ..utils.datetime_parser import fromtimestamp, since_epoch
+from ..utils.datetime import fromtimestamp, since_epoch
 from ..utils.file_system import make_dirs
 
 
