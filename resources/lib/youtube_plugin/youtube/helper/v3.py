@@ -74,6 +74,7 @@ def _process_list_response(provider,
         log.warning('Items list is empty')
         return None
 
+    yt_items_dict = {}
     new_video_id_dict = {}
     new_playlist_id_dict = {}
     new_channel_id_dict = {}
@@ -123,6 +124,7 @@ def _process_list_response(provider,
         item_params = yt_item.get('_params') or {}
         item_params.update(new_params)
 
+        item_id = None
         video_id = None
         playlist_id = None
         channel_id = None
@@ -210,6 +212,9 @@ def _process_list_response(provider,
             else:
                 log.debug('searchResult discarded: %r', kind)
                 continue
+
+        if item_id:
+            yt_items_dict[item_id] = yt_item
 
         if kind_type == 'video':
             video_id = item_id
@@ -497,7 +502,7 @@ def _process_list_response(provider,
                 'live_details': True,
                 'suppress_errors': True,
                 'defer_cache': True,
-                'yt_items': yt_items,
+                'yt_items_dict': yt_items_dict,
             },
             'thread': None,
             'updater': update_video_items,
