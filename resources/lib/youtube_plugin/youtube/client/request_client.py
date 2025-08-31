@@ -169,7 +169,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             },
             '_auth_required': 'ignore_fail',
             '_auth_type': False,
-            '_query_subtitles': 'optional',
+            '_query_subtitles': True,
             'json': {
                 'context': {
                     'client': {
@@ -351,6 +351,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             },
             '_auth_required': 'ignore_fail',
             '_auth_type': False,
+            '_query_subtitles': True,
             'json': {
                 'context': {
                     'client': {
