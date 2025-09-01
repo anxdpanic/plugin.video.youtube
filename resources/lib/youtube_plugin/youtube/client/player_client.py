@@ -1531,27 +1531,23 @@ class PlayerClient(LoginClient):
 
         return default_lang, subs_data
 
-    def _get_error_details(self, playability_status, details=None):
+    def _get_error_details(self,
+                           playability_status,
+                           details=('errorScreen', (
+                                   ('playerErrorMessageRenderer',
+                                    'reason'),
+                                   ('confirmDialogRenderer',
+                                    'title'),
+                                   ('playerCaptchaViewModel',
+                                    'accessibility',
+                                    'accessibilityData',
+                                    'label'),
+                           ))):
         if not playability_status:
             return None
-        if not details:
-            details = (
-                'errorScreen',
-                (
-                    (
-                        'playerErrorMessageRenderer',
-                        'reason',
-                    ),
-                    (
-                        'confirmDialogRenderer',
-                        'title',
-                    ),
-                )
-            )
 
         result = self.json_traverse(playability_status, details)
-
-        if not result or 'runs' not in result:
+        if not result or not isinstance(result, dict) or 'runs' not in result:
             return result
 
         detail_texts = [
