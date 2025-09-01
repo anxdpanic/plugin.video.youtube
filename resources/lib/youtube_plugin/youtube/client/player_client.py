@@ -1669,6 +1669,7 @@ class PlayerClient(LoginClient):
                         client_name=_client_name,
                         has_auth=_has_auth,
                         cache=False,
+                        pass_data=True,
                         **_client
                     ) or {}
 
@@ -1684,8 +1685,13 @@ class PlayerClient(LoginClient):
                                     .get('playerMicroformatRenderer'))
                     _streaming_data = _result.get('streamingData', {})
                     _playability = _result.get('playabilityStatus', {})
-                    _status = _playability.get('status', 'ERROR').upper()
-                    _reason = _playability.get('reason', 'UNKNOWN')
+                    if _playability:
+                        _status = _playability.get('status', 'ERROR').upper()
+                        _reason = _playability.get('reason', 'UNKNOWN')
+                    else:
+                        _error = _result.get('error', {})
+                        _status = _error.get('status', 'ERROR').upper()
+                        _reason = _error.get('message', 'UNKNOWN')
 
                     if (_video_details
                             and video_id != _video_details.get('videoId')):
@@ -1701,7 +1707,7 @@ class PlayerClient(LoginClient):
                         break
                     elif _status == 'OK':
                         break
-                    elif _status in {
+                    elif not _playability or _status in {
                         'AGE_CHECK_REQUIRED',
                         'AGE_VERIFICATION_REQUIRED',
                         'CONTENT_CHECK_REQUIRED',
@@ -1740,9 +1746,8 @@ class PlayerClient(LoginClient):
                         if any(why in compare_reason for why in retry_reasons):
                             continue
                     else:
-                        self.log.debug(('Unknown playabilityStatus in response',
-                                        'playabilityStatus: %s'),
-                                       _playability)
+                        self.log.warning('Unknown playabilityStatus: {status!r}',
+                                         status=_playability)
                 else:
                     break
                 if not restart:
