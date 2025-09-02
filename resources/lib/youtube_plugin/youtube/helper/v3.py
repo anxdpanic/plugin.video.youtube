@@ -101,7 +101,7 @@ def _process_list_response(provider,
     }
 
     settings = context.get_settings()
-    thumb_re = re_compile(r'[^/._]+?(?=(?:_live)?\.(?:jpg|webp))')
+    thumb_re = re_compile(r'[^/._]+(?=[^/.]*?\.(?:jpg|webp))')
     thumb_size = settings.get_thumbnail_size()
     fanart_type = params.get(FANART_TYPE)
     if fanart_type is None:
