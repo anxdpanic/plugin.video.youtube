@@ -20,7 +20,7 @@ from .login_client import LoginClient
 from ..helper.ratebypass import ratebypass
 from ..helper.signature.cipher import Cipher
 from ..helper.subtitles import SUBTITLE_SELECTIONS, Subtitles
-from ..helper.utils import THUMB_TYPES
+from ..helper.utils import THUMB_TYPES, THUMB_URL
 from ..youtube_exceptions import YouTubeException
 from ...kodion import logging
 from ...kodion.compatibility import (
@@ -1858,7 +1858,9 @@ class PlayerClient(LoginClient):
             },
             'thumbnails': {
                 thumb_type: {
-                    'url': thumb['url'].format(video_id, thumb_suffix),
+                    'url': THUMB_URL.format(
+                        video_id, thumb['name'], thumb_suffix
+                    ),
                     'size': thumb['size'],
                     'ratio': thumb['ratio'],
                     'unverified': True,

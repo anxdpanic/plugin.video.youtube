@@ -17,6 +17,7 @@ from re import compile as re_compile
 
 from .utils import (
     THUMB_TYPES,
+    THUMB_URL,
     filter_videos,
     get_thumbnail,
     make_comment_item,
@@ -148,9 +149,9 @@ def _process_list_response(provider,
                 _url = thumbnails[0].get('url')
                 thumbnails.extend([
                     {
-                        'url': (thumb_re.sub(thumb['filename'], _url, count=1)
+                        'url': (thumb_re.sub(thumb['name'], _url, count=1)
                                 if _url else
-                                thumb['url'].format(item_id, '')),
+                                THUMB_URL.format(item_id, thumb['name'], '')),
                         'size': thumb['size'],
                         'ratio': thumb['ratio'],
                         'unverified': True,
@@ -159,23 +160,24 @@ def _process_list_response(provider,
                 ])
             elif isinstance(thumbnails, dict):
                 _url = next(iter(thumbnails.values())).get('url')
-                for thumb_type, thumb in THUMB_TYPES.items():
-                    if thumb_type in thumbnails:
-                        continue
-                    thumbnails[thumb_type] = {
-                        'url': (thumb_re.sub(thumb['filename'], _url, count=1)
+                thumbnails.update({
+                    thumb_type: {
+                        'url': (thumb_re.sub(thumb['name'], _url, count=1)
                                 if _url else
-                                thumb['url'].format(item_id, '')),
+                                THUMB_URL.format(item_id, thumb['name'], '')),
                         'size': thumb['size'],
                         'ratio': thumb['ratio'],
                         'unverified': True,
                     }
+                    for thumb_type, thumb in THUMB_TYPES.items()
+                    if thumb_type not in thumbnails
+                })
             else:
                 thumbnails = None
             if not thumbnails:
                 thumbnails = {
                     thumb_type: {
-                        'url': thumb['url'].format(item_id, ''),
+                        'url': THUMB_URL.format(item_id, thumb['name'], ''),
                         'size': thumb['size'],
                         'ratio': thumb['ratio'],
                         'unverified': True,

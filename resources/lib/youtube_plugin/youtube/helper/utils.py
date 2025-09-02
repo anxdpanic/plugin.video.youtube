@@ -1233,63 +1233,54 @@ def update_channel_info(provider,
                     item.add_studio(channel_name)
 
 
+PREFER_WEBP_THUMBS = False
+if PREFER_WEBP_THUMBS:
+    THUMB_URL = 'https://i.ytimg.com/vi_webp/{0}/{1}{2}.webp'
+else:
+    THUMB_URL = 'https://i.ytimg.com/vi/{0}/{1}{2}.jpg'
 THUMB_TYPES = {
     'default': {
-        'filename': 'default',
-        # 'url': 'https://i.ytimg.com/vi/{0}/default{1}.jpg',
-        'url': 'https://i.ytimg.com/vi_webp/{0}/default{1}.webp',
+        'name': 'default',
         'width': 120,
         'height': 90,
         'size': 120 * 90,
         'ratio': 120 / 90,  # 4:3
     },
     'medium': {
-        'filename': 'mqdefault',
-        # 'url': 'https://i.ytimg.com/vi/{0}/mqdefault{1}.jpg',
-        'url': 'https://i.ytimg.com/vi_webp/{0}/mqdefault{1}.webp',
+        'name': 'mqdefault',
         'width': 320,
         'height': 180,
         'size': 320 * 180,
         'ratio': 320 / 180,  # 16:9
     },
     'high': {
-        'filename': 'hqdefault',
-        # 'url': 'https://i.ytimg.com/vi/{0}/hqdefault{1}.jpg',
-        'url': 'https://i.ytimg.com/vi_webp/{0}/hqdefault{1}.webp',
+        'name': 'hqdefault',
         'width': 480,
         'height': 360,
         'size': 480 * 360,
         'ratio': 480 / 360,  # 4:3
     },
     'standard': {
-        'filename': 'sddefault',
-        # 'url': 'https://i.ytimg.com/vi/{0}/sddefault{1}.jpg',
-        'url': 'https://i.ytimg.com/vi_webp/{0}/sddefault{1}.webp',
+        'name': 'sddefault',
         'width': 640,
         'height': 480,
         'size': 640 * 480,
         'ratio': 640 / 480,  # 4:3
     },
     '720': {
-        'filename': 'hq720',
-        # 'url': 'https://i.ytimg.com/vi/{0}/hq720{1}.jpg',
-        'url': 'https://i.ytimg.com/vi_webp/{0}/hq720{1}.webp',
+        'name': 'hq720',
         'width': 1280,
         'height': 720,
         'size': 1280 * 720,
         'ratio': 1280 / 720,  # 16:9
     },
     'oar': {
-        'filename': 'oardefault',
-        # 'url': 'https://i.ytimg.com/vi/{0}/oardefault{1}.jpg',
-        'url': 'https://i.ytimg.com/vi_webp/{0}/oardefault{1}.webp',
+        'name': 'oardefault',
         'size': 0,
         'ratio': 0,
     },
     'maxres': {
-        'filename': 'maxresdefault',
-        # 'url': 'https://i.ytimg.com/vi/{0}/maxresdefault{1}.jpg',
-        'url': 'https://i.ytimg.com/vi_webp/{0}/maxresdefault{1}.webp',
+        'name': 'maxresdefault',
         'size': 0,
         'ratio': 0,
     },
@@ -1335,7 +1326,7 @@ def get_thumbnail(thumb_size, thumbnails, default_thumb=None):
     url = (thumbnail[1] if is_dict else thumbnail).get('url')
     if not url:
         return default_thumb
-    if '/vi_webp/' not in url and '?' not in url:
+    if PREFER_WEBP_THUMBS and '/vi_webp/' not in url and '?' not in url:
         url = url.replace('/vi/', '/vi_webp/', 1).replace('.jpg', '.webp', 1)
     if url.startswith('//'):
         url = 'https:' + url
