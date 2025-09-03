@@ -793,9 +793,14 @@ class YouTubeRequestClient(BaseRequestsClass):
                 try:
                     if callable(key):
                         result = key(result)
+                    elif isinstance(key, dict):
+                        result = next(
+                            param for param in result
+                            if param.get(key['name']) in key['match']
+                        )[key['out']]
                     else:
                         result = result[key]
-                except (KeyError, IndexError, TypeError):
+                except (KeyError, IndexError, StopIteration, TypeError):
                     continue
                 break
             else:
