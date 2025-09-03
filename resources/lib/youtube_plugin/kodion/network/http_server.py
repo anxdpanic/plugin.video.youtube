@@ -13,7 +13,7 @@ import os
 import re
 import socket
 from collections import deque
-from errno import ECONNABORTED, ECONNREFUSED, ECONNRESET
+from errno import ECONNABORTED, ECONNREFUSED, ECONNRESET, EPIPE
 from functools import partial
 from io import open
 from json import dumps as json_dumps, loads as json_loads
@@ -163,7 +163,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             return
         except OSError as exc:
             self.close_connection = True
-            if exc.errno not in {ECONNABORTED, ECONNREFUSED, ECONNRESET}:
+            if exc.errno not in {ECONNABORTED, ECONNREFUSED, ECONNRESET, EPIPE}:
                 raise exc
 
     def ip_address_status(self, ip_address):
