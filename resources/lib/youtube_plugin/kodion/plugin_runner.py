@@ -19,6 +19,8 @@ from .constants import (
     FOLDER_URI,
     FORCE_PLAY_PARAMS,
     PATHS,
+    SORT_DIR,
+    SORT_METHOD,
     TRAKT_PAUSE_FLAG,
 )
 from .context import XbmcContext
@@ -104,11 +106,25 @@ def run(context=_context,
         refresh = context.refresh_requested(force=True, off=True, params=params)
         new_params['refresh'] = refresh if refresh else 0
 
+    sort_method = (
+            params.get(SORT_METHOD)
+            or ui.get_infolabel('Container.SortMethod')
+    )
+    if sort_method:
+        new_kwargs[SORT_METHOD] = sort_method
+
+    sort_dir = (
+            params.get(SORT_DIR)
+            or ui.get_infolabel('Container.SortOrder')
+    )
+    if sort_dir:
+        new_kwargs[SORT_DIR] = sort_dir
+
     if new_params:
         context.set_params(**new_params)
 
     system_version = context.get_system_version()
-    log.info(('Running v{version}',
+    log.info(('Running v{version} (unofficial)',
               'Kodi:   v{kodi}',
               'Python: v{python}',
               'Handle: {handle}',
