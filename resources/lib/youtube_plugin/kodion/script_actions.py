@@ -493,7 +493,7 @@ def run(argv):
             log.verbose_logging = False
 
         system_version = context.get_system_version()
-        log.info(('Running v{version}',
+        log.info(('Running v{version} (unofficial)',
                   'Kodi:     v{kodi}',
                   'Python:   v{python}',
                   'Category: {category!r}',

@@ -17,6 +17,8 @@ from .constants import (
     CHECK_SETTINGS,
     FOLDER_URI,
     PATHS,
+    SORT_DIR,
+    SORT_METHOD,
 )
 from .context import XbmcContext
 from .debug import Profiler
@@ -103,6 +105,20 @@ def run(context=_context,
         refresh = context.refresh_requested(force=True, off=True, params=params)
         new_params['refresh'] = refresh if refresh else 0
 
+    sort_method = (
+            params.get(SORT_METHOD)
+            or ui.get_infolabel('Container.SortMethod')
+    )
+    if sort_method:
+        new_kwargs[SORT_METHOD] = sort_method
+
+    sort_dir = (
+            params.get(SORT_DIR)
+            or ui.get_infolabel('Container.SortOrder')
+    )
+    if sort_dir:
+        new_kwargs[SORT_DIR] = sort_dir
+
     if new_params:
         context.set_params(**new_params)
 
@@ -112,7 +128,7 @@ def run(context=_context,
             log_params[key] = '<redacted>'
 
     system_version = context.get_system_version()
-    log.info(('Running v{version}',
+    log.info(('Running v{version} (unofficial)',
               'Kodi:   v{kodi}',
               'Python: v{python}',
               'Handle: {handle}',
