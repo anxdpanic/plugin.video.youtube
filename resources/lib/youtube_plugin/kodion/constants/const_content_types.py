@@ -11,8 +11,8 @@
 from __future__ import absolute_import, division, unicode_literals
 
 
-VIDEO_CONTENT = 'videos'
-LIST_CONTENT = 'files'
+VIDEO_CONTENT = 'episodes'
+LIST_CONTENT = 'default'
 
 COMMENTS = 'comments'
 HISTORY = 'history'

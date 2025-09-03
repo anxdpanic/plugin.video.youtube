@@ -22,6 +22,9 @@ class AbstractContextUI(object):
                                message_template=None):
         raise NotImplementedError()
 
+    def get_view_manager(self):
+        raise NotImplementedError()
+
     @staticmethod
     def on_keyboard_input(title, default='', hidden=False):
         raise NotImplementedError()
