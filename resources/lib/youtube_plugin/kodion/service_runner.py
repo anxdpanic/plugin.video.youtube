@@ -51,7 +51,7 @@ def run():
                            monitor=monitor)
 
     system_version = context.get_system_version()
-    logging.info(('Starting v{version}',
+    logging.info(('Starting v{version} (unofficial)',
                   'Kodi:    v{kodi}',
                   'Python:  v{python}'),
                  version=context.get_version(),
