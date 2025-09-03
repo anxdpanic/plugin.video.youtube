@@ -822,6 +822,7 @@ class PlayerClient(LoginClient):
         self._calculate_n = False
         self._cipher = False
 
+        self._visitor_data = None
         self._auth_client = {}
         self._client_groups = (
             ('custom', clients if clients else ()),
@@ -1576,7 +1577,6 @@ class PlayerClient(LoginClient):
         _client = None
         _has_auth = None
         _result = None
-        _visitor_data = None
         _video_details = None
         _microformat = None
         _streaming_data = None
@@ -1584,6 +1584,7 @@ class PlayerClient(LoginClient):
         _status = None
         _reason = None
 
+        visitor_data = None
         video_details = {}
         microformat = {}
         responses = {}
@@ -1624,7 +1625,7 @@ class PlayerClient(LoginClient):
             ),
             '_access_token_tv': self._access_tokens.get('tv'),
             '_cpn': None,
-            '_visitor_data': None,
+            '_visitor_data': self._visitor_data,
         }
         if use_remote_history:
             client_data['_auth_type'] = 'user'
@@ -1673,12 +1674,32 @@ class PlayerClient(LoginClient):
                         **_client
                     ) or {}
 
-                    if not _visitor_data:
-                        _visitor_data = (_result
-                                         .get('responseContext', {})
-                                         .get('visitorData'))
-                        if _visitor_data:
-                            client_data['_visitor_data'] = _visitor_data
+                    if not visitor_data:
+                        visitor_data = self.json_traverse(
+                            _result,
+                            (
+                                'responseContext',
+                                (
+                                    (
+                                        'visitorData',
+                                    ),
+                                    (
+                                        'serviceTrackingParams',
+                                        0,
+                                        'params',
+                                        {
+                                            'name': 'key',
+                                            'match': ('visitor_data',
+                                                      'visitorData'),
+                                            'out': 'value',
+                                        },
+                                    ),
+                                ),
+                            )
+                        )
+                        if visitor_data:
+                            client_data['_visitor_data'] = visitor_data
+                            self._visitor_data = visitor_data
                     _video_details = _result.get('videoDetails', {})
                     _microformat = (_result
                                     .get('microformat', {})
