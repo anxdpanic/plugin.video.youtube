@@ -969,9 +969,9 @@ class PlayerClient(LoginClient):
 
     def _get_player_config(self, client_name='web', embed=False):
         if embed:
-            url = ''.join(('https://www.youtube.com/embed/', self.video_id))
+            url = 'https://www.youtube.com/embed/%s' % self.video_id
         else:
-            url = ''.join(('https://www.youtube.com/watch?v=', self.video_id))
+            url = 'https://www.youtube.com/watch?v=%s' % self.video_id
         # Manually configured cookies to avoid cookie consent redirect
         cookies = {'SOCS': 'CAISAiAD'}
 
@@ -1395,6 +1395,9 @@ class PlayerClient(LoginClient):
                             mpd=True,
                             headers=None,
                             cpn=False,
+                            referrer=False,
+                            visitor_data=False,
+                            method='POST',
                             digits_re=re_compile(r'\d+')):
         if not url:
             return url
@@ -1433,8 +1436,22 @@ class PlayerClient(LoginClient):
                     modified = None
                 snippet['publishedAt'] = modified
 
+        if headers:
+            if visitor_data is not False:
+                headers.setdefault(
+                    'X-Goog-Visitor-Id',
+                    visitor_data or self._visitor_data,
+                )
+            if referrer is not False:
+                headers.setdefault(
+                    'Referer',
+                    referrer
+                    or 'https://www.youtube.com/watch?v=%s' % self.video_id,
+                )
+
         if mpd:
             new_params['__id'] = self.video_id
+            new_params['__method'] = method
             new_params['__host'] = [parts.hostname]
             new_params['__path'] = parts.path
             new_params['__headers'] = urlsafe_b64encode(
@@ -1503,6 +1520,7 @@ class PlayerClient(LoginClient):
             },
             'url': 'https://www.youtube.com/youtubei/v1/player',
             'method': 'POST',
+            '_visitor_data': self._visitor_data,
         }
 
         for client_name in ('smart_tv_embedded', 'web'):
@@ -2772,6 +2790,8 @@ class PlayerClient(LoginClient):
                 url = entity_escape(unquote(self._process_url_params(
                     subtitle['url'],
                     headers=headers,
+                    referrer=None,
+                    visitor_data=None,
                 )))
                 if not url:
                     continue
