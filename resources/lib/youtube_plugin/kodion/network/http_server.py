@@ -365,6 +365,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             original_path = params.pop('__path', empty)[0] or '/videoplayback'
             request_servers = params.pop('__host', empty)
             stream_id = params.pop('__id', empty)[0]
+            method = params.pop('__method', empty)[0] or 'POST'
             if original_path == '/videoplayback':
                 stream_id = (stream_id, params.get('itag', empty)[0])
                 stream_type = params.get('mime', empty)[0]
@@ -415,6 +416,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             stream_redirect = settings.httpd_stream_redirect()
 
             log_msg = ('Stream proxy response {success}',
+                       'Method: {method!r}',
                        'Server: {server!r}',
                        'Target: {target!r}',
                        'Status: {status} {reason}')
@@ -456,7 +458,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                 headers['Host'] = server
                 with self.requests.request(
                         stream_url,
-                        method='POST',
+                        method=method,
                         headers=headers,
                         allow_redirects=False,
                         stream=True,
@@ -512,6 +514,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                         level=log_level,
                         msg=log_msg,
                         success=('OK' if success else 'not OK'),
+                        method=method,
                         server=server,
                         target=target,
                         status=status,
