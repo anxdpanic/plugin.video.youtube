@@ -641,7 +641,7 @@ class AbstractContext(object):
                 wait=False,
                 wait_for=None,
                 wait_for_set=True,
-                block_ui=False):
+                block_ui=None):
         raise NotImplementedError()
 
     @staticmethod

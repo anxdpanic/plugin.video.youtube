@@ -780,18 +780,23 @@ class XbmcContext(AbstractContext):
                 wait=False,
                 wait_for=None,
                 wait_for_set=True,
-                block_ui=False):
+                block_ui=None,
+                _execute=xbmc.executebuiltin):
         if not wait_for:
-            xbmc.executebuiltin(command, wait)
+            if block_ui is False:
+                _execute('Dialog.Close(all,true)')
+            _execute(command, wait)
             return
 
         ui = self.get_ui()
         wait_for_abort = xbmc.Monitor().waitForAbort
 
-        xbmc.executebuiltin(command, wait)
+        if block_ui is False:
+            _execute('Dialog.Close(all,true)')
+        _execute(command, wait)
 
         if block_ui:
-            xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+            _execute('ActivateWindow(busydialognocancel)')
 
         if isinstance(wait_for, tuple):
             wait_for, wait_for_kwargs, delay = wait_for
@@ -808,7 +813,7 @@ class XbmcContext(AbstractContext):
                 pass
 
         if block_ui:
-            xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
+            _execute('Dialog.Close(busydialognocancel)')
 
     @staticmethod
     def sleep(timeout=None):
