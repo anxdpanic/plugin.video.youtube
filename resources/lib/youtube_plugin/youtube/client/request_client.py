@@ -473,9 +473,12 @@ class YouTubeRequestClient(BaseRequestsClass):
             },
             # Headers from a 2022 Samsung Tizen 6.5 based Smart TV
             'headers': {
-                'User-Agent': ('Mozilla/5.0 (SMART-TV; LINUX; Tizen 6.5)'
-                               ' AppleWebKit/537.36 (KHTML, like Gecko)'
-                               ' 85.0.4183.93/6.5 TV Safari/537.36'),
+                'User-Agent': (
+                    'Mozilla/5.0 (SMART-TV; LINUX; Tizen 6.5)'
+                    ' AppleWebKit/537.36 (KHTML, like Gecko)'
+                    ' Chrome/139.0.0.0'
+                    ' TV Safari/537.36'
+                ),
             },
         },
         'v1': {
@@ -612,12 +615,16 @@ class YouTubeRequestClient(BaseRequestsClass):
                     },
                 },
             },
+            '_auth_type': False,
             # Headers for a "Galaxy S20 Ultra" from Chrome dev tools device
             # emulation
             'headers': {
-                'User-Agent': ('Mozilla/5.0 (Linux; Android 10; SM-G981B)'
-                               ' AppleWebKit/537.36 (KHTML, like Gecko)'
-                               ' Chrome/80.0.3987.162 Mobile Safari/537.36'),
+                'User-Agent': (
+                    'Mozilla/5.0 (Linux; Android 10; SM-G981B)'
+                    ' AppleWebKit/537.36 (KHTML, like Gecko)'
+                    ' Chrome/139.0.0.0'
+                    ' Mobile Safari/537.36'
+                ),
             },
         },
         'watch_history': {
@@ -647,10 +654,10 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'Accept': '*/*',
                 'Accept-Language': 'en-US,en;q=0.5',
                 'User-Agent': (
-                    'Mozilla/5.0 (Linux; Android 10; SM-G981B)'
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
                     ' AppleWebKit/537.36 (KHTML, like Gecko)'
-                    ' Chrome/80.0.3987.162'
-                    ' Mobile Safari/537.36'
+                    ' Chrome/139.0.0.0'
+                    ' Safari/537.36'
                 ),
             },
             'cache': False,
@@ -684,10 +691,10 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'Accept-Language': 'en-US,en;q=0.5',
                 'Authorization': 'Bearer {{0}}',
                 'User-Agent': (
-                    'Mozilla/5.0 (Linux; Android 10; SM-G981B)'
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
                     ' AppleWebKit/537.36 (KHTML, like Gecko)'
-                    ' Chrome/80.0.3987.162'
-                    ' Mobile Safari/537.36'
+                    ' Chrome/139.0.0.0'
+                    ' Safari/537.36'
                 ),
             },
             'params': {
