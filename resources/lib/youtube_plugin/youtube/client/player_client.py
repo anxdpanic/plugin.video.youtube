@@ -2287,6 +2287,7 @@ class PlayerClient(LoginClient):
                     compare_ratio = width / height
 
                     bound = None
+                    _disable_hfr_max = disable_hfr_max
                     for quality in qualities:
                         if compare_width >= quality['width']:
                             # Bounds are defined using a 16:9 aspect ratio
@@ -2299,10 +2300,10 @@ class PlayerClient(LoginClient):
                                     quality = bound
                                 elif compare_height < quality['min_height']:
                                     quality = qualities[-1]
-                            if fps > 30 and disable_hfr_max:
-                                bound = None
+                                if fps > 30 and _disable_hfr_max:
+                                    bound = None
                             break
-                        disable_hfr_max = disable_hfr_max and not bound
+                        _disable_hfr_max = _disable_hfr_max and not bound
                         bound = quality
                     if not bound:
                         continue
