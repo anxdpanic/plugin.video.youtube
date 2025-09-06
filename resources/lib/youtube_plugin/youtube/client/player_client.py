@@ -2284,18 +2284,19 @@ class PlayerClient(LoginClient):
                     else:
                         compare_width = width
                         compare_height = height
-                    compare_ratio = width / height
+                    # Compare video stream width against pre-computed quality
+                    # selection width based on approximate aspect ratio.
+                    # 1.69 ~= 0.95 * 16 / 9
+                    if width / height > 1.69:
+                        nom_width = 'width_16:9'
+                    else:
+                        nom_width = 'width_4:3'
 
                     bound = None
                     _disable_hfr_max = disable_hfr_max
                     for quality in qualities:
-                        if compare_width >= quality['width']:
-                            # Bounds are defined using a 16:9 aspect ratio
-                            # If stream aspect ratio is approximately 16:9 then
-                            # simply use current quality without testing bounds
-                            if compare_ratio > 1.69:  # 1.69 ~= 0.95 * 16 / 9
-                                bound = quality
-                            elif bound:
+                        if compare_width > quality[nom_width]:
+                            if bound:
                                 if compare_height >= bound['min_height']:
                                     quality = bound
                                 elif compare_height < quality['min_height']:
