@@ -481,6 +481,30 @@ class XbmcPlugin(AbstractPlugin):
             action = uri
             result = False
 
+        elif uri.startswith('Container.Update('):
+            log_action = 'Updating container'
+            log_uri = uri[len('Container.Update('):-1].split(',')
+            if log_uri[0]:
+                log_uri[0] = parse_and_redact_uri(
+                    log_uri[0],
+                    redact_only=True,
+                )
+            log_uri = ','.join(log_uri)
+            action = uri
+            result = False
+
+        elif uri.startswith('Container.Refresh('):
+            log_action = 'Refreshing container'
+            log_uri = uri[len('Container.Refresh('):-1].split(',')
+            if log_uri[0]:
+                log_uri[0] = parse_and_redact_uri(
+                    log_uri[0],
+                    redact_only=True,
+                )
+            log_uri = ','.join(log_uri)
+            action = uri
+            result = False
+
         elif context.is_plugin_path(uri, PATHS.PLAY):
             parts, params, log_uri, _ = parse_and_redact_uri(uri)
             if params.get(ACTION, [None])[0] == 'list':

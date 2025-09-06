@@ -406,15 +406,32 @@ class AbstractContext(object):
         if window:
             if not isinstance(window, dict):
                 window = {}
-            window_replace = window.setdefault('replace', False)
-            window_return = window.setdefault('return', True)
+            if window.setdefault('refresh', False):
+                method = 'Container.Refresh('
+                if not window.setdefault('replace', False):
+                    uri = ''
+                history_replace = False
+                window_return = False
+            elif window.setdefault('update', False):
+                method = 'Container.Update('
+                history_replace = window.setdefault('replace', False)
+                window_return = False
+            else:
+                history_replace = False
+                window_name = window.setdefault('name', 'Videos')
+                if window.setdefault('replace', False):
+                    method = 'ReplaceWindow(%s,' % window_name
+                    window_return = window.setdefault('return', False)
+                else:
+                    method = 'ActivateWindow(%s,' % window_name
+                    window_return = window.setdefault('return', True)
             return ''.join((
                 command,
-                'ReplaceWindow(Videos,'
-                if window_replace else
-                'ActivateWindow(Videos,',
+                method,
                 uri,
-                ',return)' if window_return else ')',
+                ',return' if window_return else '',
+                ',replace' if history_replace else '',
+                ')'
             ))
         return uri
 
