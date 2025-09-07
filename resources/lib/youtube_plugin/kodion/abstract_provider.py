@@ -281,7 +281,7 @@ class AbstractProvider(object):
     def reroute(self, context, path=None, params=None, uri=None):
         ui = context.get_ui()
         current_path, current_params = context.parse_uri(
-            ui.get_container_info(FOLDER_URI, strict=False)
+            ui.get_container_info(FOLDER_URI, container_id=None)
         )
 
         if uri is None:

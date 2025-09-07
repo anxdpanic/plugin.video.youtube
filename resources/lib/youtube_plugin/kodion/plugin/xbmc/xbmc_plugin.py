@@ -356,7 +356,7 @@ class XbmcPlugin(AbstractPlugin):
                     )
                 else:
                     if context.is_plugin_path(
-                            ui.get_container_info(FOLDER_URI, strict=False)
+                            ui.get_container_info(FOLDER_URI, container_id=None)
                     ):
                         _, _post_run_action = self.uri_action(
                             context,

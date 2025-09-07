@@ -77,43 +77,47 @@ class AbstractContextUI(object):
         raise NotImplementedError()
 
     @classmethod
+    def get_container_id(cls, container_type=True):
+        raise NotImplementedError()
+
+    @classmethod
     def get_container_bool(cls,
                            name,
-                           container_id=None,
+                           container_id=True,
                            strict=True,
-                           stacklevel=2):
+                           stacklevel=None):
         raise NotImplementedError()
 
     @classmethod
     def get_container_info(cls,
                            name,
-                           container_id=None,
+                           container_id=True,
                            strict=True,
-                           stacklevel=2):
+                           stacklevel=None):
         raise NotImplementedError()
 
     @classmethod
     def get_listitem_bool(cls,
                           name,
-                          container_id=None,
+                          container_id=True,
                           strict=True,
-                          stacklevel=2):
-        raise NotImplementedError()
-
-    @classmethod
-    def get_listitem_property(cls,
-                              name,
-                              container_id=None,
-                              strict=True,
-                              stacklevel=2):
+                          stacklevel=None):
         raise NotImplementedError()
 
     @classmethod
     def get_listitem_info(cls,
                           name,
-                          container_id=None,
+                          container_id=True,
                           strict=True,
-                          stacklevel=2):
+                          stacklevel=None):
+        raise NotImplementedError()
+
+    @classmethod
+    def get_listitem_property(cls,
+                              name,
+                              container_id=True,
+                              strict=True,
+                              stacklevel=None):
         raise NotImplementedError()
 
     @classmethod
