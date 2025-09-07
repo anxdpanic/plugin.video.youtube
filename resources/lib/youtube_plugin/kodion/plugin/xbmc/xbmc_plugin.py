@@ -240,6 +240,7 @@ class XbmcPlugin(AbstractPlugin):
             result = None
 
         force_resolve = options.get(provider.FORCE_RESOLVE)
+        force_return = options.get(provider.FORCE_RETURN)
         result_item = None
         items = None
         if isinstance(result, (list, tuple)):
@@ -253,6 +254,14 @@ class XbmcPlugin(AbstractPlugin):
                         plot=context.localize('page.empty'),
                     )
                 ]
+                if force_return:
+                    _, _post_run_action = self.uri_action(
+                        context,
+                        'command://Action(Back)'
+                    )
+                    if _post_run_action:
+                        post_run_actions.append(_post_run_action)
+                        _post_run_action = None
 
             items = []
             for item in result:
@@ -324,7 +333,7 @@ class XbmcPlugin(AbstractPlugin):
                     xbmcplugin.setResolvedUrl(
                         handle, succeeded=True, listitem=item
                     )
-        elif not items:
+        elif not items or force_return:
             ui.clear_property(BUSY_FLAG)
             ui.clear_property(TRAKT_PAUSE_FLAG, raw=True)
             for param in FORCE_PLAY_PARAMS:
@@ -332,10 +341,15 @@ class XbmcPlugin(AbstractPlugin):
 
             fallback = options.get(provider.FALLBACK, True)
             if isinstance(fallback, string_type) and fallback != uri:
-                context.parse_uri(fallback, update=True)
-                return self.run(provider, context, forced=forced)
-            if fallback:
-
+                if options.get(provider.POST_RUN):
+                    _, _post_run_action = self.uri_action(
+                        context,
+                        fallback,
+                    )
+                else:
+                    context.parse_uri(fallback, update=True)
+                    return self.run(provider, context, forced=forced)
+            elif fallback:
                 if play_cancelled:
                     _, _post_run_action = self.uri_action(context, uri)
                 elif path == PATHS.PLAY:
@@ -389,13 +403,14 @@ class XbmcPlugin(AbstractPlugin):
             cacheToDisc=cache_to_disc,
         )
 
-        if any(sync_items):
-            context.send_notification(SYNC_LISTITEM, sync_items)
+        if not force_return:
+            if any(sync_items):
+                context.send_notification(SYNC_LISTITEM, sync_items)
 
-        container = ui.get_property(CONTAINER_ID)
-        position = ui.pop_property(CONTAINER_POSITION)
-        if container and position:
-            context.send_notification(CONTAINER_FOCUS, [container, position])
+            container = ui.get_property(CONTAINER_ID)
+            position = ui.pop_property(CONTAINER_POSITION)
+            if container and position:
+                context.send_notification(CONTAINER_FOCUS, [container, position])
 
         if post_run_actions:
             self.post_run(context, ui, *post_run_actions)

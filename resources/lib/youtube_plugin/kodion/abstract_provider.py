@@ -50,6 +50,8 @@ class AbstractProvider(object):
     FALLBACK = 'provider_fallback'  # type: bool | str
     FORCE_PLAY = 'provider_force_play'  # type: bool
     FORCE_RESOLVE = 'provider_force_resolve'  # type: bool
+    FORCE_RETURN = 'provider_force_return'  # type: bool
+    POST_RUN = 'provider_post_run'  # type: bool
     UPDATE_LISTING = 'provider_update_listing'  # type: bool
     CONTENT_TYPE = 'provider_content_type'  # type: tuple[str, str, str]
 
