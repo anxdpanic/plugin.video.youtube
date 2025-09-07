@@ -91,6 +91,7 @@ class XbmcPlugin(AbstractPlugin):
         path = context.get_path().rstrip('/')
 
         route = ui.pop_property(REROUTE_PATH)
+        _post_run_action = None
         post_run_actions = []
         succeeded = False
         for was_busy in (ui.pop_property(BUSY_FLAG),):
@@ -126,6 +127,7 @@ class XbmcPlugin(AbstractPlugin):
                 succeeded = result
                 if _post_run_action:
                     post_run_actions.append(_post_run_action)
+                    _post_run_action = None
                 continue
 
             if position:
@@ -172,6 +174,7 @@ class XbmcPlugin(AbstractPlugin):
                     succeeded = False
                     if _post_run_action:
                         post_run_actions.append(_post_run_action)
+                        _post_run_action = None
                     break
                 context.sleep(1)
             else:
@@ -311,6 +314,7 @@ class XbmcPlugin(AbstractPlugin):
                     )
                     if _post_run_action:
                         post_run_actions.append(_post_run_action)
+                        _post_run_action = None
                 else:
                     item = self._PLAY_ITEM_MAP[item_type](
                         context,
@@ -331,7 +335,6 @@ class XbmcPlugin(AbstractPlugin):
                 context.parse_uri(fallback, update=True)
                 return self.run(provider, context, forced=forced)
             if fallback:
-                _post_run_action = None
 
                 if play_cancelled:
                     _, _post_run_action = self.uri_action(context, uri)
@@ -371,8 +374,9 @@ class XbmcPlugin(AbstractPlugin):
                             context,
                             'command://Action(Back)',
                         )
-                if _post_run_action:
-                    post_run_actions.append(_post_run_action)
+            if _post_run_action:
+                post_run_actions.append(_post_run_action)
+                _post_run_action = None
 
         if ui.pop_property(PLAY_FORCED):
             context.set_path(PATHS.PLAY)
