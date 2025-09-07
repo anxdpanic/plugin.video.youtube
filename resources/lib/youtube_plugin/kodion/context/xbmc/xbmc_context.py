@@ -1004,7 +1004,8 @@ class XbmcContext(AbstractContext):
 
     def is_plugin_folder(self, folder_name=None):
         if folder_name is None:
-            folder_name = XbmcContextUI.get_container_info(FOLDER_NAME)
+            folder_name = XbmcContextUI.get_container_info(FOLDER_NAME,
+                                                           container_id=False)
         return folder_name == self._plugin_name
 
     def refresh_requested(self, force=False, on=False, off=False, params=None):
