@@ -17,13 +17,12 @@ from .constants import (
     BOOKMARK_ID,
     CHANNEL_ID,
     CONTAINER_ID,
-    LABEL,
+    CURRENT_ITEM,
     MARK_AS_LABEL,
     PLAYLIST_ID,
     PLAYLIST_ITEM_ID,
     PLAY_COUNT,
     PLUGIN_SLEEPING,
-    SCROLLING,
     SUBSCRIPTION_ID,
     TEMP_PATH,
     TITLE,
@@ -58,7 +57,7 @@ def run():
 
     ui = context.get_ui()
     get_container = ui.get_container
-    get_container_bool = ui.get_container_bool
+    get_container_info = ui.get_container_info
     get_listitem_info = ui.get_listitem_info
     get_listitem_property = ui.get_listitem_property
     clear_property = ui.clear_property
@@ -96,6 +95,7 @@ def run():
         return watched_label
 
     container_id = None
+    container_position = None
     plugin_item_details = {
         VIDEO_ID: {'getter': get_listitem_property, 'value': None},
         BOOKMARK_ID: {'getter': get_listitem_property, 'value': None},
@@ -191,8 +191,8 @@ def run():
                     container_id = container['id']
                     set_property(CONTAINER_ID, container_id)
 
-                scrolling = get_container_bool(SCROLLING, container_id)
-                if not scrolling and get_listitem_info(LABEL, container_id):
+                _position = get_container_info(CURRENT_ITEM, container_id)
+                if _position and _position != container_position:
                     item_has_id = None
                     for name, detail in plugin_item_details.items():
                         value = detail['value']
@@ -212,6 +212,7 @@ def run():
                         elif value:
                             detail['value'] = None
                             clear_property(name)
+                    container_position = _position
 
             elif not plugin_is_idle and not container['is_plugin']:
                 plugin_is_idle = set_property(PLUGIN_SLEEPING)
