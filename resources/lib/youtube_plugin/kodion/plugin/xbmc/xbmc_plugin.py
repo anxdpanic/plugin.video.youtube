@@ -242,6 +242,7 @@ class XbmcPlugin(AbstractPlugin):
         force_resolve = options.get(provider.FORCE_RESOLVE)
         force_return = options.get(provider.FORCE_RETURN)
         result_item = None
+        result_item_type = None
         items = None
         if isinstance(result, (list, tuple)):
             if not result:
@@ -272,6 +273,7 @@ class XbmcPlugin(AbstractPlugin):
                         and item_type in self._PLAY_ITEM_MAP
                         and item.playable):
                     result_item = item
+                    result_item_type = item_type
 
                 listitem_type = self._LIST_ITEM_MAP.get(item_type)
                 if (not listitem_type
@@ -287,6 +289,7 @@ class XbmcPlugin(AbstractPlugin):
                 ))
         else:
             result_item = result
+            result_item_type = result.__class__.__name__
 
         if items:
             content_type = options.get(provider.CONTENT_TYPE)
@@ -308,31 +311,29 @@ class XbmcPlugin(AbstractPlugin):
             cache_to_disc = options.get(provider.CACHE_TO_DISC, False)
             update_listing = options.get(provider.UPDATE_LISTING, True)
 
-        if result_item:
-            item_type = result_item.__class__.__name__
-            if item_type in self._PLAY_ITEM_MAP:
-                if path != PATHS.PLAY and not forced:
-                    force_play = True
-                else:
-                    force_play = options.get(provider.FORCE_PLAY)
+        if result_item and result_item_type in self._PLAY_ITEM_MAP:
+            if path != PATHS.PLAY and not forced:
+                force_play = True
+            else:
+                force_play = options.get(provider.FORCE_PLAY)
 
-                if force_play or not result_item.playable:
-                    result_item, _post_run_action = self.uri_action(
-                        context,
-                        result_item.get_uri()
-                    )
-                    if _post_run_action:
-                        post_run_actions.append(_post_run_action)
-                        _post_run_action = None
-                else:
-                    item = self._PLAY_ITEM_MAP[item_type](
-                        context,
-                        result_item,
-                        show_fanart=show_fanart,
-                    )
-                    xbmcplugin.setResolvedUrl(
-                        handle, succeeded=True, listitem=item
-                    )
+            if force_play or not result_item.playable:
+                _, _post_run_action = self.uri_action(
+                    context,
+                    result_item.get_uri()
+                )
+                if _post_run_action:
+                    post_run_actions.append(_post_run_action)
+                    _post_run_action = None
+            else:
+                item = self._PLAY_ITEM_MAP[result_item_type](
+                    context,
+                    result_item,
+                    show_fanart=show_fanart,
+                )
+                xbmcplugin.setResolvedUrl(
+                    handle, succeeded=True, listitem=item
+                )
         elif not items or force_return:
             ui.clear_property(BUSY_FLAG)
             ui.clear_property(TRAKT_PAUSE_FLAG, raw=True)
@@ -419,14 +420,15 @@ class XbmcPlugin(AbstractPlugin):
     @staticmethod
     def post_run(context, ui, *actions, **kwargs):
         timeout = kwargs.get('timeout', 30)
+        interval = kwargs.get('interval', 0.1)
         for action in actions:
-            while ui.busy_dialog_active():
-                timeout -= 1
+            while not ui.get_container(container_type=None, check_ready=True):
+                timeout -= interval
                 if timeout < 0:
-                    logging.error('Multiple busy dialogs active'
+                    logging.error('Container not ready'
                                   ' - Post run action unable to execute')
                     break
-                context.sleep(0.1)
+                context.sleep(interval)
             else:
                 if isinstance(action, tuple):
                     action, action_kwargs = action
@@ -439,6 +441,7 @@ class XbmcPlugin(AbstractPlugin):
                         action()
                 else:
                     context.execute(action)
+                context.sleep(interval)
 
     @staticmethod
     def uri_action(context, uri):

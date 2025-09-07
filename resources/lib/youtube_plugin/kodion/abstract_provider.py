@@ -482,77 +482,29 @@ class AbstractProvider(object):
             )
 
         if command.startswith('input'):
-            query = None
-            #  came from page 1 of search query by '..'/back
-            #  user doesn't want to input on this path
-            fallback = True
-            old_path, old_params = context.parse_uri(
-                ui.get_container_info(FOLDER_URI, strict=False)
+            result, query = ui.on_keyboard_input(
+                localize('search.title')
             )
-            old_uri = context.create_uri(old_path, old_params)
-            if (not context.refresh_requested()
-                    and context.is_plugin_folder()
-                    and context.is_plugin_path(old_uri,
-                                               PATHS.SEARCH,
-                                               partial=True)):
-                query = old_params.get('q')
-                if not query:
-                    fallback = ui.pop_property(provider.FALLBACK)
-                    if fallback:
-                        history_blacklist = (
-                            context.create_path(PATHS.SEARCH, 'input'),
-                            context.create_path(PATHS.SEARCH, 'query'),
-                            context.create_path(PATHS.SEARCH, 'list'),
-                        )
-                    else:
-                        fallback = old_uri
-                        history_blacklist = (
-                            context.create_path(PATHS.SEARCH, 'input'),
-                            context.create_path(PATHS.SEARCH, 'query'),
-                        )
-                    if old_path.startswith(history_blacklist):
-                        fallback = True
-                        query = False
-
-            if query:
-                query = to_unicode(query)
-            elif query is None:
-                result, input_query = ui.on_keyboard_input(
-                    localize('search.title')
-                )
-                if result:
-                    query = input_query
-
-            if query:
-                # Race conditions with other addons creating busy dialogs can
-                # prevent opening a new window
-                # fallback = old_uri
-                # ui.set_property(provider.RESULT_FALLBACK, fallback)
-                # return UriItem(context.create_uri(
-                #     (PATHS.SEARCH, 'query'),
-                #     dict(params, q=query),
-                #     window={'replace': False, 'return': True},
-                # )), {provider.RESULT_FALLBACK: False}
-
-                # Alternate method is faster/smoother but means that history is
-                # not properly modified to prevent navigating back to input
-                # dialog
-                context.set_params(q=query)
-                context.set_path(PATHS.SEARCH, 'query')
-                result, options = provider.on_search_run(context, query=query)
-                if not options:
-                    options = {provider.CACHE_TO_DISC: False}
-                fallback = options.setdefault(
-                    provider.FALLBACK,
-                    context.get_uri() if result else old_uri,
-                )
-                if fallback:
-                    ui.set_property(provider.FALLBACK, fallback)
+            if result and query:
+                result = []
+                options = {
+                    provider.FALLBACK: context.create_uri(
+                        (PATHS.SEARCH, 'query'),
+                        dict(params, q=query),
+                        window={
+                            'replace': False,
+                            'return': True,
+                        },
+                    ),
+                    provider.FORCE_RETURN: True,
+                    provider.POST_RUN: True,
+                    provider.CACHE_TO_DISC: True,
+                    provider.UPDATE_LISTING: False,
+                }
             else:
                 result = False
                 options = {
-                    provider.CACHE_TO_DISC: False,
-                    provider.FALLBACK: fallback,
+                    provider.FALLBACK: True,
                 }
             return result, options
 
