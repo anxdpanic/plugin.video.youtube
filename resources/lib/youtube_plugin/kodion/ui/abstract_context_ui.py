@@ -223,8 +223,7 @@ class AbstractContextUI(object):
             '[CR]' * cr_after,
         ))
 
-    @staticmethod
-    def set_focus_next_item():
+    def set_focus_next_item(self):
         raise NotImplementedError()
 
     @staticmethod

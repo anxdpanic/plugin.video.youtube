@@ -408,10 +408,20 @@ class XbmcPlugin(AbstractPlugin):
             if any(sync_items):
                 context.send_notification(SYNC_LISTITEM, sync_items)
 
-            container = ui.get_property(CONTAINER_ID)
-            position = ui.pop_property(CONTAINER_POSITION)
-            if container and position:
-                context.send_notification(CONTAINER_FOCUS, [container, position])
+            if forced and is_same_path:
+                container = ui.get_property(CONTAINER_ID)
+                position = ui.get_property(CONTAINER_POSITION)
+                if container and position:
+                    post_run_actions.append((
+                        context.send_notification,
+                        {
+                            'method': CONTAINER_FOCUS,
+                            'data': {
+                                CONTAINER_ID: container,
+                                CONTAINER_POSITION: position,
+                            },
+                        },
+                    ))
 
         if post_run_actions:
             self.post_run(context, ui, *post_run_actions)

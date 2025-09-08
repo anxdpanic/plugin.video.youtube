@@ -18,12 +18,9 @@ from re import (
 from . import logging
 from .constants import (
     CHECK_SETTINGS,
-    CONTAINER_ID,
-    CONTAINER_POSITION,
     CONTENT,
-    CURRENT_ITEM,
-    ITEMS_PER_PAGE,
     FOLDER_URI,
+    ITEMS_PER_PAGE,
     PATHS,
     REROUTE_PATH,
     WINDOW_CACHE,
@@ -313,8 +310,6 @@ class AbstractProvider(object):
                 self.log.debug('Rerouting - Fallback route not required')
                 return False, {self.FALLBACK: False}
 
-        container = None
-        position = None
         refresh = context.refresh_requested(params=params)
         if (refresh or (
                 params == current_params
@@ -323,8 +318,6 @@ class AbstractProvider(object):
             if refresh and refresh < 0:
                 del params['refresh']
             else:
-                container = ui.get_property(CONTAINER_ID)
-                position = ui.get_container_info(CURRENT_ITEM)
                 params['refresh'] = context.refresh_requested(
                     force=True,
                     on=True,
@@ -366,9 +359,6 @@ class AbstractProvider(object):
 
         if window_cache:
             ui.set_property(REROUTE_PATH, path)
-            if container and position:
-                ui.set_property(CONTAINER_ID, container)
-                ui.set_property(CONTAINER_POSITION, position)
 
         action = ''.join((
             'ReplaceWindow' if window_replace else 'ActivateWindow',

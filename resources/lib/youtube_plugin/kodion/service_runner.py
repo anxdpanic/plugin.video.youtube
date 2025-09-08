@@ -17,6 +17,7 @@ from .constants import (
     BOOKMARK_ID,
     CHANNEL_ID,
     CONTAINER_ID,
+    CONTAINER_POSITION,
     CURRENT_ITEM,
     MARK_AS_LABEL,
     PLAYLIST_ID,
@@ -213,6 +214,10 @@ def run():
                             detail['value'] = None
                             clear_property(name)
                     container_position = _position
+                    if item_has_id:
+                        set_property(CONTAINER_POSITION, container_position)
+                    else:
+                        clear_property(CONTAINER_POSITION)
 
             elif not plugin_is_idle and not container['is_plugin']:
                 plugin_is_idle = set_property(PLUGIN_SLEEPING)

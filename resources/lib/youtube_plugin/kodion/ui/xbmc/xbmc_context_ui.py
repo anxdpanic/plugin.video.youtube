@@ -18,9 +18,11 @@ from ...compatibility import string_type, xbmc, xbmcgui
 from ...constants import (
     ADDON_ID,
     BOOL_FROM_STR,
+    CONTAINER_FOCUS,
     CONTAINER_ID,
     CONTAINER_LISTITEM_INFO,
     CONTAINER_LISTITEM_PROP,
+    CONTAINER_POSITION,
     CURRENT_CONTAINER_INFO,
     HAS_FILES,
     HAS_FOLDERS,
@@ -530,20 +532,11 @@ class XbmcContextUI(AbstractContextUI):
         xbmcgui.Window(10000).clearProperty(_property_id)
         return None
 
-    @staticmethod
-    def set_focus_next_item():
-        container = xbmc.getInfoLabel('System.CurrentControlId')
-        position = xbmc.getInfoLabel('Container.CurrentItem')
-        try:
-            position = int(position) + 1
-        except ValueError:
-            return
-        xbmc.executebuiltin(
-            'SetFocus({container},{position},absolute)'.format(
-                container=container,
-                position=position
-            )
-        )
+    def set_focus_next_item(self):
+        self._context.send_notification(method=CONTAINER_FOCUS,
+                                        data={
+                                            CONTAINER_POSITION: 'next',
+                                        })
 
     @staticmethod
     def busy_dialog_active(all_modals=False, dialog_ids=frozenset((
