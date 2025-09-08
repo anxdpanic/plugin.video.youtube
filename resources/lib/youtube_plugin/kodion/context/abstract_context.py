@@ -486,7 +486,7 @@ class AbstractContext(object):
                 path, parts = self.create_path(
                     *path,
                     parts=True,
-                    parser=kwargs.get('parser'),
+                    parser=kwargs.get('parser')
                 )
         else:
             path, parts = self.create_path(*path, parts=True)
