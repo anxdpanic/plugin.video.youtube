@@ -641,7 +641,7 @@ class XbmcContext(AbstractContext):
             except KeyError:
                 try:
                     _text_id = int(_text_id)
-                except ValueError:
+                except (TypeError, ValueError):
                     _text_id = -1
         if _text_id <= 0:
             msg = 'Undefined string ID: {text_id!r}'

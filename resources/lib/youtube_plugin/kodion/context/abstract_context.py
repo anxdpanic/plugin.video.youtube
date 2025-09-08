@@ -460,8 +460,13 @@ class AbstractContext(object):
                 parts = []
             elif path.startswith(PATHS.GOTO_PAGE):
                 parts = parts[2:]
-                if parts and parts[0].isnumeric():
-                    parts = parts[1:]
+                if parts:
+                    try:
+                        int(parts[0])
+                    except (TypeError, ValueError):
+                        pass
+                    else:
+                        parts = parts[1:]
         else:
             return ('/', parts) if include_parts else '/'
 
@@ -553,8 +558,10 @@ class AbstractContext(object):
                             parsed_value, parsed_value
                         )
                     elif param in self._STRING_INT_PARAMS:
-                        if parsed_value.isdigit():
+                        try:
                             parsed_value = int(parsed_value)
+                        except (TypeError, ValueError):
+                            pass
                     # process and translate deprecated parameters
                     elif param == 'action':
                         if parsed_value in {'play_all', 'play_video'}:
