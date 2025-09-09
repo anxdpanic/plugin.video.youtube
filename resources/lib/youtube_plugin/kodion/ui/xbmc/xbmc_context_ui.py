@@ -22,12 +22,17 @@ from ...constants import (
     CONTAINER_LISTITEM_INFO,
     CONTAINER_LISTITEM_PROP,
     CURRENT_CONTAINER_INFO,
+    HAS_FILES,
+    HAS_FOLDERS,
+    HAS_PARENT,
     HIDE_PROGRESS,
     LISTITEM_INFO,
     LISTITEM_PROP,
     PLUGIN_CONTAINER_INFO,
     PROPERTY,
     REFRESH_CONTAINER,
+    UPDATING,
+    URI,
 )
 from ...utils.convert_format import to_unicode
 
@@ -195,6 +200,60 @@ class XbmcContextUI(AbstractContextUI):
     @staticmethod
     def get_infolabel(name, _label=xbmc.getInfoLabel):
         return _label(name)
+
+    def get_container(self,
+                      container_type=True,
+                      check_ready=False,
+                      stacklevel=None,
+                      _url='plugin://{0}/'.format(ADDON_ID)):
+        stacklevel = 2 if stacklevel is None else stacklevel + 1
+        container_id = self.get_container_id(container_type)
+        _container_id = container_id if container_type else container_type
+        is_plugin = self.get_listitem_info(
+            URI,
+            _container_id,
+            stacklevel=stacklevel,
+        ).startswith(_url)
+        if check_ready and container_type is True and not is_plugin:
+            is_active = False
+            is_loaded = False
+        else:
+            is_active = not self.busy_dialog_active(all_modals=True)
+            is_loaded = (
+                    not self.get_container_bool(
+                        UPDATING,
+                        _container_id,
+                        stacklevel=stacklevel,
+                    )
+                    and (
+                            self.get_container_bool(
+                                HAS_FOLDERS,
+                                _container_id,
+                                stacklevel=stacklevel
+                            )
+                            or
+                            self.get_container_bool(
+                                HAS_FILES,
+                                _container_id,
+                                stacklevel=stacklevel
+                            )
+                            or
+                            self.get_container_bool(
+                                HAS_PARENT,
+                                _container_id,
+                                stacklevel=stacklevel,
+                            )
+                    )
+            )
+
+        if check_ready:
+            return is_active and is_loaded
+        return {
+            'is_plugin': is_plugin,
+            'id': container_id,
+            'is_loaded': is_active,
+            'is_active': is_loaded,
+        }
 
     @classmethod
     def get_container_id(cls,

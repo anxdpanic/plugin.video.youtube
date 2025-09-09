@@ -24,6 +24,7 @@ from ..constants import (
     CONTAINER_FOCUS,
     FILE_READ,
     FILE_WRITE,
+    HAS_PARENT,
     MARK_AS_LABEL,
     PATHS,
     PLAYBACK_STOPPED,
@@ -76,52 +77,6 @@ class ServiceMonitor(xbmc.Monitor):
         self.onSettingsChanged(force=True)
 
         super(ServiceMonitor, self).__init__()
-
-    @staticmethod
-    def busy_dialog_active(all_modals=False, dialog_ids=frozenset((
-            10100,  # WINDOW_DIALOG_YES_NO
-            10101,  # WINDOW_DIALOG_PROGRESS
-            10103,  # WINDOW_DIALOG_KEYBOARD
-            10109,  # WINDOW_DIALOG_NUMERIC
-            10138,  # WINDOW_DIALOG_BUSY
-            10151,  # WINDOW_DIALOG_EXT_PROGRESS
-            10160,  # WINDOW_DIALOG_BUSY_NOCANCEL
-            12000,  # WINDOW_DIALOG_SELECT
-            12002,  # WINDOW_DIALOG_OK
-    ))):
-        if all_modals and xbmc.getCondVisibility('System.HasActiveModalDialog'):
-            return True
-        dialog_id = xbmcgui.getCurrentWindowDialogId()
-        if dialog_id in dialog_ids:
-            return dialog_id
-        return False
-
-    @staticmethod
-    def is_plugin_container(url='plugin://{0}/'.format(ADDON_ID),
-                            check_all=False,
-                            _bool=xbmc.getCondVisibility,
-                            _busy=busy_dialog_active.__func__,
-                            _label=xbmc.getInfoLabel):
-        control_id = _label('System.CurrentControlID')
-        if control_id:
-            is_plugin = _label(
-                'Container(%s).ListItem(0).FilenameAndPath' % control_id
-            ).startswith(url)
-        else:
-            is_plugin = False
-
-        if check_all:
-            return (is_plugin
-                    and not _bool('Container(%s).IsUpdating' % control_id)
-                    and not _busy())
-        return {
-            'is_plugin': is_plugin,
-            'id': is_plugin and control_id,
-            'is_loaded': is_plugin and not _bool(
-                'Container(%s).IsUpdating' % control_id
-            ),
-            'is_active': is_plugin and not _busy(),
-        }
 
     @staticmethod
     def send_notification(method,
@@ -217,15 +172,18 @@ class ServiceMonitor(xbmc.Monitor):
             if self.get_property(REFRESH_CONTAINER) == BUSY_FLAG:
                 self.set_property(REFRESH_CONTAINER)
                 xbmc.executebuiltin('Container.Refresh')
+            return
+
+        container = self._context.get_ui().get_container()
+        if not container['is_plugin'] or not container['is_loaded']:
+            return
+        if container['is_active']:
+            self.set_property(REFRESH_CONTAINER)
+            xbmc.executebuiltin('Container.Refresh')
         else:
-            container = self.is_plugin_container()
-            if all(container.values()):
-                self.set_property(REFRESH_CONTAINER)
-                xbmc.executebuiltin('Container.Refresh')
-            elif container['is_loaded']:
-                self.set_property(REFRESH_CONTAINER, BUSY_FLAG)
-                self.log.debug('Plugin window not active - deferring refresh')
-                self.refresh = True
+            self.set_property(REFRESH_CONTAINER, BUSY_FLAG)
+            self.log.debug('Plugin window not active - deferring refresh')
+            self.refresh = True
 
     def onNotification(self, sender, method, data):
         if sender == 'xbmc':

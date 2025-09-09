@@ -57,6 +57,7 @@ def run():
                  python=system_version.get_python_version())
 
     ui = context.get_ui()
+    get_container = ui.get_container
     get_container_bool = ui.get_container_bool
     get_listitem_info = ui.get_listitem_info
     get_listitem_property = ui.get_listitem_property
@@ -108,7 +109,6 @@ def run():
         ARTIST: {'getter': get_listitem_info, 'value': None},
         MARK_AS_LABEL: {'getter': _get_mark_as_label, 'value': None},
     }
-    container = monitor.is_plugin_container()
 
     while not monitor.abortRequested():
         is_idle = monitor.system_idle or monitor.get_idle_time() >= loop_period
@@ -152,7 +152,8 @@ def run():
                 else:
                     monitor.shutdown_httpd(terminate=True)
 
-        check_item = not plugin_is_idle and container['is_plugin']
+        container = get_container(container_type=False)
+        check_item = not plugin_is_idle and all(container.values())
         if check_item:
             wait_interval_ms = active_interval_ms
         else:
@@ -176,8 +177,8 @@ def run():
             if (monitor.interrupt
                     or (not check_item and wait_time_ms >= idle_interval_ms)):
                 monitor.interrupt = False
-                container = monitor.is_plugin_container()
-                if check_item != container['is_plugin']:
+                container = get_container(container_type=False)
+                if check_item != all(container.values()):
                     check_item = not check_item
                     if check_item:
                         wait_interval_ms = active_interval_ms

@@ -76,6 +76,12 @@ class AbstractContextUI(object):
     def get_infolabel(name):
         raise NotImplementedError()
 
+    def get_container(self,
+                      container_type=True,
+                      check_ready=False,
+                      stacklevel=None):
+        raise NotImplementedError()
+
     @classmethod
     def get_container_id(cls, container_type=True):
         raise NotImplementedError()
