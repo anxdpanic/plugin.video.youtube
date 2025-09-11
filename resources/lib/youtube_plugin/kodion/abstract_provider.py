@@ -480,7 +480,7 @@ class AbstractProvider(object):
                 options = {
                     provider.FALLBACK: context.create_uri(
                         (PATHS.SEARCH, 'query'),
-                        dict(params, q=query),
+                        dict(params, q=query, category_label=query),
                         window={
                             'replace': False,
                             'return': True,

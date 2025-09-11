@@ -59,6 +59,10 @@ def _process_related_videos(provider, context, client):
         )
         json_data['_pre_filler'] = filler
         json_data['_post_filler'] = filler
+        category_label = context.localize(
+            'video.related.to.x',
+            params.get('item_name') or context.localize('untitled'),
+        )
     else:
         json_data = function_cache.run(
             client.get_related_for_home,
@@ -67,6 +71,7 @@ def _process_related_videos(provider, context, client):
         )
         if not json_data:
             return False, None
+        category_label = None
 
     result = v3.response_to_items(
         provider,
@@ -78,7 +83,7 @@ def _process_related_videos(provider, context, client):
         provider.CONTENT_TYPE: {
             'content_type': CONTENT.VIDEO_CONTENT,
             'sub_type': None,
-            'category_label': None,
+            'category_label': category_label,
         },
     }
     return result, options
@@ -356,7 +361,10 @@ def _process_description_links(provider, context):
             provider.CONTENT_TYPE: {
                 'content_type': CONTENT.LIST_CONTENT,
                 'sub_type': None,
-                'category_label': None,
+                'category_label': context.localize(
+                    'video.description_links.from.x',
+                    params.get('item_name') or context.localize('untitled'),
+                ),
             },
         }
         return result, options

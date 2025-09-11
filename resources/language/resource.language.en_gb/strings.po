@@ -240,7 +240,7 @@ msgid "Sign Out"
 msgstr ""
 
 msgctxt "#30113"
-msgid ""
+msgid "Related to \"%s\""
 msgstr ""
 
 msgctxt "#30114"
@@ -260,7 +260,7 @@ msgid "Remove \"%s\"?"
 msgstr ""
 
 msgctxt "#30118"
-msgid ""
+msgid "Links from \"%s\""
 msgstr ""
 
 msgctxt "#30119"

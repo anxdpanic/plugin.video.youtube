@@ -77,7 +77,9 @@ def video_more_for(context,
     )
 
 
-def video_related(context, video_id=VIDEO_ID_INFOLABEL):
+def video_related(context,
+                  video_id=VIDEO_ID_INFOLABEL,
+                  video_name=TITLE_INFOLABEL):
     return (
         context.localize('video.related'),
         context_menu_uri(
@@ -85,6 +87,7 @@ def video_related(context, video_id=VIDEO_ID_INFOLABEL):
             (PATHS.ROUTE, PATHS.RELATED_VIDEOS,),
             {
                 VIDEO_ID: video_id,
+                'item_name': video_name,
             },
         ),
     )
@@ -106,7 +109,9 @@ def video_comments(context,
     )
 
 
-def video_description_links(context, video_id=VIDEO_ID_INFOLABEL):
+def video_description_links(context,
+                            video_id=VIDEO_ID_INFOLABEL,
+                            video_name=TITLE_INFOLABEL):
     return (
         context.localize('video.description_links'),
         context_menu_uri(
@@ -114,6 +119,7 @@ def video_description_links(context, video_id=VIDEO_ID_INFOLABEL):
             (PATHS.ROUTE, PATHS.DESCRIPTION_LINKS),
             {
                 VIDEO_ID: video_id,
+                'item_name': video_name,
             },
         )
     )
@@ -519,6 +525,9 @@ def channel_go_to(context,
         context_menu_uri(
             context,
             (PATHS.ROUTE, PATHS.CHANNEL, channel_id,),
+            {
+                'category_label': channel_name,
+            }
         ),
     )
 
