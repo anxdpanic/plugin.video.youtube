@@ -392,64 +392,6 @@ class XbmcContextUI(AbstractContextUI):
         return None
 
     @staticmethod
-    def bold(value, cr_before=0, cr_after=0):
-        return ''.join((
-            '[CR]' * cr_before,
-            '[B]', value, '[/B]',
-            '[CR]' * cr_after,
-        ))
-
-    @staticmethod
-    def uppercase(value, cr_before=0, cr_after=0):
-        return ''.join((
-            '[CR]' * cr_before,
-            '[UPPERCASE]', value, '[/UPPERCASE]',
-            '[CR]' * cr_after,
-        ))
-
-    @staticmethod
-    def color(color, value, cr_before=0, cr_after=0):
-        return ''.join((
-            '[CR]' * cr_before,
-            '[COLOR=', color.lower(), ']', value, '[/COLOR]',
-            '[CR]' * cr_after,
-        ))
-
-    @staticmethod
-    def light(value, cr_before=0, cr_after=0):
-        return ''.join((
-            '[CR]' * cr_before,
-            '[LIGHT]', value, '[/LIGHT]',
-            '[CR]' * cr_after,
-        ))
-
-    @staticmethod
-    def italic(value, cr_before=0, cr_after=0):
-        return ''.join((
-            '[CR]' * cr_before,
-            '[I]', value, '[/I]',
-            '[CR]' * cr_after,
-        ))
-
-    @staticmethod
-    def indent(number=1, value='', cr_before=0, cr_after=0):
-        return ''.join((
-            '[CR]' * cr_before,
-            '[TABS]', str(number), '[/TABS]', value,
-            '[CR]' * cr_after,
-        ))
-
-    @staticmethod
-    def new_line(value=1, cr_before=0, cr_after=0):
-        if isinstance(value, int):
-            return '[CR]' * value
-        return ''.join((
-            '[CR]' * cr_before,
-            value,
-            '[CR]' * cr_after,
-        ))
-
-    @staticmethod
     def set_focus_next_item():
         container = xbmc.getInfoLabel('System.CurrentControlId')
         position = xbmc.getInfoLabel('Container.CurrentItem')
