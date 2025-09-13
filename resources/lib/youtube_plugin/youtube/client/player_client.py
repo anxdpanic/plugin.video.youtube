@@ -1822,6 +1822,7 @@ class PlayerClient(LoginClient):
                         'client': _client.copy(),
                         'result': _result,
                     }
+                    client_data['_auth_requested'] = False
 
                 responses[_client_name] = {
                     'client': _client,
