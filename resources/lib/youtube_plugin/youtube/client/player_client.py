@@ -829,10 +829,6 @@ class PlayerClient(LoginClient):
             ('auth_enabled_no_usable_streams', (
                 'tv',
             )),
-            ('auth_required_limited_content', (
-                'ios_youtube_tv',
-                'android_youtube_tv',
-            )),
             ('auth_disabled_kids_vp9_avc1', (
                 'ios_testsuite_params',
             )),

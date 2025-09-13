@@ -114,11 +114,13 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'X-YouTube-Client-Version': '{_id[client_version]}',
             },
         },
+        # Disabled - requires login but fails using OAuth2 authorisation
         # 4k with HDR
         # Some videos block this client, may also require embedding enabled
         # Limited subtitle availability
         # Limited audio streams
         'android_youtube_tv': {
+            '_disabled': True,
             '_id': {
                 'client_id': 29,
                 'client_name': 'ANDROID_UNPLUGGED',
@@ -385,7 +387,9 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'X-YouTube-Client-Version': '{_id[client_version]}',
             },
         },
+        # Disabled - requires login but fails using OAuth2 authorisation
         'ios_youtube_tv': {
+            '_disabled': True,
             '_id': {
                 'client_id': 33,
                 'client_name': 'IOS_UNPLUGGED',
