@@ -444,6 +444,9 @@ class XbmcPlugin(AbstractPlugin):
                     action, action_kwargs = action
                 else:
                     action_kwargs = None
+                logging.debug('Executing queued post-run action: {action}',
+                              action=action,
+                              stacklevel=2)
                 if callable(action):
                     if action_kwargs:
                         action(**action_kwargs)
@@ -457,20 +460,20 @@ class XbmcPlugin(AbstractPlugin):
     def uri_action(context, uri):
         if uri.startswith('script://'):
             _uri = uri[len('script://'):]
-            log_action = 'Running script'
+            log_action = 'RunScript queued'
             log_uri = _uri
             action = 'RunScript({0})'.format(_uri)
             result = True
 
         elif uri.startswith('command://'):
             _uri = uri[len('command://'):]
-            log_action = 'Running command'
+            log_action = 'Builtin command queued'
             log_uri = _uri
             action = _uri
             result = True
 
         elif uri.startswith('PlayMedia('):
-            log_action = 'Redirecting for playback'
+            log_action = 'Redirect for playback queued'
             log_uri = uri[len('PlayMedia('):-1].split(',')
             log_uri[0] = parse_and_redact_uri(
                 log_uri[0],
@@ -481,7 +484,7 @@ class XbmcPlugin(AbstractPlugin):
             result = True
 
         elif uri.startswith('RunPlugin('):
-            log_action = 'Running plugin'
+            log_action = 'RunPlugin queued'
             log_uri = parse_and_redact_uri(
                 uri[len('RunPlugin('):-1],
                 redact_only=True,
@@ -490,7 +493,7 @@ class XbmcPlugin(AbstractPlugin):
             result = True
 
         elif uri.startswith('ActivateWindow('):
-            log_action = 'Activating window'
+            log_action = 'ActivateWindow queued'
             log_uri = uri[len('ActivateWindow('):-1].split(',')
             if len(log_uri) >= 2:
                 log_uri[1] = parse_and_redact_uri(
@@ -502,7 +505,7 @@ class XbmcPlugin(AbstractPlugin):
             result = False
 
         elif uri.startswith('ReplaceWindow('):
-            log_action = 'Replacing window'
+            log_action = 'ReplaceWindow queued'
             log_uri = uri[len('ReplaceWindow('):-1].split(',')
             if len(log_uri) >= 2:
                 log_uri[1] = parse_and_redact_uri(
@@ -514,7 +517,7 @@ class XbmcPlugin(AbstractPlugin):
             result = False
 
         elif uri.startswith('Container.Update('):
-            log_action = 'Updating container'
+            log_action = 'Container.Update queued'
             log_uri = uri[len('Container.Update('):-1].split(',')
             if log_uri[0]:
                 log_uri[0] = parse_and_redact_uri(
@@ -526,7 +529,7 @@ class XbmcPlugin(AbstractPlugin):
             result = False
 
         elif uri.startswith('Container.Refresh('):
-            log_action = 'Refreshing container'
+            log_action = 'Container.Refresh queued'
             log_uri = uri[len('Container.Refresh('):-1].split(',')
             if log_uri[0]:
                 log_uri[0] = parse_and_redact_uri(
@@ -540,7 +543,7 @@ class XbmcPlugin(AbstractPlugin):
         elif context.is_plugin_path(uri, PATHS.PLAY):
             parts, params, log_uri, _ = parse_and_redact_uri(uri)
             if params.get(ACTION, [None])[0] == 'list':
-                log_action = 'Redirecting to'
+                log_action = 'Redirect queued'
                 action = context.create_uri(
                     (PATHS.ROUTE, parts.path.rstrip('/')),
                     params,
@@ -548,7 +551,7 @@ class XbmcPlugin(AbstractPlugin):
                 )
                 result = False
             else:
-                log_action = 'Redirecting for playback'
+                log_action = 'Redirect for playback queued'
                 action = context.create_uri(
                     (parts.path.rstrip('/'),),
                     params,
@@ -560,7 +563,7 @@ class XbmcPlugin(AbstractPlugin):
                 result = True
 
         elif context.is_plugin_path(uri):
-            log_action = 'Redirecting to'
+            log_action = 'Redirect queued'
             parts, params, log_uri, _ = parse_and_redact_uri(uri)
             action = context.create_uri(
                 (PATHS.ROUTE, parts.path.rstrip('/') or PATHS.HOME),
@@ -574,5 +577,8 @@ class XbmcPlugin(AbstractPlugin):
             result = False
             return result, action
 
-        logging.debug('{action}: {uri!r}', action=log_action, uri=log_uri)
+        logging.debug('{action}: {uri!r}',
+                      action=log_action,
+                      uri=log_uri,
+                      stacklevel=2)
         return result, action
