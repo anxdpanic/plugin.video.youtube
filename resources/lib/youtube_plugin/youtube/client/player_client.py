@@ -1685,6 +1685,7 @@ class PlayerClient(LoginClient):
                         has_auth=_has_auth,
                         cache=False,
                         pass_data=True,
+                        raise_exc=False,
                         **_client
                     ) or {}
 

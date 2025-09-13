@@ -2897,11 +2897,12 @@ class YouTube(LoginClient):
             try:
                 json_data = response.json()
             except ValueError as exc:
-                kwargs.setdefault('raise_exc', True)
+                if kwargs.get('raise_exc') is None:
+                    kwargs['raise_exc'] = True
                 raise InvalidJSON(exc, **kwargs)
 
             if 'error' in json_data:
-                kwargs.setdefault('pass_data', False)
+                kwargs.setdefault('pass_data', True)
                 raise YouTubeException('"error" in response JSON data',
                                        json_data=json_data,
                                        **kwargs)
