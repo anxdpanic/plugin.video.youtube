@@ -1667,7 +1667,7 @@ class PlayerClient(LoginClient):
                     _client = self.build_client(_client_name, client_data)
                     if _client:
                         _has_auth = _client.get('_has_auth', False)
-                        if _has_auth:
+                        if _has_auth or _client.get('_auth_type') is False:
                             exclude_retry.add(_client_name)
                     else:
                         _has_auth = None
