@@ -1404,7 +1404,7 @@ class YouTube(LoginClient):
             post_data['context'] = context
 
         result = self.api_request(client or 'web', 'POST', path='browse',
-                                  url='https://www.youtube.com/youtubei/v1/{_endpoint}',
+                                  url=self.V1_API_URL,
                                   post_data=post_data,
                                   do_auth=do_auth,
                                   cache=True)
@@ -2359,8 +2359,9 @@ class YouTube(LoginClient):
                 return True, False
 
             with self.request(
-                    ''.join(('https://www.youtube.com/feeds/videos.xml'
-                             '?playlist_id=', item_id)),
+                    ''.join((self.BASE_URL,
+                             '/feeds/videos.xml?playlist_id=',
+                             item_id)),
                     headers=headers,
             ) as response:
                 if response is None:

@@ -17,9 +17,9 @@ from random import choice as random_choice
 from re import compile as re_compile
 
 from .login_client import LoginClient
+from .subtitles import SUBTITLE_SELECTIONS, Subtitles
 from ..helper.ratebypass import ratebypass
 from ..helper.signature.cipher import Cipher
-from ..helper.subtitles import SUBTITLE_SELECTIONS, Subtitles
 from ..helper.utils import THUMB_TYPES, THUMB_URL
 from ..youtube_exceptions import YouTubeException
 from ...kodion import logging
@@ -30,7 +30,6 @@ from ...kodion.compatibility import (
     unescape,
     unquote,
     urlencode,
-    urljoin,
     urlsplit,
     urlunsplit,
     xbmcvfs,
@@ -800,7 +799,6 @@ class PlayerClient(LoginClient):
                  **kwargs):
         self.video_id = None
         self.yt_item = None
-        self._context = context
 
         self._ask_for_quality = ask_for_quality
         self._audio_only = audio_only
@@ -964,10 +962,11 @@ class PlayerClient(LoginClient):
         return yt_format
 
     def _get_player_config(self, client_name='web', embed=False):
+        video_id = self.video_id
         if embed:
-            url = 'https://www.youtube.com/embed/%s' % self.video_id
+            url = self.BASE_URL + '/embed/%s' % video_id
         else:
-            url = 'https://www.youtube.com/watch?v=%s' % self.video_id
+            url = self.WATCH_URL.format(_video_id=video_id)
         # Manually configured cookies to avoid cookie consent redirect
         cookies = {'SOCS': 'CAISAiAD'}
 
@@ -1078,18 +1077,6 @@ class PlayerClient(LoginClient):
         if new_headers:
             headers.update(new_headers)
         return headers
-
-    @staticmethod
-    def _normalize_url(url):
-        if not url:
-            url = ''
-        elif url.startswith(('http://', 'https://')):
-            pass
-        elif url.startswith('//'):
-            url = urljoin('https:', url)
-        elif url.startswith('/'):
-            url = urljoin('https://www.youtube.com', url)
-        return url
 
     def _process_mpd(self,
                      stream_list,
@@ -1514,8 +1501,9 @@ class PlayerClient(LoginClient):
             'json': {
                 'videoId': video_id,
             },
-            'url': 'https://www.youtube.com/youtubei/v1/player',
+            'url': self.V1_API_URL,
             'method': 'POST',
+            '_endpoint': 'player',
             '_visitor_data': self._visitor_data,
         }
 
@@ -1630,7 +1618,7 @@ class PlayerClient(LoginClient):
             'json': {
                 'videoId': video_id,
             },
-            'url': 'https://www.youtube.com/youtubei/v1/player',
+            'url': self.V1_API_URL,
             'method': 'POST',
             '_access_token': (
                 self._access_tokens.get('user')
@@ -1638,6 +1626,7 @@ class PlayerClient(LoginClient):
                 None
             ),
             '_access_token_tv': self._access_tokens.get('tv'),
+            '_endpoint': 'player',
             '_cpn': None,
             '_visitor_data': self._visitor_data,
         }

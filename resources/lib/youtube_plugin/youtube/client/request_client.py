@@ -10,7 +10,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from ..youtube_exceptions import YouTubeException
-from ...kodion.compatibility import range_type
+from ...kodion.compatibility import range_type, unescape, urljoin
 from ...kodion.network import BaseRequestsClass
 from ...kodion.utils.methods import merge_dicts
 
@@ -21,13 +21,19 @@ class YouTubeRequestClient(BaseRequestsClass):
         'android_embedded': 'AIzaSyCjc_pVEDi4qsv5MtC2dMXzpIaDoRFLsxw',
         'ios': 'AIzaSyB-63vPrdThhKuerbB2N_l7Kwwcxj6yUAc',
         'ios_youtube_tv': 'AIzaSyAA2X8Iz20HQACliPKA2J9URIdPmS3xFUA',
-        'android_youtube_tv': 'AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8',
+        'youtube_tv': 'AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8',
         'web': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
     }
     _PLAYER_PARAMS = {
         'default': '8AEB',
         'testsuite': '2AMB',
     }
+
+    BASE_URL = 'https://www.youtube.com'
+    BASE_URL_MOBILE = 'https://m.youtube.com'
+    V1_API_URL = BASE_URL + '/youtubei/v1/{_endpoint}'
+    V3_API_URL = 'https://www.googleapis.com/youtube/v3/{_endpoint}'
+    WATCH_URL = BASE_URL + '/watch?v={_video_id}'
 
     CLIENTS = {
         # Disabled - requires PO token
@@ -61,7 +67,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'params': _PLAYER_PARAMS['default'],
             },
             'headers': {
-                'Origin': 'https://m.youtube.com',
+                'Origin': BASE_URL_MOBILE,
                 'User-Agent': (
                     '{_id[package_id]}/{_id[client_version]}'
                     ' (Linux; U;'
@@ -101,7 +107,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 },
             },
             'headers': {
-                'Origin': 'https://www.youtube.com',
+                'Origin': BASE_URL,
                 'User-Agent': (
                     '{_id[package_id]}/{_id[client_version]}'
                     ' (Linux; U;'
@@ -147,7 +153,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 },
             },
             'headers': {
-                'Origin': 'https://m.youtube.com',
+                'Origin': BASE_URL_MOBILE,
                 'User-Agent': (
                     '{_id[package_id]}/{_id[client_version]}'
                     ' (Linux; U;'
@@ -187,7 +193,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'params': _PLAYER_PARAMS['testsuite'],
             },
             'headers': {
-                'Origin': 'https://m.youtube.com',
+                'Origin': BASE_URL_MOBILE,
                 'User-Agent': (
                     '{_id[package_id]}/{_id[client_version]}'
                     ' (Linux; U;'
@@ -231,7 +237,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'params': _PLAYER_PARAMS['testsuite'],
             },
             'headers': {
-                'Origin': 'https://m.youtube.com',
+                'Origin': BASE_URL_MOBILE,
                 'User-Agent': (
                     '{_id[package_id]}/{_id[client_version]}'
                     ' (Linux; U;'
@@ -273,7 +279,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                     },
                 },
                 'thirdParty': {
-                    'embedUrl': 'https://www.youtube.com/',
+                    'embedUrl': BASE_URL,
                 },
             },
             'headers': {
@@ -324,7 +330,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'cpn': '{_cpn}',
             },
             'headers': {
-                'Origin': 'https://m.youtube.com',
+                'Origin': BASE_URL_MOBILE,
                 'User-Agent': (
                     '{_id[package_id]}/{_id[client_version]}'
                     ' ({_id[device_model]}; U; CPU'
@@ -375,7 +381,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'params': _PLAYER_PARAMS['testsuite'],
             },
             'headers': {
-                'Origin': 'https://m.youtube.com',
+                'Origin': BASE_URL_MOBILE,
                 'User-Agent': (
                     '{_id[package_id]}/{_id[client_version]}'
                     ' ({_id[device_model]}; U; CPU'
@@ -430,7 +436,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 },
             },
             'headers': {
-                'Origin': 'https://m.youtube.com',
+                'Origin': BASE_URL_MOBILE,
                 'User-Agent': (
                     '{_id[package_id]}/{_id[client_version]}'
                     ' ({_id[device_model]}; U; CPU'
@@ -491,7 +497,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'client_name': 'WEB',
                 'client_version': '2.20250312.04.00',
             },
-            'url': 'https://www.youtube.com/youtubei/v1/{_endpoint}',
+            'url': V1_API_URL,
             'method': None,
             'json': {
                 'context': {
@@ -508,11 +514,8 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
         'v3': {
             '_auth_type': 'user',
-            'url': 'https://www.googleapis.com/youtube/v3/{_endpoint}',
+            'url': V3_API_URL,
             'method': None,
-            'headers': {
-                'Host': 'www.googleapis.com',
-            },
             'params': {
                 'key': None,
             },
@@ -525,7 +528,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             },
             '_auth_required': 'ignore_fail',
             '_auth_type': 'user',
-            'url': 'https://www.youtube.com/youtubei/v1/{_endpoint}',
+            'url': V1_API_URL,
             'method': None,
             'json': {
                 'context': {
@@ -551,7 +554,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'client_name': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
                 'client_version': '2.0',
             },
-            'url': 'https://www.youtube.com/youtubei/v1/{_endpoint}',
+            'url': V1_API_URL,
             'method': None,
             'json': {
                 'context': {
@@ -580,7 +583,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'os_build': '15E148',
                 'platform': 'MOBILE',
             },
-            'url': 'https://www.youtube.com/youtubei/v1/{_endpoint}',
+            'url': V1_API_URL,
             'method': None,
             'json': {
                 'context': {
@@ -637,7 +640,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_video_id': None,
             'headers': {
                 'Host': 's.youtube.com',
-                'Referer': 'https://www.youtube.com/watch?v={_video_id}',
+                'Referer': WATCH_URL,
             },
             'params': {
                 'referrer': 'https://accounts.google.com/',
@@ -650,7 +653,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             },
         },
         'generate_204': {
-            'url': 'https://www.youtube.com/generate_204',
+            'url': BASE_URL + '/generate_204',
             'method': 'HEAD',
             'headers': {
                 'Accept-Encoding': 'gzip, deflate',
@@ -917,3 +920,23 @@ class YouTubeRequestClient(BaseRequestsClass):
             if response.status_code == 204:
                 return True
         return False
+
+    @classmethod
+    def _normalize_url(cls, url):
+        if not url:
+            url = ''
+        elif url.startswith(('http://', 'https://')):
+            pass
+        elif url.startswith('//'):
+            url = urljoin('https:', url)
+        elif url.startswith('/'):
+            url = urljoin(cls.BASE_URL, url)
+        return url
+
+    @classmethod
+    def _unescape(cls, text):
+        try:
+            text = unescape(text)
+        except Exception:
+            cls.log.error(('Failed', 'Text: %r'), text)
+        return text
