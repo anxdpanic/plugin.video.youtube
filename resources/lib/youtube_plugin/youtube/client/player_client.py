@@ -1507,7 +1507,7 @@ class PlayerClient(LoginClient):
             '_visitor_data': self._visitor_data,
         }
 
-        for client_name in ('smart_tv_embedded', 'web'):
+        for client_name in ('tv_embed', 'web'):
             client = self.build_client(client_name, client_data)
             if not client:
                 continue

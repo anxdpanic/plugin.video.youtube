@@ -63,7 +63,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                         'platform': '{_id[platform]}',
                     },
                 },
-                'cpn': '{_cpn}',
+                'cpn': None,
                 'params': _PLAYER_PARAMS['default'],
             },
             'headers': {
@@ -92,6 +92,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'os_build': 'UP1A.231005.007.A1',
                 'package_id': 'com.google.android.apps.youtube.vr.oculus',
             },
+            '_auth_type': False,
             '_query_subtitles': False,
             'json': {
                 'context': {
@@ -189,7 +190,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                         'platform': '{_id[platform]}',
                     },
                 },
-                'cpn': '{_cpn}',
+                'cpn': None,
                 'params': _PLAYER_PARAMS['testsuite'],
             },
             'headers': {
@@ -233,7 +234,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                         'platform': '{_id[platform]}',
                     },
                 },
-                'cpn': '{_cpn}',
+                'cpn': None,
                 'params': _PLAYER_PARAMS['testsuite'],
             },
             'headers': {
@@ -327,7 +328,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                         'platform': '{_id[platform]}',
                     },
                 },
-                'cpn': '{_cpn}',
+                'cpn': None,
             },
             'headers': {
                 'Origin': BASE_URL_MOBILE,
@@ -377,7 +378,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                         'platform': '{_id[platform]}',
                     },
                 },
-                'cpn': '{_cpn}',
+                'cpn': None,
                 'params': _PLAYER_PARAMS['testsuite'],
             },
             'headers': {
@@ -448,55 +449,13 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'X-YouTube-Client-Version': '{_id[client_version]}',
             },
         },
-        # Disabled - request are now blocked with following response
-        # 403 Forbidden - The caller does not have permission
-        # Provides progressive streams
-        'media_connect_frontend': {
-            '_id': 95,
-            '_disabled': True,
-            '_query_subtitles': True,
-            'json': {
-                'context': {
-                    'client': {
-                        'clientName': 'MEDIA_CONNECT_FRONTEND',
-                        'clientVersion': '0.1',
-                    },
-                },
-            },
-            'headers': {},
-        },
-        # Used to requests captions for clients that don't provide them
-        # Requires handling of nsig to overcome throttling (TODO)
-        'smart_tv_embedded': {
-            '_id': 85,
-            'json': {
-                'context': {
-                    'client': {
-                        'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
-                        'clientScreen': 'WATCH',
-                        'clientVersion': '2.0',
-                    },
-                },
-                'thirdParty': {
-                    'embedUrl': 'https://www.google.com/',
-                },
-            },
-            # Headers from a 2022 Samsung Tizen 6.5 based Smart TV
-            'headers': {
-                'User-Agent': (
-                    'Mozilla/5.0 (SMART-TV; LINUX; Tizen 6.5)'
-                    ' AppleWebKit/537.36 (KHTML, like Gecko)'
-                    ' Chrome/139.0.0.0'
-                    ' TV Safari/537.36'
-                ),
-            },
-        },
         'v1': {
             '_id': {
                 'client_id': 1,
                 'client_name': 'WEB',
-                'client_version': '2.20250312.04.00',
+                'client_version': '2.20250905.01.00',
             },
+            '_auth_type': False,
             'url': V1_API_URL,
             'method': None,
             'json': {
@@ -522,14 +481,105 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
         'tv': {
             '_id': {
+                'browser_name': 'SamsungBrowser',
+                'browser_version': '9.2',
                 'client_id': 7,
                 'client_name': 'TVHTML5',
-                'client_version': '7.20250312.16.00',
+                'client_version': '7.20250902.08.00',
+                'device_make': 'Samsung',
+                'device_model': 'SmartTV',
+                'os_name': 'Tizen',
+                'os_major': '4',
+                'os_minor': '0',
+                'os_patch': '0',
+                'os_build': '2',
+                'platform': 'TV',
             },
             '_auth_required': 'ignore_fail',
-            '_auth_type': 'user',
+            '_auth_type': 'tv',
+            '_auth_user_agent': (
+                'Mozilla/5.0'
+                ' (ChromiumStylePlatform)'
+                ' Cobalt/25.lts.30.1034943-gold (unlike Gecko)'
+                ' Unknown_TV_Unknown_0/Unknown (Unknown, Unknown)'
+            ),
             'url': V1_API_URL,
             'method': None,
+            'json': {
+                'context': {
+                    'client': {
+                        'clientName': '{_id[client_name]}',
+                        'clientVersion': '{_id[client_version]}',
+                        'deviceMake': '{_id[device_make]}',
+                        'deviceModel': '{_id[device_model]}',
+                        'osName': '{_id[os_name]}',
+                        'osVersion': (
+                            '{_id[os_major]}'
+                            '.{_id[os_minor]}'
+                            '.{_id[os_patch]}'
+                            '.{_id[os_build]}'
+                        ),
+                        'platform': '{_id[platform]}',
+                    },
+                },
+            },
+            'headers': {
+                'User-Agent': (
+                    'Mozilla/5.0'
+                    ' (ChromiumStylePlatform)'
+                    ' Cobalt/Version'
+                ),
+                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Version': '{_id[client_version]}',
+            },
+        },
+        # Used to requests captions for clients that don't provide them
+        # Requires handling of nsig to overcome throttling (TODO)
+        'tv_embed': {
+            '_id': {
+                'client_id': 85,
+                'client_name': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
+                'client_version': '2.0',
+            },
+            '_auth_type': 'tv',
+            'url': V1_API_URL,
+            'method': None,
+            'json': {
+                'context': {
+                    'client': {
+                        'clientName': '{_id[client_name]}',
+                        'clientVersion': '{_id[client_version]}',
+                    },
+                },
+                'thirdParty': {
+                    'embedUrl': 'https://www.google.com/',
+                },
+            },
+            'headers': {
+                # UA from a 2022 Samsung Tizen 6.5 based Smart TV
+                'User-Agent': (
+                    'Mozilla/5.0 (SMART-TV; LINUX; Tizen 6.5)'
+                    ' AppleWebKit/537.36 (KHTML, like Gecko)'
+                    ' Chrome/140.0.0.0'
+                    ' TV Safari/537.36'
+                ),
+                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Version': '{_id[client_version]}',
+            },
+        },
+        'tv_unplugged': {
+            '_id': {
+                'client_id': 65,
+                'client_name': 'TVHTML5_UNPLUGGED',
+                'client_version': '6.36',
+            },
+            '_auth_type': 'user',
+            '_auth_user_agent': (
+                'Mozilla/5.0'
+                ' (ChromiumStylePlatform)'
+                ' Cobalt/25.lts.30.1034943-gold (unlike Gecko)'
+                ' Unknown_TV_Unknown_0/Unknown (Unknown, Unknown)'
+            ),
             'json': {
                 'context': {
                     'client': {
@@ -544,28 +594,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                     ' (ChromiumStylePlatform)'
                     ' Cobalt/Version'
                 ),
-                'X-YouTube-Client-Name': '{_id[client_id]}',
-                'X-YouTube-Client-Version': '{_id[client_version]}',
-            },
-        },
-        'tv_embed': {
-            '_id': {
-                'client_id': 85,
-                'client_name': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
-                'client_version': '2.0',
-            },
-            'url': V1_API_URL,
-            'method': None,
-            'json': {
-                'context': {
-                    'client': {
-                        'clientName': '{_id[client_name]}',
-                        'clientVersion': '{_id[client_version]}',
-                    },
-                },
-            },
-            'headers': {
-                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Name': '{_id[client_name]}',
                 'X-YouTube-Client-Version': '{_id[client_version]}',
             },
         },
@@ -583,6 +612,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'os_build': '15E148',
                 'platform': 'MOBILE',
             },
+            '_auth_type': False,
             'url': V1_API_URL,
             'method': None,
             'json': {
@@ -613,25 +643,31 @@ class YouTubeRequestClient(BaseRequestsClass):
         # Used for misc api requests by default
         # Requires handling of nsig to overcome throttling (TODO)
         'web': {
-            '_id': 1,
+            '_id': {
+                'client_id': 1,
+                'client_name': 'WEB',
+                'client_version': '2.20250905.01.00',
+            },
+            '_auth_type': False,
             'json': {
                 'context': {
                     'client': {
-                        'clientName': 'WEB',
-                        'clientVersion': '2.20250312.04.00',
+                        'clientName': '{_id[client_name]}',
+                        'clientVersion': '{_id[client_version]}',
                     },
                 },
             },
-            '_auth_type': False,
-            # Headers for a "Galaxy S20 Ultra" from Chrome dev tools device
-            # emulation
             'headers': {
+                # UA for a "Galaxy S20 Ultra" from Chrome dev tools device
+                # emulation
                 'User-Agent': (
                     'Mozilla/5.0 (Linux; Android 10; SM-G981B)'
                     ' AppleWebKit/537.36 (KHTML, like Gecko)'
-                    ' Chrome/139.0.0.0'
+                    ' Chrome/140.0.0.0'
                     ' Mobile Safari/537.36'
                 ),
+                'X-YouTube-Client-Name': '{_id[client_id]}',
+                'X-YouTube-Client-Version': '{_id[client_version]}',
             },
         },
         'watch_history': {
@@ -663,7 +699,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'User-Agent': (
                     'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
                     ' AppleWebKit/537.36 (KHTML, like Gecko)'
-                    ' Chrome/139.0.0.0'
+                    ' Chrome/140.0.0.0'
                     ' Safari/537.36'
                 ),
             },
@@ -696,11 +732,11 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
                 'Accept': '*/*',
                 'Accept-Language': 'en-US,en;q=0.5',
-                'Authorization': 'Bearer {{0}}',
+                'Authorization': None,
                 'User-Agent': (
                     'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
                     ' AppleWebKit/537.36 (KHTML, like Gecko)'
-                    ' Chrome/139.0.0.0'
+                    ' Chrome/140.0.0.0'
                     ' Safari/537.36'
                 ),
             },
@@ -852,10 +888,36 @@ class YouTubeRequestClient(BaseRequestsClass):
         if auth_type is not None:
             client['_auth_type'] = auth_type
 
+        headers = client.get('headers')
+        client_json = client.get('json')
+        if client_json:
+            if 'cpn' in client_json:
+                cpn = client.get('_cpn')
+                if cpn:
+                    client_json['cpn'] = cpn
+                else:
+                    client_json = client_json.copy()
+                    del client_json['cpn']
+                    client['json'] = client_json
+
+            client_config = cls.json_traverse(
+                client_json,
+                ('context', 'client'),
+            )
+            playback_context = cls.json_traverse(
+                client_json,
+                ('playbackContext', 'contentPlaybackContext'),
+            )
+        else:
+            client_config = None
+            playback_context = None
+
         visitor_data = client.get('_visitor_data')
         if visitor_data:
-            client['json']['context']['client']['visitorData'] = visitor_data
-            client['headers']['X-Goog-Visitor-Id'] = visitor_data
+            if client_config is not None:
+                client_config['visitorData'] = visitor_data
+            if headers is not None:
+                headers['X-Goog-Visitor-Id'] = visitor_data
 
         for values, template_id, template in templates.values():
             if template_id in values:
@@ -878,11 +940,15 @@ class YouTubeRequestClient(BaseRequestsClass):
                 api_key = None
 
             if auth_token and (auth_required or auth_requested):
-                headers = client['headers']
-                if 'Authorization' in headers:
+                if headers is not None and 'Authorization' in headers:
                     headers = headers.copy()
                     auth_header = headers.get('Authorization') or 'Bearer {0}'
                     headers['Authorization'] = auth_header.format(auth_token)
+
+                    auth_user_agent = client.get('_auth_user_agent')
+                    if auth_user_agent:
+                        headers['User-Agent'] = auth_user_agent
+
                     client['headers'] = headers
                     has_auth = True
 
@@ -893,8 +959,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             elif auth_required and auth_required != 'ignore_fail':
                 return None
             else:
-                headers = client['headers']
-                if 'Authorization' in headers:
+                if headers is not None and 'Authorization' in headers:
                     headers = headers.copy()
                     del headers['Authorization']
                     client['headers'] = headers
