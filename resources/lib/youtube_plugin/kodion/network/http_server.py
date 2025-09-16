@@ -456,48 +456,57 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                     break
 
                 headers['Host'] = server
-                with self.requests.request(
-                        stream_url,
+                response = self.requests.request(
+                    stream_url,
+                    method=method,
+                    headers=headers,
+                    allow_redirects=False,
+                    stream=True,
+                    cache=False,
+                )
+                if response is None:
+                    self.log.log(
+                        level=logging.WARNING,
+                        msg=log_msg,
+                        success='not OK',
                         method=method,
-                        headers=headers,
-                        allow_redirects=False,
-                        stream=True,
-                        cache=False,
-                ) as response:
-                    if response is None:
-                        status = -1
-                        reason = 'Failed'
-                    else:
-                        while response.is_redirect:
-                            request = response.next
-                            if not request:
-                                break
+                        server=server,
+                        target=target,
+                        status=-1,
+                        reason='Failed',
+                    )
+                    break
+                with response:
+                    while response.is_redirect:
+                        request = response.next
+                        if not request:
+                            break
 
-                            target = urlsplit(request.url).hostname
-                            if (target.endswith('googlevideo.com')
-                                    and 'Authorization' in headers):
-                                _headers = (
-                                    ('Authorization', headers['Authorization']),
-                                    ('Host', target),
-                                    ('Referer', response.url)
-                                )
-                            else:
-                                _headers = (
-                                    ('Host', target),
-                                    ('Referer', response.url)
-                                )
-                            request.headers.update(_headers)
-
-                            response = self.requests.request(
-                                prepared_request=request,
-                                allow_redirects=False,
-                                stream=True,
-                                cache=False,
+                        target = urlsplit(request.url).hostname
+                        if (target.endswith('googlevideo.com')
+                                and 'Authorization' in headers):
+                            _headers = (
+                                ('Authorization', headers['Authorization']),
+                                ('Host', target),
+                                ('Referer', response.url)
                             )
-                            if response is None:
-                                break
-                        status = response.status_code
-                        reason = response.reason
+                        else:
+                            _headers = (
+                                ('Host', target),
+                                ('Referer', response.url)
+                            )
+                        request.headers.update(_headers)
+
+                        response = self.requests.request(
+                            prepared_request=request,
+                            allow_redirects=False,
+                            stream=True,
+                            cache=False,
+                        )
+                        if response is None:
+                            break
+                    status = response.status_code
+                    reason = response.reason
 
                     if 100 <= status < 400:
                         success = True
@@ -966,10 +975,11 @@ def httpd_status(context, address=None):
     ))
     if not RequestHandler.requests:
         RequestHandler.requests = BaseRequestsClass(context=context)
-    with RequestHandler.requests.request(url, cache=False) as response:
-        if response is None:
-            result = None
-        else:
+    response = RequestHandler.requests.request(url, cache=False)
+    if response is None:
+        result = None
+    else:
+        with response:
             result = response.status_code
             if result == 204:
                 return True
@@ -992,8 +1002,11 @@ def get_client_ip_address(context):
     ))
     if not RequestHandler.requests:
         RequestHandler.requests = BaseRequestsClass(context=context)
-    with RequestHandler.requests.request(url, cache=False) as response:
-        if response is None or response.status_code != 200:
+    response = RequestHandler.requests.request(url, cache=False)
+    if response is None:
+        return None
+    with response:
+        if response.status_code != 200:
             return None
         response_json = response.json()
     if response_json:

@@ -460,13 +460,16 @@ class Subtitles(YouTubeRequestClient):
         if not download:
             return subtitle_url, self.FORMATS[sub_format]
 
-        with self.request(
-                subtitle_url,
-                headers=self.headers,
-                error_title='Failed to download subtitle for: {sub_lang!r}',
-                sub_lang=lang,
-        ) as response:
-            response_text = response and response.text
+        response = self.request(
+            subtitle_url,
+            headers=self.headers,
+            error_title='Failed to download subtitle for: {sub_lang!r}',
+            sub_lang=lang,
+        )
+        if response is None:
+            return None, None
+        with response:
+            response_text = response.text
             if not response_text:
                 return None, None
 

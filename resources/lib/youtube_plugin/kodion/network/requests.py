@@ -157,7 +157,10 @@ class BaseRequestsClass(object):
             raise new_exception(*args, **kwargs)
 
     def _response_hook_json(self, **kwargs):
-        with kwargs['response'] as response:
+        response = kwargs['response']
+        if response is None:
+            return None, None
+        with response:
             try:
                 json_data = response.json()
                 if 'error' in json_data:
@@ -183,7 +186,10 @@ class BaseRequestsClass(object):
         return json_data.get('etag'), json_data
 
     def _response_hook_text(self, **kwargs):
-        with kwargs['response'] as response:
+        response = kwargs['response']
+        if response is None:
+            return None, None
+        with response:
             response.raise_for_status()
             result = response and response.text
         if not result:

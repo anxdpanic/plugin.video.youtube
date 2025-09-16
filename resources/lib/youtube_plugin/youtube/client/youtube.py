@@ -2358,15 +2358,16 @@ class YouTube(LoginClient):
             else:
                 return True, False
 
-            with self.request(
-                    ''.join((self.BASE_URL,
-                             '/feeds/videos.xml?playlist_id=',
-                             item_id)),
-                    headers=headers,
-            ) as response:
-                if response is None:
-                    return False, True
-                elif response.status_code == 404:
+            response = self.request(
+                ''.join((self.BASE_URL,
+                         '/feeds/videos.xml?playlist_id=',
+                         item_id)),
+                headers=headers,
+            )
+            if response is None:
+                return False, True
+            with response:
+                if response.status_code == 404:
                     content = None
                 elif response.status_code == 429:
                     return False, True
@@ -2874,7 +2875,10 @@ class YouTube(LoginClient):
         return False
 
     def _response_hook(self, **kwargs):
-        with kwargs['response'] as response:
+        response = kwargs['response']
+        if response is None:
+            return None, None
+        with response:
             headers = response.headers
             if kwargs.get('extended_debug'):
                 self.log.debug(('Request response',

@@ -982,9 +982,10 @@ class YouTubeRequestClient(BaseRequestsClass):
         return client
 
     def internet_available(self):
-        with self.request(**self.CLIENTS['generate_204']) as response:
-            if response is None:
-                return False
+        response = self.request(**self.CLIENTS['generate_204'])
+        if response is None:
+            return False
+        with response:
             if response.status_code == 204:
                 return True
         return False
