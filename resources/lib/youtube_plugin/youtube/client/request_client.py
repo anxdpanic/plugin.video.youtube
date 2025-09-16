@@ -51,7 +51,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'platform': 'MOBILE',
             },
             '_auth_type': False,
-            '_query_subtitles': 'optional',
+            '_use_subtitles': 'optional',
             'json': {
                 'context': {
                     'client': {
@@ -93,7 +93,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'package_id': 'com.google.android.apps.youtube.vr.oculus',
             },
             '_auth_type': False,
-            '_query_subtitles': False,
+            '_use_subtitles': False,
             'json': {
                 'context': {
                     'client': {
@@ -140,7 +140,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             },
             '_auth_required': True,
             '_auth_type': 'user',
-            '_query_subtitles': True,
+            '_use_subtitles': False,
             'json': {
                 'context': {
                     'client': {
@@ -178,7 +178,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             },
             '_auth_required': 'ignore_fail',
             '_auth_type': False,
-            '_query_subtitles': True,
+            '_use_subtitles': 'optional',
             'json': {
                 'context': {
                     'client': {
@@ -222,7 +222,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'platform': 'MOBILE',
             },
             '_auth_type': False,
-            '_query_subtitles': True,
+            '_use_subtitles': False,
             'json': {
                 'context': {
                     'client': {
@@ -266,7 +266,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'platform': 'MOBILE',
             },
             '_auth_type': False,
-            '_query_subtitles': 'optional',
+            '_use_subtitles': 'optional',
             'json': {
                 'context': {
                     'client': {
@@ -360,7 +360,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             },
             '_auth_required': 'ignore_fail',
             '_auth_type': False,
-            '_query_subtitles': True,
+            '_use_subtitles': 'optional',
             'json': {
                 'context': {
                     'client': {
@@ -417,7 +417,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             # '_auth_required': True,
             '_auth_required': 'ignore_fail',
             '_auth_type': 'user',
-            '_query_subtitles': True,
+            '_use_subtitles': False,
             'json': {
                 'context': {
                     'client': {
@@ -503,6 +503,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 ' Cobalt/25.lts.30.1034943-gold (unlike Gecko)'
                 ' Unknown_TV_Unknown_0/Unknown (Unknown, Unknown)'
             ),
+            '_use_subtitles': 'optional',
             'url': V1_API_URL,
             'method': None,
             'json': {
@@ -542,6 +543,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'client_version': '2.0',
             },
             '_auth_type': 'tv',
+            '_use_subtitles': True,
             'url': V1_API_URL,
             'method': None,
             'json': {
@@ -580,6 +582,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 ' Cobalt/25.lts.30.1034943-gold (unlike Gecko)'
                 ' Unknown_TV_Unknown_0/Unknown (Unknown, Unknown)'
             ),
+            '_use_subtitles': True,
             'json': {
                 'context': {
                     'client': {

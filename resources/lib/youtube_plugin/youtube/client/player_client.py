@@ -824,7 +824,9 @@ class PlayerClient(LoginClient):
         self._auth_client = {}
         self._client_groups = (
             ('custom', clients if clients else ()),
-            ('auth_enabled_no_usable_streams', (
+            ('auth_enabled_initial_request', (
+                'tv_embed',
+                'tv_unplugged',
                 'tv',
             )),
             ('auth_disabled_kids_vp9_avc1', (
@@ -1483,11 +1485,12 @@ class PlayerClient(LoginClient):
         for client_name, response in responses.items():
             captions = response['captions']
             client = response['client']
-            do_query = client.get('_query_subtitles')
+            use_subtitles = client.get('_use_subtitles')
 
             if (not captions
-                    or do_query is True
-                    or (do_query and subtitles.sub_selection == all_subs)):
+                    or not use_subtitles
+                    or (use_subtitles is not True
+                        and subtitles.sub_selection == all_subs)):
                 continue
 
             subtitles.load(captions, client['headers'].copy())
@@ -1637,6 +1640,7 @@ class PlayerClient(LoginClient):
         for name, clients in self._client_groups:
             if not clients:
                 continue
+            allow_skip = name != 'auth_enabled_initial_request'
             if name == 'mpd' and not use_mpd:
                 continue
             if name == 'ask' and use_mpd and not ask_for_quality:
@@ -1767,7 +1771,8 @@ class PlayerClient(LoginClient):
                             abort = True
                             break
                         if any(why in compare_reason for why in skip_reasons):
-                            break
+                            if allow_skip:
+                                break
                         if any(why in compare_reason for why in retry_reasons):
                             continue
                     else:
