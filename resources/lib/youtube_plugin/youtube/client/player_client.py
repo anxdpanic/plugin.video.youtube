@@ -1860,7 +1860,7 @@ class PlayerClient(LoginClient):
             },
             '_partial': True,
         }
-        is_live = video_details.get('isLiveContent', False)
+        is_live = video_details.get('isLiveContent') or video_details.get('hasLiveStreamingData')
         if is_live:
             is_live = video_details.get('isLive', False)
             live_dvr = video_details.get('isLiveDvrEnabled', False)
