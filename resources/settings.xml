@@ -512,7 +512,6 @@
                 <setting id="youtube.folder.saved.playlists.show" type="boolean" label="30611" help="">
                     <level>0</level>
                     <default>false</default>
-                    <visible>false</visible>
                     <control type="toggle"/>
                 </setting>
                 <setting id="youtube.folder.subscriptions.show" type="boolean" label="30504" help="">
