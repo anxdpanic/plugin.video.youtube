@@ -1520,7 +1520,7 @@ class PlayerClient(LoginClient):
                 error_hook=self._error_hook,
                 video_id=video_id,
                 client_name=client_name,
-                has_auth=client.get('_has_auth', False),
+                has_auth=client.get('_has_auth'),
                 cache=False,
                 **client
             )
@@ -1640,7 +1640,11 @@ class PlayerClient(LoginClient):
         for name, clients in self._client_groups:
             if not clients:
                 continue
-            allow_skip = name != 'auth_enabled_initial_request'
+            if name == 'auth_enabled_initial_request':
+                allow_skip = False
+                client_data['_auth_requested'] = True
+            else:
+                allow_skip = True
             if name == 'mpd' and not use_mpd:
                 continue
             if name == 'ask' and use_mpd and not ask_for_quality:
@@ -1655,8 +1659,8 @@ class PlayerClient(LoginClient):
                     client_data['_cpn'] = self._generate_cpn()
                     _client = self.build_client(_client_name, client_data)
                     if _client:
-                        _has_auth = _client.get('_has_auth', False)
-                        if _has_auth or _client.get('_auth_type') is False:
+                        _has_auth = _client.get('_has_auth')
+                        if _has_auth or _has_auth is False:
                             exclude_retry.add(_client_name)
                     else:
                         _has_auth = None
@@ -1750,12 +1754,12 @@ class PlayerClient(LoginClient):
                                           'Reason:   {reason}',
                                           'video_id: {video_id!r}',
                                           'Client:   {client!r}',
-                                          'Auth:     {auth!r}'),
+                                          'Auth:     {has_auth!r}'),
                                          status=_status,
                                          reason=_reason or 'UNKNOWN',
                                          video_id=video_id,
                                          client=_client_name,
-                                         auth=_has_auth)
+                                         has_auth=_has_auth)
                         compare_reason = _reason.lower()
                         if any(why in compare_reason for why in reauth_reasons):
                             if _client.get('_auth_required') == 'ignore_fail':
@@ -1791,10 +1795,10 @@ class PlayerClient(LoginClient):
                 self.log.debug(('Retrieved video info:',
                                 'video_id: {video_id!r}',
                                 'Client:   {client!r}',
-                                'Auth:     {auth!r}'),
+                                'Auth:     {has_auth!r}'),
                                video_id=video_id,
                                client=_client_name,
-                               auth=_has_auth)
+                               has_auth=_has_auth)
 
                 video_details = merge_dicts(
                     _video_details,

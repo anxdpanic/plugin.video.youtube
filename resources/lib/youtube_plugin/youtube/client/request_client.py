@@ -926,7 +926,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             if template_id in values:
                 values[template_id] = template.format(**client)
 
-        has_auth = False
+        has_auth = None
         try:
             params = client['params']
             auth_required = client.get('_auth_required')
@@ -953,7 +953,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                         headers['User-Agent'] = auth_user_agent
 
                     client['headers'] = headers
-                    has_auth = True
+                    has_auth = auth_type
 
                 if 'key' in params:
                     params = params.copy()
