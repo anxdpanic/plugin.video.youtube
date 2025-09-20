@@ -328,8 +328,8 @@ class YouTube(LoginClient):
         super(YouTube, self).reinit(**kwargs)
         self.__init__(**kwargs)
 
-    def set_access_token(self, tv=None, user=None):
-        super(YouTube, self).set_access_token(tv=tv, user=user)
+    def set_access_token(self, access_tokens=None):
+        super(YouTube, self).set_access_token(access_tokens)
         if self.logged_in:
             context = self._context
             function_cache = context.get_function_cache()
@@ -3004,24 +3004,21 @@ class YouTube(LoginClient):
         else:
             abort = False
 
-        # a config can decide if a token is allowed
-        config = self._configs.get('user', {})
-        access_token = (self._access_tokens.get('user')
-                        if config.get('token-allowed', True) else
-                        None)
-        if access_token:
-            client_data['_access_token'] = access_token
-        key = config.get('key')
-        if key:
-            client_data['_api_key'] = key
+        client_data['_access_tokens'] = access_tokens = {}
+        client_data['_api_keys'] = api_keys = {}
+        for config_type, config in self._configs.items():
+            if not config:
+                continue
 
-        config = self._configs.get('tv', {})
-        access_token = self._access_tokens.get('tv')
-        if access_token:
-            client_data['_access_token_tv'] = access_token
-        key = config.get('key')
-        if key:
-            client_data['_api_key_tv'] = key
+            key = config.get('key')
+            if key:
+                api_keys[config_type] = key
+
+            if not config.get('token-allowed', True):
+                continue
+            access_token = self._access_tokens.get(config_type)
+            if access_token:
+                access_tokens[config_type] = access_token
 
         client = self.build_client(client, client_data)
         if not client:

@@ -17,6 +17,11 @@ key_sets = {
         'client_id': 'ODYxNTU2NzA4NDU0LWQ2ZGxtM2xoMDVpZGQ4bnBlazE4azZiZThiYTNvYzY4',
         'client_secret': 'U2JvVmhvRzlzMHJOYWZpeENTR0dLWEFU',
     },
+    'youtube-vr': {
+        'api_key': '',
+        'client_id': 'NjUyNDY5MzEyMTY5LTRsdnM5Ym5ocjlscG5zOXY0NTFqNW9pdmQ4MXZqdnUx',
+        'client_secret': 'M2ZUV3JCSkk1VW9qbTFUSzdfaUpDVzVa',
+    },
     'provided': {
         '0': {
             'api_key': '',

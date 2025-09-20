@@ -76,6 +76,10 @@ class APIKeyStore(JSONStore):
             system = 'YouTube TV'
             key_set_details = key_sets[switch]
 
+        elif switch == 'youtube-vr':
+            system = 'YouTube VR'
+            key_set_details = key_sets[switch]
+
         elif switch.startswith('user'):
             decode = False
             system = 'All'
@@ -162,8 +166,10 @@ class APIKeyStore(JSONStore):
 
     def get_configs(self):
         return {
-            'youtube-tv': self.get_api_keys('youtube-tv'),
-            'main': self.get_api_keys(self.get_current_switch()),
+            'tv': self.get_api_keys('youtube-tv'),
+            'user': self.get_api_keys(self.get_current_switch()),
+            'vr': self.get_api_keys('youtube-vr'),
+            'dev': self.get_api_keys('developer'),
         }
 
     def get_developer_config(self, developer_id):
@@ -188,7 +194,7 @@ class APIKeyStore(JSONStore):
             return {}
 
         origin = config.get('origin', developer_id)
-        key_details = config.get('main')
+        key_details = config.get(origin)
         required_details = {'key', 'id', 'secret'}
         if (not origin
                 or not key_details
@@ -196,7 +202,7 @@ class APIKeyStore(JSONStore):
             self.log.error_trace(('Invalid developer config: {config!r}',
                                   'Expected: {{',
                                   '    "origin": ADDON_ID,',
-                                  '    "main": {{',
+                                  '    ADDON_ID: {{',
                                   '        "system": SYSTEM_NAME,',
                                   '        "key": API_KEY,',
                                   '        "id": CLIENT_ID,',
@@ -219,7 +225,7 @@ class APIKeyStore(JSONStore):
 
         return {
             'origin': origin,
-            'main': {
+            origin: {
                 'system': key_system,
                 'key': key_details['key'],
                 'id': key_details['id'],
@@ -237,7 +243,7 @@ class APIKeyStore(JSONStore):
 
         new_config = {
             'origin': developer_id,
-            'main': {
+            developer_id: {
                 'system': 'JSONStore',
                 'key': b64encode(
                     bytes(api_key, 'utf-8')

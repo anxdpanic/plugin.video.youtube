@@ -55,7 +55,7 @@ def _do_login(provider, context, client=None, **kwargs):
 
     ui.on_ok(localize('sign.multi.title'), localize('sign.multi.text'))
 
-    tokens = ['tv', 'user']
+    tokens = ['tv', 'user', 'vr']
     for token_type, token in enumerate(tokens):
         new_token = ('', -1, '')
         try:

@@ -494,7 +494,7 @@ msgid "Please complete all login prompts"
 msgstr ""
 
 msgctxt "#30547"
-msgid "You may be prompted to enable two applications so that YouTube is functioning properly."
+msgid "You may be prompted to login and enable access to multiple applications so that this addon can function properly."
 msgstr ""
 
 msgctxt "#30548"

@@ -92,7 +92,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'os_build': 'UP1A.231005.007.A1',
                 'package_id': 'com.google.android.apps.youtube.vr.oculus',
             },
-            '_auth_type': False,
+            '_auth_type': 'vr',
             '_use_subtitles': False,
             'json': {
                 'context': {
@@ -176,7 +176,6 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'package_id': 'com.google.android.youtube',
                 'platform': 'MOBILE',
             },
-            '_auth_required': 'ignore_fail',
             '_auth_type': False,
             '_use_subtitles': 'optional',
             'json': {
@@ -309,7 +308,6 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'package_id': 'com.google.ios.youtube',
                 'platform': 'MOBILE',
             },
-            '_auth_required': 'ignore_fail',
             '_auth_type': False,
             'json': {
                 'context': {
@@ -358,7 +356,6 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'package_id': 'com.google.ios.youtube',
                 'platform': 'MOBILE',
             },
-            '_auth_required': 'ignore_fail',
             '_auth_type': False,
             '_use_subtitles': 'optional',
             'json': {
@@ -411,11 +408,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'package_id': 'com.google.ios.youtubeunplugged',
                 'platform': 'MOBILE',
             },
-            # Authorised requests required for this client, but try request even
-            # if not authorised as visitorData is required for subsequent client
-            # requests
-            # '_auth_required': True,
-            '_auth_required': 'ignore_fail',
+            '_auth_required': True,
             '_auth_type': 'user',
             '_use_subtitles': False,
             'json': {
@@ -495,7 +488,6 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'os_build': '2',
                 'platform': 'TV',
             },
-            '_auth_required': 'ignore_fail',
             '_auth_type': 'tv',
             '_auth_user_agent': (
                 'Mozilla/5.0'
@@ -709,8 +701,18 @@ class YouTubeRequestClient(BaseRequestsClass):
             'cache': False,
         },
         '_common': {
-            '_access_token': None,
-            '_access_token_tv': None,
+            '_access_tokens': {
+                'dev': None,
+                'tv': None,
+                'user': None,
+                'vr': None,
+            },
+            '_api_keys': {
+                'dev': None,
+                'tv': None,
+                'user': None,
+                'vr': None,
+            },
             'json': {
                 'contentCheckOk': True,
                 'context': {
@@ -932,12 +934,9 @@ class YouTubeRequestClient(BaseRequestsClass):
             auth_required = client.get('_auth_required')
             auth_requested = client.get('_auth_requested')
             auth_type = client.get('_auth_type')
-            if auth_type == 'tv':
-                auth_token = client.get('_access_token_tv')
-                api_key = client.get('_api_key_tv')
-            elif auth_type is not False:
-                auth_token = client.get('_access_token')
-                api_key = client.get('_api_key')
+            if auth_type:
+                auth_token = client.get('_access_tokens', {}).get(auth_type)
+                api_key = client.get('_api_keys', {}).get(auth_type)
             else:
                 auth_token = None
                 api_key = None

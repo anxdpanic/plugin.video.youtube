@@ -1603,6 +1603,7 @@ class PlayerClient(LoginClient):
             'confirm your age',
             'inappropriate',
             'please sign in',
+            'not a bot',
         }
         skip_reasons = {
             'latest version',
@@ -1612,7 +1613,6 @@ class PlayerClient(LoginClient):
             'try again later',
             'unavailable',
             'unknown',
-            'not a bot',
         }
         abort = False
 
@@ -1623,12 +1623,14 @@ class PlayerClient(LoginClient):
             },
             'url': self.V1_API_URL,
             'method': 'POST',
-            '_access_token': (
-                self._access_tokens.get('user')
-                if self._configs.get('user', {}).get('token-allowed', True) else
-                None
-            ),
-            '_access_token_tv': self._access_tokens.get('tv'),
+            '_access_tokens': {
+                'user': (self._access_tokens.get('user')
+                         if (self._configs.get('user', {})
+                             .get('token-allowed', True)) else
+                         None),
+                'tv': self._access_tokens.get('tv'),
+                'vr': self._access_tokens.get('vr'),
+            },
             '_endpoint': 'player',
             '_cpn': None,
             '_visitor_data': self._visitor_data,
@@ -1827,6 +1829,10 @@ class PlayerClient(LoginClient):
                     'hls_manifest': _streaming_data.get('hlsManifestUrl'),
                     'captions': _result.get('captions'),
                 }
+
+                if (not client_data.get('_auth_required')
+                        and video_details.get('isPrivate')):
+                    client_data['_auth_required'] = True
 
         if not responses:
             if _status == 'LIVE_STREAM_OFFLINE':
