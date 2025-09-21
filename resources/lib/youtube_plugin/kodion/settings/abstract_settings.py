@@ -12,7 +12,13 @@ from __future__ import absolute_import, division, unicode_literals
 
 import sys
 
-from ..constants import SETTINGS
+from ..constants import (
+    HIDE_LIVE,
+    HIDE_PLAYLISTS,
+    HIDE_SEARCH,
+    HIDE_SHORTS,
+    SETTINGS,
+)
 from ..network.http_server import validate_ip_address
 from ..utils.methods import get_kodi_setting_bool, get_kodi_setting_value
 from ..utils.system_version import current_system_version
@@ -593,7 +599,7 @@ class AbstractSettings(object):
             return self._STREAM_SELECT[value]
         return self._STREAM_SELECT[default]
 
-    _DEFAULT_FILTER = {
+    _DEFAULT_ITEM_FILTER = {
         'shorts': True,
         'upcoming': True,
         'upcoming_live': True,
@@ -603,25 +609,52 @@ class AbstractSettings(object):
         'vod': True,
         'custom': None,
     }
+    _DEFAULT_FOLDER_FILTER = {
+        HIDE_PLAYLISTS: False,
+        HIDE_SEARCH: False,
+        HIDE_SHORTS: False,
+        HIDE_LIVE: False,
+    }
 
-    def item_filter(self, update=None, override=None, exclude=None):
+    def item_filter(self,
+                    update=None,
+                    override=None,
+                    params=None,
+                    exclude=None):
         if override is None:
             override = self.get_string_list(SETTINGS.HIDE_VIDEOS)
-            override = dict.fromkeys(override, False)
+            override = {
+                filter_type: filter_type.startswith('hide_')
+                for filter_type in override
+            }
             override['custom'] = self.get_string(SETTINGS.FILTER_LIST).split(',')
         elif isinstance(override, (list, tuple)):
             _override = {'custom': []}
-            for value in override:
-                if value in self._DEFAULT_FILTER:
-                    _override[value] = False
+            for filter_type in override:
+                if filter_type in self._DEFAULT_ITEM_FILTER:
+                    _override[filter_type] = False
+                elif filter_type in self._DEFAULT_FOLDER_FILTER:
+                    _override[filter_type] = True
                 else:
-                    _override['custom'].append(value)
+                    _override['custom'].append(filter_type)
             override = _override
-        types = dict(self._DEFAULT_FILTER, **override)
+
+        if params:
+            _override = {
+                filter_type: value
+                for filter_type, value in params.items()
+                if filter_type in self._DEFAULT_FOLDER_FILTER
+            }
+            if override is None:
+                override = _override
+            else:
+                override.update(_override)
+
+        filter_types = dict(self._DEFAULT_ITEM_FILTER, **override)
 
         if update:
             if 'live_folder' in update:
-                if 'live_folder' not in types:
+                if 'live_folder' not in filter_types:
                     update.update((
                         ('upcoming', True),
                         ('upcoming_live', True),
@@ -631,12 +664,12 @@ class AbstractSettings(object):
                     ))
                 if 'vod' not in update:
                     update['vod'] = False
-            types.update(update)
+            filter_types.update(update)
 
         if exclude:
-            types['exclude'] = exclude
+            filter_types['exclude'] = exclude
 
-        return types
+        return filter_types
 
     def subscriptions_filter_enabled(self, value=None):
         if value is not None:

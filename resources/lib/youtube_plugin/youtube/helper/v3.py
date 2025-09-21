@@ -35,6 +35,7 @@ from ...kodion.constants import (
     HIDE_PLAYLISTS,
     HIDE_SEARCH,
     HIDE_SHORTS,
+    HIDE_VIDEOS,
     INHERITED_PARAMS,
     ITEM_FILTER,
     PAGE,
@@ -273,12 +274,16 @@ def _process_list_response(provider,
                                  subscription_id=subscription_id)
 
         elif kind_type == 'searchfolder':
+            if item_filter and item_filter.get(HIDE_SEARCH):
+                continue
             channel_id = item_params[CHANNEL_ID]
             item = NewSearchItem(context, **item_params)
             channel_items = channel_items_dict.setdefault(channel_id, [])
             channel_items.append(item)
 
-        elif kind_type == 'playlistfolder':
+        elif kind_type == 'playlistsfolder':
+            if item_filter and item_filter.get(HIDE_PLAYLISTS):
+                continue
             channel_id = item_params[CHANNEL_ID]
             item_params['uri'] = context.create_uri(
                 (PATHS.CHANNEL, channel_id, 'playlists',),
@@ -288,7 +293,37 @@ def _process_list_response(provider,
             channel_items = channel_items_dict.setdefault(channel_id, [])
             channel_items.append(item)
 
-        elif kind_type == 'playlist':
+        elif kind_type in {'livefolder',
+                           'shortsfolder',
+                           'videosfolder'}:
+            if (item_filter and (
+                    (
+                            kind_type == 'livefolder'
+                            and item_filter.get(HIDE_LIVE)
+                    ) or (
+                            kind_type == 'shortsfolder'
+                            and item_filter.get(HIDE_SHORTS)
+                    ) or (
+                            kind_type == 'videosfolder'
+                            and item_filter.get(HIDE_VIDEOS)
+                    )
+            )):
+                continue
+            item = DirectoryItem(**item_params)
+
+        elif kind_type in {'playlist',
+                           'playlistlivefolder',
+                           'playlistshortsfolder'}:
+            if (item_filter and (
+                    (
+                            kind_type == 'playlistlivefolder'
+                            and item_filter.get(HIDE_LIVE)
+                    ) or (
+                            kind_type == 'playlistshortsfolder'
+                            and item_filter.get(HIDE_SHORTS)
+                    )
+            )):
+                continue
             playlist_id = item_id
             # set channel id to 'mine' if the path is for a playlist of our own
             channel_id = snippet.get('channelId')
@@ -749,6 +784,7 @@ def response_to_items(provider,
             _item_filter = settings.item_filter(
                 update=(item_filter or json_data.get('_item_filter')),
                 override=item_filter_param,
+                params=params,
                 exclude=exclude_current,
             )
             result = _process_list_response(

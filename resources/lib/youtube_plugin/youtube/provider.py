@@ -396,7 +396,7 @@ class Provider(AbstractProvider):
                     '_partial': True,
                 },
                 {
-                    'kind': 'youtube#playlist',
+                    'kind': 'youtube#playlistShortsFolder',
                     'id': uploads.replace('UU', 'UUSH', 1),
                     'snippet': {
                         'channelId': channel_id,
@@ -408,7 +408,7 @@ class Provider(AbstractProvider):
                     '_partial': True,
                 } if not params.get(HIDE_SHORTS) else None,
                 {
-                    'kind': 'youtube#playlist',
+                    'kind': 'youtube#playlistLiveFolder',
                     'id': uploads.replace('UU', 'UULV', 1),
                     'snippet': {
                         'channelId': channel_id,
@@ -749,7 +749,7 @@ class Provider(AbstractProvider):
                 'kind': 'plugin#pluginListResponse',
                 'items': [
                     {
-                        'kind': 'plugin#playlistFolder',
+                        'kind': 'plugin#playlistsFolder',
                         '_params': {
                             'title': context.localize('playlists'),
                             'image': '{media}/playlist.png',
@@ -765,7 +765,7 @@ class Provider(AbstractProvider):
                         },
                     } if not params.get(HIDE_SEARCH) else None,
                     {
-                        'kind': 'youtube#playlist',
+                        'kind': 'youtube#playlistShortsFolder',
                         'id': uploads.replace('UU', 'UUSH', 1),
                         'snippet': {
                             'channelId': channel_id,
@@ -777,7 +777,7 @@ class Provider(AbstractProvider):
                         '_partial': True,
                     } if uploads and not params.get(HIDE_SHORTS) else None,
                     {
-                        'kind': 'youtube#playlist',
+                        'kind': 'youtube#playlistLiveFolder',
                         'id': uploads.replace('UU', 'UULV', 1),
                         'snippet': {
                             'channelId': channel_id,

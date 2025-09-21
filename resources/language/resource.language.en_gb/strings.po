@@ -654,19 +654,19 @@ msgid "Blacklist"
 msgstr ""
 
 msgctxt "#30587"
-msgid ""
+msgid "Hide \"Playlists\" folder"
 msgstr ""
 
 msgctxt "#30588"
-msgid ""
+msgid "Hide \"Search\" folder"
 msgstr ""
 
 msgctxt "#30589"
-msgid ""
+msgid "Hide \"Shorts\" folder"
 msgstr ""
 
 msgctxt "#30590"
-msgid ""
+msgid "Hide \"Live\" folder"
 msgstr ""
 
 msgctxt "#30591"
@@ -1538,7 +1538,7 @@ msgid "Use channel name as"
 msgstr ""
 
 msgctxt "#30808"
-msgid "Hide videos from listings"
+msgid "Hide items from listings"
 msgstr ""
 
 msgctxt "#30809"

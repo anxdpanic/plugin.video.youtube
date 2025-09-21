@@ -257,6 +257,10 @@
                             <option label="30766">premieres</option>
                             <option label="30810">completed</option>
                             <option label="30811">live_folder</option>
+                            <option label="30587">hide_playlists</option>
+                            <option label="30588">hide_search</option>
+                            <option label="30589">hide_shorts</option>
+                            <option label="30590">hide_live</option>
                         </options>
                         <delimiter>,</delimiter>
                     </constraints>
