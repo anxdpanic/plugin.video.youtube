@@ -29,17 +29,17 @@ from ...kodion import KodionException, logging
 from ...kodion.constants import (
     CHANNEL_ID,
     FANART_TYPE,
+    FOLDER_URI,
+    HIDE_LIVE,
     HIDE_NEXT_PAGE,
+    HIDE_PLAYLISTS,
+    HIDE_SEARCH,
+    HIDE_SHORTS,
+    INHERITED_PARAMS,
     ITEM_FILTER,
     PAGE,
-    FOLDER_URI,
     PATHS,
     PLAYLIST_ID,
-    PLAY_FORCE_AUDIO,
-    PLAY_PROMPT_QUALITY,
-    PLAY_PROMPT_SUBTITLES,
-    PLAY_TIMESHIFT,
-    PLAY_USING,
     VIDEO_ID,
 )
 from ...kodion.items import (
@@ -89,15 +89,7 @@ def _process_list_response(provider,
     params = context.get_params()
     new_params = {
         param: params[param]
-        for param in (
-            'addon_id',
-            'incognito',
-            PLAY_FORCE_AUDIO,
-            PLAY_TIMESHIFT,
-            PLAY_PROMPT_QUALITY,
-            PLAY_PROMPT_SUBTITLES,
-            PLAY_USING,
-        )
+        for param in INHERITED_PARAMS
         if param in params
     }
 

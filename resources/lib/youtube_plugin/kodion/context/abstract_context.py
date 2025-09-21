@@ -24,6 +24,7 @@ from ..compatibility import (
 )
 from ..constants import (
     ACTION,
+    ADDON_ID_PARAM,
     BOOL_FROM_STR,
     CHANNEL_ID,
     CHANNEL_IDS,
@@ -147,7 +148,7 @@ class AbstractContext(object):
     _STRING_PARAMS = frozenset((
         'api_key',
         ACTION,
-        'addon_id',
+        ADDON_ID_PARAM,
         'category_label',
         CHANNEL_ID,
         'client_id',

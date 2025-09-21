@@ -153,6 +153,7 @@ WINDOW_RETURN = 'window_return'
 
 # Plugin url query parameters
 ACTION = 'action'
+ADDON_ID_PARAM = 'addon_id'
 CHANNEL_IDS = 'channel_ids'
 CLIP = 'clip'
 END = 'end'
@@ -177,6 +178,29 @@ SCREENSAVER = 'screensaver'
 SEEK = 'seek'
 START = 'start'
 VIDEO_IDS = 'video_ids'
+
+INHERITED_PARAMS = frozenset((
+    ADDON_ID_PARAM,
+    FANART_TYPE,
+    HIDE_CHANNELS,
+    HIDE_FOLDERS,
+    HIDE_LIVE,
+    HIDE_NEXT_PAGE,
+    HIDE_PLAYLISTS,
+    HIDE_PROGRESS,
+    HIDE_SEARCH,
+    HIDE_SHORTS,
+    HIDE_VIDEOS,
+    INCOGNITO,
+    ITEM_FILTER,
+    ITEMS_PER_PAGE,
+    PLAY_FORCE_AUDIO,
+    PLAY_TIMESHIFT,
+    PLAY_PROMPT_QUALITY,
+    PLAY_PROMPT_SUBTITLES,
+    PLAY_USING,
+))
+
 
 __all__ = (
     # Addon paths
@@ -285,6 +309,7 @@ __all__ = (
 
     # Plugin url query parameters
     'ACTION',
+    'ADDON_ID_PARAM',
     'CHANNEL_IDS',
     'CLIP',
     'END',
@@ -309,6 +334,8 @@ __all__ = (
     'SEEK',
     'START',
     'VIDEO_IDS',
+
+    'INHERITED_PARAMS',
 
     # Other constants
     'CONTENT',
