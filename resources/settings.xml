@@ -261,6 +261,7 @@
                             <option label="30588">hide_search</option>
                             <option label="30589">hide_shorts</option>
                             <option label="30590">hide_live</option>
+                            <option label="30597">hide_members</option>
                         </options>
                         <delimiter>,</delimiter>
                     </constraints>

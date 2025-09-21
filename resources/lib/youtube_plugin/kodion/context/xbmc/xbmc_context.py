@@ -218,6 +218,7 @@ class XbmcContext(AbstractContext):
         'maintenance.requests_cache': 30523,
         'maintenance.search_history': 30558,
         'maintenance.watch_later': 30782,
+        'members_only': 30624,
         'my_channel': 30507,
         'my_location': 30654,
         'my_subscriptions': 30510,

@@ -694,7 +694,7 @@ msgid "Strict"
 msgstr ""
 
 msgctxt "#30597"
-msgid ""
+msgid "Hide \"Members only\" folder"
 msgstr ""
 
 msgctxt "#30598"
@@ -802,7 +802,7 @@ msgid "Install InputStream Helper"
 msgstr ""
 
 msgctxt "#30624"
-msgid ""
+msgid "Members only"
 msgstr ""
 
 msgctxt "#30625"

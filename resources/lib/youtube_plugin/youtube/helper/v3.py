@@ -31,6 +31,7 @@ from ...kodion.constants import (
     FANART_TYPE,
     FOLDER_URI,
     HIDE_LIVE,
+    HIDE_MEMBERS,
     HIDE_NEXT_PAGE,
     HIDE_PLAYLISTS,
     HIDE_SEARCH,
@@ -294,12 +295,16 @@ def _process_list_response(provider,
             channel_items.append(item)
 
         elif kind_type in {'livefolder',
+                           'membersfolder',
                            'shortsfolder',
                            'videosfolder'}:
             if (item_filter and (
                     (
                             kind_type == 'livefolder'
                             and item_filter.get(HIDE_LIVE)
+                    ) or (
+                            kind_type == 'membersfolder'
+                            and item_filter.get(HIDE_MEMBERS)
                     ) or (
                             kind_type == 'shortsfolder'
                             and item_filter.get(HIDE_SHORTS)
@@ -313,11 +318,15 @@ def _process_list_response(provider,
 
         elif kind_type in {'playlist',
                            'playlistlivefolder',
+                           'playlistmembersfolder',
                            'playlistshortsfolder'}:
             if (item_filter and (
                     (
                             kind_type == 'playlistlivefolder'
                             and item_filter.get(HIDE_LIVE)
+                    ) or (
+                            kind_type == 'playlistmembersfolder'
+                            and item_filter.get(HIDE_MEMBERS)
                     ) or (
                             kind_type == 'playlistshortsfolder'
                             and item_filter.get(HIDE_SHORTS)

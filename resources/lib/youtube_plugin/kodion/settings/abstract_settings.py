@@ -14,6 +14,7 @@ import sys
 
 from ..constants import (
     HIDE_LIVE,
+    HIDE_MEMBERS,
     HIDE_PLAYLISTS,
     HIDE_SEARCH,
     HIDE_SHORTS,
@@ -614,6 +615,7 @@ class AbstractSettings(object):
         HIDE_SEARCH: False,
         HIDE_SHORTS: False,
         HIDE_LIVE: False,
+        HIDE_MEMBERS: False
     }
 
     def item_filter(self,

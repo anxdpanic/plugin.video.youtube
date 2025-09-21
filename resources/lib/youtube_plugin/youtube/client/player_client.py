@@ -1604,6 +1604,7 @@ class PlayerClient(LoginClient):
             'inappropriate',
             'please sign in',
             'not a bot',
+            'member',
         }
         skip_reasons = {
             'latest version',

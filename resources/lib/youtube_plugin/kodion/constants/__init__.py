@@ -161,6 +161,7 @@ FANART_TYPE = 'fanart_type'
 HIDE_CHANNELS = 'hide_channels'
 HIDE_FOLDERS = 'hide_folders'
 HIDE_LIVE = 'hide_live'
+HIDE_MEMBERS = 'hide_members'
 HIDE_NEXT_PAGE = 'hide_next_page'
 HIDE_PLAYLISTS = 'hide_playlists'
 HIDE_PROGRESS = 'hide_progress'
@@ -185,6 +186,7 @@ INHERITED_PARAMS = frozenset((
     HIDE_CHANNELS,
     HIDE_FOLDERS,
     HIDE_LIVE,
+    HIDE_MEMBERS,
     HIDE_NEXT_PAGE,
     HIDE_PLAYLISTS,
     HIDE_PROGRESS,
@@ -317,6 +319,7 @@ __all__ = (
     'HIDE_CHANNELS',
     'HIDE_FOLDERS',
     'HIDE_LIVE',
+    'HIDE_MEMBERS',
     'HIDE_NEXT_PAGE',
     'HIDE_PLAYLISTS',
     'HIDE_PROGRESS',

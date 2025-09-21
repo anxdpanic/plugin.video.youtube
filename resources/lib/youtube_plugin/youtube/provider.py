@@ -39,6 +39,7 @@ from ..kodion.constants import (
     HIDE_CHANNELS,
     HIDE_FOLDERS,
     HIDE_LIVE,
+    HIDE_MEMBERS,
     HIDE_PLAYLISTS,
     HIDE_SEARCH,
     HIDE_SHORTS,
@@ -788,6 +789,18 @@ class Provider(AbstractProvider):
                         },
                         '_partial': True,
                     } if uploads and not params.get(HIDE_LIVE) else None,
+                    {
+                        'kind': 'youtube#playlistMembersFolder',
+                        'id': uploads.replace('UU', 'UUMO', 1),
+                        'snippet': {
+                            'channelId': channel_id,
+                            'title': context.localize('members_only'),
+                            'thumbnails': {'default': {
+                                'url': '{media}/sign_in.png',
+                            }},
+                        },
+                        '_partial': True,
+                    } if uploads and not params.get(HIDE_MEMBERS) else None,
                 ],
             }
             result.extend(v3.response_to_items(provider, context, v3_response))
