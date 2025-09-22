@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2025-08-22 19:29+0000\n"
 "Last-Translator: Massimo Pissarello <mapi68@gmail.com>\n"
@@ -237,8 +237,8 @@ msgid "Sign Out"
 msgstr "Disconnessione"
 
 msgctxt "#30113"
-msgid ""
-msgstr " "
+msgid "Related to \"%s\""
+msgstr ""
 
 msgctxt "#30114"
 msgid "Confirm delete"
@@ -257,8 +257,8 @@ msgid "Remove \"%s\"?"
 msgstr "Rimuovere \"%s\"?"
 
 msgctxt "#30118"
-msgid ""
-msgstr " "
+msgid "Links from \"%s\""
+msgstr ""
 
 msgctxt "#30119"
 msgid "Please wait..."
@@ -489,8 +489,8 @@ msgid "Please complete all login prompts"
 msgstr "Completa tutte le richieste di accesso"
 
 msgctxt "#30547"
-msgid "You may be prompted to enable two applications so that YouTube is functioning properly."
-msgstr "Potrebbe esserti richiesto di abilitare due applicazioni affinché YouTube funzioni correttamente."
+msgid "You may be prompted to login and enable access to multiple applications so that this addon can function properly."
+msgstr ""
 
 msgctxt "#30548"
 msgid ""
@@ -649,20 +649,20 @@ msgid "Blacklist"
 msgstr "Blacklist"
 
 msgctxt "#30587"
-msgid ""
-msgstr " "
+msgid "Hide \"Playlists\" folder"
+msgstr ""
 
 msgctxt "#30588"
-msgid ""
-msgstr " "
+msgid "Hide \"Search\" folder"
+msgstr ""
 
 msgctxt "#30589"
-msgid ""
-msgstr " "
+msgid "Hide \"Shorts\" folder"
+msgstr ""
 
 msgctxt "#30590"
-msgid ""
-msgstr " "
+msgid "Hide \"Live\" folder"
+msgstr ""
 
 msgctxt "#30591"
 msgid "Thumbnail size"
@@ -689,8 +689,8 @@ msgid "Strict"
 msgstr "Severo"
 
 msgctxt "#30597"
-msgid ""
-msgstr " "
+msgid "Hide \"Members only\" folder"
+msgstr ""
 
 msgctxt "#30598"
 msgid "Large (4:3)"
@@ -797,8 +797,8 @@ msgid "Install InputStream Helper"
 msgstr "Installa InputStream Helper"
 
 msgctxt "#30624"
-msgid ""
-msgstr " "
+msgid "Members only"
+msgstr ""
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
@@ -1533,8 +1533,8 @@ msgid "Use channel name as"
 msgstr "Usa nome del canale come"
 
 msgctxt "#30808"
-msgid "Hide videos from listings"
-msgstr "Nascondi video dagli elenchi"
+msgid "Hide items from listings"
+msgstr ""
 
 msgctxt "#30809"
 msgid "All upcoming videos"
@@ -1583,6 +1583,46 @@ msgstr "Riproduci dall'inizio"
 msgctxt "#30820"
 msgid "Podcast"
 msgstr "Podcast"
+
+#~ msgctxt "#30113"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30118"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30547"
+#~ msgid "You may be prompted to enable two applications so that YouTube is functioning properly."
+#~ msgstr "Potrebbe esserti richiesto di abilitare due applicazioni affinché YouTube funzioni correttamente."
+
+#~ msgctxt "#30587"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30588"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30589"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30590"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30597"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30624"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30808"
+#~ msgid "Hide videos from listings"
+#~ msgstr "Nascondi video dagli elenchi"
 
 # empty strings 30019
 #~ msgctxt "#30020"
