@@ -151,8 +151,8 @@ def _process_remove_video(provider,
         if params.get(KEYMAP) or not params.get(CONTEXT_MENU):
             ui.set_focus_next_item()
 
-        if playlist_id in container_uri:
-            path, params = context.parse_uri(container_uri)
+        path, params = context.parse_uri(container_uri)
+        if path.rstrip('/').endswith('/'.join((PATHS.PLAYLIST, playlist_id))):
             if 'refresh' not in params:
                 params['refresh'] = True
         else:
@@ -456,8 +456,8 @@ def _process_rate_playlist(provider,
         if params.get(KEYMAP) or not params.get(CONTEXT_MENU):
             ui.set_focus_next_item()
 
-        if context.get_path().startswith(PATHS.SAVED_PLAYLISTS):
-            path, params = context.parse_uri(container_uri)
+        path, params = context.parse_uri(container_uri)
+        if path.startswith(PATHS.SAVED_PLAYLISTS):
             if 'refresh' not in params:
                 params['refresh'] = True
         else:
