@@ -59,6 +59,10 @@ def _process_related_videos(provider, context, client):
         )
         json_data['_pre_filler'] = filler
         json_data['_post_filler'] = filler
+        category_label = context.localize(
+            'video.related.to.x',
+            params.get('item_name') or context.localize('untitled'),
+        )
     else:
         json_data = function_cache.run(
             client.get_related_for_home,
@@ -67,6 +71,7 @@ def _process_related_videos(provider, context, client):
         )
         if not json_data:
             return False, None
+        category_label = None
 
     result = v3.response_to_items(
         provider,
@@ -78,7 +83,7 @@ def _process_related_videos(provider, context, client):
         provider.CONTENT_TYPE: {
             'content_type': CONTENT.VIDEO_CONTENT,
             'sub_type': None,
-            'category_label': None,
+            'category_label': category_label,
         },
     }
     return result, options
@@ -356,7 +361,10 @@ def _process_description_links(provider, context):
             provider.CONTENT_TYPE: {
                 'content_type': CONTENT.LIST_CONTENT,
                 'sub_type': None,
-                'category_label': None,
+                'category_label': context.localize(
+                    'video.description_links.from.x',
+                    params.get('item_name') or context.localize('untitled'),
+                ),
             },
         }
         return result, options
@@ -517,29 +525,46 @@ def _process_my_subscriptions(provider,
 
         params = context.get_params()
         if params.get(PAGE, 1) == 1 and not params.get(HIDE_FOLDERS):
-            result = [
-                DirectoryItem(
-                    context.localize('my_subscriptions'),
-                    context.create_uri(my_subscriptions_path),
-                    image='{media}/new_uploads.png',
-                )
-                if feed_type != 'videos' and not params.get(HIDE_VIDEOS) else
-                None,
-                DirectoryItem(
-                    context.localize('shorts'),
-                    context.create_uri((my_subscriptions_path, 'shorts')),
-                    image='{media}/shorts.png',
-                )
-                if feed_type != 'shorts' and not params.get(HIDE_SHORTS) else
-                None,
-                DirectoryItem(
-                    context.localize('live'),
-                    context.create_uri((my_subscriptions_path, 'live')),
-                    image='{media}/live.png',
-                )
-                if feed_type != 'live' and not params.get(HIDE_LIVE) else
-                None,
-            ]
+            v3_response = {
+                'kind': 'plugin#pluginListResponse',
+                'items': [
+                    None
+                    if feed_type == 'videos' or params.get(HIDE_VIDEOS) else
+                    {
+                        'kind': 'plugin#videosFolder',
+                        '_params': {
+                            'name': context.localize('my_subscriptions'),
+                            'uri': context.create_uri(my_subscriptions_path),
+                            'image': '{media}/new_uploads.png',
+                        },
+                    },
+                    None
+                    if feed_type == 'shorts' or params.get(HIDE_SHORTS) else
+                    {
+                        'kind': 'plugin#shortsFolder',
+                        '_params': {
+                            'name': context.localize('shorts'),
+                            'uri': context.create_uri(
+                                (my_subscriptions_path, 'shorts')
+                            ),
+                            'image': '{media}/shorts.png',
+                        },
+                    },
+                    None
+                    if feed_type == 'live' or params.get(HIDE_LIVE) else
+                    {
+                        'kind': 'plugin#liveFolder',
+                        '_params': {
+                            'name': context.localize('live'),
+                            'uri': context.create_uri(
+                                (my_subscriptions_path, 'live')
+                            ),
+                            'image': '{media}/live.png',
+                        },
+                    },
+                ],
+            }
+            result = v3.response_to_items(provider, context, v3_response)
         else:
             result = []
 

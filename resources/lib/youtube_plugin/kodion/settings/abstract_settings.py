@@ -12,7 +12,14 @@ from __future__ import absolute_import, division, unicode_literals
 
 import sys
 
-from ..constants import SETTINGS
+from ..constants import (
+    HIDE_LIVE,
+    HIDE_MEMBERS,
+    HIDE_PLAYLISTS,
+    HIDE_SEARCH,
+    HIDE_SHORTS,
+    SETTINGS,
+)
 from ..network.http_server import validate_ip_address
 from ..utils.methods import get_kodi_setting_bool, get_kodi_setting_value
 from ..utils.system_version import current_system_version
@@ -540,19 +547,19 @@ class AbstractSettings(object):
             return self.set_bool(SETTINGS.USE_REMOTE_HISTORY, value)
         return self.get_bool(SETTINGS.USE_REMOTE_HISTORY, False)
 
-    # Selections based on max width and min height at common (utra-)wide aspect ratios
-    _QUALITY_SELECTIONS = {                                                                         # Setting | Resolution
-        7:   {'width': 7680, 'min_height': 3148, 'nom_height': 4320, 'label': '{0}p{1} (8K){2}{3}{4}'},   #   7     |   4320p 8K
-        6:   {'width': 3840, 'min_height': 1080, 'nom_height': 2160, 'label': '{0}p{1} (4K){2}{3}{4}'},   #   6     |   2160p 4K
-        5:   {'width': 2560, 'min_height': 984,  'nom_height': 1440, 'label': '{0}p{1} (QHD){2}{3}{4}'},  #   5     |   1440p 2.5K / QHD
-        4.1: {'width': 2048, 'min_height': 858,  'nom_height': 1152, 'label': '{0}p{1} (2K){2}{3}{4}'},   #   N/A   |   1152p 2K / QWXGA
-        4:   {'width': 1920, 'min_height': 787,  'nom_height': 1080, 'label': '{0}p{1} (FHD){2}{3}{4}'},  #   4     |   1080p FHD
-        3:   {'width': 1280, 'min_height': 525,  'nom_height': 720,  'label': '{0}p{1} (HD){2}{3}{4}'},   #   3     |   720p  HD
-        2:   {'width': 854,  'min_height': 350,  'nom_height': 480,  'label': '{0}p{1}{2}{3}{4}'},        #   2     |   480p
-        1:   {'width': 640,  'min_height': 263,  'nom_height': 360,  'label': '{0}p{1}{2}{3}{4}'},        #   1     |   360p
-        0:   {'width': 426,  'min_height': 175,  'nom_height': 240,  'label': '{0}p{1}{2}{3}{4}'},        #   0     |   240p
-        -1:  {'width': 256,  'min_height': 105,  'nom_height': 144,  'label': '{0}p{1}{2}{3}{4}'},        #   N/A   |   144p
-        -2:  {'width': 0,    'min_height': 0,    'nom_height': 0,    'label': '{0}p{1}{2}{3}{4}'},        #   N/A   |   Custom
+    # Selections based on width and min height at common aspect ratios
+    _QUALITY_SELECTIONS = {                                                                                                       # Setting | Resolution
+        7:   {'width_16:9': 7680, 'width_4:3': 5760, 'min_height': 3148, 'nom_height': 4320, 'label': '{0}p{1} (8K){2}{3}{4}'},   #   7     |   4320p 8K
+        6:   {'width_16:9': 3840, 'width_4:3': 2880, 'min_height': 1080, 'nom_height': 2160, 'label': '{0}p{1} (4K){2}{3}{4}'},   #   6     |   2160p 4K
+        5:   {'width_16:9': 2560, 'width_4:3': 1920, 'min_height': 984,  'nom_height': 1440, 'label': '{0}p{1} (QHD){2}{3}{4}'},  #   5     |   1440p 2.5K / QHD
+        4.1: {'width_16:9': 2048, 'width_4:3': 1536, 'min_height': 858,  'nom_height': 1152, 'label': '{0}p{1} (2K){2}{3}{4}'},   #   N/A   |   1152p 2K / QWXGA
+        4:   {'width_16:9': 1920, 'width_4:3': 1440, 'min_height': 787,  'nom_height': 1080, 'label': '{0}p{1} (FHD){2}{3}{4}'},  #   4     |   1080p FHD
+        3:   {'width_16:9': 1280, 'width_4:3': 960,  'min_height': 525,  'nom_height': 720,  'label': '{0}p{1} (HD){2}{3}{4}'},   #   3     |   720p  HD
+        2:   {'width_16:9': 854,  'width_4:3': 640,  'min_height': 350,  'nom_height': 480,  'label': '{0}p{1}{2}{3}{4}'},        #   2     |   480p
+        1:   {'width_16:9': 640,  'width_4:3': 480,  'min_height': 263,  'nom_height': 360,  'label': '{0}p{1}{2}{3}{4}'},        #   1     |   360p
+        0:   {'width_16:9': 426,  'width_4:3': 320,  'min_height': 175,  'nom_height': 240,  'label': '{0}p{1}{2}{3}{4}'},        #   0     |   240p
+        -1:  {'width_16:9': 256,  'width_4:3': 192,  'min_height': 105,  'nom_height': 144,  'label': '{0}p{1}{2}{3}{4}'},        #   N/A   |   144p
+        -2:  {'width_16:9': 0,    'width_4:3': 0,    'min_height': 0,    'nom_height': 0,    'label': '{0}p{1}{2}{3}{4}'},        #   N/A   |   Custom
     }
 
     def mpd_video_qualities(self, value=None):
@@ -593,7 +600,7 @@ class AbstractSettings(object):
             return self._STREAM_SELECT[value]
         return self._STREAM_SELECT[default]
 
-    _DEFAULT_FILTER = {
+    _DEFAULT_ITEM_FILTER = {
         'shorts': True,
         'upcoming': True,
         'upcoming_live': True,
@@ -603,25 +610,53 @@ class AbstractSettings(object):
         'vod': True,
         'custom': None,
     }
+    _DEFAULT_FOLDER_FILTER = {
+        HIDE_PLAYLISTS: False,
+        HIDE_SEARCH: False,
+        HIDE_SHORTS: False,
+        HIDE_LIVE: False,
+        HIDE_MEMBERS: False
+    }
 
-    def item_filter(self, update=None, override=None, exclude=None):
+    def item_filter(self,
+                    update=None,
+                    override=None,
+                    params=None,
+                    exclude=None):
         if override is None:
             override = self.get_string_list(SETTINGS.HIDE_VIDEOS)
-            override = dict.fromkeys(override, False)
+            override = {
+                filter_type: filter_type.startswith('hide_')
+                for filter_type in override
+            }
             override['custom'] = self.get_string(SETTINGS.FILTER_LIST).split(',')
         elif isinstance(override, (list, tuple)):
             _override = {'custom': []}
-            for value in override:
-                if value in self._DEFAULT_FILTER:
-                    _override[value] = False
+            for filter_type in override:
+                if filter_type in self._DEFAULT_ITEM_FILTER:
+                    _override[filter_type] = False
+                elif filter_type in self._DEFAULT_FOLDER_FILTER:
+                    _override[filter_type] = True
                 else:
-                    _override['custom'].append(value)
+                    _override['custom'].append(filter_type)
             override = _override
-        types = dict(self._DEFAULT_FILTER, **override)
+
+        if params:
+            _override = {
+                filter_type: value
+                for filter_type, value in params.items()
+                if filter_type in self._DEFAULT_FOLDER_FILTER
+            }
+            if override is None:
+                override = _override
+            else:
+                override.update(_override)
+
+        filter_types = dict(self._DEFAULT_ITEM_FILTER, **override)
 
         if update:
             if 'live_folder' in update:
-                if 'live_folder' not in types:
+                if 'live_folder' not in filter_types:
                     update.update((
                         ('upcoming', True),
                         ('upcoming_live', True),
@@ -631,12 +666,12 @@ class AbstractSettings(object):
                     ))
                 if 'vod' not in update:
                     update['vod'] = False
-            types.update(update)
+            filter_types.update(update)
 
         if exclude:
-            types['exclude'] = exclude
+            filter_types['exclude'] = exclude
 
-        return types
+        return filter_types
 
     def subscriptions_filter_enabled(self, value=None):
         if value is not None:

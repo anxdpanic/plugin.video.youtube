@@ -156,16 +156,16 @@ class AccessManager(JSONStore):
         for key, value in data:
             if key in output:
                 continue
-            if key.isdigit():
-                try:
-                    key = int(key)
-                except (TypeError, ValueError):
-                    continue
-            elif key == 'current_user':
+            if key == 'current_user':
                 try:
                     value = int(value)
                 except (TypeError, ValueError):
                     value = 0
+            else:
+                try:
+                    key = int(key)
+                except (TypeError, ValueError):
+                    pass
             output[key] = value
         return output
 

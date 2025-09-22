@@ -35,49 +35,59 @@ class LoginClient(YouTubeRequestClient):
     TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token'
     TOKEN_TYPES = {
         0: 'tv',
-        'tv': 'tv',
+        'tv': 0,
         1: 'user',
-        'user': 'user',
+        'user': 1,
+        2: 'vr',
+        'vr': 2,
+        3: 'dev',
+        'dev': 3,
     }
 
     _configs = {
+        'dev': {},
         'user': {},
         'tv': {},
+        'vr': {},
     }
     _access_tokens = {
+        'dev': None,
         'user': None,
         'tv': None,
+        'vr': None,
     }
     _initialised = False
     _logged_in = False
 
     def __init__(self,
                  configs=None,
-                 access_token=None,
-                 access_token_tv=None,
+                 access_tokens=None,
                  **kwargs):
         super(LoginClient, self).__init__(exc_type=LoginException, **kwargs)
-        LoginClient.init(configs=configs)
-        self.set_access_token(tv=access_token_tv, user=access_token)
+        LoginClient.init(configs)
+        self.set_access_token(access_tokens)
         self.initialised = any(self._configs.values())
 
     @classmethod
     def init(cls, configs=None, **_kwargs):
-        if configs is not None:
-            cls._configs['user'] = configs.get('main')
-            cls._configs['tv'] = configs.get('youtube-tv')
+        _configs = cls._configs
+        if not configs:
+            return
+        for config_type, config in configs.items():
+            if config_type in _configs:
+                _configs[config_type] = config
 
     def reinit(self, **kwargs):
         super(LoginClient, self).reinit(**kwargs)
         self.__init__(**kwargs)
 
-    def set_access_token(self, tv=None, user=None):
-        cls = type(self)
-        if tv is not None:
-            cls._access_tokens['tv'] = tv
-        if user is not None:
-            cls._access_tokens['user'] = user
-        self.logged_in = any(self._access_tokens.values())
+    def set_access_token(self, access_tokens=None):
+        _access_tokens = type(self)._access_tokens
+        if access_tokens:
+            for token_type, token in access_tokens.items():
+                if token is not None and token_type in _access_tokens:
+                    _access_tokens[token_type] = token
+        self.logged_in = any(_access_tokens.values())
 
     @property
     def initialised(self):

@@ -125,14 +125,17 @@ class YouTubeResolver(AbstractResolver):
                 query=urlencode(next_params)
             ).geturl()
 
-        with self.request(url,
-                          method=method,
-                          headers=self._HEADERS,
-                          # Manually configured cookies to avoid cookie
-                          # consent redirect
-                          cookies={'SOCS': 'CAISAiAD'},
-                          allow_redirects=True) as response:
-            if response is None or response.status_code >= 400:
+        response = self.request(url,
+                                method=method,
+                                headers=self._HEADERS,
+                                # Manually configured cookies to avoid cookie
+                                # consent redirect
+                                cookies={'SOCS': 'CAISAiAD'},
+                                allow_redirects=True)
+        if response is None:
+            return url
+        with response:
+            if response.status_code >= 400:
                 return url
             url = response.url
             response_text = response.text if method == 'GET' else None
@@ -223,11 +226,14 @@ class CommonResolver(AbstractResolver):
         return 'HEAD'
 
     def resolve(self, url, url_components, method='HEAD'):
-        with self.request(url,
-                          method=method,
-                          headers=self._HEADERS,
-                          allow_redirects=True) as response:
-            if response is None or response.status_code >= 400:
+        response = self.request(url,
+                                method=method,
+                                headers=self._HEADERS,
+                                allow_redirects=True)
+        if response is None:
+            return url
+        with response:
+            if response.status_code >= 400:
                 return url
             return response.url
 

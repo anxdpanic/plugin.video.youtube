@@ -28,15 +28,16 @@ class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
         'playlist_id': None
     }
 
+    # xbmc.PlayList only supports music and video playlist IDs
     PLAYLIST_MAP = {
-        -1: 'none',
+        # -1: 'none',
         0: 'music',
         1: 'video',
-        2: 'picture',
-        'none': -1,
+        # 2: 'picture',
+        # 'none': -1,
         'audio': xbmc.PLAYLIST_MUSIC,  # 0
         'video': xbmc.PLAYLIST_VIDEO,  # 1
-        'picture': 2,
+        # 'picture': 2,
     }
 
     def __init__(self, context, playlist_type=None, retry=None):

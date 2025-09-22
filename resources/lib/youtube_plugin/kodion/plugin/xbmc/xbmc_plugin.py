@@ -91,6 +91,7 @@ class XbmcPlugin(AbstractPlugin):
         path = context.get_path().rstrip('/')
 
         route = ui.pop_property(REROUTE_PATH)
+        _post_run_action = None
         post_run_actions = []
         succeeded = False
         for was_busy in (ui.pop_property(BUSY_FLAG),):
@@ -126,6 +127,7 @@ class XbmcPlugin(AbstractPlugin):
                 succeeded = result
                 if _post_run_action:
                     post_run_actions.append(_post_run_action)
+                    _post_run_action = None
                 continue
 
             if position:
@@ -172,6 +174,7 @@ class XbmcPlugin(AbstractPlugin):
                     succeeded = False
                     if _post_run_action:
                         post_run_actions.append(_post_run_action)
+                        _post_run_action = None
                     break
                 context.sleep(1)
             else:
@@ -237,7 +240,9 @@ class XbmcPlugin(AbstractPlugin):
             result = None
 
         force_resolve = options.get(provider.FORCE_RESOLVE)
+        force_return = options.get(provider.FORCE_RETURN)
         result_item = None
+        result_item_type = None
         items = None
         if isinstance(result, (list, tuple)):
             if not result:
@@ -250,6 +255,14 @@ class XbmcPlugin(AbstractPlugin):
                         plot=context.localize('page.empty'),
                     )
                 ]
+                if force_return:
+                    _, _post_run_action = self.uri_action(
+                        context,
+                        'command://Action(Back)'
+                    )
+                    if _post_run_action:
+                        post_run_actions.append(_post_run_action)
+                        _post_run_action = None
 
             items = []
             for item in result:
@@ -260,6 +273,7 @@ class XbmcPlugin(AbstractPlugin):
                         and item_type in self._PLAY_ITEM_MAP
                         and item.playable):
                     result_item = item
+                    result_item_type = item_type
 
                 listitem_type = self._LIST_ITEM_MAP.get(item_type)
                 if (not listitem_type
@@ -275,6 +289,7 @@ class XbmcPlugin(AbstractPlugin):
                 ))
         else:
             result_item = result
+            result_item_type = result.__class__.__name__
 
         if items:
             content_type = options.get(provider.CONTENT_TYPE)
@@ -296,43 +311,46 @@ class XbmcPlugin(AbstractPlugin):
             cache_to_disc = options.get(provider.CACHE_TO_DISC, False)
             update_listing = options.get(provider.UPDATE_LISTING, True)
 
-        if result_item:
-            item_type = result_item.__class__.__name__
-            if item_type in self._PLAY_ITEM_MAP:
-                if path != PATHS.PLAY and not forced:
-                    force_play = True
-                else:
-                    force_play = options.get(provider.FORCE_PLAY)
+        if result_item and result_item_type in self._PLAY_ITEM_MAP:
+            if path != PATHS.PLAY and not forced:
+                force_play = True
+            else:
+                force_play = options.get(provider.FORCE_PLAY)
 
-                if force_play or not result_item.playable:
-                    result_item, _post_run_action = self.uri_action(
-                        context,
-                        result_item.get_uri()
-                    )
-                    if _post_run_action:
-                        post_run_actions.append(_post_run_action)
-                else:
-                    item = self._PLAY_ITEM_MAP[item_type](
-                        context,
-                        result_item,
-                        show_fanart=show_fanart,
-                    )
-                    xbmcplugin.setResolvedUrl(
-                        handle, succeeded=True, listitem=item
-                    )
-        elif not items:
+            if force_play or not result_item.playable:
+                _, _post_run_action = self.uri_action(
+                    context,
+                    result_item.get_uri()
+                )
+                if _post_run_action:
+                    post_run_actions.append(_post_run_action)
+                    _post_run_action = None
+            else:
+                item = self._PLAY_ITEM_MAP[result_item_type](
+                    context,
+                    result_item,
+                    show_fanart=show_fanart,
+                )
+                xbmcplugin.setResolvedUrl(
+                    handle, succeeded=True, listitem=item
+                )
+        elif not items or force_return:
             ui.clear_property(BUSY_FLAG)
             ui.clear_property(TRAKT_PAUSE_FLAG, raw=True)
             for param in FORCE_PLAY_PARAMS:
                 ui.clear_property(param)
 
-            fallback = options.get(provider.FALLBACK, True)
+            fallback = options.get(provider.FALLBACK, not force_return)
             if isinstance(fallback, string_type) and fallback != uri:
-                context.parse_uri(fallback, update=True)
-                return self.run(provider, context, forced=forced)
-            if fallback:
-                _post_run_action = None
-
+                if options.get(provider.POST_RUN):
+                    _, _post_run_action = self.uri_action(
+                        context,
+                        fallback,
+                    )
+                else:
+                    context.parse_uri(fallback, update=True)
+                    return self.run(provider, context, forced=forced)
+            elif fallback:
                 if play_cancelled:
                     _, _post_run_action = self.uri_action(context, uri)
                 elif path == PATHS.PLAY:
@@ -356,7 +374,7 @@ class XbmcPlugin(AbstractPlugin):
                     )
                 else:
                     if context.is_plugin_path(
-                            ui.get_container_info(FOLDER_URI, strict=False)
+                            ui.get_container_info(FOLDER_URI, container_id=None)
                     ):
                         _, _post_run_action = self.uri_action(
                             context,
@@ -371,8 +389,9 @@ class XbmcPlugin(AbstractPlugin):
                             context,
                             'command://Action(Back)',
                         )
-                if _post_run_action:
-                    post_run_actions.append(_post_run_action)
+            if _post_run_action:
+                post_run_actions.append(_post_run_action)
+                _post_run_action = None
 
         if ui.pop_property(PLAY_FORCED):
             context.set_path(PATHS.PLAY)
@@ -385,13 +404,24 @@ class XbmcPlugin(AbstractPlugin):
             cacheToDisc=cache_to_disc,
         )
 
-        if any(sync_items):
-            context.send_notification(SYNC_LISTITEM, sync_items)
+        if not force_return:
+            if any(sync_items):
+                context.send_notification(SYNC_LISTITEM, sync_items)
 
-        container = ui.get_property(CONTAINER_ID)
-        position = ui.pop_property(CONTAINER_POSITION)
-        if container and position:
-            context.send_notification(CONTAINER_FOCUS, [container, position])
+            if forced and is_same_path:
+                container = ui.get_property(CONTAINER_ID)
+                position = ui.get_property(CONTAINER_POSITION)
+                if container and position:
+                    post_run_actions.append((
+                        context.send_notification,
+                        {
+                            'method': CONTAINER_FOCUS,
+                            'data': {
+                                CONTAINER_ID: container,
+                                CONTAINER_POSITION: position,
+                            },
+                        },
+                    ))
 
         if post_run_actions:
             self.post_run(context, ui, *post_run_actions)
@@ -400,19 +430,23 @@ class XbmcPlugin(AbstractPlugin):
     @staticmethod
     def post_run(context, ui, *actions, **kwargs):
         timeout = kwargs.get('timeout', 30)
+        interval = kwargs.get('interval', 0.1)
         for action in actions:
-            while ui.busy_dialog_active():
-                timeout -= 1
+            while not ui.get_container(container_type=None, check_ready=True):
+                timeout -= interval
                 if timeout < 0:
-                    logging.error('Multiple busy dialogs active'
+                    logging.error('Container not ready'
                                   ' - Post run action unable to execute')
                     break
-                context.sleep(0.1)
+                context.sleep(interval)
             else:
                 if isinstance(action, tuple):
                     action, action_kwargs = action
                 else:
                     action_kwargs = None
+                logging.debug('Executing queued post-run action: {action}',
+                              action=action,
+                              stacklevel=2)
                 if callable(action):
                     if action_kwargs:
                         action(**action_kwargs)
@@ -420,25 +454,26 @@ class XbmcPlugin(AbstractPlugin):
                         action()
                 else:
                     context.execute(action)
+                context.sleep(interval)
 
     @staticmethod
     def uri_action(context, uri):
         if uri.startswith('script://'):
             _uri = uri[len('script://'):]
-            log_action = 'Running script'
+            log_action = 'RunScript queued'
             log_uri = _uri
             action = 'RunScript({0})'.format(_uri)
             result = True
 
         elif uri.startswith('command://'):
             _uri = uri[len('command://'):]
-            log_action = 'Running command'
+            log_action = 'Builtin command queued'
             log_uri = _uri
             action = _uri
             result = True
 
         elif uri.startswith('PlayMedia('):
-            log_action = 'Redirecting for playback'
+            log_action = 'Redirect for playback queued'
             log_uri = uri[len('PlayMedia('):-1].split(',')
             log_uri[0] = parse_and_redact_uri(
                 log_uri[0],
@@ -449,7 +484,7 @@ class XbmcPlugin(AbstractPlugin):
             result = True
 
         elif uri.startswith('RunPlugin('):
-            log_action = 'Running plugin'
+            log_action = 'RunPlugin queued'
             log_uri = parse_and_redact_uri(
                 uri[len('RunPlugin('):-1],
                 redact_only=True,
@@ -458,7 +493,7 @@ class XbmcPlugin(AbstractPlugin):
             result = True
 
         elif uri.startswith('ActivateWindow('):
-            log_action = 'Activating window'
+            log_action = 'ActivateWindow queued'
             log_uri = uri[len('ActivateWindow('):-1].split(',')
             if len(log_uri) >= 2:
                 log_uri[1] = parse_and_redact_uri(
@@ -470,7 +505,7 @@ class XbmcPlugin(AbstractPlugin):
             result = False
 
         elif uri.startswith('ReplaceWindow('):
-            log_action = 'Replacing window'
+            log_action = 'ReplaceWindow queued'
             log_uri = uri[len('ReplaceWindow('):-1].split(',')
             if len(log_uri) >= 2:
                 log_uri[1] = parse_and_redact_uri(
@@ -481,10 +516,34 @@ class XbmcPlugin(AbstractPlugin):
             action = uri
             result = False
 
+        elif uri.startswith('Container.Update('):
+            log_action = 'Container.Update queued'
+            log_uri = uri[len('Container.Update('):-1].split(',')
+            if log_uri[0]:
+                log_uri[0] = parse_and_redact_uri(
+                    log_uri[0],
+                    redact_only=True,
+                )
+            log_uri = ','.join(log_uri)
+            action = uri
+            result = False
+
+        elif uri.startswith('Container.Refresh('):
+            log_action = 'Container.Refresh queued'
+            log_uri = uri[len('Container.Refresh('):-1].split(',')
+            if log_uri[0]:
+                log_uri[0] = parse_and_redact_uri(
+                    log_uri[0],
+                    redact_only=True,
+                )
+            log_uri = ','.join(log_uri)
+            action = uri
+            result = False
+
         elif context.is_plugin_path(uri, PATHS.PLAY):
             parts, params, log_uri, _ = parse_and_redact_uri(uri)
             if params.get(ACTION, [None])[0] == 'list':
-                log_action = 'Redirecting to'
+                log_action = 'Redirect queued'
                 action = context.create_uri(
                     (PATHS.ROUTE, parts.path.rstrip('/')),
                     params,
@@ -492,7 +551,7 @@ class XbmcPlugin(AbstractPlugin):
                 )
                 result = False
             else:
-                log_action = 'Redirecting for playback'
+                log_action = 'Redirect for playback queued'
                 action = context.create_uri(
                     (parts.path.rstrip('/'),),
                     params,
@@ -504,7 +563,7 @@ class XbmcPlugin(AbstractPlugin):
                 result = True
 
         elif context.is_plugin_path(uri):
-            log_action = 'Redirecting to'
+            log_action = 'Redirect queued'
             parts, params, log_uri, _ = parse_and_redact_uri(uri)
             action = context.create_uri(
                 (PATHS.ROUTE, parts.path.rstrip('/') or PATHS.HOME),
@@ -518,5 +577,8 @@ class XbmcPlugin(AbstractPlugin):
             result = False
             return result, action
 
-        logging.debug('{action}: {uri!r}', action=log_action, uri=log_uri)
+        logging.debug('{action}: {uri!r}',
+                      action=log_action,
+                      uri=log_uri,
+                      stacklevel=2)
         return result, action

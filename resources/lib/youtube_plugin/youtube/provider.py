@@ -39,6 +39,7 @@ from ..kodion.constants import (
     HIDE_CHANNELS,
     HIDE_FOLDERS,
     HIDE_LIVE,
+    HIDE_MEMBERS,
     HIDE_PLAYLISTS,
     HIDE_SEARCH,
     HIDE_SHORTS,
@@ -145,7 +146,7 @@ class Provider(AbstractProvider):
                                 'Config:  {config!r}',
                                 'User #:  {user!r}',
                                 'Key set: {switch!r}'),
-                               config=configs['main']['system'],
+                               config=configs['user']['system'],
                                user=user,
                                switch=switch)
             else:
@@ -154,9 +155,9 @@ class Provider(AbstractProvider):
         else:
             dev_config = api_store.get_developer_config(dev_id)
             origin = dev_config.get('origin')
-            key_details = dev_config.get('main')
+            key_details = dev_config.get(origin)
             if key_details:
-                configs['main'] = key_details
+                configs[origin] = key_details
                 switch = 'developer'
                 self.log.debug(('Using developer provided API details',
                                 'Config:  {config!r}',
@@ -166,7 +167,7 @@ class Provider(AbstractProvider):
                                user=user,
                                switch=switch)
             else:
-                key_details = configs['main']
+                key_details = configs['dev']
                 switch = api_store.get_current_switch()
                 self.log.debug(('Using developer provided access tokens',
                                 'Config:  {config!r}',
@@ -248,7 +249,7 @@ class Provider(AbstractProvider):
         with client:
             # create new access tokens
             if num_refresh_tokens and num_access_tokens != num_refresh_tokens:
-                access_tokens = [None, None]
+                access_tokens = [None, None, None, None]
                 token_expiry = 0
                 try:
                     for token_type, value in enumerate(refresh_tokens):
@@ -294,12 +295,20 @@ class Provider(AbstractProvider):
             else:
                 access_tokens = access_manager.get_access_token()
 
-            if num_access_tokens and access_tokens[1]:
+            if num_access_tokens and access_tokens[client.TOKEN_TYPES['user']]:
                 self.log.info('User is logged in')
-                client.set_access_token(*access_tokens)
+                client.set_access_token({
+                    client.TOKEN_TYPES[idx]: token
+                    for idx, token in enumerate(access_tokens)
+                    if token
+
+                })
             else:
                 self.log.info('User is not logged in')
-                client.set_access_token(tv='', user='')
+                client.set_access_token({
+                    client.TOKEN_TYPES[idx]: ''
+                    for idx, _ in enumerate(access_tokens)
+                })
 
         return client
 
@@ -388,7 +397,7 @@ class Provider(AbstractProvider):
                     '_partial': True,
                 },
                 {
-                    'kind': 'youtube#playlist',
+                    'kind': 'youtube#playlistShortsFolder',
                     'id': uploads.replace('UU', 'UUSH', 1),
                     'snippet': {
                         'channelId': channel_id,
@@ -400,7 +409,7 @@ class Provider(AbstractProvider):
                     '_partial': True,
                 } if not params.get(HIDE_SHORTS) else None,
                 {
-                    'kind': 'youtube#playlist',
+                    'kind': 'youtube#playlistLiveFolder',
                     'id': uploads.replace('UU', 'UULV', 1),
                     'snippet': {
                         'channelId': channel_id,
@@ -741,7 +750,7 @@ class Provider(AbstractProvider):
                 'kind': 'plugin#pluginListResponse',
                 'items': [
                     {
-                        'kind': 'plugin#playlistFolder',
+                        'kind': 'plugin#playlistsFolder',
                         '_params': {
                             'title': context.localize('playlists'),
                             'image': '{media}/playlist.png',
@@ -757,7 +766,7 @@ class Provider(AbstractProvider):
                         },
                     } if not params.get(HIDE_SEARCH) else None,
                     {
-                        'kind': 'youtube#playlist',
+                        'kind': 'youtube#playlistShortsFolder',
                         'id': uploads.replace('UU', 'UUSH', 1),
                         'snippet': {
                             'channelId': channel_id,
@@ -769,7 +778,7 @@ class Provider(AbstractProvider):
                         '_partial': True,
                     } if uploads and not params.get(HIDE_SHORTS) else None,
                     {
-                        'kind': 'youtube#playlist',
+                        'kind': 'youtube#playlistLiveFolder',
                         'id': uploads.replace('UU', 'UULV', 1),
                         'snippet': {
                             'channelId': channel_id,
@@ -780,6 +789,18 @@ class Provider(AbstractProvider):
                         },
                         '_partial': True,
                     } if uploads and not params.get(HIDE_LIVE) else None,
+                    {
+                        'kind': 'youtube#playlistMembersFolder',
+                        'id': uploads.replace('UU', 'UUMO', 1),
+                        'snippet': {
+                            'channelId': channel_id,
+                            'title': context.localize('members_only'),
+                            'thumbnails': {'default': {
+                                'url': '{media}/sign_in.png',
+                            }},
+                        },
+                        '_partial': True,
+                    } if uploads and not params.get(HIDE_MEMBERS) else None,
                 ],
             }
             result.extend(v3.response_to_items(provider, context, v3_response))

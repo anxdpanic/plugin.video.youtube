@@ -540,7 +540,7 @@ class ResourceManager(object):
                    live_details=False,
                    suppress_errors=False,
                    defer_cache=False,
-                   yt_items=None):
+                   yt_items_dict=None):
         ids = tuple(ids)
 
         context = self._context
@@ -568,7 +568,10 @@ class ResourceManager(object):
                      if id_
                      and (id_ not in result
                           or not result[id_]
-                          or result[id_].get('_partial'))]
+                          or result[id_].get('_partial')
+                          or (yt_items_dict
+                              and yt_items_dict.get(id_)
+                              and result[id_].get('_unavailable')))]
 
         if result:
             self.log.debugging and self.log.debug(
@@ -612,11 +615,8 @@ class ResourceManager(object):
             result.update(new_data)
             self.cache_data(new_data, defer=defer_cache)
 
-        if not result and not new_data and yt_items:
-            result = {
-                yt_item.get('id'): yt_item
-                for yt_item in yt_items
-            }
+        if not result and not new_data and yt_items_dict:
+            result = yt_items_dict
             self.cache_data(result, defer=defer_cache)
 
         # Re-sort result to match order of requested IDs
