@@ -31,7 +31,8 @@ class BookmarkItem(VideoItem, DirectoryItem):
                  channel_id=None,
                  playlist_id=None,
                  playlist_item_id=None,
-                 subscription_id=None):
+                 subscription_id=None,
+                 **_kwargs):
         super(BookmarkItem, self).__init__(
             name=name,
             uri=uri,
