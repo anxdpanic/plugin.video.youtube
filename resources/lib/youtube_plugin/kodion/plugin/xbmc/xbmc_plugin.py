@@ -340,7 +340,7 @@ class XbmcPlugin(AbstractPlugin):
             for param in FORCE_PLAY_PARAMS:
                 ui.clear_property(param)
 
-            fallback = options.get(provider.FALLBACK, True)
+            fallback = options.get(provider.FALLBACK, not force_return)
             if isinstance(fallback, string_type) and fallback != uri:
                 if options.get(provider.POST_RUN):
                     _, _post_run_action = self.uri_action(

@@ -179,13 +179,14 @@ class ServiceMonitor(xbmc.Monitor):
 
         container = self._context.get_ui().get_container()
         if not container['is_plugin'] or not container['is_loaded']:
+            self.log.debug('No plugin container loaded - cancelling refresh')
             return
         if container['is_active']:
             self.set_property(REFRESH_CONTAINER)
             xbmc.executebuiltin('Container.Refresh')
         else:
             self.set_property(REFRESH_CONTAINER, BUSY_FLAG)
-            self.log.debug('Plugin window not active - deferring refresh')
+            self.log.debug('Plugin container not active - deferring refresh')
             self.refresh = True
 
     def onNotification(self, sender, method, data):
@@ -378,10 +379,11 @@ class ServiceMonitor(xbmc.Monitor):
 
             if not isinstance(position, int):
                 if position == 'next':
+                    position = ui.get_container_info(CURRENT_ITEM, container_id)
                     offset += 1
                 elif position == 'previous':
+                    position = ui.get_container_info(CURRENT_ITEM, container_id)
                     offset -= 1
-                position = ui.get_container_info(CURRENT_ITEM, container_id)
                 try:
                     position = int(position)
                 except (TypeError, ValueError):

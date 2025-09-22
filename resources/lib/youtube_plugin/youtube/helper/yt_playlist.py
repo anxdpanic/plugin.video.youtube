@@ -59,7 +59,7 @@ def _process_add_video(provider, context):
             time_ms=2500,
             audible=False,
         )
-        return False
+        return False, {provider.FORCE_RETURN: True}
 
     ui.show_notification(
         message=localize(('added.to.x', 'playlist')),
@@ -77,7 +77,7 @@ def _process_add_video(provider, context):
         if cached_last_page:
             data_cache.update_item(cache_key, None)
 
-    return True
+    return True, {provider.FORCE_RETURN: True}
 
 
 def _process_remove_video(provider,

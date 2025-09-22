@@ -199,6 +199,10 @@ def run():
                         value = detail['value']
                         if value is TypeError:
                             if item_has_id is None:
+                                container = get_container(container_type=False)
+                                if check_item != all(container.values()):
+                                    check_item = not check_item
+                                    break
                                 item_has_id = False
                             continue
                         if item_has_id is not False:
@@ -213,11 +217,12 @@ def run():
                         elif value:
                             detail['value'] = None
                             clear_property(name)
-                    container_position = _position
-                    if item_has_id:
-                        set_property(CONTAINER_POSITION, container_position)
                     else:
-                        clear_property(CONTAINER_POSITION)
+                        container_position = _position
+                        if item_has_id:
+                            set_property(CONTAINER_POSITION, container_position)
+                        else:
+                            clear_property(CONTAINER_POSITION)
 
             elif not plugin_is_idle and not container['is_plugin']:
                 plugin_is_idle = set_property(PLUGIN_SLEEPING)
