@@ -257,6 +257,11 @@
                             <option label="30766">premieres</option>
                             <option label="30810">completed</option>
                             <option label="30811">live_folder</option>
+                            <option label="30587">hide_playlists</option>
+                            <option label="30588">hide_search</option>
+                            <option label="30589">hide_shorts</option>
+                            <option label="30590">hide_live</option>
+                            <option label="30597">hide_members</option>
                         </options>
                         <delimiter>,</delimiter>
                     </constraints>
@@ -512,7 +517,6 @@
                 <setting id="youtube.folder.saved.playlists.show" type="boolean" label="30611" help="">
                     <level>0</level>
                     <default>false</default>
-                    <visible>false</visible>
                     <control type="toggle"/>
                 </setting>
                 <setting id="youtube.folder.subscriptions.show" type="boolean" label="30504" help="">

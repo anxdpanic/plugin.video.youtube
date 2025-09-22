@@ -59,7 +59,7 @@ def _process_add_video(provider, context):
             time_ms=2500,
             audible=False,
         )
-        return False
+        return False, {provider.FORCE_RETURN: True}
 
     ui.show_notification(
         message=localize(('added.to.x', 'playlist')),
@@ -77,7 +77,7 @@ def _process_add_video(provider, context):
         if cached_last_page:
             data_cache.update_item(cache_key, None)
 
-    return True
+    return True, {provider.FORCE_RETURN: True}
 
 
 def _process_remove_video(provider,
@@ -151,8 +151,8 @@ def _process_remove_video(provider,
         if params.get(KEYMAP) or not params.get(CONTEXT_MENU):
             ui.set_focus_next_item()
 
-        if playlist_id in container_uri:
-            path, params = context.parse_uri(container_uri)
+        path, params = context.parse_uri(container_uri)
+        if path.rstrip('/').endswith('/'.join((PATHS.PLAYLIST, playlist_id))):
             if 'refresh' not in params:
                 params['refresh'] = True
         else:
@@ -456,8 +456,8 @@ def _process_rate_playlist(provider,
         if params.get(KEYMAP) or not params.get(CONTEXT_MENU):
             ui.set_focus_next_item()
 
-        if context.get_path().startswith(PATHS.SAVED_PLAYLISTS):
-            path, params = context.parse_uri(container_uri)
+        path, params = context.parse_uri(container_uri)
+        if path.startswith(PATHS.SAVED_PLAYLISTS):
             if 'refresh' not in params:
                 params['refresh'] = True
         else:

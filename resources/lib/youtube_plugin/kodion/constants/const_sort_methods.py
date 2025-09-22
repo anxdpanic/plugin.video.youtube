@@ -111,9 +111,9 @@ LIST_CONTENT_DETAILED = (
     (SORT.LABEL,         '%T \u2022 %P',           '%D | %J'),
 )
 LIST_CONTENT_SIMPLE = (
-    (SORT.UNSORTED,      '%T',        '%D | %J'),
-    (SORT.TRACKNUM,      '[%N. ]%T',  '%D | %J'),
-    (SORT.LABEL,         '%T',        '%D | %J'),
+    (SORT.UNSORTED,      '%T',        '%D'),
+    (SORT.TRACKNUM,      '[%N. ]%T',  '%D'),
+    (SORT.LABEL,         '%T',        '%D'),
 )
 
 PLAYLIST_CONTENT_DETAILED = (
@@ -128,9 +128,9 @@ PLAYLIST_CONTENT_DETAILED = (
     (SORT.VIDEO_RUNTIME, '[%N. ]%T \u2022 %P | %J',      '%D'),
 )
 PLAYLIST_CONTENT_SIMPLE = (
-    (SORT.TRACKNUM,      '[%N. ]%T',        '%D | %J'),
-    (SORT.LABEL,         '[%N. ]%T',        '%D | %J'),
-    (SORT.CHANNEL,       '[%N. ][%A - ]%T', '%D | %J'),
+    (SORT.TRACKNUM,      '[%N. ]%T',        '%D'),
+    (SORT.LABEL,         '[%N. ]%T',        '%D'),
+    (SORT.CHANNEL,       '[%N. ][%A - ]%T', '%D'),
     (SORT.ARTIST,        '[%N. ]%T',        '%A'),
     (SORT.PROGRAM_COUNT, '[%N. ]%T',        '%C'),
     (SORT.VIDEO_RATING,  '[%N. ]%T',        '%R'),
@@ -152,10 +152,10 @@ VIDEO_CONTENT_DETAILED = (
     (SORT.VIDEO_RUNTIME, '%T \u2022 %P | %J',      '%D'),
 )
 VIDEO_CONTENT_SIMPLE = (
-    (SORT.UNSORTED,      '%T',        '%D | %J'),
-    (SORT.TRACKNUM,      '[%N. ]%T',  '%D | %J'),
-    (SORT.LABEL,         '%T',        '%D | %J'),
-    (SORT.CHANNEL,       '[%A - ]%T', '%D | %J'),
+    (SORT.UNSORTED,      '%T',        '%D'),
+    (SORT.TRACKNUM,      '[%N. ]%T',  '%D'),
+    (SORT.LABEL,         '%T',        '%D'),
+    (SORT.CHANNEL,       '[%A - ]%T', '%D'),
     (SORT.ARTIST,        '%T',        '%A'),
     (SORT.PROGRAM_COUNT, '%T',        '%C'),
     (SORT.VIDEO_RATING,  '%T',        '%R'),

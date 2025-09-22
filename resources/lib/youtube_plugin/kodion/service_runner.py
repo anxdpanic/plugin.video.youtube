@@ -17,13 +17,13 @@ from .constants import (
     BOOKMARK_ID,
     CHANNEL_ID,
     CONTAINER_ID,
-    LABEL,
+    CONTAINER_POSITION,
+    CURRENT_ITEM,
     MARK_AS_LABEL,
     PLAYLIST_ID,
     PLAYLIST_ITEM_ID,
     PLAY_COUNT,
     PLUGIN_SLEEPING,
-    SCROLLING,
     SUBSCRIPTION_ID,
     TEMP_PATH,
     TITLE,
@@ -57,7 +57,8 @@ def run():
                  python=system_version.get_python_version())
 
     ui = context.get_ui()
-    get_container_bool = ui.get_container_bool
+    get_container = ui.get_container
+    get_container_info = ui.get_container_info
     get_listitem_info = ui.get_listitem_info
     get_listitem_property = ui.get_listitem_property
     clear_property = ui.clear_property
@@ -95,6 +96,7 @@ def run():
         return watched_label
 
     container_id = None
+    container_position = None
     plugin_item_details = {
         VIDEO_ID: {'getter': get_listitem_property, 'value': None},
         BOOKMARK_ID: {'getter': get_listitem_property, 'value': None},
@@ -108,7 +110,6 @@ def run():
         ARTIST: {'getter': get_listitem_info, 'value': None},
         MARK_AS_LABEL: {'getter': _get_mark_as_label, 'value': None},
     }
-    container = monitor.is_plugin_container()
 
     while not monitor.abortRequested():
         is_idle = monitor.system_idle or monitor.get_idle_time() >= loop_period
@@ -152,7 +153,8 @@ def run():
                 else:
                     monitor.shutdown_httpd(terminate=True)
 
-        check_item = not plugin_is_idle and container['is_plugin']
+        container = get_container(container_type=False)
+        check_item = not plugin_is_idle and all(container.values())
         if check_item:
             wait_interval_ms = active_interval_ms
         else:
@@ -176,8 +178,8 @@ def run():
             if (monitor.interrupt
                     or (not check_item and wait_time_ms >= idle_interval_ms)):
                 monitor.interrupt = False
-                container = monitor.is_plugin_container()
-                if check_item != container['is_plugin']:
+                container = get_container(container_type=False)
+                if check_item != all(container.values()):
                     check_item = not check_item
                     if check_item:
                         wait_interval_ms = active_interval_ms
@@ -190,13 +192,17 @@ def run():
                     container_id = container['id']
                     set_property(CONTAINER_ID, container_id)
 
-                scrolling = get_container_bool(SCROLLING, container_id)
-                if not scrolling and get_listitem_info(LABEL, container_id):
+                _position = get_container_info(CURRENT_ITEM, container_id)
+                if _position and _position != container_position:
                     item_has_id = None
                     for name, detail in plugin_item_details.items():
                         value = detail['value']
                         if value is TypeError:
                             if item_has_id is None:
+                                container = get_container(container_type=False)
+                                if check_item != all(container.values()):
+                                    check_item = not check_item
+                                    break
                                 item_has_id = False
                             continue
                         if item_has_id is not False:
@@ -211,6 +217,12 @@ def run():
                         elif value:
                             detail['value'] = None
                             clear_property(name)
+                    else:
+                        container_position = _position
+                        if item_has_id:
+                            set_property(CONTAINER_POSITION, container_position)
+                        else:
+                            clear_property(CONTAINER_POSITION)
 
             elif not plugin_is_idle and not container['is_plugin']:
                 plugin_is_idle = set_property(PLUGIN_SLEEPING)

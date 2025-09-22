@@ -106,16 +106,18 @@ def _process_more_for_video(context):
     if not video_id:
         raise KodionException('video/more/: missing video_id')
 
+    item_name = params.get('item_name')
+
     items = [
         menu_items.playlist_add_to_selected(context, video_id),
-        menu_items.video_related(context, video_id),
-        menu_items.video_comments(context, video_id, params.get('item_name')),
-        menu_items.video_description_links(context, video_id),
+        menu_items.video_related(context, video_id, item_name),
+        menu_items.video_comments(context, video_id, item_name),
+        menu_items.video_description_links(context, video_id, item_name),
         menu_items.video_rate(context, video_id),
     ] if params.get('logged_in') else [
-        menu_items.video_related(context, video_id),
-        menu_items.video_comments(context, video_id, params.get('item_name')),
-        menu_items.video_description_links(context, video_id),
+        menu_items.video_related(context, video_id, item_name),
+        menu_items.video_comments(context, video_id, item_name),
+        menu_items.video_description_links(context, video_id, item_name),
     ]
 
     result = context.get_ui().on_select(context.localize('video.more'), items)

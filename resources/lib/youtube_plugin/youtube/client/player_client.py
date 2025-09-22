@@ -17,10 +17,10 @@ from random import choice as random_choice
 from re import compile as re_compile
 
 from .login_client import LoginClient
+from .subtitles import SUBTITLE_SELECTIONS, Subtitles
 from ..helper.ratebypass import ratebypass
 from ..helper.signature.cipher import Cipher
-from ..helper.subtitles import SUBTITLE_SELECTIONS, Subtitles
-from ..helper.utils import THUMB_TYPES
+from ..helper.utils import THUMB_TYPES, THUMB_URL
 from ..youtube_exceptions import YouTubeException
 from ...kodion import logging
 from ...kodion.compatibility import (
@@ -30,7 +30,6 @@ from ...kodion.compatibility import (
     unescape,
     unquote,
     urlencode,
-    urljoin,
     urlsplit,
     urlunsplit,
     xbmcvfs,
@@ -800,7 +799,6 @@ class PlayerClient(LoginClient):
                  **kwargs):
         self.video_id = None
         self.yt_item = None
-        self._context = context
 
         self._ask_for_quality = ask_for_quality
         self._audio_only = audio_only
@@ -816,15 +814,20 @@ class PlayerClient(LoginClient):
         self._language_prefer_default = prefer_default
 
         self._player_js = None
-        self._calculate_n = True
-        self._cipher = None
+        # signatureCipher and nsig handling currently broken and disabled
+        # self._calculate_n = True
+        # self._cipher = None
+        self._calculate_n = False
+        self._cipher = False
 
+        self._visitor_data = None
         self._auth_client = {}
         self._client_groups = (
             ('custom', clients if clients else ()),
-            ('auth_required_limited_content', (
-                'ios_youtube_tv',
-                'android_youtube_tv',
+            ('auth_enabled_initial_request', (
+                'tv_embed',
+                'tv_unplugged',
+                'tv',
             )),
             ('auth_disabled_kids_vp9_avc1', (
                 'ios_testsuite_params',
@@ -961,10 +964,11 @@ class PlayerClient(LoginClient):
         return yt_format
 
     def _get_player_config(self, client_name='web', embed=False):
+        video_id = self.video_id
         if embed:
-            url = ''.join(('https://www.youtube.com/embed/', self.video_id))
+            url = self.BASE_URL + '/embed/%s' % video_id
         else:
-            url = ''.join(('https://www.youtube.com/watch?v=', self.video_id))
+            url = self.WATCH_URL.format(_video_id=video_id)
         # Manually configured cookies to avoid cookie consent redirect
         cookies = {'SOCS': 'CAISAiAD'}
 
@@ -1075,18 +1079,6 @@ class PlayerClient(LoginClient):
         if new_headers:
             headers.update(new_headers)
         return headers
-
-    @staticmethod
-    def _normalize_url(url):
-        if not url:
-            url = ''
-        elif url.startswith(('http://', 'https://')):
-            pass
-        elif url.startswith('//'):
-            url = urljoin('https:', url)
-        elif url.startswith('/'):
-            url = urljoin('https://www.youtube.com', url)
-        return url
 
     def _process_mpd(self,
                      stream_list,
@@ -1291,9 +1283,9 @@ class PlayerClient(LoginClient):
                 else:
                     new_url = url
 
+                new_url = self._process_url_params(new_url, mpd=False)
                 if not new_url:
                     continue
-                new_url = self._process_url_params(new_url, mpd=False)
 
                 stream_map['itag'] = itag
                 yt_format = self._get_stream_format(
@@ -1353,6 +1345,7 @@ class PlayerClient(LoginClient):
                 self._player_js = self._get_player_js()
             self._cipher = Cipher(self._context, javascript=self._player_js)
         if not self._cipher:
+            self.log.warning('signatureCipher handling disabled')
             return None
 
         signature_cipher = parse_qs(stream_map['signatureCipher'])
@@ -1387,6 +1380,9 @@ class PlayerClient(LoginClient):
                             mpd=True,
                             headers=None,
                             cpn=False,
+                            referrer=False,
+                            visitor_data=False,
+                            method='POST',
                             digits_re=re_compile(r'\d+')):
         if not url:
             return url
@@ -1395,18 +1391,23 @@ class PlayerClient(LoginClient):
         params = parse_qs(parts.query)
         new_params = {}
 
-        if self._calculate_n and 'n' in params:
+        if 'n' not in params:
+            pass
+        elif not self._calculate_n:
+            self.log.debug('Decoding of nsig value disabled')
+            return None
+        else:
             if self._player_js is None:
                 self._player_js = self._get_player_js()
             if self._calculate_n is True:
-                self.log.debug('nsig detected')
+                self.log.debug('Detected nsig in stream url')
                 self._calculate_n = ratebypass.CalculateN(self._player_js)
 
             # Cipher n to get the updated value
-            new_n = self._calculate_n.calculate_n(params['n'])
+            new_n = self._calculate_n.calculate_n(params['n'][0])
             if new_n:
                 new_params['n'] = new_n
-                new_params['ratebypass'] = 'yes'
+                new_params['ratebypass'] = ['yes']
             else:
                 self.log.error('nsig handling failed')
                 self._calculate_n = False
@@ -1420,8 +1421,22 @@ class PlayerClient(LoginClient):
                     modified = None
                 snippet['publishedAt'] = modified
 
+        if headers:
+            if visitor_data is not False:
+                headers.setdefault(
+                    'X-Goog-Visitor-Id',
+                    visitor_data or self._visitor_data,
+                )
+            if referrer is not False:
+                headers.setdefault(
+                    'Referer',
+                    referrer
+                    or 'https://www.youtube.com/watch?v=%s' % self.video_id,
+                )
+
         if mpd:
             new_params['__id'] = self.video_id
+            new_params['__method'] = method
             new_params['__host'] = [parts.hostname]
             new_params['__path'] = parts.path
             new_params['__headers'] = urlsafe_b64encode(
@@ -1451,7 +1466,7 @@ class PlayerClient(LoginClient):
                 query=query_str,
             ).geturl()
 
-        elif 'range' not in params:
+        elif 'ratebypass' not in params and 'range' not in params:
             content_length = params.get('clen', [''])[0]
             new_params['range'] = '0-{0}'.format(content_length)
 
@@ -1470,11 +1485,12 @@ class PlayerClient(LoginClient):
         for client_name, response in responses.items():
             captions = response['captions']
             client = response['client']
-            do_query = client.get('_query_subtitles')
+            use_subtitles = client.get('_use_subtitles')
 
             if (not captions
-                    or do_query is True
-                    or (do_query and subtitles.sub_selection == all_subs)):
+                    or not use_subtitles
+                    or (use_subtitles is not True
+                        and subtitles.sub_selection == all_subs)):
                 continue
 
             subtitles.load(captions, client['headers'].copy())
@@ -1488,11 +1504,13 @@ class PlayerClient(LoginClient):
             'json': {
                 'videoId': video_id,
             },
-            'url': 'https://www.youtube.com/youtubei/v1/player',
+            'url': self.V1_API_URL,
             'method': 'POST',
+            '_endpoint': 'player',
+            '_visitor_data': self._visitor_data,
         }
 
-        for client_name in ('smart_tv_embedded', 'web'):
+        for client_name in ('tv_embed', 'web'):
             client = self.build_client(client_name, client_data)
             if not client:
                 continue
@@ -1502,7 +1520,7 @@ class PlayerClient(LoginClient):
                 error_hook=self._error_hook,
                 video_id=video_id,
                 client_name=client_name,
-                has_auth=client.get('_has_auth', False),
+                has_auth=client.get('_has_auth'),
                 cache=False,
                 **client
             )
@@ -1519,27 +1537,23 @@ class PlayerClient(LoginClient):
 
         return default_lang, subs_data
 
-    def _get_error_details(self, playability_status, details=None):
+    def _get_error_details(self,
+                           playability_status,
+                           details=('errorScreen', (
+                                   ('playerErrorMessageRenderer',
+                                    'reason'),
+                                   ('confirmDialogRenderer',
+                                    'title'),
+                                   ('playerCaptchaViewModel',
+                                    'accessibility',
+                                    'accessibilityData',
+                                    'label'),
+                           ))):
         if not playability_status:
             return None
-        if not details:
-            details = (
-                'errorScreen',
-                (
-                    (
-                        'playerErrorMessageRenderer',
-                        'reason',
-                    ),
-                    (
-                        'confirmDialogRenderer',
-                        'title',
-                    ),
-                )
-            )
 
         result = self.json_traverse(playability_status, details)
-
-        if not result or 'runs' not in result:
+        if not result or not isinstance(result, dict) or 'runs' not in result:
             return result
 
         detail_texts = [
@@ -1568,7 +1582,6 @@ class PlayerClient(LoginClient):
         _client = None
         _has_auth = None
         _result = None
-        _visitor_data = None
         _video_details = None
         _microformat = None
         _streaming_data = None
@@ -1576,6 +1589,7 @@ class PlayerClient(LoginClient):
         _status = None
         _reason = None
 
+        visitor_data = None
         video_details = {}
         microformat = {}
         responses = {}
@@ -1589,6 +1603,8 @@ class PlayerClient(LoginClient):
             'confirm your age',
             'inappropriate',
             'please sign in',
+            'not a bot',
+            'member',
         }
         skip_reasons = {
             'latest version',
@@ -1598,7 +1614,6 @@ class PlayerClient(LoginClient):
             'try again later',
             'unavailable',
             'unknown',
-            'not a bot',
         }
         abort = False
 
@@ -1607,16 +1622,19 @@ class PlayerClient(LoginClient):
             'json': {
                 'videoId': video_id,
             },
-            'url': 'https://www.youtube.com/youtubei/v1/player',
+            'url': self.V1_API_URL,
             'method': 'POST',
-            '_access_token': (
-                self._access_tokens.get('user')
-                if self._configs.get('user', {}).get('token-allowed', True) else
-                None
-            ),
-            '_access_token_tv': self._access_tokens.get('tv'),
+            '_access_tokens': {
+                'user': (self._access_tokens.get('user')
+                         if (self._configs.get('user', {})
+                             .get('token-allowed', True)) else
+                         None),
+                'tv': self._access_tokens.get('tv'),
+                'vr': self._access_tokens.get('vr'),
+            },
+            '_endpoint': 'player',
             '_cpn': None,
-            '_visitor_data': None,
+            '_visitor_data': self._visitor_data,
         }
         if use_remote_history:
             client_data['_auth_type'] = 'user'
@@ -1625,6 +1643,11 @@ class PlayerClient(LoginClient):
         for name, clients in self._client_groups:
             if not clients:
                 continue
+            if name == 'auth_enabled_initial_request':
+                allow_skip = False
+                client_data['_auth_requested'] = True
+            else:
+                allow_skip = True
             if name == 'mpd' and not use_mpd:
                 continue
             if name == 'ask' and use_mpd and not ask_for_quality:
@@ -1639,8 +1662,8 @@ class PlayerClient(LoginClient):
                     client_data['_cpn'] = self._generate_cpn()
                     _client = self.build_client(_client_name, client_data)
                     if _client:
-                        _has_auth = _client.get('_has_auth', False)
-                        if _has_auth:
+                        _has_auth = _client.get('_has_auth')
+                        if _has_auth or _has_auth is False:
                             exclude_retry.add(_client_name)
                     else:
                         _has_auth = None
@@ -1661,23 +1684,50 @@ class PlayerClient(LoginClient):
                         client_name=_client_name,
                         has_auth=_has_auth,
                         cache=False,
+                        pass_data=True,
+                        raise_exc=False,
                         **_client
                     ) or {}
 
-                    if not _visitor_data:
-                        _visitor_data = (_result
-                                         .get('responseContext', {})
-                                         .get('visitorData'))
-                        if _visitor_data:
-                            client_data['_visitor_data'] = _visitor_data
+                    if not visitor_data:
+                        visitor_data = self.json_traverse(
+                            _result,
+                            (
+                                'responseContext',
+                                (
+                                    (
+                                        'visitorData',
+                                    ),
+                                    (
+                                        'serviceTrackingParams',
+                                        0,
+                                        'params',
+                                        {
+                                            'name': 'key',
+                                            'match': ('visitor_data',
+                                                      'visitorData'),
+                                            'out': 'value',
+                                        },
+                                    ),
+                                ),
+                            )
+                        )
+                        if visitor_data:
+                            client_data['_visitor_data'] = visitor_data
+                            self._visitor_data = visitor_data
                     _video_details = _result.get('videoDetails', {})
                     _microformat = (_result
                                     .get('microformat', {})
                                     .get('playerMicroformatRenderer'))
                     _streaming_data = _result.get('streamingData', {})
                     _playability = _result.get('playabilityStatus', {})
-                    _status = _playability.get('status', 'ERROR').upper()
-                    _reason = _playability.get('reason', 'UNKNOWN')
+                    if _playability:
+                        _status = _playability.get('status', 'ERROR').upper()
+                        _reason = _playability.get('reason', 'UNKNOWN')
+                    else:
+                        _error = _result.get('error', {})
+                        _status = _error.get('status', 'ERROR').upper()
+                        _reason = _error.get('message', 'UNKNOWN')
 
                     if (_video_details
                             and video_id != _video_details.get('videoId')):
@@ -1693,7 +1743,7 @@ class PlayerClient(LoginClient):
                         break
                     elif _status == 'OK':
                         break
-                    elif _status in {
+                    elif not _playability or _status in {
                         'AGE_CHECK_REQUIRED',
                         'AGE_VERIFICATION_REQUIRED',
                         'CONTENT_CHECK_REQUIRED',
@@ -1707,12 +1757,12 @@ class PlayerClient(LoginClient):
                                           'Reason:   {reason}',
                                           'video_id: {video_id!r}',
                                           'Client:   {client!r}',
-                                          'Auth:     {auth!r}'),
+                                          'Auth:     {has_auth!r}'),
                                          status=_status,
                                          reason=_reason or 'UNKNOWN',
                                          video_id=video_id,
                                          client=_client_name,
-                                         auth=_has_auth)
+                                         has_auth=_has_auth)
                         compare_reason = _reason.lower()
                         if any(why in compare_reason for why in reauth_reasons):
                             if _client.get('_auth_required') == 'ignore_fail':
@@ -1728,13 +1778,13 @@ class PlayerClient(LoginClient):
                             abort = True
                             break
                         if any(why in compare_reason for why in skip_reasons):
-                            break
+                            if allow_skip:
+                                break
                         if any(why in compare_reason for why in retry_reasons):
                             continue
                     else:
-                        self.log.debug(('Unknown playabilityStatus in response',
-                                        'playabilityStatus: %s'),
-                                       _playability)
+                        self.log.warning('Unknown playabilityStatus: {status!r}',
+                                         status=_playability)
                 else:
                     break
                 if not restart:
@@ -1748,10 +1798,10 @@ class PlayerClient(LoginClient):
                 self.log.debug(('Retrieved video info:',
                                 'video_id: {video_id!r}',
                                 'Client:   {client!r}',
-                                'Auth:     {auth!r}'),
+                                'Auth:     {has_auth!r}'),
                                video_id=video_id,
                                client=_client_name,
-                               auth=_has_auth)
+                               has_auth=_has_auth)
 
                 video_details = merge_dicts(
                     _video_details,
@@ -1770,6 +1820,7 @@ class PlayerClient(LoginClient):
                         'client': _client.copy(),
                         'result': _result,
                     }
+                    client_data['_auth_requested'] = False
 
                 responses[_client_name] = {
                     'client': _client,
@@ -1779,6 +1830,10 @@ class PlayerClient(LoginClient):
                     'hls_manifest': _streaming_data.get('hlsManifestUrl'),
                     'captions': _result.get('captions'),
                 }
+
+                if (not client_data.get('_auth_required')
+                        and video_details.get('isPrivate')):
+                    client_data['_auth_required'] = True
 
         if not responses:
             if _status == 'LIVE_STREAM_OFFLINE':
@@ -1816,7 +1871,7 @@ class PlayerClient(LoginClient):
             },
             '_partial': True,
         }
-        is_live = video_details.get('isLiveContent', False)
+        is_live = video_details.get('isLiveContent') or video_details.get('hasLiveStreamingData')
         if is_live:
             is_live = video_details.get('isLive', False)
             live_dvr = video_details.get('isLiveDvrEnabled', False)
@@ -1845,7 +1900,9 @@ class PlayerClient(LoginClient):
             },
             'thumbnails': {
                 thumb_type: {
-                    'url': thumb['url'].format(video_id, thumb_suffix),
+                    'url': THUMB_URL.format(
+                        video_id, thumb['name'], thumb_suffix
+                    ),
                     'size': thumb['size'],
                     'ratio': thumb['ratio'],
                     'unverified': True,
@@ -2230,25 +2287,27 @@ class PlayerClient(LoginClient):
                     else:
                         compare_width = width
                         compare_height = height
-                    compare_ratio = width / height
+                    # Compare video stream width against pre-computed quality
+                    # selection width based on approximate aspect ratio.
+                    # 1.69 ~= 0.95 * 16 / 9
+                    if width / height > 1.69:
+                        nom_width = 'width_16:9'
+                    else:
+                        nom_width = 'width_4:3'
 
                     bound = None
+                    _disable_hfr_max = disable_hfr_max
                     for quality in qualities:
-                        if compare_width >= quality['width']:
-                            # Bounds are defined using a 16:9 aspect ratio
-                            # If stream aspect ratio is approximately 16:9 then
-                            # simply use current quality without testing bounds
-                            if compare_ratio > 1.69:  # 1.69 ~= 0.95 * 16 / 9
-                                bound = quality
-                            elif bound:
+                        if compare_width > quality[nom_width]:
+                            if bound:
                                 if compare_height >= bound['min_height']:
                                     quality = bound
                                 elif compare_height < quality['min_height']:
                                     quality = qualities[-1]
-                            if fps > 30 and disable_hfr_max:
-                                bound = None
+                                if fps > 30 and _disable_hfr_max:
+                                    bound = None
                             break
-                        disable_hfr_max = disable_hfr_max and not bound
+                        _disable_hfr_max = _disable_hfr_max and not bound
                         bound = quality
                     if not bound:
                         continue
@@ -2736,7 +2795,11 @@ class PlayerClient(LoginClient):
                 url = entity_escape(unquote(self._process_url_params(
                     subtitle['url'],
                     headers=headers,
+                    referrer=None,
+                    visitor_data=None,
                 )))
+                if not url:
+                    continue
 
                 output.extend((
                     '\t\t<AdaptationSet'

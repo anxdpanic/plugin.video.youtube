@@ -266,10 +266,15 @@ class ViewManager(object):
 
     @classmethod
     def apply_sort_method(cls, context, **kwargs):
-        sort_method = (kwargs.get(SORT_METHOD)
-                       or CONTENT.VIDEO_CONTENT.join(('__', '__')))
         execute = context.execute
         get_infolabel = xbmc.getInfoLabel
+
+        sort_method = (kwargs.get(SORT_METHOD)
+                       or CONTENT.VIDEO_CONTENT.join(('__', '__'))).lower()
+        sort_id = SORT.SORT_ID_MAPPING.get(sort_method)
+        if sort_id is None:
+            cls.log.warning('Unknown sort method: %r', sort_method)
+            return
 
         _sort_method = get_infolabel('Container.SortMethod').lower()
         _sort_id = SORT.SORT_ID_MAPPING.get(_sort_method)
@@ -278,13 +283,6 @@ class ViewManager(object):
             cls.log.warning('Sort method mismatch: {method!r} ID is not {id}',
                             method=_sort_method,
                             id=_sort_id)
-            sort_method = get_infolabel('Container.SortMethod')
-
-        sort_method = sort_method.lower()
-        sort_id = SORT.SORT_ID_MAPPING.get(sort_method)
-        if sort_id is None:
-            cls.log.warning('Unknown sort method: %r', sort_method)
-            return
 
         # Workaround for Container.SetSortMethod failing for some sort methods
         num_attempts_remaining = 3
@@ -296,7 +294,8 @@ class ViewManager(object):
             # https://github.com/xbmc/xbmc/blob/7e1a55cb861342cd9062745161d88aca08dcead1/xbmc/windows/GUIMediaWindow.cpp#L502
             if sort_id == 0:
                 # Sort by track number to reset sort order to default order
-                execute('Container.SetSortMethod(%s)' % 8)
+                _sort_id = SORT.SORT_ID_MAPPING.get(SORT.TRACKNUM)
+                execute('Container.SetSortMethod(%s)' % _sort_id)
                 # Then switch to previous sort method which is default/unsorted
                 # as per the order set in XbmcContext.apply_content
                 execute('Container.PreviousSortMethod')

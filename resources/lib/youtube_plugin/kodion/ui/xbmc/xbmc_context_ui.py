@@ -19,16 +19,23 @@ from ...compatibility import string_type, xbmc, xbmcgui
 from ...constants import (
     ADDON_ID,
     BOOL_FROM_STR,
+    CONTAINER_FOCUS,
     CONTAINER_ID,
     CONTAINER_LISTITEM_INFO,
     CONTAINER_LISTITEM_PROP,
+    CONTAINER_POSITION,
     CURRENT_CONTAINER_INFO,
+    HAS_FILES,
+    HAS_FOLDERS,
+    HAS_PARENT,
     HIDE_PROGRESS,
     LISTITEM_INFO,
     LISTITEM_PROP,
     PLUGIN_CONTAINER_INFO,
     PROPERTY,
     REFRESH_CONTAINER,
+    UPDATING,
+    URI,
 )
 from ...utils.convert_format import to_unicode
 
@@ -204,116 +211,250 @@ class XbmcContextUI(AbstractContextUI):
     def get_infolabel(name, _label=xbmc.getInfoLabel):
         return _label(name)
 
+    def get_container(self,
+                      container_type=True,
+                      check_ready=False,
+                      stacklevel=None,
+                      _url='plugin://{0}/'.format(ADDON_ID)):
+        stacklevel = 2 if stacklevel is None else stacklevel + 1
+        container_id = self.get_container_id(container_type)
+        _container_id = container_id if container_type else container_type
+        is_plugin = self.get_listitem_info(
+            URI,
+            _container_id,
+            stacklevel=stacklevel,
+        ).startswith(_url)
+        if check_ready and container_type is True and not is_plugin:
+            is_active = False
+            is_loaded = False
+        else:
+            is_active = not self.busy_dialog_active(all_modals=True)
+            is_loaded = (
+                    not self.get_container_bool(
+                        UPDATING,
+                        _container_id,
+                        stacklevel=stacklevel,
+                    )
+                    and (
+                            self.get_container_bool(
+                                HAS_FOLDERS,
+                                _container_id,
+                                stacklevel=stacklevel
+                            )
+                            or
+                            self.get_container_bool(
+                                HAS_FILES,
+                                _container_id,
+                                stacklevel=stacklevel
+                            )
+                            or
+                            self.get_container_bool(
+                                HAS_PARENT,
+                                _container_id,
+                                stacklevel=stacklevel,
+                            )
+                    )
+            )
+
+        if check_ready:
+            return is_active and is_loaded
+        return {
+            'is_plugin': is_plugin,
+            'id': container_id,
+            'is_loaded': is_active,
+            'is_active': is_loaded,
+        }
+
+    @classmethod
+    def get_container_id(cls,
+                         container_type=True,
+                         _label=xbmc.getInfoLabel):
+        if container_type is True:
+            return _label(PROPERTY % CONTAINER_ID)
+        if container_type is None:
+            return None
+        return _label('System.CurrentControlID')
+
     @classmethod
     def get_container_bool(cls,
                            name,
-                           container_id=None,
+                           container_id=True,
                            strict=True,
-                           stacklevel=2,
+                           stacklevel=None,
                            _bool=xbmc.getCondVisibility,
                            _label=xbmc.getInfoLabel):
-        if container_id is None:
+        if container_id is True:
             container_id = _label(PROPERTY % CONTAINER_ID)
+        elif container_id is None:
+            strict = False
+        elif container_id is False:
+            container_id = _label('System.CurrentControlID')
+            strict = False
+
+        stacklevel = 2 if stacklevel is None else stacklevel + 1
+
         if container_id:
-            return _bool(PLUGIN_CONTAINER_INFO % (container_id, name))
-        if strict:
+            out = _bool(PLUGIN_CONTAINER_INFO % (container_id, name))
+            log_msg = 'Container {container_id} used for {name!r}: {out!r}'
+        elif strict:
+            out = False
+            log_msg = None
             cls.log.warning('Plugin container not found for %r', name,
                             stacklevel=stacklevel)
-            return False
-        out = _bool(CURRENT_CONTAINER_INFO % name)
-        cls.log.warning('Current container used for {name!r}: {out!r}',
-                        name=name,
-                        out=out,
-                        stacklevel=stacklevel)
+        else:
+            out = _bool(CURRENT_CONTAINER_INFO % name)
+            log_msg = 'Current container used for {name!r}: {out!r}'
+        if log_msg and cls.log.verbose_logging:
+            cls.log.debug(log_msg,
+                          container_id=container_id,
+                          name=name,
+                          out=out,
+                          stacklevel=stacklevel)
         return out
 
     @classmethod
     def get_container_info(cls,
                            name,
-                           container_id=None,
+                           container_id=True,
                            strict=True,
-                           stacklevel=2,
+                           stacklevel=None,
                            _label=xbmc.getInfoLabel):
-        if container_id is None:
+        if container_id is True:
             container_id = _label(PROPERTY % CONTAINER_ID)
+        elif container_id is None:
+            strict = False
+        elif container_id is False:
+            container_id = _label('System.CurrentControlID')
+            strict = False
+
+        stacklevel = 2 if stacklevel is None else stacklevel + 1
+
         if container_id:
-            return _label(PLUGIN_CONTAINER_INFO % (container_id, name))
-        if strict:
+            out = _label(PLUGIN_CONTAINER_INFO % (container_id, name))
+            log_msg = 'Container {container_id} used for {name!r}: {out!r}'
+        elif strict:
+            out = False
+            log_msg = None
             cls.log.warning('Plugin container not found for %r', name,
                             stacklevel=stacklevel)
-            return ''
-        out = _label(CURRENT_CONTAINER_INFO % name)
-        cls.log.warning('Current container used for {name!r}: {out!r}',
-                        name=name,
-                        out=out,
-                        stacklevel=stacklevel)
+        else:
+            out = _label(CURRENT_CONTAINER_INFO % name)
+            log_msg = 'Current container used for {name!r}: {out!r}'
+        if log_msg and cls.log.verbose_logging:
+            cls.log.debug(log_msg,
+                          container_id=container_id,
+                          name=name,
+                          out=out,
+                          stacklevel=stacklevel)
         return out
 
     @classmethod
     def get_listitem_bool(cls,
                           name,
-                          container_id=None,
+                          container_id=True,
                           strict=True,
-                          stacklevel=2,
+                          stacklevel=None,
                           _bool=xbmc.getCondVisibility,
                           _label=xbmc.getInfoLabel):
-        if container_id is None:
+        if container_id is True:
             container_id = _label(PROPERTY % CONTAINER_ID)
-        if container_id:
-            return _bool(CONTAINER_LISTITEM_INFO % (container_id, name))
-        if strict:
-            cls.log.warning('Plugin container not found for %r', name,
-                            stacklevel=stacklevel)
-            return False
-        out = _bool(LISTITEM_INFO % name)
-        cls.log.warning('Current container used for {name!r}: {out!r}',
-                        name=name,
-                        out=out,
-                        stacklevel=stacklevel)
-        return out
+        elif container_id is None:
+            strict = False
+        elif container_id is False:
+            container_id = _label('System.CurrentControlID')
+            strict = False
 
-    @classmethod
-    def get_listitem_property(cls,
-                              name,
-                              container_id=None,
-                              strict=True,
-                              stacklevel=2,
-                              _label=xbmc.getInfoLabel):
-        if container_id is None:
-            container_id = _label(PROPERTY % CONTAINER_ID)
+        stacklevel = 2 if stacklevel is None else stacklevel + 1
+
         if container_id:
-            return _label(CONTAINER_LISTITEM_PROP % (container_id, name))
-        if strict:
+            out = _bool(CONTAINER_LISTITEM_INFO % (container_id, name))
+            log_msg = 'Container {container_id} used for {name!r}: {out!r}'
+        elif strict:
+            out = False
+            log_msg = None
             cls.log.warning('Plugin container not found for %r', name,
                             stacklevel=stacklevel)
-            return ''
-        out = _label(LISTITEM_PROP % name)
-        cls.log.warning('Current container used for {name!r}: {out!r}',
-                        name=name,
-                        out=out,
-                        stacklevel=stacklevel)
+        else:
+            out = _bool(LISTITEM_INFO % name)
+            log_msg = 'Current container used for {name!r}: {out!r}'
+        if log_msg and cls.log.verbose_logging:
+            cls.log.debug(log_msg,
+                          container_id=container_id,
+                          name=name,
+                          out=out,
+                          stacklevel=stacklevel)
         return out
 
     @classmethod
     def get_listitem_info(cls,
                           name,
-                          container_id=None,
+                          container_id=True,
                           strict=True,
-                          stacklevel=2,
+                          stacklevel=None,
                           _label=xbmc.getInfoLabel):
-        if container_id is None:
+        if container_id is True:
             container_id = _label(PROPERTY % CONTAINER_ID)
+        elif container_id is None:
+            strict = False
+        elif container_id is False:
+            container_id = _label('System.CurrentControlID')
+            strict = False
+
+        stacklevel = 2 if stacklevel is None else stacklevel + 1
+
         if container_id:
-            return _label(CONTAINER_LISTITEM_INFO % (container_id, name))
-        if strict:
+            out = _label(CONTAINER_LISTITEM_INFO % (container_id, name))
+            log_msg = 'Container {container_id} used for {name!r}: {out!r}'
+        elif strict:
+            out = ''
+            log_msg = None
             cls.log.warning('Plugin container not found for %r', name,
                             stacklevel=stacklevel)
-            return ''
-        out = _label(LISTITEM_INFO % name)
-        cls.log.warning('Current container used for {name!r}: {out!r}',
-                        name=name,
-                        out=out,
-                        stacklevel=stacklevel)
+        else:
+            out = _label(LISTITEM_INFO % name)
+            log_msg = 'Current container used for {name!r}: {out!r}'
+        if log_msg and cls.log.verbose_logging:
+            cls.log.debug(log_msg,
+                          container_id=container_id,
+                          name=name,
+                          out=out,
+                          stacklevel=stacklevel)
+        return out
+
+    @classmethod
+    def get_listitem_property(cls,
+                              name,
+                              container_id=True,
+                              strict=True,
+                              stacklevel=None,
+                              _label=xbmc.getInfoLabel):
+        if container_id is True:
+            container_id = _label(PROPERTY % CONTAINER_ID)
+        elif container_id is None:
+            strict = False
+        elif container_id is False:
+            container_id = _label('System.CurrentControlID')
+            strict = False
+
+        stacklevel = 2 if stacklevel is None else stacklevel + 1
+
+        if container_id:
+            out = _label(CONTAINER_LISTITEM_PROP % (container_id, name))
+            log_msg = 'Container {container_id} used for {name!r}: {out!r}'
+        elif strict:
+            out = ''
+            log_msg = None
+            cls.log.warning('Plugin container not found for %r', name,
+                            stacklevel=stacklevel)
+        else:
+            out = _label(LISTITEM_PROP % name)
+            log_msg = 'Current container used for {name!r}: {out!r}'
+        if log_msg and cls.log.verbose_logging:
+            cls.log.debug(log_msg,
+                          container_id=container_id,
+                          name=name,
+                          out=out,
+                          stacklevel=stacklevel)
         return out
 
     @classmethod
@@ -399,78 +540,11 @@ class XbmcContextUI(AbstractContextUI):
         xbmcgui.Window(10000).clearProperty(_property_id)
         return None
 
-    @staticmethod
-    def bold(value, cr_before=0, cr_after=0):
-        return ''.join((
-            '[CR]' * cr_before,
-            '[B]', value, '[/B]',
-            '[CR]' * cr_after,
-        ))
-
-    @staticmethod
-    def uppercase(value, cr_before=0, cr_after=0):
-        return ''.join((
-            '[CR]' * cr_before,
-            '[UPPERCASE]', value, '[/UPPERCASE]',
-            '[CR]' * cr_after,
-        ))
-
-    @staticmethod
-    def color(color, value, cr_before=0, cr_after=0):
-        return ''.join((
-            '[CR]' * cr_before,
-            '[COLOR=', color.lower(), ']', value, '[/COLOR]',
-            '[CR]' * cr_after,
-        ))
-
-    @staticmethod
-    def light(value, cr_before=0, cr_after=0):
-        return ''.join((
-            '[CR]' * cr_before,
-            '[LIGHT]', value, '[/LIGHT]',
-            '[CR]' * cr_after,
-        ))
-
-    @staticmethod
-    def italic(value, cr_before=0, cr_after=0):
-        return ''.join((
-            '[CR]' * cr_before,
-            '[I]', value, '[/I]',
-            '[CR]' * cr_after,
-        ))
-
-    @staticmethod
-    def indent(number=1, value='', cr_before=0, cr_after=0):
-        return ''.join((
-            '[CR]' * cr_before,
-            '[TABS]', str(number), '[/TABS]', value,
-            '[CR]' * cr_after,
-        ))
-
-    @staticmethod
-    def new_line(value=1, cr_before=0, cr_after=0):
-        if isinstance(value, int):
-            return '[CR]' * value
-        return ''.join((
-            '[CR]' * cr_before,
-            value,
-            '[CR]' * cr_after,
-        ))
-
-    @staticmethod
-    def set_focus_next_item():
-        container = xbmc.getInfoLabel('System.CurrentControlId')
-        position = xbmc.getInfoLabel('Container.CurrentItem')
-        try:
-            position = int(position) + 1
-        except ValueError:
-            return
-        xbmc.executebuiltin(
-            'SetFocus({container},{position},absolute)'.format(
-                container=container,
-                position=position
-            )
-        )
+    def set_focus_next_item(self):
+        self._context.send_notification(method=CONTAINER_FOCUS,
+                                        data={
+                                            CONTAINER_POSITION: 'next',
+                                        })
 
     @staticmethod
     def busy_dialog_active(all_modals=False, dialog_ids=frozenset((

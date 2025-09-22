@@ -65,7 +65,11 @@ PLUGIN_CONTAINER_INFO = 'Container(%s).%s'
 CURRENT_ITEM = 'CurrentItem'
 FOLDER_NAME = 'FolderName'
 FOLDER_URI = 'FolderPath'
+HAS_FILES = 'HasFiles'
+HAS_FOLDERS = 'HasFolders'
+HAS_PARENT = 'HasParent'
 SCROLLING = 'Scrolling'
+UPDATING = 'IsUpdating'
 
 # ListItem Info
 CONTAINER_LISTITEM_INFO = 'Container(%s).ListItem(0).%s'
@@ -149,6 +153,7 @@ WINDOW_RETURN = 'window_return'
 
 # Plugin url query parameters
 ACTION = 'action'
+ADDON_ID_PARAM = 'addon_id'
 CHANNEL_IDS = 'channel_ids'
 CLIP = 'clip'
 END = 'end'
@@ -156,6 +161,7 @@ FANART_TYPE = 'fanart_type'
 HIDE_CHANNELS = 'hide_channels'
 HIDE_FOLDERS = 'hide_folders'
 HIDE_LIVE = 'hide_live'
+HIDE_MEMBERS = 'hide_members'
 HIDE_NEXT_PAGE = 'hide_next_page'
 HIDE_PLAYLISTS = 'hide_playlists'
 HIDE_PROGRESS = 'hide_progress'
@@ -175,6 +181,30 @@ SORT_DIR = 'sort_dir'
 SORT_METHOD = 'sort_method'
 START = 'start'
 VIDEO_IDS = 'video_ids'
+
+INHERITED_PARAMS = frozenset((
+    ADDON_ID_PARAM,
+    FANART_TYPE,
+    HIDE_CHANNELS,
+    HIDE_FOLDERS,
+    HIDE_LIVE,
+    HIDE_MEMBERS,
+    HIDE_NEXT_PAGE,
+    HIDE_PLAYLISTS,
+    HIDE_PROGRESS,
+    HIDE_SEARCH,
+    HIDE_SHORTS,
+    HIDE_VIDEOS,
+    INCOGNITO,
+    ITEM_FILTER,
+    ITEMS_PER_PAGE,
+    PLAY_FORCE_AUDIO,
+    PLAY_TIMESHIFT,
+    PLAY_PROMPT_QUALITY,
+    PLAY_PROMPT_SUBTITLES,
+    PLAY_USING,
+))
+
 
 __all__ = (
     # Addon paths
@@ -201,7 +231,11 @@ __all__ = (
     'CURRENT_ITEM',
     'FOLDER_NAME',
     'FOLDER_URI',
+    'HAS_FILES',
+    'HAS_FOLDERS',
+    'HAS_PARENT',
     'SCROLLING',
+    'UPDATING',
 
     # ListItem Info
     'CONTAINER_LISTITEM_INFO',
@@ -279,6 +313,7 @@ __all__ = (
 
     # Plugin url query parameters
     'ACTION',
+    'ADDON_ID_PARAM',
     'CHANNEL_IDS',
     'CLIP',
     'END',
@@ -286,6 +321,7 @@ __all__ = (
     'HIDE_CHANNELS',
     'HIDE_FOLDERS',
     'HIDE_LIVE',
+    'HIDE_MEMBERS',
     'HIDE_NEXT_PAGE',
     'HIDE_PLAYLISTS',
     'HIDE_PROGRESS',
@@ -305,6 +341,8 @@ __all__ = (
     'SORT_METHOD',
     'START',
     'VIDEO_IDS',
+
+    'INHERITED_PARAMS',
 
     # Other constants
     'CONTENT',

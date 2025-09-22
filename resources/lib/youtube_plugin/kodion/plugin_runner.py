@@ -70,7 +70,7 @@ def run(context=_context,
         profiler.disable()
 
     old_path, old_params = context.parse_uri(
-        ui.get_container_info(FOLDER_URI, strict=False),
+        ui.get_container_info(FOLDER_URI, container_id=None),
         parse_params=False,
     )
     old_path = old_path.rstrip('/')

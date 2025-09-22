@@ -24,6 +24,7 @@ from ..compatibility import (
 )
 from ..constants import (
     ACTION,
+    ADDON_ID_PARAM,
     BOOL_FROM_STR,
     CHANNEL_ID,
     CHANNEL_IDS,
@@ -34,6 +35,7 @@ from ..constants import (
     HIDE_CHANNELS,
     HIDE_FOLDERS,
     HIDE_LIVE,
+    HIDE_MEMBERS,
     HIDE_NEXT_PAGE,
     HIDE_PLAYLISTS,
     HIDE_PROGRESS,
@@ -105,6 +107,7 @@ class AbstractContext(object):
         HIDE_CHANNELS,
         HIDE_FOLDERS,
         HIDE_LIVE,
+        HIDE_MEMBERS,
         HIDE_NEXT_PAGE,
         HIDE_PLAYLISTS,
         HIDE_PROGRESS,
@@ -149,7 +152,7 @@ class AbstractContext(object):
     _STRING_PARAMS = frozenset((
         'api_key',
         ACTION,
-        'addon_id',
+        ADDON_ID_PARAM,
         'category_label',
         CHANNEL_ID,
         'client_id',
@@ -410,15 +413,32 @@ class AbstractContext(object):
         if window:
             if not isinstance(window, dict):
                 window = {}
-            window_replace = window.setdefault('replace', False)
-            window_return = window.setdefault('return', True)
+            if window.setdefault('refresh', False):
+                method = 'Container.Refresh('
+                if not window.setdefault('replace', False):
+                    uri = ''
+                history_replace = False
+                window_return = False
+            elif window.setdefault('update', False):
+                method = 'Container.Update('
+                history_replace = window.setdefault('replace', False)
+                window_return = False
+            else:
+                history_replace = False
+                window_name = window.setdefault('name', 'Videos')
+                if window.setdefault('replace', False):
+                    method = 'ReplaceWindow(%s,' % window_name
+                    window_return = window.setdefault('return', False)
+                else:
+                    method = 'ActivateWindow(%s,' % window_name
+                    window_return = window.setdefault('return', True)
             return ''.join((
                 command,
-                'ReplaceWindow(Videos,'
-                if window_replace else
-                'ActivateWindow(Videos,',
+                method,
                 uri,
-                ',return)' if window_return else ')',
+                ',return' if window_return else '',
+                ',replace' if history_replace else '',
+                ')'
             ))
         return uri
 
@@ -447,8 +467,13 @@ class AbstractContext(object):
                 parts = []
             elif path.startswith(PATHS.GOTO_PAGE):
                 parts = parts[2:]
-                if parts and parts[0].isnumeric():
-                    parts = parts[1:]
+                if parts:
+                    try:
+                        int(parts[0])
+                    except (TypeError, ValueError):
+                        pass
+                    else:
+                        parts = parts[1:]
         else:
             return ('/', parts) if include_parts else '/'
 
@@ -468,7 +493,7 @@ class AbstractContext(object):
                 path, parts = self.create_path(
                     *path,
                     parts=True,
-                    parser=kwargs.get('parser'),
+                    parser=kwargs.get('parser')
                 )
         else:
             path, parts = self.create_path(*path, parts=True)
@@ -540,8 +565,10 @@ class AbstractContext(object):
                             parsed_value, parsed_value
                         )
                     elif param in self._STRING_INT_PARAMS:
-                        if parsed_value.isdigit():
+                        try:
                             parsed_value = int(parsed_value)
+                        except (TypeError, ValueError):
+                            pass
                     # process and translate deprecated parameters
                     elif param == 'action':
                         if parsed_value in {'play_all', 'play_video'}:
@@ -645,7 +672,7 @@ class AbstractContext(object):
                 wait=False,
                 wait_for=None,
                 wait_for_set=True,
-                block_ui=False):
+                block_ui=None):
         raise NotImplementedError()
 
     @staticmethod

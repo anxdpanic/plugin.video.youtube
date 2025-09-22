@@ -17,6 +17,7 @@ from re import compile as re_compile
 
 from .utils import (
     THUMB_TYPES,
+    THUMB_URL,
     filter_videos,
     get_thumbnail,
     make_comment_item,
@@ -28,17 +29,19 @@ from ...kodion import KodionException, logging
 from ...kodion.constants import (
     CHANNEL_ID,
     FANART_TYPE,
+    FOLDER_URI,
+    HIDE_LIVE,
+    HIDE_MEMBERS,
     HIDE_NEXT_PAGE,
+    HIDE_PLAYLISTS,
+    HIDE_SEARCH,
+    HIDE_SHORTS,
+    HIDE_VIDEOS,
+    INHERITED_PARAMS,
     ITEM_FILTER,
     PAGE,
-    FOLDER_URI,
     PATHS,
     PLAYLIST_ID,
-    PLAY_FORCE_AUDIO,
-    PLAY_PROMPT_QUALITY,
-    PLAY_PROMPT_SUBTITLES,
-    PLAY_TIMESHIFT,
-    PLAY_USING,
     VIDEO_ID,
 )
 from ...kodion.items import (
@@ -74,6 +77,7 @@ def _process_list_response(provider,
         log.warning('Items list is empty')
         return None
 
+    yt_items_dict = {}
     new_video_id_dict = {}
     new_playlist_id_dict = {}
     new_channel_id_dict = {}
@@ -87,20 +91,12 @@ def _process_list_response(provider,
     params = context.get_params()
     new_params = {
         param: params[param]
-        for param in (
-            'addon_id',
-            'incognito',
-            PLAY_FORCE_AUDIO,
-            PLAY_TIMESHIFT,
-            PLAY_PROMPT_QUALITY,
-            PLAY_PROMPT_SUBTITLES,
-            PLAY_USING,
-        )
+        for param in INHERITED_PARAMS
         if param in params
     }
 
     settings = context.get_settings()
-    thumb_re = re_compile(r'[^/._]+?(?=(?:_live)?\.(?:jpg|webp))')
+    thumb_re = re_compile(r'[^/._]+(?=[^/.]*?\.(?:jpg|webp))')
     thumb_size = settings.get_thumbnail_size()
     fanart_type = params.get(FANART_TYPE)
     if fanart_type is None:
@@ -123,6 +119,7 @@ def _process_list_response(provider,
         item_params = yt_item.get('_params') or {}
         item_params.update(new_params)
 
+        item_id = None
         video_id = None
         playlist_id = None
         channel_id = None
@@ -146,9 +143,9 @@ def _process_list_response(provider,
                 _url = thumbnails[0].get('url')
                 thumbnails.extend([
                     {
-                        'url': (thumb_re.sub(thumb['filename'], _url, count=1)
+                        'url': (thumb_re.sub(thumb['name'], _url, count=1)
                                 if _url else
-                                thumb['url'].format(item_id, '')),
+                                THUMB_URL.format(item_id, thumb['name'], '')),
                         'size': thumb['size'],
                         'ratio': thumb['ratio'],
                         'unverified': True,
@@ -157,23 +154,24 @@ def _process_list_response(provider,
                 ])
             elif isinstance(thumbnails, dict):
                 _url = next(iter(thumbnails.values())).get('url')
-                for thumb_type, thumb in THUMB_TYPES.items():
-                    if thumb_type in thumbnails:
-                        continue
-                    thumbnails[thumb_type] = {
-                        'url': (thumb_re.sub(thumb['filename'], _url, count=1)
+                thumbnails.update({
+                    thumb_type: {
+                        'url': (thumb_re.sub(thumb['name'], _url, count=1)
                                 if _url else
-                                thumb['url'].format(item_id, '')),
+                                THUMB_URL.format(item_id, thumb['name'], '')),
                         'size': thumb['size'],
                         'ratio': thumb['ratio'],
                         'unverified': True,
                     }
+                    for thumb_type, thumb in THUMB_TYPES.items()
+                    if thumb_type not in thumbnails
+                })
             else:
                 thumbnails = None
             if not thumbnails:
                 thumbnails = {
                     thumb_type: {
-                        'url': thumb['url'].format(item_id, ''),
+                        'url': THUMB_URL.format(item_id, thumb['name'], ''),
                         'size': thumb['size'],
                         'ratio': thumb['ratio'],
                         'unverified': True,
@@ -210,6 +208,9 @@ def _process_list_response(provider,
             else:
                 log.debug('searchResult discarded: %r', kind)
                 continue
+
+        if item_id:
+            yt_items_dict[item_id] = yt_item
 
         if kind_type == 'video':
             video_id = item_id
@@ -274,12 +275,16 @@ def _process_list_response(provider,
                                  subscription_id=subscription_id)
 
         elif kind_type == 'searchfolder':
+            if item_filter and item_filter.get(HIDE_SEARCH):
+                continue
             channel_id = item_params[CHANNEL_ID]
             item = NewSearchItem(context, **item_params)
             channel_items = channel_items_dict.setdefault(channel_id, [])
             channel_items.append(item)
 
-        elif kind_type == 'playlistfolder':
+        elif kind_type == 'playlistsfolder':
+            if item_filter and item_filter.get(HIDE_PLAYLISTS):
+                continue
             channel_id = item_params[CHANNEL_ID]
             item_params['uri'] = context.create_uri(
                 (PATHS.CHANNEL, channel_id, 'playlists',),
@@ -289,7 +294,45 @@ def _process_list_response(provider,
             channel_items = channel_items_dict.setdefault(channel_id, [])
             channel_items.append(item)
 
-        elif kind_type == 'playlist':
+        elif kind_type in {'livefolder',
+                           'membersfolder',
+                           'shortsfolder',
+                           'videosfolder'}:
+            if (item_filter and (
+                    (
+                            kind_type == 'livefolder'
+                            and item_filter.get(HIDE_LIVE)
+                    ) or (
+                            kind_type == 'membersfolder'
+                            and item_filter.get(HIDE_MEMBERS)
+                    ) or (
+                            kind_type == 'shortsfolder'
+                            and item_filter.get(HIDE_SHORTS)
+                    ) or (
+                            kind_type == 'videosfolder'
+                            and item_filter.get(HIDE_VIDEOS)
+                    )
+            )):
+                continue
+            item = DirectoryItem(**item_params)
+
+        elif kind_type in {'playlist',
+                           'playlistlivefolder',
+                           'playlistmembersfolder',
+                           'playlistshortsfolder'}:
+            if (item_filter and (
+                    (
+                            kind_type == 'playlistlivefolder'
+                            and item_filter.get(HIDE_LIVE)
+                    ) or (
+                            kind_type == 'playlistmembersfolder'
+                            and item_filter.get(HIDE_MEMBERS)
+                    ) or (
+                            kind_type == 'playlistshortsfolder'
+                            and item_filter.get(HIDE_SHORTS)
+                    )
+            )):
+                continue
             playlist_id = item_id
             # set channel id to 'mine' if the path is for a playlist of our own
             channel_id = snippet.get('channelId')
@@ -497,7 +540,7 @@ def _process_list_response(provider,
                 'live_details': True,
                 'suppress_errors': True,
                 'defer_cache': True,
-                'yt_items': yt_items,
+                'yt_items_dict': yt_items_dict,
             },
             'thread': None,
             'updater': update_video_items,
@@ -750,6 +793,7 @@ def response_to_items(provider,
             _item_filter = settings.item_filter(
                 update=(item_filter or json_data.get('_item_filter')),
                 override=item_filter_param,
+                params=params,
                 exclude=exclude_current,
             )
             result = _process_list_response(

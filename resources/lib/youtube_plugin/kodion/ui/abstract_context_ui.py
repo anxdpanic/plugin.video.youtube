@@ -79,42 +79,156 @@ class AbstractContextUI(object):
     def get_infolabel(name):
         raise NotImplementedError()
 
+    def get_container(self,
+                      container_type=True,
+                      check_ready=False,
+                      stacklevel=None):
+        raise NotImplementedError()
+
+    @classmethod
+    def get_container_id(cls, container_type=True):
+        raise NotImplementedError()
+
     @classmethod
     def get_container_bool(cls,
                            name,
-                           container_id=None,
+                           container_id=True,
                            strict=True,
-                           stacklevel=2):
+                           stacklevel=None):
         raise NotImplementedError()
 
     @classmethod
     def get_container_info(cls,
                            name,
-                           container_id=None,
+                           container_id=True,
                            strict=True,
-                           stacklevel=2):
+                           stacklevel=None):
         raise NotImplementedError()
 
     @classmethod
     def get_listitem_bool(cls,
                           name,
-                          container_id=None,
+                          container_id=True,
                           strict=True,
-                          stacklevel=2):
-        raise NotImplementedError()
-
-    @classmethod
-    def get_listitem_property(cls,
-                              name,
-                              container_id=None,
-                              strict=True,
-                              stacklevel=2):
+                          stacklevel=None):
         raise NotImplementedError()
 
     @classmethod
     def get_listitem_info(cls,
                           name,
-                          container_id=None,
+                          container_id=True,
                           strict=True,
-                          stacklevel=2):
+                          stacklevel=None):
+        raise NotImplementedError()
+
+    @classmethod
+    def get_listitem_property(cls,
+                              name,
+                              container_id=True,
+                              strict=True,
+                              stacklevel=None):
+        raise NotImplementedError()
+
+    @classmethod
+    def set_property(cls,
+                     property_id,
+                     value='true',
+                     stacklevel=2,
+                     process=None,
+                     log_value=None,
+                     log_process=None,
+                     raw=False):
+        raise NotImplementedError()
+
+    @classmethod
+    def get_property(cls,
+                     property_id,
+                     stacklevel=2,
+                     process=None,
+                     log_value=None,
+                     log_process=None,
+                     raw=False,
+                     as_bool=False,
+                     default=False):
+        raise NotImplementedError()
+
+    @classmethod
+    def pop_property(cls,
+                     property_id,
+                     stacklevel=2,
+                     process=None,
+                     log_value=None,
+                     log_process=None,
+                     raw=False,
+                     as_bool=False,
+                     default=False):
+        raise NotImplementedError()
+
+    @classmethod
+    def clear_property(cls, property_id, stacklevel=2, raw=False):
+        raise NotImplementedError()
+
+    @staticmethod
+    def bold(value, cr_before=0, cr_after=0):
+        return ''.join((
+            '[CR]' * cr_before,
+            '[B]', value, '[/B]',
+            '[CR]' * cr_after,
+        ))
+
+    @staticmethod
+    def uppercase(value, cr_before=0, cr_after=0):
+        return ''.join((
+            '[CR]' * cr_before,
+            '[UPPERCASE]', value, '[/UPPERCASE]',
+            '[CR]' * cr_after,
+        ))
+
+    @staticmethod
+    def color(color, value, cr_before=0, cr_after=0):
+        return ''.join((
+            '[CR]' * cr_before,
+            '[COLOR=', color.lower(), ']', value, '[/COLOR]',
+            '[CR]' * cr_after,
+        ))
+
+    @staticmethod
+    def light(value, cr_before=0, cr_after=0):
+        return ''.join((
+            '[CR]' * cr_before,
+            '[LIGHT]', value, '[/LIGHT]',
+            '[CR]' * cr_after,
+        ))
+
+    @staticmethod
+    def italic(value, cr_before=0, cr_after=0):
+        return ''.join((
+            '[CR]' * cr_before,
+            '[I]', value, '[/I]',
+            '[CR]' * cr_after,
+        ))
+
+    @staticmethod
+    def indent(number=1, value='', cr_before=0, cr_after=0):
+        return ''.join((
+            '[CR]' * cr_before,
+            '[TABS]', str(number), '[/TABS]', value,
+            '[CR]' * cr_after,
+        ))
+
+    @staticmethod
+    def new_line(value=1, cr_before=0, cr_after=0):
+        if isinstance(value, int):
+            return '[CR]' * value
+        return ''.join((
+            '[CR]' * cr_before,
+            value,
+            '[CR]' * cr_after,
+        ))
+
+    def set_focus_next_item(self):
+        raise NotImplementedError()
+
+    @staticmethod
+    def busy_dialog_active():
         raise NotImplementedError()

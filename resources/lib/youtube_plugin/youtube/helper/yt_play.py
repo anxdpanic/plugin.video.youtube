@@ -552,7 +552,8 @@ def process(provider, context, **_kwargs):
                 )
             ))
 
-        ui.set_property(BUSY_FLAG)
+        if not context.get_system_version().compatible(22):
+            ui.set_property(BUSY_FLAG)
 
         media_item = _play_stream(provider, context)
         if media_item:

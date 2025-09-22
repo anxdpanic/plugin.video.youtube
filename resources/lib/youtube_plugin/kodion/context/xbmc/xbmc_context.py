@@ -218,6 +218,7 @@ class XbmcContext(AbstractContext):
         'maintenance.requests_cache': 30523,
         'maintenance.search_history': 30558,
         'maintenance.watch_later': 30782,
+        'members_only': 30624,
         'my_channel': 30507,
         'my_location': 30654,
         'my_subscriptions': 30510,
@@ -362,6 +363,7 @@ class XbmcContext(AbstractContext):
         'video.comments.likes': 30733,
         'video.comments.replies': 30734,
         'video.description_links': 30544,
+        'video.description_links.from.x': 30118,
         'video.description_links.not_found': 30545,
         'video.disliked': 30538,
         'video.liked': 30508,
@@ -378,6 +380,7 @@ class XbmcContext(AbstractContext):
         'video.rate.like': 30529,
         'video.rate.none': 15015,
         'video.related': 30514,
+        'video.related.to.x': 30113,
         'videos': 3,
         'watch_later': 30107,
         'watch_later.add': 30107,
@@ -641,7 +644,7 @@ class XbmcContext(AbstractContext):
             except KeyError:
                 try:
                     _text_id = int(_text_id)
-                except ValueError:
+                except (TypeError, ValueError):
                     _text_id = -1
         if _text_id <= 0:
             msg = 'Undefined string ID: {text_id!r}'
@@ -781,18 +784,23 @@ class XbmcContext(AbstractContext):
                 wait=False,
                 wait_for=None,
                 wait_for_set=True,
-                block_ui=False):
+                block_ui=None,
+                _execute=xbmc.executebuiltin):
         if not wait_for:
-            xbmc.executebuiltin(command, wait)
+            if block_ui is False:
+                _execute('Dialog.Close(all,true)')
+            _execute(command, wait)
             return
 
         ui = self.get_ui()
         wait_for_abort = xbmc.Monitor().waitForAbort
 
-        xbmc.executebuiltin(command, wait)
+        if block_ui is False:
+            _execute('Dialog.Close(all,true)')
+        _execute(command, wait)
 
         if block_ui:
-            xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+            _execute('ActivateWindow(busydialognocancel)')
 
         if isinstance(wait_for, tuple):
             wait_for, wait_for_kwargs, delay = wait_for
@@ -809,7 +817,7 @@ class XbmcContext(AbstractContext):
                 pass
 
         if block_ui:
-            xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
+            _execute('Dialog.Close(busydialognocancel)')
 
     @staticmethod
     def sleep(timeout=None):
@@ -1000,7 +1008,8 @@ class XbmcContext(AbstractContext):
 
     def is_plugin_folder(self, folder_name=None):
         if folder_name is None:
-            folder_name = XbmcContextUI.get_container_info(FOLDER_NAME)
+            folder_name = XbmcContextUI.get_container_info(FOLDER_NAME,
+                                                           container_id=False)
         return folder_name == self._plugin_name
 
     def refresh_requested(self, force=False, on=False, off=False, params=None):

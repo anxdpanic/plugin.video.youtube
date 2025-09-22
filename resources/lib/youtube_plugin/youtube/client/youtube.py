@@ -328,8 +328,8 @@ class YouTube(LoginClient):
         super(YouTube, self).reinit(**kwargs)
         self.__init__(**kwargs)
 
-    def set_access_token(self, tv=None, user=None):
-        super(YouTube, self).set_access_token(tv=tv, user=user)
+    def set_access_token(self, access_tokens=None):
+        super(YouTube, self).set_access_token(access_tokens)
         if self.logged_in:
             context = self._context
             function_cache = context.get_function_cache()
@@ -1404,7 +1404,7 @@ class YouTube(LoginClient):
             post_data['context'] = context
 
         result = self.api_request(client or 'web', 'POST', path='browse',
-                                  url='https://www.youtube.com/youtubei/v1/{_endpoint}',
+                                  url=self.V1_API_URL,
                                   post_data=post_data,
                                   do_auth=do_auth,
                                   cache=True)
@@ -2358,14 +2358,16 @@ class YouTube(LoginClient):
             else:
                 return True, False
 
-            with self.request(
-                    ''.join(('https://www.youtube.com/feeds/videos.xml'
-                             '?playlist_id=', item_id)),
-                    headers=headers,
-            ) as response:
-                if response is None:
-                    return False, True
-                elif response.status_code == 404:
+            response = self.request(
+                ''.join((self.BASE_URL,
+                         '/feeds/videos.xml?playlist_id=',
+                         item_id)),
+                headers=headers,
+            )
+            if response is None:
+                return False, True
+            with response:
+                if response.status_code == 404:
                     content = None
                 elif response.status_code == 429:
                     return False, True
@@ -2873,7 +2875,10 @@ class YouTube(LoginClient):
         return False
 
     def _response_hook(self, **kwargs):
-        with kwargs['response'] as response:
+        response = kwargs['response']
+        if response is None:
+            return None, None
+        with response:
             headers = response.headers
             if kwargs.get('extended_debug'):
                 self.log.debug(('Request response',
@@ -2897,11 +2902,12 @@ class YouTube(LoginClient):
             try:
                 json_data = response.json()
             except ValueError as exc:
-                kwargs.setdefault('raise_exc', True)
+                if kwargs.get('raise_exc') is None:
+                    kwargs['raise_exc'] = True
                 raise InvalidJSON(exc, **kwargs)
 
             if 'error' in json_data:
-                kwargs.setdefault('pass_data', False)
+                kwargs.setdefault('pass_data', True)
                 raise YouTubeException('"error" in response JSON data',
                                        json_data=json_data,
                                        **kwargs)
@@ -2998,24 +3004,21 @@ class YouTube(LoginClient):
         else:
             abort = False
 
-        # a config can decide if a token is allowed
-        config = self._configs.get('user', {})
-        access_token = (self._access_tokens.get('user')
-                        if config.get('token-allowed', True) else
-                        None)
-        if access_token:
-            client_data['_access_token'] = access_token
-        key = config.get('key')
-        if key:
-            client_data['_api_key'] = key
+        client_data['_access_tokens'] = access_tokens = {}
+        client_data['_api_keys'] = api_keys = {}
+        for config_type, config in self._configs.items():
+            if not config:
+                continue
 
-        config = self._configs.get('tv', {})
-        access_token = self._access_tokens.get('tv')
-        if access_token:
-            client_data['_access_token_tv'] = access_token
-        key = config.get('key')
-        if key:
-            client_data['_api_key_tv'] = key
+            key = config.get('key')
+            if key:
+                api_keys[config_type] = key
+
+            if not config.get('token-allowed', True):
+                continue
+            access_token = self._access_tokens.get(config_type)
+            if access_token:
+                access_tokens[config_type] = access_token
 
         client = self.build_client(client, client_data)
         if not client:

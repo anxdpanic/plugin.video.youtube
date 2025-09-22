@@ -10,21 +10,14 @@ from __future__ import absolute_import, division, unicode_literals
 
 import os
 
+from .request_client import YouTubeRequestClient
 from ...kodion import logging
-from ...kodion.compatibility import (
-    parse_qs,
-    unescape,
-    urlencode,
-    urljoin,
-    urlsplit,
-    xbmcvfs,
-)
+from ...kodion.compatibility import parse_qs, urlencode, urlsplit, xbmcvfs
 from ...kodion.constants import (
     PLAY_PROMPT_SUBTITLES,
     TEMP_PATH,
     TRANSLATION_LANGUAGES,
 )
-from ...kodion.network import BaseRequestsClass
 from ...kodion.utils.file_system import make_dirs
 
 
@@ -58,7 +51,7 @@ SUBTITLE_SELECTIONS = {
 }
 
 
-class Subtitles(object):
+class Subtitles(YouTubeRequestClient):
     log = logging.getLogger(__name__)
 
     BASE_PATH = make_dirs(TEMP_PATH)
@@ -87,8 +80,9 @@ class Subtitles(object):
     }
 
     def __init__(self, context, video_id, use_mpd=None):
+        super(Subtitles, self).__init__(context=context)
+
         self.video_id = video_id
-        self._context = context
 
         self.defaults = None
         self.headers = None
@@ -141,8 +135,9 @@ class Subtitles(object):
         else:
             self.preferred_lang = ('en',)
 
-        ui = context.get_ui()
-        self.prompt_override = bool(ui.pop_property(PLAY_PROMPT_SUBTITLES))
+        self.prompt_override = bool(
+            context.get_ui().pop_property(PLAY_PROMPT_SUBTITLES)
+        )
 
     def load(self, captions, headers=None):
         if headers:
@@ -218,13 +213,6 @@ class Subtitles(object):
                         self.defaults['base'] = track
                         self.defaults['base_lang'] = base_lang
                         break
-
-    def _unescape(self, text):
-        try:
-            text = unescape(text)
-        except Exception:
-            self.log.error('Failed: %r', text)
-        return text
 
     def get_lang_details(self):
         return {
@@ -472,13 +460,16 @@ class Subtitles(object):
         if not download:
             return subtitle_url, self.FORMATS[sub_format]
 
-        with BaseRequestsClass(context=self._context).request(
-                subtitle_url,
-                headers=self.headers,
-                error_title='Failed to download subtitle for: {sub_lang!r}',
-                sub_lang=lang,
-        ) as response:
-            response_text = response and response.text
+        response = self.request(
+            subtitle_url,
+            headers=self.headers,
+            error_title='Failed to download subtitle for: {sub_lang!r}',
+            sub_lang=lang,
+        )
+        if response is None:
+            return None, None
+        with response:
+            response_text = response.text
             if not response_text:
                 return None, None
 
@@ -600,15 +591,3 @@ class Subtitles(object):
         return components._replace(
             query=urlencode(query_params, doseq=True)
         ).geturl()
-
-    @staticmethod
-    def _normalize_url(url):
-        if not url:
-            url = ''
-        elif url.startswith(('http://', 'https://')):
-            pass
-        elif url.startswith('//'):
-            url = urljoin('https:', url)
-        elif url.startswith('/'):
-            url = urljoin('https://www.youtube.com', url)
-        return url
