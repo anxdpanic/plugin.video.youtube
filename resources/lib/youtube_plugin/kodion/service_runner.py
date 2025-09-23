@@ -97,6 +97,7 @@ def run():
 
     container_id = None
     container_position = None
+    item_has_id = None
     plugin_item_details = {
         VIDEO_ID: {'getter': get_listitem_property, 'value': None},
         BOOKMARK_ID: {'getter': get_listitem_property, 'value': None},
@@ -194,18 +195,18 @@ def run():
 
                 _position = get_container_info(CURRENT_ITEM, container_id)
                 if _position and _position != container_position:
-                    item_has_id = None
+                    _item_has_id = None
                     for name, detail in plugin_item_details.items():
                         value = detail['value']
                         if value is TypeError:
-                            if item_has_id is None:
+                            if _item_has_id is None:
                                 container = get_container(container_type=False)
                                 if check_item != all(container.values()):
                                     check_item = not check_item
                                     break
-                                item_has_id = False
+                                _item_has_id = False
                             continue
-                        if item_has_id is not False:
+                        if _item_has_id is not False:
                             new_value = detail['getter'](name, container_id)
                         else:
                             new_value = None
@@ -213,16 +214,17 @@ def run():
                             if new_value != value:
                                 detail['value'] = new_value
                                 set_property(name, new_value)
-                            item_has_id = True
+                            _item_has_id = True
                         elif value:
                             detail['value'] = None
                             clear_property(name)
                     else:
                         container_position = _position
-                        if item_has_id:
+                        if _item_has_id:
                             set_property(CONTAINER_POSITION, container_position)
-                        else:
+                        elif item_has_id:
                             clear_property(CONTAINER_POSITION)
+                        item_has_id = _item_has_id
 
             elif not plugin_is_idle and not container['is_plugin']:
                 plugin_is_idle = set_property(PLUGIN_SLEEPING)
