@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2025-08-22 19:29+0000\n"
+"PO-Revision-Date: 2025-09-23 09:09+0000\n"
 "Last-Translator: Marek Adamski <fevbew@wp.pl>\n"
 "Language-Team: Polish <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/pl_pl/>\n"
 "Language: pl_pl\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.13\n"
+"X-Generator: Weblate 5.13.3\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -237,7 +237,7 @@ msgstr "Wyloguj"
 
 msgctxt "#30113"
 msgid "Related to \"%s\""
-msgstr ""
+msgstr "Powiązane z \"%s\""
 
 msgctxt "#30114"
 msgid "Confirm delete"
@@ -257,7 +257,7 @@ msgstr "Przenieść \"%s\"?"
 
 msgctxt "#30118"
 msgid "Links from \"%s\""
-msgstr ""
+msgstr "Linki z \"%s\""
 
 msgctxt "#30119"
 msgid "Please wait..."
@@ -489,7 +489,7 @@ msgstr "Wypełnij wszystkie monity logowania"
 
 msgctxt "#30547"
 msgid "You may be prompted to login and enable access to multiple applications so that this addon can function properly."
-msgstr ""
+msgstr "Aby dodatek działał prawidłowo, może zostać wyświetlony monit o zalogowanie się i zezwolenie na dostęp do wielu aplikacji."
 
 msgctxt "#30548"
 msgid ""
@@ -649,19 +649,19 @@ msgstr "Czarna lista"
 
 msgctxt "#30587"
 msgid "Hide \"Playlists\" folder"
-msgstr ""
+msgstr "Ukryj folder „Playlisty”"
 
 msgctxt "#30588"
 msgid "Hide \"Search\" folder"
-msgstr ""
+msgstr "Ukryj folder „Szukaj”"
 
 msgctxt "#30589"
 msgid "Hide \"Shorts\" folder"
-msgstr ""
+msgstr "Ukryj folder „Shorts”"
 
 msgctxt "#30590"
 msgid "Hide \"Live\" folder"
-msgstr ""
+msgstr "Ukryj folder „Na żywo”"
 
 msgctxt "#30591"
 msgid "Thumbnail size"
@@ -689,7 +689,7 @@ msgstr "Rygorystyczny"
 
 msgctxt "#30597"
 msgid "Hide \"Members only\" folder"
-msgstr ""
+msgstr "Ukryj folder „Tylko dla wspierających”"
 
 msgctxt "#30598"
 msgid "Large (4:3)"
@@ -797,7 +797,7 @@ msgstr "Zainstaluj InputStream Helper"
 
 msgctxt "#30624"
 msgid "Members only"
-msgstr ""
+msgstr "Tylko dla wspierających"
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
@@ -1533,7 +1533,7 @@ msgstr "Użyj nazwy kanału jako"
 
 msgctxt "#30808"
 msgid "Hide items from listings"
-msgstr ""
+msgstr "Ukryj elementy z listy"
 
 msgctxt "#30809"
 msgid "All upcoming videos"
