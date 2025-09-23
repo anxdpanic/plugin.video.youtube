@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2025-08-22 19:29+0000\n"
+"PO-Revision-Date: 2025-09-23 09:09+0000\n"
 "Last-Translator: Pavlo Marianov <acid@jack.kyiv.ua>\n"
 "Language-Team: Ukrainian <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/uk_ua/>\n"
 "Language: uk_ua\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.13\n"
+"X-Generator: Weblate 5.13.3\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -237,7 +237,7 @@ msgstr "Вийти"
 
 msgctxt "#30113"
 msgid "Related to \"%s\""
-msgstr ""
+msgstr "Пов'язано з «%s»"
 
 msgctxt "#30114"
 msgid "Confirm delete"
@@ -257,7 +257,7 @@ msgstr "Вилучити \"%s\"?"
 
 msgctxt "#30118"
 msgid "Links from \"%s\""
-msgstr ""
+msgstr "Посилання з «%s»"
 
 msgctxt "#30119"
 msgid "Please wait..."
@@ -453,7 +453,7 @@ msgstr "Відтворити з цього місця"
 
 msgctxt "#30538"
 msgid "Disliked Videos"
-msgstr "Відео, яке не сподобались"
+msgstr "Відео, які не сподобались"
 
 msgctxt "#30539"
 msgid "Play recently added"
@@ -489,7 +489,7 @@ msgstr "Завершіть всі етапи входу"
 
 msgctxt "#30547"
 msgid "You may be prompted to login and enable access to multiple applications so that this addon can function properly."
-msgstr ""
+msgstr "Вам може бути запропоновано увійти в систему та увімкнути доступ до кількох додатків, щоб цей додаток міг працювати належним чином."
 
 msgctxt "#30548"
 msgid ""
@@ -649,19 +649,19 @@ msgstr "Чорний список"
 
 msgctxt "#30587"
 msgid "Hide \"Playlists\" folder"
-msgstr ""
+msgstr "Приховати теку «Списки відтворення»"
 
 msgctxt "#30588"
 msgid "Hide \"Search\" folder"
-msgstr ""
+msgstr "Приховати теку «Пошук»"
 
 msgctxt "#30589"
 msgid "Hide \"Shorts\" folder"
-msgstr ""
+msgstr "Приховати теку «Shorts»"
 
 msgctxt "#30590"
 msgid "Hide \"Live\" folder"
-msgstr ""
+msgstr "Приховати теку «Наживо»"
 
 msgctxt "#30591"
 msgid "Thumbnail size"
@@ -689,7 +689,7 @@ msgstr "Суворий"
 
 msgctxt "#30597"
 msgid "Hide \"Members only\" folder"
-msgstr ""
+msgstr "Приховати теку «Лише для спонсорів»"
 
 msgctxt "#30598"
 msgid "Large (4:3)"
@@ -797,7 +797,7 @@ msgstr "Встановити InputStream Helper"
 
 msgctxt "#30624"
 msgid "Members only"
-msgstr ""
+msgstr "Лише для спонсорів"
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
@@ -1309,7 +1309,7 @@ msgstr "Увімкнути аудіо Opus"
 
 msgctxt "#30752"
 msgid "Enable AAC audio"
-msgstr "Ввімкнути аудіо AAC"
+msgstr "Увімкнути аудіо AAC"
 
 msgctxt "#30753"
 msgid "Enable surround sound audio"
@@ -1533,7 +1533,7 @@ msgstr "Використовувати назву каналу як"
 
 msgctxt "#30808"
 msgid "Hide items from listings"
-msgstr ""
+msgstr "Приховати елементи зі списків"
 
 msgctxt "#30809"
 msgid "All upcoming videos"
