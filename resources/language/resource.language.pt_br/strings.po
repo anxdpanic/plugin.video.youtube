@@ -237,7 +237,7 @@ msgid "Sign Out"
 msgstr "Deslogar"
 
 msgctxt "#30113"
-msgid ""
+msgid "Related to \"%s\""
 msgstr ""
 
 msgctxt "#30114"
@@ -257,7 +257,7 @@ msgid "Remove \"%s\"?"
 msgstr "Remover \"%s\"?"
 
 msgctxt "#30118"
-msgid ""
+msgid "Links from \"%s\""
 msgstr ""
 
 msgctxt "#30119"
@@ -490,7 +490,7 @@ msgid "Please complete all login prompts"
 msgstr ""
 
 msgctxt "#30547"
-msgid "You may be prompted to enable two applications so that YouTube is functioning properly."
+msgid "You may be prompted to login and enable access to multiple applications so that this addon can function properly."
 msgstr ""
 
 msgctxt "#30548"
@@ -650,19 +650,19 @@ msgid "Blacklist"
 msgstr "Lista negra"
 
 msgctxt "#30587"
-msgid ""
+msgid "Hide \"Playlists\" folder"
 msgstr ""
 
 msgctxt "#30588"
-msgid ""
+msgid "Hide \"Search\" folder"
 msgstr ""
 
 msgctxt "#30589"
-msgid ""
+msgid "Hide \"Shorts\" folder"
 msgstr ""
 
 msgctxt "#30590"
-msgid ""
+msgid "Hide \"Live\" folder"
 msgstr ""
 
 msgctxt "#30591"
@@ -690,7 +690,7 @@ msgid "Strict"
 msgstr "Estrita"
 
 msgctxt "#30597"
-msgid ""
+msgid "Hide \"Members only\" folder"
 msgstr ""
 
 msgctxt "#30598"
@@ -798,7 +798,7 @@ msgid "Install InputStream Helper"
 msgstr "Instalar InputStream Helper"
 
 msgctxt "#30624"
-msgid ""
+msgid "Members only"
 msgstr ""
 
 msgctxt "#30625"
@@ -1539,8 +1539,8 @@ msgid "Use channel name as"
 msgstr "Use o nome do canal como"
 
 msgctxt "#30808"
-msgid "Hide videos from listings"
-msgstr "Ocultar vídeos das listagens"
+msgid "Hide items from listings"
+msgstr ""
 
 msgctxt "#30809"
 msgid "All upcoming videos"
@@ -1589,6 +1589,10 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30808"
+#~ msgid "Hide videos from listings"
+#~ msgstr "Ocultar vídeos das listagens"
 
 #~ msgctxt "#30020"
 #~ msgid "Allow 3D"

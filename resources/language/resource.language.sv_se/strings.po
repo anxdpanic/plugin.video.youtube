@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2025-08-30 13:29+0000\n"
 "Last-Translator: Daniel Nylander <daniel@danielnylander.se>\n"
@@ -236,7 +236,7 @@ msgid "Sign Out"
 msgstr "Logga ut"
 
 msgctxt "#30113"
-msgid ""
+msgid "Related to \"%s\""
 msgstr ""
 
 msgctxt "#30114"
@@ -256,7 +256,7 @@ msgid "Remove \"%s\"?"
 msgstr "Ta bort \"%s\"?"
 
 msgctxt "#30118"
-msgid ""
+msgid "Links from \"%s\""
 msgstr ""
 
 msgctxt "#30119"
@@ -488,8 +488,8 @@ msgid "Please complete all login prompts"
 msgstr "Fyll i alla inloggningsförfrågningar"
 
 msgctxt "#30547"
-msgid "You may be prompted to enable two applications so that YouTube is functioning properly."
-msgstr "Du kan bli ombedd att aktivera två program så att YouTube fungerar korrekt."
+msgid "You may be prompted to login and enable access to multiple applications so that this addon can function properly."
+msgstr ""
 
 msgctxt "#30548"
 msgid ""
@@ -648,19 +648,19 @@ msgid "Blacklist"
 msgstr "Svartlista"
 
 msgctxt "#30587"
-msgid ""
+msgid "Hide \"Playlists\" folder"
 msgstr ""
 
 msgctxt "#30588"
-msgid ""
+msgid "Hide \"Search\" folder"
 msgstr ""
 
 msgctxt "#30589"
-msgid ""
+msgid "Hide \"Shorts\" folder"
 msgstr ""
 
 msgctxt "#30590"
-msgid ""
+msgid "Hide \"Live\" folder"
 msgstr ""
 
 msgctxt "#30591"
@@ -688,7 +688,7 @@ msgid "Strict"
 msgstr "Strikt"
 
 msgctxt "#30597"
-msgid ""
+msgid "Hide \"Members only\" folder"
 msgstr ""
 
 msgctxt "#30598"
@@ -796,7 +796,7 @@ msgid "Install InputStream Helper"
 msgstr "Installera InputStream-hjälpprogram"
 
 msgctxt "#30624"
-msgid ""
+msgid "Members only"
 msgstr ""
 
 msgctxt "#30625"
@@ -1532,8 +1532,8 @@ msgid "Use channel name as"
 msgstr "Använd kanalnamn som"
 
 msgctxt "#30808"
-msgid "Hide videos from listings"
-msgstr "Dölj videor från listor"
+msgid "Hide items from listings"
+msgstr ""
 
 msgctxt "#30809"
 msgid "All upcoming videos"
@@ -1582,6 +1582,14 @@ msgstr "Spela från början"
 msgctxt "#30820"
 msgid "Podcast"
 msgstr "Podradio"
+
+#~ msgctxt "#30547"
+#~ msgid "You may be prompted to enable two applications so that YouTube is functioning properly."
+#~ msgstr "Du kan bli ombedd att aktivera två program så att YouTube fungerar korrekt."
+
+#~ msgctxt "#30808"
+#~ msgid "Hide videos from listings"
+#~ msgstr "Dölj videor från listor"
 
 # empty strings 30019
 #~ msgctxt "#30020"
