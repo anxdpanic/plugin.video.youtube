@@ -15,7 +15,7 @@ from functools import partial
 from re import compile as re_compile
 from weakref import proxy
 
-from .client import YouTube
+from .client import YouTubePlayerClient
 from .helper import (
     ResourceManager,
     UrlResolver,
@@ -178,11 +178,10 @@ class Provider(AbstractProvider):
                                switch=switch)
 
         if not client:
-            client = YouTube(
+            client = YouTubePlayerClient(
                 context=context,
                 language=settings.get_language(),
                 region=settings.get_region(),
-                items_per_page=settings.items_per_page(),
                 configs=configs,
             )
             self._client = client

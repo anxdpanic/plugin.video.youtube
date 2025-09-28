@@ -19,7 +19,6 @@ from re import compile as re_compile
 from xml.etree.ElementTree import Element as ET_Element, XML as ET_XML
 
 from .login_client import LoginClient
-from .player_client import PlayerClient
 from ..helper.utils import channel_filter_split
 from ..helper.v3 import pre_fill
 from ..youtube_exceptions import InvalidJSON, YouTubeException
@@ -315,9 +314,13 @@ class YouTube(LoginClient):
         },
     }
 
-    def __init__(self, items_per_page=50, **kwargs):
+    def __init__(self, context, items_per_page=None, **kwargs):
         self.channel_id = None
-        super(YouTube, self).__init__(**kwargs)
+
+        if items_per_page is None:
+            items_per_page = context.get_settings().items_per_page()
+
+        super(YouTube, self).__init__(context=context, **kwargs)
         YouTube.init(items_per_page=items_per_page)
 
     @classmethod
@@ -386,19 +389,6 @@ class YouTube(LoginClient):
                          no_content=True,
                          do_auth=True,
                          cache=False)
-
-    @staticmethod
-    def get_streams(context,
-                    video_id,
-                    ask_for_quality=False,
-                    audio_only=False,
-                    use_mpd=True):
-        return PlayerClient(
-            context=context,
-            ask_for_quality=ask_for_quality,
-            audio_only=audio_only,
-            use_mpd=use_mpd,
-        ).load_stream_info(video_id)
 
     def remove_playlist(self, playlist_id, **kwargs):
         params = {'id': playlist_id,

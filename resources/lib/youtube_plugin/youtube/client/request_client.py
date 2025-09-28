@@ -774,7 +774,8 @@ class YouTubeRequestClient(BaseRequestsClass):
              **_kwargs):
         common_client = cls.CLIENTS['_common']['json']['context']['client']
         # the default language is always en_US (like YouTube on the WEB)
-        cls._language = common_client['hl'] = language.replace('-', '_')
+        common_client['hl'] = 'en_US'
+        cls._language = language.replace('-', '_')
         cls._region = common_client['gl'] = region
 
     def reinit(self, **kwargs):

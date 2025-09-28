@@ -16,7 +16,7 @@ from os import path as os_path
 from random import choice as random_choice
 from re import compile as re_compile
 
-from .login_client import LoginClient
+from .youtube import YouTube
 from .subtitles import SUBTITLE_SELECTIONS, Subtitles
 from ..helper.ratebypass import ratebypass
 from ..helper.signature.cipher import Cipher
@@ -42,7 +42,7 @@ from ...kodion.utils.methods import merge_dicts
 from ...kodion.utils.redact import redact_ip_in_uri
 
 
-class PlayerClient(LoginClient):
+class YouTubePlayerClient(YouTube):
     log = logging.getLogger(__name__)
 
     BASE_PATH = make_dirs(TEMP_PATH)
@@ -793,20 +793,33 @@ class PlayerClient(LoginClient):
     def __init__(self,
                  context,
                  clients=None,
-                 ask_for_quality=False,
-                 audio_only=False,
-                 use_mpd=True,
+                 ask_for_quality=None,
+                 audio_only=None,
+                 use_mpd=None,
                  **kwargs):
         self.video_id = None
         self.yt_item = None
 
-        self._ask_for_quality = ask_for_quality
-        self._audio_only = audio_only
-        self._use_mpd = use_mpd
+        settings = context.get_settings()
+
+        if ask_for_quality is None:
+            self._ask_for_quality = settings.ask_for_video_quality()
+        else:
+            self._ask_for_quality = ask_for_quality
+
+        if audio_only is None:
+            self._audio_only = settings.audio_only()
+        else:
+            self._audio_only = audio_only
+
+        if use_mpd is None:
+            self._use_mpd = settings.use_mpd_videos()
+        else:
+            self._use_mpd = use_mpd
 
         audio_language, prefer_default = context.get_player_language()
         if audio_language == 'mediadefault':
-            self._language_base = context.get_settings().get_language()[0:2]
+            self._language_base = settings.get_language()[0:2]
         elif audio_language == 'original':
             self._language_base = ''
         else:
@@ -844,7 +857,7 @@ class PlayerClient(LoginClient):
             )),
         )
 
-        super(PlayerClient, self).__init__(context=context, **kwargs)
+        super(YouTubePlayerClient, self).__init__(context=context, **kwargs)
 
     @staticmethod
     def _error_hook(**kwargs):
@@ -1567,15 +1580,31 @@ class PlayerClient(LoginClient):
             return result['simpleText']
         return None
 
-    def load_stream_info(self, video_id):
+    def load_stream_info(self,
+                         video_id,
+                         ask_for_quality=None,
+                         audio_only=None,
+                         use_mpd=None):
         self.video_id = video_id
+
+        if ask_for_quality is None:
+            ask_for_quality = self._ask_for_quality
+        else:
+            self._ask_for_quality = ask_for_quality
+
+        if audio_only is None:
+            audio_only = self._audio_only
+        else:
+            self._audio_only = audio_only
+
+        if use_mpd is None:
+            use_mpd = self._use_mpd
+        else:
+            self._use_mpd = use_mpd
 
         context = self._context
         settings = context.get_settings()
         age_gate_enabled = settings.age_gate()
-        audio_only = self._audio_only
-        ask_for_quality = self._ask_for_quality
-        use_mpd = self._use_mpd
         use_remote_history = settings.use_remote_history()
 
         _client_name = None

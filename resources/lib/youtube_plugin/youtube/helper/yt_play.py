@@ -83,8 +83,7 @@ def _play_stream(provider, context):
                    and context.ipc_exec(SERVER_WAKEUP, timeout=5))
 
         try:
-            streams, yt_item = client.get_streams(
-                context,
+            streams, yt_item = client.load_stream_info(
                 video_id=video_id,
                 ask_for_quality=ask_for_quality,
                 audio_only=audio_only,
