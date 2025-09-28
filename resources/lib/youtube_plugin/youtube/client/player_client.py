@@ -793,29 +793,14 @@ class YouTubePlayerClient(YouTube):
     def __init__(self,
                  context,
                  clients=None,
-                 ask_for_quality=None,
-                 audio_only=None,
-                 use_mpd=None,
                  **kwargs):
         self.video_id = None
         self.yt_item = None
 
         settings = context.get_settings()
-
-        if ask_for_quality is None:
-            self._ask_for_quality = settings.ask_for_video_quality()
-        else:
-            self._ask_for_quality = ask_for_quality
-
-        if audio_only is None:
-            self._audio_only = settings.audio_only()
-        else:
-            self._audio_only = audio_only
-
-        if use_mpd is None:
-            self._use_mpd = settings.use_mpd_videos()
-        else:
-            self._use_mpd = use_mpd
+        self._ask_for_quality = settings.ask_for_video_quality()
+        self._audio_only = settings.audio_only()
+        self._use_mpd = settings.use_mpd_videos()
 
         audio_language, prefer_default = context.get_player_language()
         if audio_language == 'mediadefault':
