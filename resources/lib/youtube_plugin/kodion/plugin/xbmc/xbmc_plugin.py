@@ -223,10 +223,9 @@ class XbmcPlugin(AbstractPlugin):
                 ui.on_ok('Error in ContentProvider', exc.__str__())
 
         if not ui.pop_property(REFRESH_CONTAINER, as_bool=True) and forced:
-            player_video_id = ui.pop_property(PLAYER_VIDEO_ID)
-            if player_video_id:
+            played_video_id = ui.pop_property(PLAYER_VIDEO_ID)
+            if played_video_id:
                 focused_video_id = None
-                played_video_id = player_video_id
             else:
                 focused_video_id = None if route else ui.get_property(VIDEO_ID)
                 played_video_id = None
@@ -408,7 +407,7 @@ class XbmcPlugin(AbstractPlugin):
             if any(sync_items):
                 context.send_notification(SYNC_LISTITEM, sync_items)
 
-            if forced and is_same_path:
+            if forced and is_same_path and (not played_video_id or route):
                 container = ui.get_property(CONTAINER_ID)
                 position = ui.get_property(CONTAINER_POSITION)
                 if container and position:
