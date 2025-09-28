@@ -34,7 +34,7 @@ from ...kodion.compatibility import (
     urlunsplit,
     xbmcvfs,
 )
-from ...kodion.constants import PATHS, TEMP_PATH, VALUE_TO_STR
+from ...kodion.constants import INCOGNITO, PATHS, TEMP_PATH, VALUE_TO_STR
 from ...kodion.network import get_connect_address
 from ...kodion.utils.datetime import fromtimestamp
 from ...kodion.utils.file_system import make_dirs
@@ -818,7 +818,11 @@ class YouTubePlayerClient(YouTube):
         self._calculate_n = False
         self._cipher = False
 
-        self._visitor_data = None
+        self._visitor_data = {
+            'current': None,
+            INCOGNITO: None,
+        }
+        self._visitor_data_key = 'current'
         self._auth_client = {}
         self._client_groups = (
             ('custom', clients if clients else ()),
@@ -1423,7 +1427,7 @@ class YouTubePlayerClient(YouTube):
             if visitor_data is not False:
                 headers.setdefault(
                     'X-Goog-Visitor-Id',
-                    visitor_data or self._visitor_data,
+                    visitor_data or self._visitor_data[self._visitor_data_key],
                 )
             if referrer is not False:
                 headers.setdefault(
@@ -1505,7 +1509,7 @@ class YouTubePlayerClient(YouTube):
             'url': self.V1_API_URL,
             'method': 'POST',
             '_endpoint': 'player',
-            '_visitor_data': self._visitor_data,
+            '_visitor_data': self._visitor_data[self._visitor_data_key],
         }
 
         for client_name in ('tv_embed', 'web'):
@@ -1569,6 +1573,7 @@ class YouTubePlayerClient(YouTube):
                          video_id,
                          ask_for_quality=None,
                          audio_only=None,
+                         incognito=None,
                          use_mpd=None):
         self.video_id = video_id
 
@@ -1581,6 +1586,14 @@ class YouTubePlayerClient(YouTube):
             audio_only = self._audio_only
         else:
             self._audio_only = audio_only
+
+        if incognito is None:
+            incognito = self._context.get_param(INCOGNITO, False)
+        if incognito:
+            visitor_data_key = self._visitor_data_key = INCOGNITO
+            self._visitor_data[visitor_data_key] = None
+        else:
+            visitor_data_key = self._visitor_data_key = 'current'
 
         if use_mpd is None:
             use_mpd = self._use_mpd
@@ -1603,7 +1616,7 @@ class YouTubePlayerClient(YouTube):
         _status = None
         _reason = None
 
-        visitor_data = None
+        visitor_data = self._visitor_data[visitor_data_key]
         video_details = {}
         microformat = {}
         responses = {}
@@ -1648,7 +1661,7 @@ class YouTubePlayerClient(YouTube):
             },
             '_endpoint': 'player',
             '_cpn': None,
-            '_visitor_data': self._visitor_data,
+            '_visitor_data': visitor_data,
         }
         if use_remote_history:
             client_data['_auth_type'] = 'user'
@@ -1658,6 +1671,8 @@ class YouTubePlayerClient(YouTube):
             if not clients:
                 continue
             if name == 'auth_enabled_initial_request':
+                if visitor_data and not logged_in:
+                    continue
                 allow_skip = False
                 client_data['_auth_requested'] = True
             else:
@@ -1728,7 +1743,7 @@ class YouTubePlayerClient(YouTube):
                         )
                         if visitor_data:
                             client_data['_visitor_data'] = visitor_data
-                            self._visitor_data = visitor_data
+                            self._visitor_data[visitor_data_key] = visitor_data
                     _video_details = _result.get('videoDetails', {})
                     _microformat = (_result
                                     .get('microformat', {})

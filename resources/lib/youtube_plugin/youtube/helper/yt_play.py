@@ -87,6 +87,7 @@ def _play_stream(provider, context):
                 video_id=video_id,
                 ask_for_quality=ask_for_quality,
                 audio_only=audio_only,
+                incognito=incognito,
                 use_mpd=use_mpd,
             )
         except YouTubeException as exc:
