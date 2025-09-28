@@ -1646,7 +1646,7 @@ class YouTubePlayerClient(YouTube):
         }
         abort = False
 
-        has_access_token = bool(self._access_tokens)
+        logged_in = self.logged_in
         client_data = {
             'json': {
                 'videoId': video_id,
@@ -1799,7 +1799,7 @@ class YouTubePlayerClient(YouTube):
                             elif client_data.get('_auth_required'):
                                 restart = False
                                 abort = True
-                            elif restart is None and has_access_token:
+                            elif restart is None and logged_in:
                                 client_data['_auth_required'] = True
                                 restart = True
                             break
