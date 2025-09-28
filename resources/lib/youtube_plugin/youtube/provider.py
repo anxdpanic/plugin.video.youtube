@@ -115,9 +115,24 @@ class Provider(AbstractProvider):
 
     def reset_client(self, **kwargs):
         if self._client:
-            kwargs.setdefault('configs', {})
-            kwargs.setdefault('access_token', '')
-            kwargs.setdefault('access_token_tv', '')
+            kwargs.setdefault(
+                'configs',
+                {
+                    'dev': {},
+                    'user': {},
+                    'tv': {},
+                    'vr': {},
+                }
+            )
+            kwargs.setdefault(
+                'access_tokens',
+                {
+                    'dev': None,
+                    'user': None,
+                    'tv': None,
+                    'vr': None,
+                }
+            )
             self._client.reinit(**kwargs)
 
     def get_client(self, context):
