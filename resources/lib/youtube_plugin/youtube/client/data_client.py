@@ -18,7 +18,7 @@ from random import randint
 from re import compile as re_compile
 from xml.etree.ElementTree import Element as ET_Element, XML as ET_XML
 
-from .login_client import LoginClient
+from .login_client import YouTubeLoginClient
 from ..helper.utils import channel_filter_split
 from ..helper.v3 import pre_fill
 from ..youtube_exceptions import InvalidJSON, YouTubeException
@@ -34,7 +34,7 @@ from ...kodion.utils.datetime import (
 )
 
 
-class YouTube(LoginClient):
+class YouTubeDataClient(YouTubeLoginClient):
     log = logging.getLogger(__name__)
 
     _max_results = 50
@@ -320,19 +320,18 @@ class YouTube(LoginClient):
         if items_per_page is None:
             items_per_page = context.get_settings().items_per_page()
 
-        super(YouTube, self).__init__(context=context, **kwargs)
-        YouTube.init(items_per_page=items_per_page)
+        super(YouTubeDataClient, self).__init__(context=context, **kwargs)
+        YouTubeDataClient.init(items_per_page=items_per_page)
 
     @classmethod
     def init(cls, items_per_page=50, **_kwargs):
         cls._max_results = items_per_page
 
     def reinit(self, **kwargs):
-        super(YouTube, self).reinit(**kwargs)
-        self.__init__(**kwargs)
+        super(YouTubeDataClient, self).reinit(**kwargs)
 
     def set_access_token(self, access_tokens=None):
-        super(YouTube, self).set_access_token(access_tokens)
+        super(YouTubeDataClient, self).set_access_token(access_tokens)
         if self.logged_in:
             context = self._context
             function_cache = context.get_function_cache()

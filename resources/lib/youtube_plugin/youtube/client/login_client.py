@@ -15,7 +15,7 @@ from ..youtube_exceptions import InvalidGrant, LoginException
 from ...kodion import logging
 
 
-class LoginClient(YouTubeRequestClient):
+class YouTubeLoginClient(YouTubeRequestClient):
     log = logging.getLogger(__name__)
 
     ANDROID_CLIENT_AUTH_URL = 'https://android.clients.google.com/auth'
@@ -63,8 +63,11 @@ class LoginClient(YouTubeRequestClient):
                  configs=None,
                  access_tokens=None,
                  **kwargs):
-        super(LoginClient, self).__init__(exc_type=LoginException, **kwargs)
-        LoginClient.init(configs)
+        super(YouTubeLoginClient, self).__init__(
+            exc_type=LoginException,
+            **kwargs
+        )
+        YouTubeLoginClient.init(configs)
         self.set_access_token(access_tokens)
         self.initialised = any(self._configs.values())
 
@@ -78,8 +81,7 @@ class LoginClient(YouTubeRequestClient):
                 _configs[config_type] = config
 
     def reinit(self, **kwargs):
-        super(LoginClient, self).reinit(**kwargs)
-        self.__init__(**kwargs)
+        super(YouTubeLoginClient, self).reinit(**kwargs)
 
     def set_access_token(self, access_tokens=None):
         _access_tokens = type(self)._access_tokens
@@ -133,7 +135,7 @@ class LoginClient(YouTubeRequestClient):
             data=post_data,
             headers=headers,
             response_hook=self._response_hook_json,
-            error_hook=LoginClient._error_hook,
+            error_hook=YouTubeLoginClient._error_hook,
             error_title='Logout failed - Refresh token revocation error',
             raise_exc=True,
         )
@@ -188,7 +190,7 @@ class LoginClient(YouTubeRequestClient):
             data=post_data,
             headers=headers,
             response_hook=self._response_hook_json,
-            error_hook=LoginClient._error_hook,
+            error_hook=YouTubeLoginClient._error_hook,
             error_title='Login failed - Refresh token grant error',
             error_info=log_info,
             raise_exc=True,
@@ -246,7 +248,7 @@ class LoginClient(YouTubeRequestClient):
             data=post_data,
             headers=headers,
             response_hook=self._response_hook_json,
-            error_hook=LoginClient._error_hook,
+            error_hook=YouTubeLoginClient._error_hook,
             error_title='Login failed - Access token request error',
             error_info=log_info,
             raise_exc=True,
@@ -294,7 +296,7 @@ class LoginClient(YouTubeRequestClient):
             data=post_data,
             headers=headers,
             response_hook=self._response_hook_json,
-            error_hook=LoginClient._error_hook,
+            error_hook=YouTubeLoginClient._error_hook,
             error_title='Login failed - Device/user code request error',
             error_info=log_info,
             raise_exc=True,

@@ -35,7 +35,7 @@ def _do_logout(provider, context, client=None, refresh=True, **kwargs):
             except LoginException:
                 success = False
 
-    provider.reset_client(**kwargs)
+    provider.reset_client(context=context, **kwargs)
     access_manager.update_access_token(
         addon_id, access_token='', expiry=-1, refresh_token='',
     )
@@ -143,7 +143,7 @@ def _do_login(provider, context, client=None, **kwargs):
                           expiry=new_token[1],
                           has_refresh_token=bool(new_token[2]))
     else:
-        provider.reset_client(**kwargs)
+        provider.reset_client(context=context, **kwargs)
         access_manager.update_access_token(addon_id, *zip(*tokens))
         ui.refresh_container()
         return True

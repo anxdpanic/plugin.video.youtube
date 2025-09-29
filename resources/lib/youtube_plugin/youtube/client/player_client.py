@@ -16,7 +16,7 @@ from os import path as os_path
 from random import choice as random_choice
 from re import compile as re_compile
 
-from .youtube import YouTube
+from .data_client import YouTubeDataClient
 from .subtitles import SUBTITLE_SELECTIONS, Subtitles
 from ..helper.ratebypass import ratebypass
 from ..helper.signature.cipher import Cipher
@@ -42,7 +42,7 @@ from ...kodion.utils.methods import merge_dicts
 from ...kodion.utils.redact import redact_ip_in_uri
 
 
-class YouTubePlayerClient(YouTube):
+class YouTubePlayerClient(YouTubeDataClient):
     log = logging.getLogger(__name__)
 
     BASE_PATH = make_dirs(TEMP_PATH)

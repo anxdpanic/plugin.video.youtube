@@ -228,7 +228,7 @@ class Provider(AbstractProvider):
                           old=api_last_origin,
                           new=origin)
             access_manager.set_last_origin(origin)
-            self.reset_client()
+            client.initialised = False
 
         if not client.initialised:
             self.reset_client(
