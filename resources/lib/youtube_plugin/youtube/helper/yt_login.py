@@ -19,6 +19,13 @@ SIGN_OUT = 'out'
 
 
 def _do_logout(provider, context, client=None, refresh=True, **kwargs):
+    ui = context.get_ui()
+    if not context.get_param('confirmed') and not ui.on_yes_no_input(
+            context.localize('sign.out'),
+            context.localize('are_you_sure')
+    ):
+        return False
+
     if not client:
         client = provider.get_client(context)
 
@@ -55,11 +62,32 @@ def _do_login(provider, context, client=None, **kwargs):
 
     ui.on_ok(localize('sign.multi.title'), localize('sign.multi.text'))
 
-    tokens = ['tv', 'user', 'vr']
-    for token_type, token in enumerate(tokens):
-        new_token = ('', -1, '')
+    (
+        access_tokens,
+        num_access_tokens,
+        expiry_timestamp,
+    ) = access_manager.get_access_tokens()
+    (
+        refresh_tokens,
+        num_refresh_tokens,
+    ) = access_manager.get_refresh_tokens()
+    token_types = ['tv', 'user', 'vr', 'dev']
+    new_access_tokens = dict.fromkeys(token_types, None)
+    for token_idx, token_type in enumerate(token_types):
         try:
-            json_data = client.request_device_and_user_code(token_type)
+            access_token = access_tokens[token_idx]
+            refresh_token = refresh_tokens[token_idx]
+            if access_token and refresh_token:
+                new_access_tokens[token_type] = access_token
+                new_token = (access_token, expiry_timestamp, refresh_token)
+                token_types[token_idx] = new_token
+                continue
+        except IndexError:
+            pass
+
+        new_token = ('', expiry_timestamp, '')
+        try:
+            json_data = client.request_device_and_user_code(token_idx)
             if not json_data:
                 continue
 
@@ -93,7 +121,7 @@ def _do_login(provider, context, client=None, **kwargs):
                 for _ in range(steps):
                     progress_dialog.update()
                     json_data = client.request_access_token(
-                        token_type, device_code
+                        token_idx, device_code
                     )
                     if not json_data:
                         break
@@ -132,19 +160,24 @@ def _do_login(provider, context, client=None, **kwargs):
             _do_logout(provider, context, client=client)
             break
         finally:
-            tokens[token_type] = new_token
+            new_access_tokens[token_type] = new_token[0]
+            token_types[token_idx] = new_token
             logging.debug(('YouTube Login:',
                            'Type:          {token!r}',
                            'Access token:  {has_access_token!r}',
                            'Expires:       {expiry!r}',
                            'Refresh token: {has_refresh_token!r}'),
-                          token=token,
+                          token=token_type,
                           has_access_token=bool(new_token[0]),
                           expiry=new_token[1],
                           has_refresh_token=bool(new_token[2]))
     else:
-        provider.reset_client(context=context, **kwargs)
-        access_manager.update_access_token(addon_id, *zip(*tokens))
+        provider.reset_client(
+            context=context,
+            access_tokens=new_access_tokens,
+            **kwargs
+        )
+        access_manager.update_access_token(addon_id, *zip(*token_types))
         ui.refresh_container()
         return True
     return False

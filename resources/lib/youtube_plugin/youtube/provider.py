@@ -932,28 +932,12 @@ class Provider(AbstractProvider):
     @AbstractProvider.register_path('^/sign/(?P<mode>[^/]+)/?$')
     @staticmethod
     def on_sign_x(provider, context, re_match):
-        confirmed = context.get_param('confirmed')
-        mode = re_match.group('mode')
-        client = provider.get_client(context)
-        if mode == yt_login.SIGN_IN:
-            if client.logged_in:
-                yt_login.process(yt_login.SIGN_OUT,
-                                 provider,
-                                 context,
-                                 client=client,
-                                 refresh=False)
-                client = None
-        elif mode == yt_login.SIGN_OUT:
-            if not confirmed and not context.get_ui().on_yes_no_input(
-                    context.localize('sign.out'),
-                    context.localize('are_you_sure')
-            ):
-                return False
-        else:
-            return False
-
-        yt_login.process(mode, provider, context, client=client)
-        return True
+        return yt_login.process(
+            re_match.group('mode'),
+            provider,
+            context,
+            client=provider.get_client(context),
+        )
 
     def _search_channel_or_playlist(self,
                                     context,
