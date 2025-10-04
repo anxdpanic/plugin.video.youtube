@@ -311,7 +311,7 @@ class XbmcPlugin(AbstractPlugin):
             update_listing = options.get(provider.UPDATE_LISTING, True)
 
         if result_item and result_item_type in self._PLAY_ITEM_MAP:
-            if path != PATHS.PLAY and not forced:
+            if not forced and not force_resolve and path != PATHS.PLAY:
                 force_play = True
             else:
                 force_play = options.get(provider.FORCE_PLAY)

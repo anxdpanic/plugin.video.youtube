@@ -358,8 +358,9 @@ class Provider(AbstractProvider):
                                                 context=context,
                                                 skip_title=skip_title)
         if items:
-            return (items if listing else items[0]), None
-
+            if listing:
+                return items, None
+            return items[0], {provider.FORCE_RESOLVE: True}
         return [], None
 
     @AbstractProvider.register_path(
