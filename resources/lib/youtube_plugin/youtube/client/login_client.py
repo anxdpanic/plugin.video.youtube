@@ -84,12 +84,31 @@ class YouTubeLoginClient(YouTubeRequestClient):
         super(YouTubeLoginClient, self).reinit(**kwargs)
 
     def set_access_token(self, access_tokens=None):
-        _access_tokens = type(self)._access_tokens
+        existing_access_tokens = type(self)._access_tokens
         if access_tokens:
-            for token_type, token in access_tokens.items():
-                if token is not None and token_type in _access_tokens:
-                    _access_tokens[token_type] = token
-        self.logged_in = any(_access_tokens.values())
+            token_status = 0
+            for token_type, token in existing_access_tokens.items():
+                if token_type in access_tokens:
+                    token = access_tokens[token_type]
+                    existing_access_tokens[token_type] = token
+                if token or token_type == 'dev':
+                    token_status |= 1
+                else:
+                    token_status |= 2
+
+            self.logged_in = (
+                'partially'
+                if token_status & 2 else
+                'fully'
+                if token_status & 1 else
+                False
+            )
+            self.log.info('User is %s logged in', self.logged_in or 'not')
+        else:
+            for token_type in existing_access_tokens:
+                existing_access_tokens[token_type] = None
+            self.logged_in = False
+            self.log.info('User is not logged in')
 
     @property
     def initialised(self):

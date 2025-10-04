@@ -26,8 +26,8 @@ def _do_logout(provider, context, client=None, refresh=True, **kwargs):
     addon_id = context.get_param('addon_id', None)
 
     success = True
-    refresh_tokens = access_manager.get_refresh_token()
-    if any(refresh_tokens):
+    refresh_tokens, num_refresh_tokens = access_manager.get_refresh_tokens()
+    if num_refresh_tokens:
         for refresh_token in frozenset(refresh_tokens):
             try:
                 if refresh_token:

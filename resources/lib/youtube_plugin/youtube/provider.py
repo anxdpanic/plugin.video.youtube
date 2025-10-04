@@ -239,17 +239,19 @@ class Provider(AbstractProvider):
                 configs=configs,
             )
 
-        num_access_tokens, expired = access_manager.access_token_status(dev_id)
-        if num_access_tokens:
-            if expired:
-                num_access_tokens = 0
-            elif client.logged_in:
-                self.log.debug('User is logged in')
-                return client
+        (
+            access_tokens,
+            num_access_tokens,
+            _,
+        ) = access_manager.get_access_tokens(dev_id)
+        (
+            refresh_tokens,
+            num_refresh_tokens,
+        ) = access_manager.get_refresh_tokens(dev_id)
 
-        refresh_tokens = access_manager.get_refresh_token(dev_id)
-        num_refresh_tokens = len([1 for token in refresh_tokens if token])
-
+        if num_access_tokens and client.logged_in:
+            self.log.debug('User is %s logged in', client.logged_in)
+            return client
         if num_access_tokens or num_refresh_tokens:
             self.log.debug(('# Access tokens:  %d',
                             '# Refresh tokens: %d'),
@@ -305,24 +307,12 @@ class Provider(AbstractProvider):
                         refresh_token=refresh_token,
                     )
 
-                num_access_tokens = len([1 for token in access_tokens if token])
-            else:
-                access_tokens = access_manager.get_access_token()
+            client.set_access_token({
+                client.TOKEN_TYPES[idx]: token
+                for idx, token in enumerate(access_tokens)
+                if token
 
-            if num_access_tokens and access_tokens[client.TOKEN_TYPES['user']]:
-                self.log.info('User is logged in')
-                client.set_access_token({
-                    client.TOKEN_TYPES[idx]: token
-                    for idx, token in enumerate(access_tokens)
-                    if token
-
-                })
-            else:
-                self.log.info('User is not logged in')
-                client.set_access_token({
-                    client.TOKEN_TYPES[idx]: ''
-                    for idx, _ in enumerate(access_tokens)
-                })
+            })
 
         return client
 
@@ -1408,7 +1398,8 @@ class Provider(AbstractProvider):
         }
 
         # sign in
-        if not logged_in and settings_bool(settings.SHOW_SIGN_IN, True):
+        if ((not logged_in or logged_in == 'partially')
+                and settings_bool(settings.SHOW_SIGN_IN, True)):
             item_label = localize('sign.in')
             sign_in_item = DirectoryItem(
                 bold(item_label),
