@@ -127,7 +127,7 @@ class YouTubeLoginClient(YouTubeRequestClient):
         type(self)._logged_in = value
 
     @staticmethod
-    def _error_hook(**kwargs):
+    def _login_error_hook(**kwargs):
         json_data = getattr(kwargs['exc'], 'json_data', None)
         if not json_data or 'error' not in json_data:
             return None, None, None, None, LoginException
@@ -154,7 +154,7 @@ class YouTubeLoginClient(YouTubeRequestClient):
             data=post_data,
             headers=headers,
             response_hook=self._response_hook_json,
-            error_hook=YouTubeLoginClient._error_hook,
+            error_hook=self._login_error_hook,
             error_title='Logout failed - Refresh token revocation error',
             raise_exc=True,
         )
@@ -209,7 +209,7 @@ class YouTubeLoginClient(YouTubeRequestClient):
             data=post_data,
             headers=headers,
             response_hook=self._response_hook_json,
-            error_hook=YouTubeLoginClient._error_hook,
+            error_hook=self._login_error_hook,
             error_title='Login failed - Refresh token grant error',
             error_info=log_info,
             raise_exc=True,
@@ -267,7 +267,7 @@ class YouTubeLoginClient(YouTubeRequestClient):
             data=post_data,
             headers=headers,
             response_hook=self._response_hook_json,
-            error_hook=YouTubeLoginClient._error_hook,
+            error_hook=self._login_error_hook,
             error_title='Login failed - Access token request error',
             error_info=log_info,
             raise_exc=True,
@@ -315,7 +315,7 @@ class YouTubeLoginClient(YouTubeRequestClient):
             data=post_data,
             headers=headers,
             response_hook=self._response_hook_json,
-            error_hook=YouTubeLoginClient._error_hook,
+            error_hook=self._login_error_hook,
             error_title='Login failed - Device/user code request error',
             error_info=log_info,
             raise_exc=True,

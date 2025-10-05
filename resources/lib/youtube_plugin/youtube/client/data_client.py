@@ -2863,7 +2863,7 @@ class YouTubeDataClient(YouTubeLoginClient):
             return True
         return False
 
-    def _response_hook(self, **kwargs):
+    def _request_response_hook(self, **kwargs):
         response = kwargs['response']
         if response is None:
             return None, None
@@ -2904,7 +2904,7 @@ class YouTubeDataClient(YouTubeLoginClient):
             response.raise_for_status()
         return json_data.get('etag'), json_data
 
-    def _error_hook(self, **kwargs):
+    def _request_error_hook(self, **kwargs):
         exc = kwargs['exc']
         json_data = getattr(exc, 'json_data', None)
         if getattr(exc, 'pass_data', False):
@@ -3072,9 +3072,9 @@ class YouTubeDataClient(YouTubeLoginClient):
             cache = False
         elif cache is not False and self._context.refresh_requested():
             cache = 'refresh'
-        return self.request(response_hook=self._response_hook,
+        return self.request(response_hook=self._request_response_hook,
                             event_hook_kwargs=kwargs,
-                            error_hook=self._error_hook,
+                            error_hook=self._request_error_hook,
                             stacklevel=3,
                             cache=cache,
                             **client)
