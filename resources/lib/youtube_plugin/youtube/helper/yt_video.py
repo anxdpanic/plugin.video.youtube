@@ -70,16 +70,11 @@ def _process_rate_video(provider,
     else:
         result = -1
 
+    notify_message = None
+    response = None
     if result != -1:
-        notify_message = ''
-
         response = provider.get_client(context).rate_video(video_id, result)
-
         if response:
-            # this will be set if we are in the 'Liked Video' playlist
-            if context.refresh_requested():
-                ui.refresh_container()
-
             if result == 'none':
                 notify_message = localize(('removed.x', 'rating'))
             elif result == 'like':
@@ -89,14 +84,20 @@ def _process_rate_video(provider,
         else:
             notify_message = localize('failed')
 
-        if notify_message:
-            ui.show_notification(
-                message=notify_message,
-                time_ms=2500,
-                audible=False,
-            )
+    if notify_message:
+        ui.show_notification(
+            message=notify_message,
+            time_ms=2500,
+            audible=False,
+        )
 
-    return True
+    return (
+        True,
+        {
+            # this will be set if we are in the 'Liked Video' playlist
+            provider.FORCE_REFRESH: response and context.refresh_requested(),
+        },
+    )
 
 
 def _process_more_for_video(context):

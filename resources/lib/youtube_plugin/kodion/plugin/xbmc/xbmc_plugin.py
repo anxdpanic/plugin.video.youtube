@@ -371,6 +371,8 @@ class XbmcPlugin(AbstractPlugin):
                         succeeded=False,
                         listitem=item,
                     )
+                elif options.get(provider.FORCE_REFRESH):
+                    _post_run_action = ui.refresh_container
                 else:
                     if context.is_plugin_path(
                             ui.get_container_info(FOLDER_URI, container_id=None)

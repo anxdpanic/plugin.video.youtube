@@ -1222,10 +1222,9 @@ class Provider(AbstractProvider):
                 context.get_name(), localize('reset.access_manager.check')
         ):
             access_manager = context.get_access_manager()
-            success = (
-                    yt_login.process(yt_login.SIGN_OUT, provider, context)
-                    and access_manager.set_defaults(reset=True)
-            )
+            success, _ = yt_login.process(yt_login.SIGN_OUT, provider, context)
+            if success:
+                success = access_manager.set_defaults(reset=True)
             ui.show_notification(localize('succeeded' if success else 'failed'))
         else:
             success = False
@@ -1294,18 +1293,16 @@ class Provider(AbstractProvider):
                 return False, {provider.FALLBACK: False}
 
             playback_history.clear()
-            ui.refresh_container()
-
             ui.show_notification(
                 localize('completed'),
                 time_ms=2500,
                 audible=False,
             )
-            return True
+            return True, {provider.FORCE_REFRESH: True}
 
         video_id = params.get(VIDEO_ID)
         if not video_id:
-            return False
+            return False, None
 
         if command == 'remove':
             video_name = params.get('item_name') or video_id
@@ -1317,14 +1314,12 @@ class Provider(AbstractProvider):
                 return False, {provider.FALLBACK: False}
 
             playback_history.del_item(video_id)
-            ui.refresh_container()
-
             ui.show_notification(
                 localize('removed.name.x', video_name),
                 time_ms=2500,
                 audible=False,
             )
-            return True
+            return True, {provider.FORCE_REFRESH: True}
 
         play_data = playback_history.get_item(video_id)
         if play_data:
@@ -1361,8 +1356,7 @@ class Provider(AbstractProvider):
             play_data['played_percent'] = 0
 
         playback_history_method(video_id, play_data)
-        ui.refresh_container()
-        return True
+        return True, {provider.FORCE_REFRESH: True}
 
     @staticmethod
     def on_root(provider, context, re_match):
@@ -1946,14 +1940,12 @@ class Provider(AbstractProvider):
                 return False, {provider.FALLBACK: False}
 
             context.get_bookmarks_list().clear()
-            ui.refresh_container()
-
             ui.show_notification(
                 localize('completed'),
                 time_ms=2500,
                 audible=False,
             )
-            return True
+            return True, {provider.FORCE_REFRESH: True}
 
         item_id = params.get('item_id')
 
@@ -1961,10 +1953,10 @@ class Provider(AbstractProvider):
             results = ui.on_keyboard_input(localize('bookmarks.edit.uri'),
                                            params.get('uri', ''))
             if not results[0]:
-                return False
+                return False, None
             item_uri = results[1]
             if not item_uri:
-                return False
+                return False, None
 
             if item_uri.startswith(('https://', 'http://')):
                 item_uri = UrlToItemConverter().process_url(
@@ -1978,12 +1970,12 @@ class Provider(AbstractProvider):
                     time_ms=2500,
                     audible=False,
                 )
-                return False
+                return False, None
 
             results = ui.on_keyboard_input(localize('bookmarks.edit.name'),
                                            params.get('item_name', item_uri))
             if not results[0]:
-                return False
+                return False, None
             item_name = results[1]
 
             item_date_time = now()
@@ -2004,7 +1996,6 @@ class Provider(AbstractProvider):
                 )
                 item.bookmark_id = item_id
                 context.get_bookmarks_list().add_item(item_id, repr(item))
-            ui.refresh_container()
 
             ui.show_notification(
                 localize('updated.x', item_name)
@@ -2013,26 +2004,30 @@ class Provider(AbstractProvider):
                 time_ms=2500,
                 audible=False,
             )
-            return True
+            return True, {provider.FORCE_REFRESH: True}
 
         if not item_id:
-            return False
+            return False, None
 
         if command == 'add':
             item = params.get('item')
             if not item:
-                return False
+                return False, None
 
             context.get_bookmarks_list().add_item(item_id, item)
-            if context.get_path().startswith(PATHS.BOOKMARKS):
-                ui.refresh_container()
-
             ui.show_notification(
                 localize('bookmark.created'),
                 time_ms=2500,
                 audible=False,
             )
-            return True
+            return (
+                True,
+                {
+                    provider.FORCE_REFRESH: context.get_path().startswith(
+                        PATHS.BOOKMARKS
+                    ),
+                },
+            )
 
         if command == 'remove':
             bookmark_name = params.get('item_name') or localize('bookmark')
@@ -2044,16 +2039,14 @@ class Provider(AbstractProvider):
                 return False, {provider.FALLBACK: False}
 
             context.get_bookmarks_list().del_item(item_id)
-            ui.refresh_container()
-
             ui.show_notification(
                 localize('removed.name.x', bookmark_name),
                 time_ms=2500,
                 audible=False,
             )
-            return True
+            return True, {provider.FORCE_REFRESH: True}
 
-        return False
+        return False, None
 
     @staticmethod
     def on_watch_later(provider, context, re_match):
@@ -2112,23 +2105,21 @@ class Provider(AbstractProvider):
                 return False, {provider.FALLBACK: False}
 
             context.get_watch_later_list().clear()
-            ui.refresh_container()
-
             ui.show_notification(
                 localize('completed'),
                 time_ms=2500,
                 audible=False,
             )
-            return True
+            return True, {provider.FORCE_REFRESH: True}
 
         video_id = params.get(VIDEO_ID)
         if not video_id:
-            return False
+            return False, None
 
         if command == 'add':
             item = params.get('item')
             if not item:
-                return False
+                return False, None
 
             context.get_watch_later_list().add_item(video_id, item)
             ui.show_notification(
@@ -2136,7 +2127,7 @@ class Provider(AbstractProvider):
                 time_ms=2500,
                 audible=False,
             )
-            return True
+            return True, None
 
         if command == 'remove':
             video_name = params.get('item_name') or localize('untitled')
@@ -2148,16 +2139,14 @@ class Provider(AbstractProvider):
                 return False, {provider.FALLBACK: False}
 
             context.get_watch_later_list().del_item(video_id)
-            ui.refresh_container()
-
             ui.show_notification(
                 localize('removed.name.x', video_name),
                 time_ms=2500,
                 audible=False,
             )
-            return True
+            return True, {provider.FORCE_REFRESH: True}
 
-        return False
+        return False, None
 
     def handle_exception(self, context, exception_to_handle):
         if not isinstance(exception_to_handle, (InvalidGrant, LoginException)):

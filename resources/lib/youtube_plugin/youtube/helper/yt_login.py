@@ -18,7 +18,7 @@ SIGN_IN = 'in'
 SIGN_OUT = 'out'
 
 
-def _do_logout(provider, context, client=None, refresh=True, **kwargs):
+def _do_logout(provider, context, client=None, **kwargs):
     ui = context.get_ui()
     if not context.get_param('confirmed') and not ui.on_yes_no_input(
             context.localize('sign.out'),
@@ -46,8 +46,6 @@ def _do_logout(provider, context, client=None, refresh=True, **kwargs):
     access_manager.update_access_token(
         addon_id, access_token='', expiry=-1, refresh_token='',
     )
-    if refresh:
-        context.get_ui().refresh_container()
     return success
 
 
@@ -178,27 +176,27 @@ def _do_login(provider, context, client=None, **kwargs):
             **kwargs
         )
         access_manager.update_access_token(addon_id, *zip(*token_types))
-        ui.refresh_container()
         return True
     return False
 
 
 def process(mode, provider, context, client=None, refresh=True, **kwargs):
     if mode == SIGN_OUT:
-        return _do_logout(
+        signed_out = _do_logout(
             provider,
             context,
             client=client,
-            refresh=refresh,
             **kwargs
         )
+        return signed_out, {provider.FORCE_REFRESH: refresh}
 
     if mode == SIGN_IN:
-        return _do_login(
+        signed_in = _do_login(
             provider,
             context,
             client=client,
             **kwargs
         )
+        return signed_in, {provider.FORCE_REFRESH: refresh and signed_in}
 
-    return None
+    return None, None
