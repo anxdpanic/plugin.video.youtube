@@ -849,7 +849,7 @@ class YouTubePlayerClient(YouTubeDataClient):
         super(YouTubePlayerClient, self).__init__(context=context, **kwargs)
 
     @staticmethod
-    def _error_hook(**kwargs):
+    def _player_error_hook(**kwargs):
         exc = kwargs.pop('exc')
         json_data = getattr(exc, 'json_data', None)
         if getattr(exc, 'pass_data', False):
