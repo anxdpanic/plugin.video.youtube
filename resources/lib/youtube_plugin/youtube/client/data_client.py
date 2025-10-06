@@ -1315,6 +1315,7 @@ class YouTubeDataClient(YouTubeLoginClient):
     def get_browse_items(self,
                          browse_id=None,
                          channel_id=None,
+                         skip_ids=None,
                          params=None,
                          route=None,
                          _route={
@@ -1429,8 +1430,24 @@ class YouTubeDataClient(YouTubeLoginClient):
                     item,
                     json_path.get('item_id') or (item_id_kind,),
                 )
-                if not item_id:
+                if not item_id or skip_ids and item_id in skip_ids:
                     continue
+                if channel_id:
+                    _channel_id = channel_id
+                else:
+                    _channel_id = self.json_traverse(
+                        item,
+                        json_path.get('channel_id') or (
+                            ('longBylineText', 'shortBylineText'),
+                            'runs',
+                            0,
+                            'navigationEndpoint',
+                            'browseEndpoint',
+                            'browseId',
+                        ),
+                    )
+                    if skip_ids and _channel_id in skip_ids:
+                        continue
                 items.append({
                     'kind': item_kind,
                     'id': item_id,
@@ -1452,17 +1469,7 @@ class YouTubeDataClient(YouTubeLoginClient):
                                 'thumbnails'
                             ),
                         ),
-                        'channelId': channel_id or self.json_traverse(
-                            item,
-                            json_path.get('channel_id') or (
-                                ('longBylineText', 'shortBylineText'),
-                                'runs',
-                                0,
-                                'navigationEndpoint',
-                                'browseEndpoint',
-                                'browseId',
-                            ),
-                        ),
+                        'channelId': _channel_id,
                     }
                 })
         if not items:
@@ -1514,6 +1521,7 @@ class YouTubeDataClient(YouTubeLoginClient):
                 next_response = self.get_browse_items(
                     browse_id=browse_id,
                     channel_id=channel_id,
+                    skip_ids=skip_ids,
                     params=params,
                     route=route,
                     data=data,
