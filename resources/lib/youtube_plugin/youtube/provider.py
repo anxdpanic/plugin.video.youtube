@@ -15,7 +15,7 @@ from functools import partial
 from re import compile as re_compile
 from weakref import proxy
 
-from .client import YouTube
+from .client import YouTubePlayerClient
 from .helper import (
     ResourceManager,
     UrlResolver,
@@ -115,9 +115,24 @@ class Provider(AbstractProvider):
 
     def reset_client(self, **kwargs):
         if self._client:
-            kwargs.setdefault('configs', {})
-            kwargs.setdefault('access_token', '')
-            kwargs.setdefault('access_token_tv', '')
+            kwargs.setdefault(
+                'configs',
+                {
+                    'dev': {},
+                    'user': {},
+                    'tv': {},
+                    'vr': {},
+                }
+            )
+            kwargs.setdefault(
+                'access_tokens',
+                {
+                    'dev': None,
+                    'user': None,
+                    'tv': None,
+                    'vr': None,
+                }
+            )
             self._client.reinit(**kwargs)
 
     def get_client(self, context):
@@ -178,11 +193,10 @@ class Provider(AbstractProvider):
                                switch=switch)
 
         if not client:
-            client = YouTube(
+            client = YouTubePlayerClient(
                 context=context,
                 language=settings.get_language(),
                 region=settings.get_region(),
-                items_per_page=settings.items_per_page(),
                 configs=configs,
             )
             self._client = client
@@ -214,7 +228,7 @@ class Provider(AbstractProvider):
                           old=api_last_origin,
                           new=origin)
             access_manager.set_last_origin(origin)
-            self.reset_client()
+            client.initialised = False
 
         if not client.initialised:
             self.reset_client(
@@ -225,17 +239,19 @@ class Provider(AbstractProvider):
                 configs=configs,
             )
 
-        num_access_tokens, expired = access_manager.access_token_status(dev_id)
-        if num_access_tokens:
-            if expired:
-                num_access_tokens = 0
-            elif client.logged_in:
-                self.log.debug('User is logged in')
-                return client
+        (
+            access_tokens,
+            num_access_tokens,
+            _,
+        ) = access_manager.get_access_tokens(dev_id)
+        (
+            refresh_tokens,
+            num_refresh_tokens,
+        ) = access_manager.get_refresh_tokens(dev_id)
 
-        refresh_tokens = access_manager.get_refresh_token(dev_id)
-        num_refresh_tokens = len([1 for token in refresh_tokens if token])
-
+        if num_access_tokens and client.logged_in:
+            self.log.debug('User is %s logged in', client.logged_in)
+            return client
         if num_access_tokens or num_refresh_tokens:
             self.log.debug(('# Access tokens:  %d',
                             '# Refresh tokens: %d'),
@@ -291,24 +307,12 @@ class Provider(AbstractProvider):
                         refresh_token=refresh_token,
                     )
 
-                num_access_tokens = len([1 for token in access_tokens if token])
-            else:
-                access_tokens = access_manager.get_access_token()
+            client.set_access_token({
+                client.TOKEN_TYPES[idx]: token
+                for idx, token in enumerate(access_tokens)
+                if token
 
-            if num_access_tokens and access_tokens[client.TOKEN_TYPES['user']]:
-                self.log.info('User is logged in')
-                client.set_access_token({
-                    client.TOKEN_TYPES[idx]: token
-                    for idx, token in enumerate(access_tokens)
-                    if token
-
-                })
-            else:
-                self.log.info('User is not logged in')
-                client.set_access_token({
-                    client.TOKEN_TYPES[idx]: ''
-                    for idx, _ in enumerate(access_tokens)
-                })
+            })
 
         return client
 
@@ -354,8 +358,9 @@ class Provider(AbstractProvider):
                                                 context=context,
                                                 skip_title=skip_title)
         if items:
-            return (items if listing else items[0]), None
-
+            if listing:
+                return items, None
+            return items[0], {provider.FORCE_RESOLVE: True}
         return [], None
 
     @AbstractProvider.register_path(
@@ -928,28 +933,12 @@ class Provider(AbstractProvider):
     @AbstractProvider.register_path('^/sign/(?P<mode>[^/]+)/?$')
     @staticmethod
     def on_sign_x(provider, context, re_match):
-        confirmed = context.get_param('confirmed')
-        mode = re_match.group('mode')
-        client = provider.get_client(context)
-        if mode == yt_login.SIGN_IN:
-            if client.logged_in:
-                yt_login.process(yt_login.SIGN_OUT,
-                                 provider,
-                                 context,
-                                 client=client,
-                                 refresh=False)
-                client = None
-        elif mode == yt_login.SIGN_OUT:
-            if not confirmed and not context.get_ui().on_yes_no_input(
-                    context.localize('sign.out'),
-                    context.localize('are_you_sure')
-            ):
-                return False
-        else:
-            return False
-
-        yt_login.process(mode, provider, context, client=client)
-        return True
+        return yt_login.process(
+            re_match.group('mode'),
+            provider,
+            context,
+            client=provider.get_client(context),
+        )
 
     def _search_channel_or_playlist(self,
                                     context,
@@ -1233,10 +1222,9 @@ class Provider(AbstractProvider):
                 context.get_name(), localize('reset.access_manager.check')
         ):
             access_manager = context.get_access_manager()
-            success = (
-                    yt_login.process(yt_login.SIGN_OUT, provider, context)
-                    and access_manager.set_defaults(reset=True)
-            )
+            success, _ = yt_login.process(yt_login.SIGN_OUT, provider, context)
+            if success:
+                success = access_manager.set_defaults(reset=True)
             ui.show_notification(localize('succeeded' if success else 'failed'))
         else:
             success = False
@@ -1305,18 +1293,16 @@ class Provider(AbstractProvider):
                 return False, {provider.FALLBACK: False}
 
             playback_history.clear()
-            ui.refresh_container()
-
             ui.show_notification(
                 localize('completed'),
                 time_ms=2500,
                 audible=False,
             )
-            return True
+            return True, {provider.FORCE_REFRESH: True}
 
         video_id = params.get(VIDEO_ID)
         if not video_id:
-            return False
+            return False, None
 
         if command == 'remove':
             video_name = params.get('item_name') or video_id
@@ -1328,14 +1314,12 @@ class Provider(AbstractProvider):
                 return False, {provider.FALLBACK: False}
 
             playback_history.del_item(video_id)
-            ui.refresh_container()
-
             ui.show_notification(
                 localize('removed.name.x', video_name),
                 time_ms=2500,
                 audible=False,
             )
-            return True
+            return True, {provider.FORCE_REFRESH: True}
 
         play_data = playback_history.get_item(video_id)
         if play_data:
@@ -1372,8 +1356,7 @@ class Provider(AbstractProvider):
             play_data['played_percent'] = 0
 
         playback_history_method(video_id, play_data)
-        ui.refresh_container()
-        return True
+        return True, {provider.FORCE_REFRESH: True}
 
     @staticmethod
     def on_root(provider, context, re_match):
@@ -1394,7 +1377,8 @@ class Provider(AbstractProvider):
         }
 
         # sign in
-        if not logged_in and settings_bool(settings.SHOW_SIGN_IN, True):
+        if ((not logged_in or logged_in == 'partially')
+                and settings_bool(settings.SHOW_SIGN_IN, True)):
             item_label = localize('sign.in')
             sign_in_item = DirectoryItem(
                 bold(item_label),
@@ -1956,14 +1940,12 @@ class Provider(AbstractProvider):
                 return False, {provider.FALLBACK: False}
 
             context.get_bookmarks_list().clear()
-            ui.refresh_container()
-
             ui.show_notification(
                 localize('completed'),
                 time_ms=2500,
                 audible=False,
             )
-            return True
+            return True, {provider.FORCE_REFRESH: True}
 
         item_id = params.get('item_id')
 
@@ -1971,10 +1953,10 @@ class Provider(AbstractProvider):
             results = ui.on_keyboard_input(localize('bookmarks.edit.uri'),
                                            params.get('uri', ''))
             if not results[0]:
-                return False
+                return False, None
             item_uri = results[1]
             if not item_uri:
-                return False
+                return False, None
 
             if item_uri.startswith(('https://', 'http://')):
                 item_uri = UrlToItemConverter().process_url(
@@ -1988,12 +1970,12 @@ class Provider(AbstractProvider):
                     time_ms=2500,
                     audible=False,
                 )
-                return False
+                return False, None
 
             results = ui.on_keyboard_input(localize('bookmarks.edit.name'),
                                            params.get('item_name', item_uri))
             if not results[0]:
-                return False
+                return False, None
             item_name = results[1]
 
             item_date_time = now()
@@ -2014,7 +1996,6 @@ class Provider(AbstractProvider):
                 )
                 item.bookmark_id = item_id
                 context.get_bookmarks_list().add_item(item_id, repr(item))
-            ui.refresh_container()
 
             ui.show_notification(
                 localize('updated.x', item_name)
@@ -2023,26 +2004,30 @@ class Provider(AbstractProvider):
                 time_ms=2500,
                 audible=False,
             )
-            return True
+            return True, {provider.FORCE_REFRESH: True}
 
         if not item_id:
-            return False
+            return False, None
 
         if command == 'add':
             item = params.get('item')
             if not item:
-                return False
+                return False, None
 
             context.get_bookmarks_list().add_item(item_id, item)
-            if context.get_path().startswith(PATHS.BOOKMARKS):
-                ui.refresh_container()
-
             ui.show_notification(
                 localize('bookmark.created'),
                 time_ms=2500,
                 audible=False,
             )
-            return True
+            return (
+                True,
+                {
+                    provider.FORCE_REFRESH: context.get_path().startswith(
+                        PATHS.BOOKMARKS
+                    ),
+                },
+            )
 
         if command == 'remove':
             bookmark_name = params.get('item_name') or localize('bookmark')
@@ -2054,16 +2039,14 @@ class Provider(AbstractProvider):
                 return False, {provider.FALLBACK: False}
 
             context.get_bookmarks_list().del_item(item_id)
-            ui.refresh_container()
-
             ui.show_notification(
                 localize('removed.name.x', bookmark_name),
                 time_ms=2500,
                 audible=False,
             )
-            return True
+            return True, {provider.FORCE_REFRESH: True}
 
-        return False
+        return False, None
 
     @staticmethod
     def on_watch_later(provider, context, re_match):
@@ -2122,23 +2105,21 @@ class Provider(AbstractProvider):
                 return False, {provider.FALLBACK: False}
 
             context.get_watch_later_list().clear()
-            ui.refresh_container()
-
             ui.show_notification(
                 localize('completed'),
                 time_ms=2500,
                 audible=False,
             )
-            return True
+            return True, {provider.FORCE_REFRESH: True}
 
         video_id = params.get(VIDEO_ID)
         if not video_id:
-            return False
+            return False, None
 
         if command == 'add':
             item = params.get('item')
             if not item:
-                return False
+                return False, None
 
             context.get_watch_later_list().add_item(video_id, item)
             ui.show_notification(
@@ -2146,7 +2127,7 @@ class Provider(AbstractProvider):
                 time_ms=2500,
                 audible=False,
             )
-            return True
+            return True, None
 
         if command == 'remove':
             video_name = params.get('item_name') or localize('untitled')
@@ -2158,16 +2139,14 @@ class Provider(AbstractProvider):
                 return False, {provider.FALLBACK: False}
 
             context.get_watch_later_list().del_item(video_id)
-            ui.refresh_container()
-
             ui.show_notification(
                 localize('removed.name.x', video_name),
                 time_ms=2500,
                 audible=False,
             )
-            return True
+            return True, {provider.FORCE_REFRESH: True}
 
-        return False
+        return False, None
 
     def handle_exception(self, context, exception_to_handle):
         if not isinstance(exception_to_handle, (InvalidGrant, LoginException)):

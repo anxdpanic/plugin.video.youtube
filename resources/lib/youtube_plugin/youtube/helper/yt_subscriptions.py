@@ -59,7 +59,7 @@ def _process_add(_provider, context, client):
     return True
 
 
-def _process_remove(_provider, context, client):
+def _process_remove(provider, context, client):
     ui = context.get_ui()
     li_subscription_id = ui.get_listitem_property(SUBSCRIPTION_ID)
     li_channel_id = ui.get_listitem_property(CHANNEL_ID)
@@ -80,15 +80,14 @@ def _process_remove(_provider, context, client):
         success = False
 
     if not success:
-        return False
+        return False, None
 
-    ui.refresh_container()
     ui.show_notification(
         context.localize('unsubscribed.from.channel'),
         time_ms=2500,
         audible=False,
     )
-    return True
+    return True, {provider.FORCE_REFRESH: True}
 
 
 def process(provider, context, re_match):

@@ -193,7 +193,7 @@ def _process_remove_playlist(provider, context):
                 time_ms=2500,
                 audible=False,
             )
-            return False
+            return False, None
 
         ui.show_notification(
             message=localize('removed.name.x', playlist_name),
@@ -204,8 +204,9 @@ def _process_remove_playlist(provider, context):
         if channel_id:
             data_cache = context.get_data_cache()
             data_cache.del_item(channel_id)
-            ui.refresh_container()
-    return False
+            return True, {provider.FORCE_REFRESH: True}
+
+    return False, None
 
 
 def _process_select_playlist(provider, context):
@@ -350,7 +351,7 @@ def _process_rename_playlist(provider, context):
         default=params.get('item_name', li_playlist_name),
     )
     if not result or not text:
-        return False
+        return False, None
 
     success = provider.get_client(context).rename_playlist(
         playlist_id=playlist_id, new_title=text,
@@ -361,7 +362,7 @@ def _process_rename_playlist(provider, context):
             time_ms=2500,
             audible=False,
         )
-        return False
+        return False, None
 
     ui.show_notification(
         message=localize('succeeded'),
@@ -371,8 +372,7 @@ def _process_rename_playlist(provider, context):
 
     data_cache = context.get_data_cache()
     data_cache.del_item(playlist_id)
-    ui.refresh_container()
-    return False
+    return True, {provider.FORCE_REFRESH: True}
 
 
 def _playlist_id_change(context, playlist, command):

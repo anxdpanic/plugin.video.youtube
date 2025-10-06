@@ -16,7 +16,7 @@ from os import path as os_path
 from random import choice as random_choice
 from re import compile as re_compile
 
-from .login_client import LoginClient
+from .data_client import YouTubeDataClient
 from .subtitles import SUBTITLE_SELECTIONS, Subtitles
 from ..helper.ratebypass import ratebypass
 from ..helper.signature.cipher import Cipher
@@ -34,7 +34,7 @@ from ...kodion.compatibility import (
     urlunsplit,
     xbmcvfs,
 )
-from ...kodion.constants import PATHS, TEMP_PATH, VALUE_TO_STR
+from ...kodion.constants import INCOGNITO, PATHS, TEMP_PATH, VALUE_TO_STR
 from ...kodion.network import get_connect_address
 from ...kodion.utils.datetime import fromtimestamp
 from ...kodion.utils.file_system import make_dirs
@@ -42,7 +42,7 @@ from ...kodion.utils.methods import merge_dicts
 from ...kodion.utils.redact import redact_ip_in_uri
 
 
-class PlayerClient(LoginClient):
+class YouTubePlayerClient(YouTubeDataClient):
     log = logging.getLogger(__name__)
 
     BASE_PATH = make_dirs(TEMP_PATH)
@@ -793,20 +793,18 @@ class PlayerClient(LoginClient):
     def __init__(self,
                  context,
                  clients=None,
-                 ask_for_quality=False,
-                 audio_only=False,
-                 use_mpd=True,
                  **kwargs):
         self.video_id = None
         self.yt_item = None
 
-        self._ask_for_quality = ask_for_quality
-        self._audio_only = audio_only
-        self._use_mpd = use_mpd
+        settings = context.get_settings()
+        self._ask_for_quality = settings.ask_for_video_quality()
+        self._audio_only = settings.audio_only()
+        self._use_mpd = settings.use_mpd_videos()
 
         audio_language, prefer_default = context.get_player_language()
         if audio_language == 'mediadefault':
-            self._language_base = context.get_settings().get_language()[0:2]
+            self._language_base = settings.get_language()[0:2]
         elif audio_language == 'original':
             self._language_base = ''
         else:
@@ -820,7 +818,11 @@ class PlayerClient(LoginClient):
         self._calculate_n = False
         self._cipher = False
 
-        self._visitor_data = None
+        self._visitor_data = {
+            'current': None,
+            INCOGNITO: None,
+        }
+        self._visitor_data_key = 'current'
         self._auth_client = {}
         self._client_groups = (
             ('custom', clients if clients else ()),
@@ -844,7 +846,7 @@ class PlayerClient(LoginClient):
             )),
         )
 
-        super(PlayerClient, self).__init__(context=context, **kwargs)
+        super(YouTubePlayerClient, self).__init__(context=context, **kwargs)
 
     @staticmethod
     def _error_hook(**kwargs):
@@ -981,8 +983,8 @@ class PlayerClient(LoginClient):
             headers=client['headers'],
             response_hook=self._response_hook_text,
             error_title='Failed to get player html',
-            error_hook=self._error_hook,
             video_id=self.video_id,
+            error_hook=self._player_error_hook,
             client_name=client_name,
             has_auth=False,
             cache=False,
@@ -1056,7 +1058,7 @@ class PlayerClient(LoginClient):
             headers=client['headers'],
             response_hook=self._response_hook_text,
             error_title='Failed to get player JavaScript',
-            error_hook=self._error_hook,
+            error_hook=self._player_error_hook,
             video_id=self.video_id,
             client_name=client_name,
             has_auth=False,
@@ -1173,7 +1175,7 @@ class PlayerClient(LoginClient):
                 headers=headers,
                 response_hook=self._response_hook_text,
                 error_title='Failed to get HLS manifest',
-                error_hook=self._error_hook,
+                error_hook=self._player_error_hook,
                 video_id=self.video_id,
                 client_name=client_name,
                 has_auth=False,
@@ -1425,7 +1427,7 @@ class PlayerClient(LoginClient):
             if visitor_data is not False:
                 headers.setdefault(
                     'X-Goog-Visitor-Id',
-                    visitor_data or self._visitor_data,
+                    visitor_data or self._visitor_data[self._visitor_data_key],
                 )
             if referrer is not False:
                 headers.setdefault(
@@ -1507,7 +1509,7 @@ class PlayerClient(LoginClient):
             'url': self.V1_API_URL,
             'method': 'POST',
             '_endpoint': 'player',
-            '_visitor_data': self._visitor_data,
+            '_visitor_data': self._visitor_data[self._visitor_data_key],
         }
 
         for client_name in ('tv_embed', 'web'):
@@ -1517,7 +1519,7 @@ class PlayerClient(LoginClient):
             result = self.request(
                 response_hook=self._response_hook_json,
                 error_title='Caption player request failed',
-                error_hook=self._error_hook,
+                error_hook=self._player_error_hook,
                 video_id=video_id,
                 client_name=client_name,
                 has_auth=client.get('_has_auth'),
@@ -1567,15 +1569,40 @@ class PlayerClient(LoginClient):
             return result['simpleText']
         return None
 
-    def load_stream_info(self, video_id):
+    def load_stream_info(self,
+                         video_id,
+                         ask_for_quality=None,
+                         audio_only=None,
+                         incognito=None,
+                         use_mpd=None):
         self.video_id = video_id
+
+        if ask_for_quality is None:
+            ask_for_quality = self._ask_for_quality
+        else:
+            self._ask_for_quality = ask_for_quality
+
+        if audio_only is None:
+            audio_only = self._audio_only
+        else:
+            self._audio_only = audio_only
+
+        if incognito is None:
+            incognito = self._context.get_param(INCOGNITO, False)
+        if incognito:
+            visitor_data_key = self._visitor_data_key = INCOGNITO
+            self._visitor_data[visitor_data_key] = None
+        else:
+            visitor_data_key = self._visitor_data_key = 'current'
+
+        if use_mpd is None:
+            use_mpd = self._use_mpd
+        else:
+            self._use_mpd = use_mpd
 
         context = self._context
         settings = context.get_settings()
         age_gate_enabled = settings.age_gate()
-        audio_only = self._audio_only
-        ask_for_quality = self._ask_for_quality
-        use_mpd = self._use_mpd
         use_remote_history = settings.use_remote_history()
 
         _client_name = None
@@ -1589,7 +1616,7 @@ class PlayerClient(LoginClient):
         _status = None
         _reason = None
 
-        visitor_data = None
+        visitor_data = self._visitor_data[visitor_data_key]
         video_details = {}
         microformat = {}
         responses = {}
@@ -1617,7 +1644,7 @@ class PlayerClient(LoginClient):
         }
         abort = False
 
-        has_access_token = bool(self._access_tokens)
+        logged_in = self.logged_in
         client_data = {
             'json': {
                 'videoId': video_id,
@@ -1634,7 +1661,7 @@ class PlayerClient(LoginClient):
             },
             '_endpoint': 'player',
             '_cpn': None,
-            '_visitor_data': self._visitor_data,
+            '_visitor_data': visitor_data,
         }
         if use_remote_history:
             client_data['_auth_type'] = 'user'
@@ -1644,6 +1671,8 @@ class PlayerClient(LoginClient):
             if not clients:
                 continue
             if name == 'auth_enabled_initial_request':
+                if visitor_data and not logged_in:
+                    continue
                 allow_skip = False
                 client_data['_auth_requested'] = True
             else:
@@ -1679,7 +1708,7 @@ class PlayerClient(LoginClient):
                     _result = self.request(
                         response_hook=self._response_hook_json,
                         error_title='Player request failed',
-                        error_hook=self._error_hook,
+                        error_hook=self._player_error_hook,
                         video_id=video_id,
                         client_name=_client_name,
                         has_auth=_has_auth,
@@ -1714,7 +1743,7 @@ class PlayerClient(LoginClient):
                         )
                         if visitor_data:
                             client_data['_visitor_data'] = visitor_data
-                            self._visitor_data = visitor_data
+                            self._visitor_data[visitor_data_key] = visitor_data
                     _video_details = _result.get('videoDetails', {})
                     _microformat = (_result
                                     .get('microformat', {})
@@ -1770,7 +1799,7 @@ class PlayerClient(LoginClient):
                             elif client_data.get('_auth_required'):
                                 restart = False
                                 abort = True
-                            elif restart is None and has_access_token:
+                            elif restart is None and logged_in:
                                 client_data['_auth_required'] = True
                                 restart = True
                             break

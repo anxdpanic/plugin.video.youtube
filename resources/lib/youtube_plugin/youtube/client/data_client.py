@@ -18,8 +18,7 @@ from random import randint
 from re import compile as re_compile
 from xml.etree.ElementTree import Element as ET_Element, XML as ET_XML
 
-from .login_client import LoginClient
-from .player_client import PlayerClient
+from .login_client import YouTubeLoginClient
 from ..helper.utils import channel_filter_split
 from ..helper.v3 import pre_fill
 from ..youtube_exceptions import InvalidJSON, YouTubeException
@@ -35,7 +34,7 @@ from ...kodion.utils.datetime import (
 )
 
 
-class YouTube(LoginClient):
+class YouTubeDataClient(YouTubeLoginClient):
     log = logging.getLogger(__name__)
 
     _max_results = 50
@@ -315,21 +314,24 @@ class YouTube(LoginClient):
         },
     }
 
-    def __init__(self, items_per_page=50, **kwargs):
+    def __init__(self, context, items_per_page=None, **kwargs):
         self.channel_id = None
-        super(YouTube, self).__init__(**kwargs)
-        YouTube.init(items_per_page=items_per_page)
+
+        if items_per_page is None:
+            items_per_page = context.get_settings().items_per_page()
+
+        super(YouTubeDataClient, self).__init__(context=context, **kwargs)
+        YouTubeDataClient.init(items_per_page=items_per_page)
 
     @classmethod
     def init(cls, items_per_page=50, **_kwargs):
         cls._max_results = items_per_page
 
     def reinit(self, **kwargs):
-        super(YouTube, self).reinit(**kwargs)
-        self.__init__(**kwargs)
+        super(YouTubeDataClient, self).reinit(**kwargs)
 
     def set_access_token(self, access_tokens=None):
-        super(YouTube, self).set_access_token(access_tokens)
+        super(YouTubeDataClient, self).set_access_token(access_tokens)
         if self.logged_in:
             context = self._context
             function_cache = context.get_function_cache()
@@ -386,19 +388,6 @@ class YouTube(LoginClient):
                          no_content=True,
                          do_auth=True,
                          cache=False)
-
-    @staticmethod
-    def get_streams(context,
-                    video_id,
-                    ask_for_quality=False,
-                    audio_only=False,
-                    use_mpd=True):
-        return PlayerClient(
-            context=context,
-            ask_for_quality=ask_for_quality,
-            audio_only=audio_only,
-            use_mpd=use_mpd,
-        ).load_stream_info(video_id)
 
     def remove_playlist(self, playlist_id, **kwargs):
         params = {'id': playlist_id,
@@ -1326,6 +1315,7 @@ class YouTube(LoginClient):
     def get_browse_items(self,
                          browse_id=None,
                          channel_id=None,
+                         skip_ids=None,
                          params=None,
                          route=None,
                          _route={
@@ -1440,8 +1430,24 @@ class YouTube(LoginClient):
                     item,
                     json_path.get('item_id') or (item_id_kind,),
                 )
-                if not item_id:
+                if not item_id or skip_ids and item_id in skip_ids:
                     continue
+                if channel_id:
+                    _channel_id = channel_id
+                else:
+                    _channel_id = self.json_traverse(
+                        item,
+                        json_path.get('channel_id') or (
+                            ('longBylineText', 'shortBylineText'),
+                            'runs',
+                            0,
+                            'navigationEndpoint',
+                            'browseEndpoint',
+                            'browseId',
+                        ),
+                    )
+                    if skip_ids and _channel_id in skip_ids:
+                        continue
                 items.append({
                     'kind': item_kind,
                     'id': item_id,
@@ -1463,17 +1469,7 @@ class YouTube(LoginClient):
                                 'thumbnails'
                             ),
                         ),
-                        'channelId': channel_id or self.json_traverse(
-                            item,
-                            json_path.get('channel_id') or (
-                                ('longBylineText', 'shortBylineText'),
-                                'runs',
-                                0,
-                                'navigationEndpoint',
-                                'browseEndpoint',
-                                'browseId',
-                            ),
-                        ),
+                        'channelId': _channel_id,
                     }
                 })
         if not items:
@@ -1525,6 +1521,7 @@ class YouTube(LoginClient):
                 next_response = self.get_browse_items(
                     browse_id=browse_id,
                     channel_id=channel_id,
+                    skip_ids=skip_ids,
                     params=params,
                     route=route,
                     data=data,
@@ -2874,7 +2871,7 @@ class YouTube(LoginClient):
             return True
         return False
 
-    def _response_hook(self, **kwargs):
+    def _request_response_hook(self, **kwargs):
         response = kwargs['response']
         if response is None:
             return None, None
@@ -2915,7 +2912,7 @@ class YouTube(LoginClient):
             response.raise_for_status()
         return json_data.get('etag'), json_data
 
-    def _error_hook(self, **kwargs):
+    def _request_error_hook(self, **kwargs):
         exc = kwargs['exc']
         json_data = getattr(exc, 'json_data', None)
         if getattr(exc, 'pass_data', False):
@@ -3083,9 +3080,9 @@ class YouTube(LoginClient):
             cache = False
         elif cache is not False and self._context.refresh_requested():
             cache = 'refresh'
-        return self.request(response_hook=self._response_hook,
+        return self.request(response_hook=self._request_response_hook,
                             event_hook_kwargs=kwargs,
-                            error_hook=self._error_hook,
+                            error_hook=self._request_error_hook,
                             stacklevel=3,
                             cache=cache,
                             **client)

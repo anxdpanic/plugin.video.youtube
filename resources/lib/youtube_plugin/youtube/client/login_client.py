@@ -15,7 +15,7 @@ from ..youtube_exceptions import InvalidGrant, LoginException
 from ...kodion import logging
 
 
-class LoginClient(YouTubeRequestClient):
+class YouTubeLoginClient(YouTubeRequestClient):
     log = logging.getLogger(__name__)
 
     ANDROID_CLIENT_AUTH_URL = 'https://android.clients.google.com/auth'
@@ -63,8 +63,11 @@ class LoginClient(YouTubeRequestClient):
                  configs=None,
                  access_tokens=None,
                  **kwargs):
-        super(LoginClient, self).__init__(exc_type=LoginException, **kwargs)
-        LoginClient.init(configs)
+        super(YouTubeLoginClient, self).__init__(
+            exc_type=LoginException,
+            **kwargs
+        )
+        YouTubeLoginClient.init(configs)
         self.set_access_token(access_tokens)
         self.initialised = any(self._configs.values())
 
@@ -78,16 +81,34 @@ class LoginClient(YouTubeRequestClient):
                 _configs[config_type] = config
 
     def reinit(self, **kwargs):
-        super(LoginClient, self).reinit(**kwargs)
-        self.__init__(**kwargs)
+        super(YouTubeLoginClient, self).reinit(**kwargs)
 
     def set_access_token(self, access_tokens=None):
-        _access_tokens = type(self)._access_tokens
+        existing_access_tokens = type(self)._access_tokens
         if access_tokens:
-            for token_type, token in access_tokens.items():
-                if token is not None and token_type in _access_tokens:
-                    _access_tokens[token_type] = token
-        self.logged_in = any(_access_tokens.values())
+            token_status = 0
+            for token_type, token in existing_access_tokens.items():
+                if token_type in access_tokens:
+                    token = access_tokens[token_type]
+                    existing_access_tokens[token_type] = token
+                if token or token_type == 'dev':
+                    token_status |= 1
+                else:
+                    token_status |= 2
+
+            self.logged_in = (
+                'partially'
+                if token_status & 2 else
+                'fully'
+                if token_status & 1 else
+                False
+            )
+            self.log.info('User is %s logged in', self.logged_in or 'not')
+        else:
+            for token_type in existing_access_tokens:
+                existing_access_tokens[token_type] = None
+            self.logged_in = False
+            self.log.info('User is not logged in')
 
     @property
     def initialised(self):
@@ -106,7 +127,7 @@ class LoginClient(YouTubeRequestClient):
         type(self)._logged_in = value
 
     @staticmethod
-    def _error_hook(**kwargs):
+    def _login_error_hook(**kwargs):
         json_data = getattr(kwargs['exc'], 'json_data', None)
         if not json_data or 'error' not in json_data:
             return None, None, None, None, LoginException
@@ -133,7 +154,7 @@ class LoginClient(YouTubeRequestClient):
             data=post_data,
             headers=headers,
             response_hook=self._response_hook_json,
-            error_hook=LoginClient._error_hook,
+            error_hook=self._login_error_hook,
             error_title='Logout failed - Refresh token revocation error',
             raise_exc=True,
         )
@@ -188,7 +209,7 @@ class LoginClient(YouTubeRequestClient):
             data=post_data,
             headers=headers,
             response_hook=self._response_hook_json,
-            error_hook=LoginClient._error_hook,
+            error_hook=self._login_error_hook,
             error_title='Login failed - Refresh token grant error',
             error_info=log_info,
             raise_exc=True,
@@ -246,7 +267,7 @@ class LoginClient(YouTubeRequestClient):
             data=post_data,
             headers=headers,
             response_hook=self._response_hook_json,
-            error_hook=LoginClient._error_hook,
+            error_hook=self._login_error_hook,
             error_title='Login failed - Access token request error',
             error_info=log_info,
             raise_exc=True,
@@ -294,7 +315,7 @@ class LoginClient(YouTubeRequestClient):
             data=post_data,
             headers=headers,
             response_hook=self._response_hook_json,
-            error_hook=LoginClient._error_hook,
+            error_hook=self._login_error_hook,
             error_title='Login failed - Device/user code request error',
             error_info=log_info,
             raise_exc=True,

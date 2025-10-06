@@ -22,7 +22,8 @@ class CommandItem(DirectoryItem):
                  context,
                  image=None,
                  fanart=None,
-                 plot=None):
+                 plot=None,
+                 **_kwargs):
         super(CommandItem, self).__init__(
             name,
             context.create_uri((PATHS.COMMAND, command)),
