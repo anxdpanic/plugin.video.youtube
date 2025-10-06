@@ -441,36 +441,32 @@ class AccessManager(JSONStore):
         """
         return self._last_origin
 
-    def get_access_token(self, addon_id=None):
+    def get_refresh_tokens(self, addon_id=None):
         """
-        Returns the access token for some API
-        :return: access_token
-        """
-        details = self.get_current_user_details(addon_id)
-        return details.get('access_token', '').split('|')
-
-    def get_refresh_token(self, addon_id=None):
-        """
-        Returns the refresh token
-        :return: refresh token
+        Returns a tuple containing a list of refresh tokens and the number of
+        valid refresh tokens
+        :return:
         """
         details = self.get_current_user_details(addon_id)
-        return details.get('refresh_token', '').split('|')
+        refresh_tokens = details.get('refresh_token', '').split('|')
+        num_refresh_tokens = len([1 for token in refresh_tokens if token])
+        return refresh_tokens, num_refresh_tokens
 
-    def access_token_status(self, addon_id=None):
+    def get_access_tokens(self, addon_id=None):
         """
-        Returns tuple containing the number of access tokens and whether they
-        are expired.
+        Returns a tuple containing a list of access tokens, the number of valid
+        access tokens, and the token expiry timestamp.
         :return:
         """
         details = self.get_current_user_details(addon_id)
         access_tokens = details.get('access_token').split('|')
-        num_access_tokens = len([1 for token in access_tokens if token])
-        expires = int(details.get('token_expires', -1))
-
-        if num_access_tokens:
-            return num_access_tokens, expires <= int(time.time())
-        return 0, False
+        expiry_timestamp = int(details.get('token_expires', -1))
+        if expiry_timestamp > int(time.time()):
+            num_access_tokens = len([1 for token in access_tokens if token])
+        else:
+            access_tokens = [None, None, None, None]
+            num_access_tokens = 0
+        return access_tokens, num_access_tokens, expiry_timestamp
 
     def update_access_token(self,
                             addon_id,

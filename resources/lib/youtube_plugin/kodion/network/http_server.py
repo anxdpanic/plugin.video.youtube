@@ -13,12 +13,21 @@ import os
 import re
 import socket
 from collections import deque
-from errno import ECONNABORTED, ECONNREFUSED, ECONNRESET, EPIPE
+from errno import (
+    ECONNABORTED,
+    ECONNREFUSED,
+    ECONNRESET,
+    EPIPE,
+    EPROTOTYPE,
+    ESHUTDOWN,
+)
 from functools import partial
 from io import open
 from json import dumps as json_dumps, loads as json_loads
 from select import select
 from textwrap import dedent
+
+from urllib3.exceptions import HTTPError
 
 from .requests import BaseRequestsClass
 from .. import logging
@@ -121,6 +130,15 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         'server_lists': {},
     }
 
+    SWALLOWED_ERRORS = {
+        ECONNABORTED,
+        ECONNREFUSED,
+        ECONNRESET,
+        EPIPE,
+        EPROTOTYPE,
+        ESHUTDOWN,
+    }
+
     def __init__(self, request, client_address, server):
         if not RequestHandler.requests:
             RequestHandler.requests = BaseRequestsClass(context=self._context)
@@ -161,9 +179,9 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         try:
             super(RequestHandler, self).handle_one_request()
             return
-        except OSError as exc:
+        except (HTTPError, OSError) as exc:
             self.close_connection = True
-            if exc.errno not in {ECONNABORTED, ECONNREFUSED, ECONNRESET, EPIPE}:
+            if exc.errno not in self.SWALLOWED_ERRORS:
                 raise exc
 
     def ip_address_status(self, ip_address):

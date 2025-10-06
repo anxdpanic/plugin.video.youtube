@@ -94,7 +94,8 @@ class NewSearchItem(DirectoryItem):
                  incognito=False,
                  channel_id='',
                  addon_id='',
-                 location=False):
+                 location=False,
+                 **_kwargs):
         if not name:
             name = context.get_ui().bold(
                 title or context.localize('search.new')

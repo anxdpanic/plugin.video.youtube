@@ -1,3 +1,18 @@
+## v7.3.0+beta.5
+### Fixed
+- Fix not resolving single playable items when using the uri2addon plugin endpoint #1300
+- Correctly check whether access tokens are available to be used for player requests
+- Fix not correctly resetting client instance
+- Dont restore container position on forced refresh when playback ends
+- Better handle urllib3 re-raising low level errors but sometimes not
+- Ignore unused parameters in item constructors #1282
+
+### Changed
+- Don't list users own playlists in listing of saved playlists
+- Allow sign-in when partially logged in without needing to sign-out
+- Identify if user is only partially logged in
+- Use persistent visitor data where possible except when incognito
+
 ## v7.3.0+beta.4
 ### Fixed
 - Various misc fixes for focus and position loss on refresh
@@ -12,6 +27,8 @@
 - Fix setting focus on items in listing when parent item is not shown #1012
 - Reduce CPU usage of service runner loop when idle
 - Simplify window history fallback for search inputs #1070 #1266
+- Fix MPD quality selection #1268
+- Fix stream feature for disabling HFR at max resolution #539
 - Don't re-raise BrokenPipeError in RequestHandler.handle_one_request #1259
 - Fix including details in label2 mask when video details in listings is disabled #1265
 - Fix incorrect modification of custom thumbnails #1245

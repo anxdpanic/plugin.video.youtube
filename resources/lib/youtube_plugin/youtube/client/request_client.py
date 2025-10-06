@@ -82,7 +82,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_id': {
                 'client_id': 28,
                 'client_name': 'ANDROID_VR',
-                'client_version': '1.64.34',
+                'client_version': '1.65.10',
                 'android_sdk_version': '34',
                 'device_codename': 'eureka',
                 'device_make': 'Oculus',
@@ -446,7 +446,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_id': {
                 'client_id': 1,
                 'client_name': 'WEB',
-                'client_version': '2.20250905.01.00',
+                'client_version': '2.20250925.01.00',
             },
             '_auth_type': False,
             'url': V1_API_URL,
@@ -478,7 +478,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'browser_version': '9.2',
                 'client_id': 7,
                 'client_name': 'TVHTML5',
-                'client_version': '7.20250902.08.00',
+                'client_version': '7.20250923.13.00',
                 'device_make': 'Samsung',
                 'device_model': 'SmartTV',
                 'os_name': 'Tizen',
@@ -535,6 +535,12 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'client_version': '2.0',
             },
             '_auth_type': 'tv',
+            '_auth_user_agent': (
+                'Mozilla/5.0'
+                ' (ChromiumStylePlatform)'
+                ' Cobalt/25.lts.30.1034943-gold (unlike Gecko)'
+                ' Unknown_TV_Unknown_0/Unknown (Unknown, Unknown)'
+            ),
             '_use_subtitles': True,
             'url': V1_API_URL,
             'method': None,
@@ -550,12 +556,10 @@ class YouTubeRequestClient(BaseRequestsClass):
                 },
             },
             'headers': {
-                # UA from a 2022 Samsung Tizen 6.5 based Smart TV
                 'User-Agent': (
-                    'Mozilla/5.0 (SMART-TV; LINUX; Tizen 6.5)'
-                    ' AppleWebKit/537.36 (KHTML, like Gecko)'
-                    ' Chrome/140.0.0.0'
-                    ' TV Safari/537.36'
+                    'Mozilla/5.0'
+                    ' (ChromiumStylePlatform)'
+                    ' Cobalt/Version'
                 ),
                 'X-YouTube-Client-Name': '{_id[client_id]}',
                 'X-YouTube-Client-Version': '{_id[client_version]}',
@@ -589,7 +593,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                     ' (ChromiumStylePlatform)'
                     ' Cobalt/Version'
                 ),
-                'X-YouTube-Client-Name': '{_id[client_name]}',
+                'X-YouTube-Client-Name': '{_id[client_id]}',
                 'X-YouTube-Client-Version': '{_id[client_version]}',
             },
         },
@@ -641,7 +645,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_id': {
                 'client_id': 1,
                 'client_name': 'WEB',
-                'client_version': '2.20250905.01.00',
+                'client_version': '2.20250925.01.00',
             },
             '_auth_type': False,
             'json': {
@@ -774,12 +778,12 @@ class YouTubeRequestClient(BaseRequestsClass):
              **_kwargs):
         common_client = cls.CLIENTS['_common']['json']['context']['client']
         # the default language is always en_US (like YouTube on the WEB)
-        cls._language = common_client['hl'] = language.replace('-', '_')
+        common_client['hl'] = 'en_US'
+        cls._language = language.replace('-', '_')
         cls._region = common_client['gl'] = region
 
     def reinit(self, **kwargs):
         super(YouTubeRequestClient, self).reinit(**kwargs)
-        self.__init__(**kwargs)
 
     def get_language(self):
         return self._language

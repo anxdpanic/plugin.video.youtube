@@ -7,27 +7,27 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-04-12 14:59+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"PO-Revision-Date: 2025-08-30 13:29+0000\n"
+"Last-Translator: SecularSteve <fairfull.playing@gmail.com>\n"
 "Language-Team: Bosnian (Bosnia and Herzegovina) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/bs_ba/>\n"
 "Language: bs_ba\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.4.3\n"
+"X-Generator: Weblate 5.13\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
-msgstr ""
+msgstr "Dodatak za YouTube"
 
 msgctxt "Addon Description"
 msgid "YouTube is one of the biggest video-sharing websites of the world."
-msgstr ""
+msgstr "YouTube je jedna od najvećih svjetskih web stranica za dijeljenje videozapisa."
 
 msgctxt "Addon Disclaimer"
 msgid "This plugin is not endorsed by Google"
-msgstr ""
+msgstr "Ovaj dodatak nije odobren od strane Googlea"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
@@ -50,150 +50,150 @@ msgstr ""
 
 msgctxt "#30003"
 msgid "YouTube"
-msgstr ""
+msgstr "YouTube"
 
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
 msgid "Use InputStream.Adaptive"
-msgstr ""
+msgstr "Koristite InputStream.Adaptive"
 
 msgctxt "#30008"
 msgid "Configure InputStream.Adaptive"
-msgstr ""
+msgstr "Konfigurišite InputStream.Adaptive"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
-msgstr ""
+msgstr "Uvijek pitajte za kvalitet videa"
 
 msgctxt "#30010"
 msgid "Maximum video quality"
-msgstr ""
+msgstr "Maksimalni kvalitet videa"
 
 msgctxt "#30011"
 msgid "480p"
-msgstr ""
+msgstr "480p"
 
 msgctxt "#30012"
 msgid "720p (HD)"
-msgstr ""
+msgstr "720p (HD)"
 
 msgctxt "#30013"
 msgid "1080p (FHD)"
-msgstr ""
+msgstr "1080p (FHD)"
 
 msgctxt "#30014"
 msgid "2160p (4K)"
-msgstr ""
+msgstr "2160p (4K)"
 
 msgctxt "#30015"
 msgid "4320p (8K)"
-msgstr ""
+msgstr "4320p (8K)"
 
 msgctxt "#30016"
 msgid "240p"
-msgstr ""
+msgstr "240p"
 
 msgctxt "#30017"
 msgid "360p"
-msgstr ""
+msgstr "360p"
 
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
-msgstr ""
+msgstr "1080p Uživo / 720p (HD)"
 
 msgctxt "#30019"
 msgid "144p"
-msgstr ""
+msgstr "144p"
 
 msgctxt "#30020"
 msgid "Enable Stereoscopic 3D video"
-msgstr ""
+msgstr "Omogući stereoskopski 3D video"
 
 msgctxt "#30021"
 msgid "Show fanart"
-msgstr ""
+msgstr "Prikaži fanart"
 
 msgctxt "#30022"
 msgid "Items per page"
-msgstr ""
+msgstr "Stavke po stranici"
 
 msgctxt "#30023"
 msgid "Search history size"
-msgstr ""
+msgstr "Veličina historije pretraživanja"
 
 msgctxt "#30024"
 msgid "Cache size (MB)"
-msgstr ""
+msgstr "Veličina keš memorije (MB)"
 
 msgctxt "#30025"
 msgid "Enable Setup Wizard"
-msgstr ""
+msgstr "Omogući čarobnjaka za podešavanje"
 
 msgctxt "#30026"
 msgid "Override views"
-msgstr ""
+msgstr "Prekriži prikaze"
 
 msgctxt "#30027"
 msgid "View: Default"
-msgstr ""
+msgstr "Prikaz: Zadano"
 
 msgctxt "#30028"
 msgid "View: Episodes"
-msgstr ""
+msgstr "Prikaz: Epizode"
 
 msgctxt "#30029"
 msgid "View: Movies"
-msgstr ""
+msgstr "Prikaz: Filmovi"
 
 msgctxt "#30030"
 msgid "Configure %s?"
-msgstr ""
+msgstr "Konfigurirati %s?"
 
 msgctxt "#30031"
 msgid "Requests cache size (MB)"
-msgstr ""
+msgstr "Veličina keš memorije zahtjeva (MB)"
 
 msgctxt "#30032"
 msgid "View: TV Shows"
-msgstr ""
+msgstr "Prikaz: TV emisije"
 
 msgctxt "#30033"
 msgid "View: Songs"
-msgstr ""
+msgstr "Prikaz: Pjesme"
 
 msgctxt "#30034"
 msgid "View: Artists"
-msgstr ""
+msgstr "Prikaz: Umjetnici"
 
 msgctxt "#30035"
 msgid "View: Albums"
-msgstr ""
+msgstr "Prikaz: Albumi"
 
 msgctxt "#30036"
 msgid "Support alternative player"
-msgstr ""
+msgstr "Podrži alternativnog igrača"
 
 msgctxt "#30037"
 msgid "Custom Watch Later playlist id"
-msgstr ""
+msgstr "ID prilagođene plejliste za gledanje kasnije"
 
 msgctxt "#30038"
 msgid "Custom History playlist id"
-msgstr ""
+msgstr "ID prilagođene liste za reprodukciju historije"
 
 # Kodion Common
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
 msgid "Bookmarks"
-msgstr ""
+msgstr "Obilješci"
 
 msgctxt "#30101"
 msgid "Bookmark"
-msgstr ""
+msgstr "Označi"
 
 msgctxt "#30102"
 msgid "Search"
-msgstr ""
+msgstr "Pretraga"
 
 msgctxt "#30103"
 msgid ""
@@ -205,89 +205,89 @@ msgstr ""
 
 msgctxt "#30105"
 msgid "filtered"
-msgstr ""
+msgstr "filtrirano"
 
 msgctxt "#30106"
 msgid "Next page: %d"
-msgstr ""
+msgstr "Sljedeća stranica: %d"
 
 msgctxt "#30107"
 msgid "Watch Later"
-msgstr ""
+msgstr "Gledaj kasnije"
 
 msgctxt "#30108"
 msgid "Enter the name of the bookmark"
-msgstr ""
+msgstr "Unesite naziv oznake"
 
 msgctxt "#30109"
 msgid "Enter a valid YouTube or plugin URL for the bookmark"
-msgstr ""
+msgstr "Unesite važeći YouTube ili dodatak URL za oznaku"
 
 msgctxt "#30110"
 msgid "New Search"
-msgstr ""
+msgstr "Nova pretraga"
 
 msgctxt "#30111"
 msgid "Sign In"
-msgstr ""
+msgstr "Prijavi se"
 
 msgctxt "#30112"
 msgid "Sign Out"
-msgstr ""
+msgstr "Odjava"
 
 msgctxt "#30113"
-msgid ""
+msgid "Related to \"%s\""
 msgstr ""
 
 msgctxt "#30114"
 msgid "Confirm delete"
-msgstr ""
+msgstr "Potvrdi brisanje"
 
 msgctxt "#30115"
 msgid "Confirm remove"
-msgstr ""
+msgstr "Potvrdi uklanjanje"
 
 msgctxt "#30116"
 msgid "Delete \"%s\"?"
-msgstr ""
+msgstr "Izbrisati \"%s\"?"
 
 msgctxt "#30117"
 msgid "Remove \"%s\"?"
-msgstr ""
+msgstr "Ukloniti \"%s\"?"
 
 msgctxt "#30118"
-msgid ""
+msgid "Links from \"%s\""
 msgstr ""
 
 msgctxt "#30119"
 msgid "Please wait..."
-msgstr ""
+msgstr "Molimo pričekajte..."
 
 msgctxt "#30120"
 msgid "Confirm clear"
-msgstr ""
+msgstr "Potvrdi brisanje"
 
 msgctxt "#30121"
 msgid "Clear %s?"
-msgstr ""
+msgstr "Obrisati %s?"
 
 # YouTube
 # empty strings from id 30121 to 30199
 msgctxt "#30200"
 msgid "API"
-msgstr ""
+msgstr "API"
 
 msgctxt "#30201"
 msgid "API Key"
-msgstr ""
+msgstr "API ključ"
 
 msgctxt "#30202"
 msgid "API Id"
-msgstr ""
+msgstr "ID API-ja"
 
 msgctxt "#30203"
 msgid "API Secret"
-msgstr ""
+msgstr "Tajna API-ja"
 
 msgctxt "#30204"
 msgid ""
@@ -301,127 +301,127 @@ msgstr ""
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
 msgid "%s failed"
-msgstr ""
+msgstr "%s nije uspjelo"
 
 msgctxt "#30501"
 msgid "Edit %s"
-msgstr ""
+msgstr "Uredi %s"
 
 msgctxt "#30502"
 msgid "Go to %s"
-msgstr ""
+msgstr "Idi na %s"
 
 msgctxt "#30503"
 msgid "Channel fanart"
-msgstr ""
+msgstr "Umjetnost obožavatelja kanala"
 
 msgctxt "#30504"
 msgid "Subscriptions"
-msgstr ""
+msgstr "Pretplate"
 
 msgctxt "#30505"
 msgid "Unsubscribe"
-msgstr ""
+msgstr "Otpretplati se"
 
 msgctxt "#30506"
 msgid "Subscribe"
-msgstr ""
+msgstr "Pretplati se"
 
 msgctxt "#30507"
 msgid "My Channel"
-msgstr ""
+msgstr "Moj kanal"
 
 msgctxt "#30508"
 msgid "Liked Videos"
-msgstr ""
+msgstr "Sviđa mi se videozapisi"
 
 msgctxt "#30509"
 msgid "History"
-msgstr ""
+msgstr "Historija"
 
 msgctxt "#30510"
 msgid "My Subscriptions"
-msgstr ""
+msgstr "Moje pretplate"
 
 msgctxt "#30511"
 msgid "Queue video"
-msgstr ""
+msgstr "Video u redu čekanja"
 
 msgctxt "#30512"
 msgid "Browse Channels"
-msgstr ""
+msgstr "Pregledaj kanale"
 
 msgctxt "#30513"
 msgid "Trending"
-msgstr ""
+msgstr "U trendu"
 
 msgctxt "#30514"
 msgid "Related Videos"
-msgstr ""
+msgstr "Povezani videozapisi"
 
 msgctxt "#30515"
 msgid "Auto-Remove from Watch Later"
-msgstr ""
+msgstr "Automatsko uklanjanje iz rubrike Gledaj kasnije"
 
 msgctxt "#30516"
 msgid "Folders"
-msgstr ""
+msgstr "Folderi"
 
 msgctxt "#30517"
 msgid "Subscribe to %s"
-msgstr ""
+msgstr "Pretplatite se na %s"
 
 msgctxt "#30518"
 msgid "Feeds"
-msgstr ""
+msgstr "Feedovi"
 
 msgctxt "#30519"
 msgid "and enter the following code:"
-msgstr ""
+msgstr "i unesite sljedeći kod:"
 
 msgctxt "#30520"
 msgid "Add to..."
-msgstr ""
+msgstr "Dodaj u..."
 
 msgctxt "#30521"
 msgid "Delete requests cache database"
-msgstr ""
+msgstr "Brisanje keš baze podataka zahtjeva"
 
 msgctxt "#30522"
 msgid "Clear requests cache"
-msgstr ""
+msgstr "Obriši keš zahtjeva"
 
 msgctxt "#30523"
 msgid "requests cache"
-msgstr ""
+msgstr "keš zahtjeva"
 
 msgctxt "#30524"
 msgid "Select language"
-msgstr ""
+msgstr "Odaberite jezik"
 
 msgctxt "#30525"
 msgid "Select region"
-msgstr ""
+msgstr "Odaberite regiju"
 
 msgctxt "#30526"
 msgid "Setup Wizard"
-msgstr ""
+msgstr "Čarobnjak za podešavanje"
 
 msgctxt "#30527"
 msgid "Language and Region"
-msgstr ""
+msgstr "Jezik i regija"
 
 msgctxt "#30528"
 msgid "Rate..."
-msgstr ""
+msgstr "Ocijeni..."
 
 msgctxt "#30529"
 msgid "I like this"
-msgstr ""
+msgstr "Sviđa mi se ovo"
 
 msgctxt "#30530"
 msgid "I dislike this"
-msgstr ""
+msgstr "Ne sviđa mi se ovo"
 
 msgctxt "#30531"
 msgid ""
@@ -433,7 +433,7 @@ msgstr ""
 
 msgctxt "#30533"
 msgid "Reverse"
-msgstr ""
+msgstr "Obrnuto"
 
 msgctxt "#30534"
 msgid ""
@@ -441,23 +441,23 @@ msgstr ""
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
-msgstr ""
+msgstr "Odaberite redoslijed popisa za reprodukciju"
 
 msgctxt "#30536"
 msgid "Updating Playlist..."
-msgstr ""
+msgstr "Ažuriranje plejliste..."
 
 msgctxt "#30537"
 msgid "Play from here"
-msgstr ""
+msgstr "Reproduciraj odavde"
 
 msgctxt "#30538"
 msgid "Disliked Videos"
-msgstr ""
+msgstr "Nesviđa mi se videozapisi"
 
 msgctxt "#30539"
 msgid "Play recently added"
-msgstr ""
+msgstr "Nedavno dodana reprodukcija"
 
 msgctxt "#30540"
 msgid ""
@@ -465,11 +465,11 @@ msgstr ""
 
 msgctxt "#30541"
 msgid "Show channel name and video details in description"
-msgstr ""
+msgstr "Prikaži naziv kanala i detalje videa u opisu"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
-msgstr ""
+msgstr "rtmpe streamovi nisu podržani"
 
 msgctxt "#30543"
 msgid ""
@@ -477,18 +477,18 @@ msgstr ""
 
 msgctxt "#30544"
 msgid "More Links from the description"
-msgstr ""
+msgstr "Više linkova iz opisa"
 
 msgctxt "#30545"
 msgid "No videos found."
-msgstr ""
+msgstr "Nije pronađen nijedan video."
 
 msgctxt "#30546"
 msgid "Please complete all login prompts"
-msgstr ""
+msgstr "Molimo Vas da ispunite sve upite za prijavu"
 
 msgctxt "#30547"
-msgid "You may be prompted to enable two applications so that YouTube is functioning properly."
+msgid "You may be prompted to login and enable access to multiple applications so that this addon can function properly."
 msgstr ""
 
 msgctxt "#30548"
@@ -497,7 +497,7 @@ msgstr ""
 
 msgctxt "#30549"
 msgid "No streams found"
-msgstr ""
+msgstr "Nisu pronađeni streamovi"
 
 msgctxt "#30550"
 msgid ""
@@ -505,39 +505,39 @@ msgstr ""
 
 msgctxt "#30551"
 msgid "Recommendations"
-msgstr ""
+msgstr "Preporuke"
 
 msgctxt "#30552"
 msgid "Maintenance"
-msgstr ""
+msgstr "Održavanje"
 
 msgctxt "#30553"
 msgid "Delete function cache database"
-msgstr ""
+msgstr "Obriši bazu podataka keš memorije funkcija"
 
 msgctxt "#30554"
 msgid "Delete search history database"
-msgstr ""
+msgstr "Obriši bazu podataka historije pretraživanja"
 
 msgctxt "#30555"
 msgid "Clear function cache"
-msgstr ""
+msgstr "Obriši keš memoriju funkcija"
 
 msgctxt "#30556"
 msgid "Clear search history"
-msgstr ""
+msgstr "Obriši historiju pretraživanja"
 
 msgctxt "#30557"
 msgid "function cache"
-msgstr ""
+msgstr "keš za funkciju"
 
 msgctxt "#30558"
 msgid "search history"
-msgstr ""
+msgstr "historija pretraživanja"
 
 msgctxt "#30559"
 msgid "Delete settings.xml"
-msgstr ""
+msgstr "Obriši settings.xml"
 
 msgctxt "#30560"
 msgid ""
@@ -549,15 +549,15 @@ msgstr ""
 
 msgctxt "#30562"
 msgid "View all"
-msgstr ""
+msgstr "Prikaži sve"
 
 msgctxt "#30563"
 msgid "Plugin execution timeout"
-msgstr ""
+msgstr "Vremensko ograničenje izvršavanja dodatka"
 
 msgctxt "#30564"
 msgid "For testing only - forcibly terminate plugin execution after set time limit. Set to 0 seconds (default) to disable."
-msgstr ""
+msgstr "Samo za testiranje - prisilno prekinite izvršavanje dodatka nakon postavljenog vremenskog ograničenja. Postavite na 0 sekundi (zadano) da biste onemogućili."
 
 msgctxt "#30565"
 msgid ""
@@ -569,255 +569,255 @@ msgstr ""
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
-msgstr ""
+msgstr "Postavi kao Gledaj kasnije"
 
 msgctxt "#30568"
 msgid "Remove as Watch Later"
-msgstr ""
+msgstr "Ukloni kao Gledaj kasnije"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
-msgstr ""
+msgstr "Jeste li sigurni da želite ukloniti \"%s\" sa svoje liste Gledaj kasnije?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
-msgstr ""
+msgstr "Jeste li sigurni da želite zamijeniti svoju trenutnu listu Gledaj kasnije sa \"%s\"?"
 
 msgctxt "#30571"
 msgid "Set as History"
-msgstr ""
+msgstr "Postavi kao historiju"
 
 msgctxt "#30572"
 msgid "Remove as History"
-msgstr ""
+msgstr "Ukloni kao historiju"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove \"%s\" as your History list?"
-msgstr ""
+msgstr "Jeste li sigurni da želite ukloniti \"%s\" sa svoje liste historije?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with \"%s\"?"
-msgstr ""
+msgstr "Jeste li sigurni da želite zamijeniti svoju trenutnu listu historije sa \"%s\"?"
 
 msgctxt "#30575"
 msgid "Succeeded"
-msgstr ""
+msgstr "Uspjelo je"
 
 msgctxt "#30576"
 msgid "Failed"
-msgstr ""
+msgstr "Nije uspjelo"
 
 msgctxt "#30577"
 msgid "Smallest (4:3)"
-msgstr ""
+msgstr "Najmanji (4:3)"
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
-msgstr ""
+msgstr "Prisilna verifikacija SSL certifikata"
 
 msgctxt "#30579"
 msgid "InputStream.Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream.Adaptive now?"
-msgstr ""
+msgstr "InputStream.Adaptive je aktiviran u postavkama YouTubea, međutim, dodatak je onemogućen. Želite li sada omogućiti InputStream.Adaptive?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
-msgstr ""
+msgstr "Resetiraj upravitelja pristupa"
 
 msgctxt "#30581"
 msgid "Are you sure you want to reset access manager?"
-msgstr ""
+msgstr "Jeste li sigurni da želite resetirati upravitelja pristupa?"
 
 msgctxt "#30582"
 msgid "Autoplay suggested videos"
-msgstr ""
+msgstr "Automatska reprodukcija predloženih videozapisa"
 
 msgctxt "#30583"
 msgid "Filters can be channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel', and/or custom video filters in the form '{ATTR}{OP}{VALUE}' eg. '{duration}{>=}{180}{artists_string}{=}{\"The Best Channel\"},{duration}{<}{180}'"
-msgstr ""
+msgstr "Filteri mogu biti nazivi kanala odvojeni zarezom, npr. 'Najbolji kanal, Drugi najbolji kanal', i/ili prilagođeni video filteri u obliku '{ATTR}{OP}{VALUE}', npr. '{duration}{>=}{180}{artists_string}{=}{\"Najbolji kanal\"},{duration}{<}{180}'"
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
-msgstr ""
+msgstr "Moje pretplate (filtrirane)"
 
 msgctxt "#30585"
 msgid "Enable Blacklist to exclude channel names in Filters from My Subscriptions, disable to include channel names"
-msgstr ""
+msgstr "Omogućite Crnu listu da biste isključili nazive kanala u Filterima iz Mojih pretplata, onemogućite da biste uključili nazive kanala"
 
 msgctxt "#30586"
 msgid "Blacklist"
-msgstr ""
+msgstr "Crna lista"
 
 msgctxt "#30587"
-msgid ""
+msgid "Hide \"Playlists\" folder"
 msgstr ""
 
 msgctxt "#30588"
-msgid ""
+msgid "Hide \"Search\" folder"
 msgstr ""
 
 msgctxt "#30589"
-msgid ""
+msgid "Hide \"Shorts\" folder"
 msgstr ""
 
 msgctxt "#30590"
-msgid ""
+msgid "Hide \"Live\" folder"
 msgstr ""
 
 msgctxt "#30591"
 msgid "Thumbnail size"
-msgstr ""
+msgstr "Veličina sličice"
 
 msgctxt "#30592"
 msgid "Small (16:9)"
-msgstr ""
+msgstr "Mali (16:9)"
 
 msgctxt "#30593"
 msgid "Medium (4:3)"
-msgstr ""
+msgstr "Srednje (4:3)"
 
 msgctxt "#30594"
 msgid "Safe search"
-msgstr ""
+msgstr "Sigurna pretraga"
 
 msgctxt "#30595"
 msgid "Moderate"
-msgstr ""
+msgstr "Nadzirite"
 
 msgctxt "#30596"
 msgid "Strict"
-msgstr ""
+msgstr "Strogo"
 
 msgctxt "#30597"
-msgid ""
+msgid "Hide \"Members only\" folder"
 msgstr ""
 
 msgctxt "#30598"
 msgid "Large (4:3)"
-msgstr ""
+msgstr "Veliko (4:3)"
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
-msgstr ""
+msgstr "Omogućavanje ličnih API ključeva nije uspjelo. Nedostaje: %s"
 
 msgctxt "#30600"
 msgid "Largest (16:9)"
-msgstr ""
+msgstr "Najveći (16:9)"
 
 msgctxt "#30601"
 msgid "%s with Original/%s fallback"
-msgstr ""
+msgstr "%s s originalnim/%s rezervnim"
 
 msgctxt "#30602"
 msgid "No auto-generated"
-msgstr ""
+msgstr "Nije automatski generirano"
 
 msgctxt "#30603"
 msgid "Age gate"
-msgstr ""
+msgstr "Starosna granica"
 
 msgctxt "#30604"
 msgid "Allow offensive content"
-msgstr ""
+msgstr "Dozvoli uvredljiv sadržaj"
 
 msgctxt "#30605"
 msgid "Quick Search"
-msgstr ""
+msgstr "Brza pretraga"
 
 msgctxt "#30606"
 msgid "Quick Search (Incognito)"
-msgstr ""
+msgstr "Brza pretraga (anonimno)"
 
 msgctxt "#30607"
 msgid "Audio only"
-msgstr ""
+msgstr "Samo zvuk"
 
 msgctxt "#30608"
 msgid "Allow developer keys"
-msgstr ""
+msgstr "Dozvoli ključeve za programere"
 
 msgctxt "#30609"
 msgid "Clear watch history"
-msgstr ""
+msgstr "Obriši historiju gledanja"
 
 msgctxt "#30610"
 msgid "This will clear your account's watch history from all devices. You can't undo this."
-msgstr ""
+msgstr "Ovim će se izbrisati historija gledanja vašeg računa sa svih uređaja. Ovu radnju ne možete poništiti."
 
 msgctxt "#30611"
 msgid "Saved Playlists"
-msgstr ""
+msgstr "Sačuvane liste za reprodukciju"
 
 msgctxt "#30612"
 msgid "Retry"
-msgstr ""
+msgstr "Pokušaj ponovo"
 
 msgctxt "#30613"
 msgid "Add to %s"
-msgstr ""
+msgstr "Dodaj u %s"
 
 msgctxt "#30614"
 msgid "Remove from %s"
-msgstr ""
+msgstr "Ukloni iz %s"
 
 msgctxt "#30615"
 msgid "Added to %s"
-msgstr ""
+msgstr "Dodano u %s"
 
 msgctxt "#30616"
 msgid "Removed from %s"
-msgstr ""
+msgstr "Uklonjeno iz %s"
 
 msgctxt "#30617"
 msgid "InputStream.Adaptive"
-msgstr ""
+msgstr "InputStream.Adaptive"
 
 msgctxt "#30618"
 msgid "Stream redirect"
-msgstr ""
+msgstr "Preusmjeravanje streama"
 
 msgctxt "#30619"
 msgid "Enable to reduce resource usage on less powerful devices, but could lead to IP bans. Use at own risk."
-msgstr ""
+msgstr "Omogućite smanjenje korištenja resursa na manje moćnim uređajima, ali može dovesti do zabrane IP adresa. Koristite na vlastitu odgovornost."
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
-msgstr ""
+msgstr "Port %s je već u upotrebi. Nije moguće pokrenuti http server."
 
 msgctxt "#30621"
 msgid "Verbose"
-msgstr ""
+msgstr "Opširno"
 
 msgctxt "#30622"
 msgid "Purchases"
-msgstr ""
+msgstr "Kupovine"
 
 msgctxt "#30623"
 msgid "Install InputStream Helper"
-msgstr ""
+msgstr "Instalirajte InputStream pomoćnika"
 
 msgctxt "#30624"
-msgid ""
+msgid "Members only"
 msgstr ""
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
-msgstr ""
+msgstr "InputStream Helper je već instaliran."
 
 msgctxt "#30626"
 msgid "Delete temporary files"
-msgstr ""
+msgstr "Izbriši privremene datoteke"
 
 msgctxt "#30627"
 msgid "Rate video after watching"
-msgstr ""
+msgstr "Ocijenite video nakon gledanja"
 
 msgctxt "#30628"
 msgid "HTTP Server"
-msgstr ""
+msgstr "HTTP server"
 
 msgctxt "#30629"
 msgid "IP whitelist (comma delimited)"
-msgstr ""
+msgstr "Bijela IP lista (razdvojena zarezom)"
 
 msgctxt "#30630"
 msgid ""
@@ -825,175 +825,175 @@ msgstr ""
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
-msgstr ""
+msgstr "Uspješno ažurirano: %s"
 
 msgctxt "#30632"
 msgid "Enable API configuration page"
-msgstr ""
+msgstr "Omogući stranicu za konfiguraciju API-ja"
 
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/youtube/api (see Advanced > HTTP Server)"
-msgstr ""
+msgstr "http://<ipaddress> :<port> /youtube/api (pogledajte Napredno > HTTP server)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
-msgstr ""
+msgstr "Konfiguracija API-ja za YouTube dodatak"
 
 msgctxt "#30635"
 msgid "No changes detected, API keys were not updated."
-msgstr ""
+msgstr "Nisu otkrivene promjene, API ključevi nisu ažurirani."
 
 msgctxt "#30636"
 msgid "Personal API keys are enabled."
-msgstr ""
+msgstr "Lični API ključevi su omogućeni."
 
 msgctxt "#30637"
 msgid "Personal API keys are disabled."
-msgstr ""
+msgstr "Lični API ključevi su onemogućeni."
 
 msgctxt "#30638"
 msgid "Bookmark this page to quickly add your keys in the future."
-msgstr ""
+msgstr "Označite ovu stranicu kako biste brzo dodali svoje ključeve u budućnosti."
 
 msgctxt "#30639"
 msgid "Found personal API keys in api_keys.json, would you like to restore them? Choosing no will overwrite them."
-msgstr ""
+msgstr "Pronađeni su lični API ključevi u api_keys.json, želite li ih vratiti? Odabirom opcije \"ne\" prepisat ćete ih."
 
 msgctxt "#30640"
 msgid "Restore"
-msgstr ""
+msgstr "Povratite"
 
 msgctxt "#30641"
 msgid "Delete api_keys.json"
-msgstr ""
+msgstr "Obriši api_keys.json"
 
 msgctxt "#30642"
 msgid "Delete access_manager.json"
-msgstr ""
+msgstr "Obriši datoteku access_manager.json"
 
 msgctxt "#30643"
 msgid "Listen on IP"
-msgstr ""
+msgstr "Slušajte putem IP-a"
 
 msgctxt "#30644"
 msgid "Select listen IP"
-msgstr ""
+msgstr "Odaberite IP adresu za slušanje"
 
 msgctxt "#30645"
 msgid "Refresh after watching"
-msgstr ""
+msgstr "Osvježi nakon gledanja"
 
 msgctxt "#30646"
 msgid "Upcoming Live"
-msgstr ""
+msgstr "Predstojeći prijenos uživo"
 
 msgctxt "#30647"
 msgid "Completed Live"
-msgstr ""
+msgstr "Završeno uživo"
 
 msgctxt "#30648"
 msgid "API Key is incorrect. Settings > API > API Key"
-msgstr ""
+msgstr "API ključ je netačan. Postavke > API > API ključ"
 
 msgctxt "#30649"
 msgid "Client Id is incorrect. Settings > API > API Id"
-msgstr ""
+msgstr "ID klijenta je netačan. Postavke > API > ID API-ja"
 
 msgctxt "#30650"
 msgid "Client Secret is incorrect. Settings > API > API Secret"
-msgstr ""
+msgstr "Tajni podatak klijenta je netačan. Postavke > API > Tajni podatak API-ja"
 
 msgctxt "#30651"
 msgid "Location"
-msgstr ""
+msgstr "Lokacija"
 
 msgctxt "#30652"
 msgid "Location radius (km)"
-msgstr ""
+msgstr "Radijus lokacije (km)"
 
 msgctxt "#30653"
 msgid "My Location using IP geolocation lookup"
-msgstr ""
+msgstr "Moja lokacija korištenjem pretrage geolokacije IP adrese"
 
 msgctxt "#30654"
 msgid "My Location"
-msgstr ""
+msgstr "Moja lokacija"
 
 msgctxt "#30655"
 msgid "Switch User"
-msgstr ""
+msgstr "Promijeni korisnika"
 
 msgctxt "#30656"
 msgid "New user"
-msgstr ""
+msgstr "Novi korisnik"
 
 msgctxt "#30657"
 msgid "Unnamed"
-msgstr ""
+msgstr "Neimenovano"
 
 msgctxt "#30658"
 msgid "Enter a name for this user"
-msgstr ""
+msgstr "Unesite ime za ovog korisnika"
 
 msgctxt "#30659"
 msgid "User is now \"%s\""
-msgstr ""
+msgstr "Korisnik je sada \"%s\""
 
 msgctxt "#30660"
 msgid "Users"
-msgstr ""
+msgstr "Korisnici"
 
 msgctxt "#30661"
 msgid "Add a user"
-msgstr ""
+msgstr "Dodaj korisnika"
 
 msgctxt "#30662"
 msgid "Remove a user"
-msgstr ""
+msgstr "Uklonite korisnika"
 
 msgctxt "#30663"
 msgid "Rename a user"
-msgstr ""
+msgstr "Preimenuj korisnika"
 
 msgctxt "#30664"
 msgid "Switch user"
-msgstr ""
+msgstr "Promijeni korisnika"
 
 msgctxt "#30665"
 msgid "Switch to \"%s\" now?"
-msgstr ""
+msgstr "Prebaciti se na \"%s\" sada?"
 
 msgctxt "#30666"
 msgid "\"%s\" removed"
-msgstr ""
+msgstr "\"%s\" je uklonjeno"
 
 msgctxt "#30667"
 msgid "Renamed \"%s\" to \"%s\""
-msgstr ""
+msgstr "Preimenovano iz \"%s\" u \"%s\""
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
-msgstr ""
+msgstr "Minimalni postotak broja reprodukcija"
 
 msgctxt "#30669"
 msgid "%s removed"
-msgstr ""
+msgstr "%s uklonjeno"
 
 msgctxt "#30670"
 msgid "Added %s"
-msgstr ""
+msgstr "Dodano %s"
 
 msgctxt "#30671"
 msgid "Clear playback history"
-msgstr ""
+msgstr "Obriši historiju reprodukcije"
 
 msgctxt "#30672"
 msgid "Delete playback history database"
-msgstr ""
+msgstr "Obriši bazu podataka historije reprodukcije"
 
 msgctxt "#30673"
 msgid "playback history"
-msgstr ""
+msgstr "historija reprodukcije"
 
 msgctxt "#30674"
 msgid ""
@@ -1001,115 +1001,115 @@ msgstr ""
 
 msgctxt "#30675"
 msgid "Use local playback history (watched, resume tracking)"
-msgstr ""
+msgstr "Koristi lokalnu historiju reprodukcije (gledano, nastaviti praćenje)"
 
 msgctxt "#30676"
 msgid "Just now"
-msgstr ""
+msgstr "Upravo sada"
 
 msgctxt "#30677"
 msgid "A minute ago"
-msgstr ""
+msgstr "Prije minute"
 
 msgctxt "#30678"
 msgid "Recently"
-msgstr ""
+msgstr "Nedavno"
 
 msgctxt "#30679"
 msgid "An hour ago"
-msgstr ""
+msgstr "Prije sat vremena"
 
 msgctxt "#30680"
 msgid "Two hours ago"
-msgstr ""
+msgstr "Prije dva sata"
 
 msgctxt "#30681"
 msgid "Three hours ago"
-msgstr ""
+msgstr "Prije tri sata"
 
 msgctxt "#30682"
 msgid "Yesterday at"
-msgstr ""
+msgstr "Jučer u"
 
 msgctxt "#30683"
 msgid "Two days ago"
-msgstr ""
+msgstr "Prije dva dana"
 
 msgctxt "#30684"
 msgid "Today at"
-msgstr ""
+msgstr "Danas u"
 
 msgctxt "#30685"
 msgid "Delete data cache database"
-msgstr ""
+msgstr "Izbriši bazu podataka keš memorije"
 
 msgctxt "#30686"
 msgid "Clear data cache"
-msgstr ""
+msgstr "Obriši keš podatke"
 
 msgctxt "#30687"
 msgid "data cache"
-msgstr ""
+msgstr "keš podataka"
 
 msgctxt "#30688"
 msgid "Use MPEG-DASH for videos"
-msgstr ""
+msgstr "Koristite MPEG-DASH za videozapise"
 
 msgctxt "#30689"
 msgid "Use for live streams"
-msgstr ""
+msgstr "Koristi za prijenose uživo"
 
 msgctxt "#30690"
 msgid "InputStream.Adaptive >= 2.0.12 is required for adaptive live streams"
-msgstr ""
+msgstr "Za adaptivne prijenose uživo potreban je InputStream.Adaptive >= 2.0.12"
 
 msgctxt "#30691"
 msgid "Airing now"
-msgstr ""
+msgstr "Emitira se sada"
 
 msgctxt "#30692"
 msgid "In a minute"
-msgstr ""
+msgstr "Za minutu"
 
 msgctxt "#30693"
 msgid "Airing soon"
-msgstr ""
+msgstr "Uskoro u emitiranju"
 
 msgctxt "#30694"
 msgid "In over an hour"
-msgstr ""
+msgstr "Za više od sat vremena"
 
 msgctxt "#30695"
 msgid "In over two hours"
-msgstr ""
+msgstr "Za više od dva sata"
 
 msgctxt "#30696"
 msgid "Airing today at"
-msgstr ""
+msgstr "Emituje se danas u"
 
 msgctxt "#30697"
 msgid "Tomorrow at"
-msgstr ""
+msgstr "Sutra u"
 
 msgctxt "#30698"
 msgid "Check my IP"
-msgstr ""
+msgstr "Provjeri moju IP adresu"
 
 msgctxt "#30699"
 msgid "HTTP server is not running"
-msgstr ""
+msgstr "HTTP server ne radi"
 
 msgctxt "#30700"
 msgid "Client IP is %s"
-msgstr ""
+msgstr "IP adresa klijenta je %s"
 
 msgctxt "#30701"
 msgid "Failed to obtain client IP"
-msgstr ""
+msgstr "Nije uspjelo dobijanje IP adrese klijenta"
 
 msgctxt "#30702"
 msgid "Play with subtitles"
-msgstr ""
+msgstr "Reproduciraj s titlovima"
 
 msgctxt "#30703"
 msgid ""
@@ -1117,31 +1117,31 @@ msgstr ""
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
-msgstr ""
+msgstr "Koristite URL-ove YouTube web stranice sa zadanim playerom"
 
 msgctxt "#30705"
 msgid "Download subtitles"
-msgstr ""
+msgstr "Preuzmi titlove"
 
 msgctxt "#30706"
 msgid "Download subtitles before starting playback? (Default: No)"
-msgstr ""
+msgstr "Preuzmi titlove prije početka reprodukcije? (Zadano: Ne)"
 
 msgctxt "#30707"
 msgid "Untitled"
-msgstr ""
+msgstr "Bez naslova"
 
 msgctxt "#30708"
 msgid "Play audio only"
-msgstr ""
+msgstr "Reprodukuj samo zvuk"
 
 msgctxt "#30709"
 msgid "WebVTT subtitles"
-msgstr ""
+msgstr "WebVTT titlovi"
 
 msgctxt "#30710"
 msgid "TTML subtitles"
-msgstr ""
+msgstr "TTML titlovi"
 
 msgctxt "#30711"
 msgid ""
@@ -1149,436 +1149,444 @@ msgstr ""
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
-msgstr ""
+msgstr "Ocijenite videozapise na plejlistama"
 
 msgctxt "#30713"
 msgid "Prefer dubbed audio over original audio"
-msgstr ""
+msgstr "Preferiraj sinkronizirani zvuk u odnosu na originalni zvuk"
 
 msgctxt "#30714"
 msgid "Prefer automatically translated dubbed audio over original audio"
-msgstr ""
+msgstr "Preferiraj automatski prevedeni sinkronizirani audio u odnosu na originalni audio"
 
 msgctxt "#30715"
 msgid "Use YouTube internal list for Watch History?[CR][CR]Requires signing-in via the addon and activating history tracking on YouTube."
-msgstr ""
+msgstr "Koristiti internu listu YouTubea za historiju gledanja?[CR][CR]Zahtijeva prijavu putem dodatka i aktiviranje praćenja historije na YouTubeu."
 
 msgctxt "#30716"
 msgid "Liked video"
-msgstr ""
+msgstr "Sviđa mi se video"
 
 msgctxt "#30717"
 msgid "Disliked video"
-msgstr ""
+msgstr "Nesviđa mi se video"
 
 msgctxt "#30718"
 msgid "Use YouTube internal list for Watch Later?[CR][CR]Requires signing-in via the addon."
-msgstr ""
+msgstr "Koristiti YouTube internu listu za Gledaj kasnije?[CR][CR]Zahtijeva prijavu putem dodatka."
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
-msgstr ""
+msgstr "Pretplaćeni ste na kanal"
 
 msgctxt "#30720"
 msgid "Unsubscribed from channel"
-msgstr ""
+msgstr "Odjavljeni ste s kanala"
 
 msgctxt "#30721"
 msgid "Enable Panoramic/180/360/VR video"
-msgstr ""
+msgstr "Omogući panoramski/180/360/VR video"
 
 msgctxt "#30722"
 msgid "Enable HDR video"
-msgstr ""
+msgstr "Omogući HDR video"
 
 msgctxt "#30723"
 msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream.Adaptive >= 2.3.14"
-msgstr ""
+msgstr "Proxy je potreban za MPEG-DASH VOD-ove (pogledajte Napredno > HTTP Server)[CR]HDR i >1080p video zahtijevaju InputStream.Adaptive >= 2.3.14"
 
 msgctxt "#30724"
 msgid "Enable high framerate video"
-msgstr ""
+msgstr "Omogući video s visokom brzinom kadrova"
 
 msgctxt "#30725"
 msgid "1440p (QHD)"
-msgstr ""
+msgstr "1440p (QHD)"
 
 msgctxt "#30726"
 msgid "Uploads"
-msgstr ""
+msgstr "Otpremanja"
 
 msgctxt "#30727"
 msgid "Enable H.264 video"
-msgstr ""
+msgstr "Omogući H.264 video"
 
 msgctxt "#30728"
 msgid "Enable VP9 video"
-msgstr ""
+msgstr "Omogući VP9 video"
 
 msgctxt "#30729"
 msgid "Prefer lower resolution streams for unselected codecs"
-msgstr ""
+msgstr "Preferiraj streamove niže rezolucije za neodabrane kodeke"
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
-msgstr ""
+msgstr "Igrajte (Tražite kvalitet)"
 
 msgctxt "#30731"
 msgid "The YouTube add-on now requires that you use your own API keys.[CR]For more information see the wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Sorry for the inconvenience."
-msgstr ""
+msgstr "Dodatak za YouTube sada zahtijeva korištenje vlastitih API ključeva.[CR]Za više informacija pogledajte wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Žao nam je zbog neugodnosti."
 
 msgctxt "#30732"
 msgid "Comments"
-msgstr ""
+msgstr "Komentari"
 
 msgctxt "#30733"
 msgid "Likes"
-msgstr ""
+msgstr "Sviđanja"
 
 msgctxt "#30734"
 msgid "Replies"
-msgstr ""
+msgstr "Odgovori"
 
 msgctxt "#30735"
 msgid "Edited"
-msgstr ""
+msgstr "Uređeno"
 
 msgctxt "#30736"
 msgid "Shorts"
-msgstr ""
+msgstr "Kratke hlače"
 
 msgctxt "#30737"
 msgid "Shorts - Max duration"
-msgstr ""
+msgstr "Kratki filmovi - Maksimalno trajanje"
 
 msgctxt "#30738"
 msgid "Enable spatial audio"
-msgstr ""
+msgstr "Omogući prostorni zvuk"
 
 msgctxt "#30739"
 msgid "Subscribers"
-msgstr ""
+msgstr "Pretplatnici"
 
 msgctxt "#30740"
 msgid "HLS"
-msgstr ""
+msgstr "HLS"
 
 msgctxt "#30741"
 msgid "Multi-stream HLS"
-msgstr ""
+msgstr "Višestruki HLS"
 
 msgctxt "#30742"
 msgid "Adaptive HLS"
-msgstr ""
+msgstr "Adaptivni HLS"
 
 msgctxt "#30743"
 msgid "MPEG-DASH"
-msgstr ""
+msgstr "MPEG-DASH"
 
 msgctxt "#30744"
 msgid "Original"
-msgstr ""
+msgstr "Original"
 
 msgctxt "#30745"
 msgid "Dubbed"
-msgstr ""
+msgstr "Sinhronizovano"
 
 msgctxt "#30746"
 msgid "Descriptive"
-msgstr ""
+msgstr "Opisno"
 
 msgctxt "#30747"
 msgid "Alternate"
-msgstr ""
+msgstr "Alternativni"
 
 msgctxt "#30748"
 msgid "Stream features"
-msgstr ""
+msgstr "Funkcije streama"
 
 msgctxt "#30749"
 msgid "Enable AV1 video"
-msgstr ""
+msgstr "Omogući AV1 video"
 
 msgctxt "#30750"
 msgid "Enable Vorbis audio"
-msgstr ""
+msgstr "Omogući Vorbis audio"
 
 msgctxt "#30751"
 msgid "Enable Opus audio"
-msgstr ""
+msgstr "Omogući Opus audio"
 
 msgctxt "#30752"
 msgid "Enable AAC audio"
-msgstr ""
+msgstr "Omogući AAC zvuk"
 
 msgctxt "#30753"
 msgid "Enable surround sound audio"
-msgstr ""
+msgstr "Omogući surround zvuk"
 
 msgctxt "#30754"
 msgid "Enable AC-3 audio"
-msgstr ""
+msgstr "Omogući AC-3 zvuk"
 
 msgctxt "#30755"
 msgid "Enable EAC-3 audio"
-msgstr ""
+msgstr "Omogući EAC-3 zvuk"
 
 msgctxt "#30756"
 msgid "Enable DTS audio"
-msgstr ""
+msgstr "Omogući DTS zvuk"
 
 msgctxt "#30757"
 msgid "Remove similar/duplicate streams"
-msgstr ""
+msgstr "Ukloni slične/duplicirane streamove"
 
 msgctxt "#30758"
 msgid "Stream selection"
-msgstr ""
+msgstr "Odabir streama"
 
 msgctxt "#30759"
 msgid "Quality selection"
-msgstr ""
+msgstr "Odabir kvalitete"
 
 msgctxt "#30760"
 msgid "Automatic + Quality selection"
-msgstr ""
+msgstr "Automatski + odabir kvalitete"
 
 msgctxt "#30761"
 msgid "Update playback history on Youtube"
-msgstr ""
+msgstr "Ažuriranje historije reprodukcije na YouTubeu"
 
 msgctxt "#30762"
 msgid "Multi-language"
-msgstr ""
+msgstr "Višejezičnost"
 
 msgctxt "#30763"
 msgid "Multi-audio"
-msgstr ""
+msgstr "Višestruki audio"
 
 msgctxt "#30764"
 msgid "Requests connect timeout"
-msgstr ""
+msgstr "Zahtjevi za povezivanje su prekinuli vrijeme"
 
 msgctxt "#30765"
 msgid "Requests read timeout"
-msgstr ""
+msgstr "Zahtjevi za čitanje su istekli"
 
 msgctxt "#30766"
 msgid "Premieres"
-msgstr ""
+msgstr "Premijere"
 
 msgctxt "#30767"
 msgid "Views"
-msgstr ""
+msgstr "Pregledi"
 
 msgctxt "#30768"
 msgid "Disable high framerate video at maximum video quality"
-msgstr ""
+msgstr "Onemogući video s visokom brzinom sličica u sekundi pri maksimalnom kvalitetu videa"
 
 msgctxt "#30769"
 msgid "Clear Watch Later list"
-msgstr ""
+msgstr "Obriši listu Gledaj kasnije"
 
 msgctxt "#30770"
 msgid "Are you sure you want to clear your Watch Later list?"
-msgstr ""
+msgstr "Jeste li sigurni da želite obrisati svoju listu \"Gledaj kasnije\"?"
 
 msgctxt "#30771"
 msgid "Disable fractional framerate hinting"
-msgstr ""
+msgstr "Onemogući hintovanje frakcijskog broja sličica u sekundi"
 
 msgctxt "#30772"
 msgid "Disable all framerate hinting"
-msgstr ""
+msgstr "Onemogući sve nagovještaje o brzini kadrova"
 
 msgctxt "#30773"
 msgid "Show video details in video lists"
-msgstr ""
+msgstr "Prikaži detalje o videu u listama videa"
 
 msgctxt "#30774"
 msgid "All available"
-msgstr ""
+msgstr "Sve dostupno"
 
 msgctxt "#30775"
 msgid "%s (translation)"
-msgstr ""
+msgstr "%s (prijevod)"
 
 msgctxt "#30776"
 msgid "Ask + Automatic + Quality selection"
-msgstr ""
+msgstr "Pitaj + Automatski + Odabir kvalitete"
 
 msgctxt "#30777"
 msgid "Views for %s (%s)"
-msgstr ""
+msgstr "Pregledi za %s (%s)"
 
 msgctxt "#30778"
 msgid "Import old playback history?"
-msgstr ""
+msgstr "Uvesti staru historiju reprodukcije?"
 
 msgctxt "#30779"
 msgid "Import old search history?"
-msgstr ""
+msgstr "Uvesti staru historiju pretraživanja?"
 
 msgctxt "#30780"
 msgid "Clear local watch later list"
-msgstr ""
+msgstr "Obriši lokalnu listu za kasnije gledanje"
 
 msgctxt "#30781"
 msgid "Delete watch later database"
-msgstr ""
+msgstr "Obriši bazu podataka za kasnije gledanje"
 
 msgctxt "#30782"
 msgid "local watch later list"
-msgstr ""
+msgstr "lokalna lista za kasnije gledanje"
 
 msgctxt "#30783"
 msgid "settings to recommended values"
-msgstr ""
+msgstr "postavke na preporučene vrijednosti"
 
 msgctxt "#30784"
 msgid "listings to show minimal details"
-msgstr ""
+msgstr "oglasi za prikaz minimalnih detalja"
 
 msgctxt "#30785"
 msgid "performance settings"
-msgstr ""
+msgstr "postavke performansi"
 
 msgctxt "#30786"
 msgid "Choose device capabilities"
-msgstr ""
+msgstr "Odaberite mogućnosti uređaja"
 
 msgctxt "#30787"
 msgid "720p, H.264 only | Limited or older devices"
-msgstr ""
+msgstr "Samo 720p, H.264 | Ograničeni ili stariji uređaji"
 
 msgctxt "#30788"
 msgid "1080p/30 fps | Raspberry Pi 3, or similar"
-msgstr ""
+msgstr "1080p/30 fps | Raspberry Pi 3 ili slično"
 
 msgctxt "#30789"
 msgid "4K/30 fps or 1080p/60 fps, HDR if compatible | Raspberry Pi 5, or similar"
-msgstr ""
+msgstr "4K/30 fps ili 1080p/60 fps, HDR ako je kompatibilan | Raspberry Pi 5 ili slično"
 
 msgctxt "#30790"
 msgid "4K/60 fps, HDR if compatible | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1, or similar"
-msgstr ""
+msgstr "4K/60 fps, HDR ako je kompatibilan | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1 ili slično"
 
 msgctxt "#30791"
 msgid "4K/60 fps, HDR, using AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V, or similar"
-msgstr ""
+msgstr "4K/60 fps, HDR, korištenjem AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V ili slično"
 
 msgctxt "#30792"
 msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities"
-msgstr ""
+msgstr "8K/60 fps, HDR, korištenje AV1 | Moderni uređaj ili računar sa svim mogućnostima"
 
 msgctxt "#30793"
 msgid "Views count display colour"
-msgstr ""
+msgstr "Boja prikaza broja pregleda"
 
 msgctxt "#30794"
 msgid "Subscriber/Likes count display colour"
-msgstr ""
+msgstr "Boja prikaza broja pretplatnika/lajkova"
 
 msgctxt "#30795"
 msgid "Videos/Comments count display colour"
-msgstr ""
+msgstr "Boja prikaza broja videa/komentara"
 
 msgctxt "#30796"
 msgid "1080p/60 fps | Raspberry Pi 4, or similar"
-msgstr ""
+msgstr "1080p/60 fps | Raspberry Pi 4 ili slično"
 
 msgctxt "#30797"
 msgid "1080p/30 fps or 720p/30 fps, H.264 only | Raspberry Pi 1/2, or similar"
-msgstr ""
+msgstr "1080p/30 fps ili 720p/30 fps, samo H.264 | Raspberry Pi 1/2 ili slično"
 
 msgctxt "#30798"
 msgid "Clear bookmarks list"
-msgstr ""
+msgstr "Obriši listu oznaka"
 
 msgctxt "#30799"
 msgid "Delete bookmarks database"
-msgstr ""
+msgstr "Obriši bazu podataka oznaka"
 
 msgctxt "#30800"
 msgid "bookmarks list"
-msgstr ""
+msgstr "lista oznaka"
 
 msgctxt "#30801"
 msgid "Clear Bookmarks list"
-msgstr ""
+msgstr "Obriši listu oznaka"
 
 msgctxt "#30802"
 msgid "Are you sure you want to clear your Bookmarks list?"
-msgstr ""
+msgstr "Jeste li sigurni da želite obrisati listu oznaka?"
 
 msgctxt "#30803"
 msgid "Bookmark %s"
-msgstr ""
+msgstr "Označi %s"
 
 msgctxt "#30804"
 msgid "Use YouTube website urls with external player"
-msgstr ""
+msgstr "Koristite URL-ove YouTube web stranice s vanjskim playerom"
 
 msgctxt "#30805"
 msgid "Use MPEG-DASH with external player"
-msgstr ""
+msgstr "Koristite MPEG-DASH sa eksternim plejerom"
 
 msgctxt "#30806"
 msgid "Jump to page..."
-msgstr ""
+msgstr "Skoči na stranicu..."
 
 msgctxt "#30807"
 msgid "Use channel name as"
-msgstr ""
+msgstr "Koristi naziv kanala kao"
 
 msgctxt "#30808"
-msgid "Hide videos from listings"
+msgid "Hide items from listings"
 msgstr ""
 
 msgctxt "#30809"
 msgid "All upcoming videos"
-msgstr ""
+msgstr "Svi nadolazeći videozapisi"
 
 msgctxt "#30810"
 msgid "All previously streamed (completed) videos"
-msgstr ""
+msgstr "Svi prethodno strimovani (završeni) videozapisi"
 
 msgctxt "#30811"
 msgid "Filter Live folders"
-msgstr ""
+msgstr "Filtriraj žive mape"
 
 msgctxt "#30812"
 msgid "Clear subscription feed history"
-msgstr ""
+msgstr "Obriši historiju feeda pretplata"
 
 msgctxt "#30813"
 msgid "Delete subscription feed history database"
-msgstr ""
+msgstr "Obriši bazu podataka historije pretplata"
 
 msgctxt "#30814"
 msgid "feed history"
-msgstr ""
+msgstr "historija feeda"
 
 msgctxt "#30815"
 msgid "Go back..."
-msgstr ""
+msgstr "Vrati se..."
 
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
-msgstr ""
+msgstr "Lista je prazna.[CR][CR]Osvježite iz kontekstnog menija ili pokušajte ponovo kasnije."
 
 msgctxt "#30817"
 msgid "Refresh settings.xml"
-msgstr ""
+msgstr "Osvježi settings.xml"
 
 msgctxt "#30818"
 msgid "Are you sure you want to refresh settings.xml?"
-msgstr ""
+msgstr "Jeste li sigurni da želite osvježiti datoteku settings.xml?"
 
 msgctxt "#30819"
 msgid "Play from start"
-msgstr ""
+msgstr "Reproduciraj od početka"
 
 msgctxt "#30820"
 msgid "Podcast"
-msgstr ""
+msgstr "Podcast"
+
+#~ msgctxt "#30547"
+#~ msgid "You may be prompted to enable two applications so that YouTube is functioning properly."
+#~ msgstr "Možda će vam biti zatraženo da omogućite dvije aplikacije kako bi YouTube ispravno funkcionirao."
+
+#~ msgctxt "#30808"
+#~ msgid "Hide videos from listings"
+#~ msgstr "Sakrij videozapise iz oglasa"

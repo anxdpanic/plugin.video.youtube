@@ -437,9 +437,14 @@ def _process_saved_playlists(provider, context, client):
     browse_client = 'tv'
     browse_paths = client.JSON_PATHS['tv_grid']
 
+    own_channel = client.channel_id
+    if own_channel:
+        own_channel = (own_channel,)
+
     json_data = client.get_browse_items(
         browse_id=browse_id,
         client=browse_client,
+        skip_ids=own_channel,
         response_type=browse_response_type,
         do_auth=True,
         page_token=params.get('page_token'),
@@ -454,6 +459,7 @@ def _process_saved_playlists(provider, context, client):
         client.get_browse_items,
         browse_id=browse_id,
         client=browse_client,
+        skip_ids=own_channel,
         response_type=browse_response_type,
         do_auth=True,
         json_path=browse_paths,

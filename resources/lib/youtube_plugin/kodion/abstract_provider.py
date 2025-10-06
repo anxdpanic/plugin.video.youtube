@@ -46,6 +46,7 @@ class AbstractProvider(object):
     CACHE_TO_DISC = 'provider_cache_to_disc'  # type: bool
     FALLBACK = 'provider_fallback'  # type: bool | str
     FORCE_PLAY = 'provider_force_play'  # type: bool
+    FORCE_REFRESH = 'provider_force_refresh'  # type: bool
     FORCE_RESOLVE = 'provider_force_resolve'  # type: bool
     FORCE_RETURN = 'provider_force_return'  # type: bool
     POST_RUN = 'provider_post_run'  # type: bool
@@ -430,12 +431,10 @@ class AbstractProvider(object):
                 return False, None
 
             search_history.del_item(query)
-            ui.refresh_container()
-
             ui.show_notification(localize('removed.name.x', query),
                                  time_ms=2500,
                                  audible=False)
-            return True, None
+            return True, {provider.FORCE_REFRESH: True}
 
         if command == 'rename':
             query = to_unicode(params.get('q', ''))
@@ -447,8 +446,7 @@ class AbstractProvider(object):
 
             search_history.del_item(query)
             search_history.add_item(new_query)
-            ui.refresh_container()
-            return True, None
+            return True, {provider.FORCE_REFRESH: True}
 
         if command == 'clear':
             if not ui.on_yes_no_input(
@@ -458,12 +456,10 @@ class AbstractProvider(object):
                 return False, None
 
             search_history.clear()
-            ui.refresh_container()
-
             ui.show_notification(localize('completed'),
                                  time_ms=2500,
                                  audible=False)
-            return True, None
+            return True, {provider.FORCE_REFRESH: True}
 
         if command == 'links':
             return provider.on_specials_x(

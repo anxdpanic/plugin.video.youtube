@@ -225,10 +225,9 @@ class XbmcPlugin(AbstractPlugin):
                 ui.on_ok('Error in ContentProvider', exc.__str__())
 
         if not ui.pop_property(REFRESH_CONTAINER, as_bool=True) and forced:
-            player_video_id = ui.pop_property(PLAYER_VIDEO_ID)
-            if player_video_id:
+            played_video_id = ui.pop_property(PLAYER_VIDEO_ID)
+            if played_video_id:
                 focused_video_id = None
-                played_video_id = player_video_id
             else:
                 focused_video_id = None if route else ui.get_property(VIDEO_ID)
                 played_video_id = None
@@ -314,7 +313,7 @@ class XbmcPlugin(AbstractPlugin):
             update_listing = options.get(provider.UPDATE_LISTING, True)
 
         if result_item and result_item_type in self._PLAY_ITEM_MAP:
-            if path != PATHS.PLAY and not forced:
+            if not forced and not force_resolve and path != PATHS.PLAY:
                 force_play = True
             else:
                 force_play = options.get(provider.FORCE_PLAY)
@@ -374,6 +373,8 @@ class XbmcPlugin(AbstractPlugin):
                         succeeded=False,
                         listitem=item,
                     )
+                elif options.get(provider.FORCE_REFRESH):
+                    _post_run_action = ui.refresh_container
                 else:
                     if context.is_plugin_path(
                             ui.get_container_info(FOLDER_URI, container_id=None)
@@ -410,7 +411,7 @@ class XbmcPlugin(AbstractPlugin):
             if any(sync_items):
                 context.send_notification(SYNC_LISTITEM, sync_items)
 
-            if forced and is_same_path:
+            if forced and is_same_path and (not played_video_id or route):
                 container = ui.get_property(CONTAINER_ID)
                 position = ui.get_property(CONTAINER_POSITION)
                 if container and position:

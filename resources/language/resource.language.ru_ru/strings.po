@@ -5,17 +5,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-04-14 19:47+0000\n"
-"Last-Translator: Christian Gade <gade@kodi.tv>\n"
+"PO-Revision-Date: 2025-10-04 08:29+0000\n"
+"Last-Translator: Alexey <signfinder@gmail.com>\n"
 "Language-Team: Russian <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/ru_ru/>\n"
 "Language: ru_ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.4.3\n"
+"X-Generator: Weblate 5.13.3\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -50,16 +50,16 @@ msgstr ""
 
 msgctxt "#30003"
 msgid "YouTube"
-msgstr ""
+msgstr "YouTube"
 
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
 msgid "Use InputStream.Adaptive"
-msgstr ""
+msgstr "Использовать InputStream.Adaptive"
 
 msgctxt "#30008"
 msgid "Configure InputStream.Adaptive"
-msgstr ""
+msgstr "Настроить InputStream.Adaptive"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -67,7 +67,7 @@ msgstr "Всегда задавать вопрос о качестве виде�
 
 msgctxt "#30010"
 msgid "Maximum video quality"
-msgstr ""
+msgstr "Максимальное качество видео"
 
 msgctxt "#30011"
 msgid "480p"
@@ -103,11 +103,11 @@ msgstr "1080p Прямой эфир / 720p (HD)"
 
 msgctxt "#30019"
 msgid "144p"
-msgstr ""
+msgstr "144p"
 
 msgctxt "#30020"
 msgid "Enable Stereoscopic 3D video"
-msgstr ""
+msgstr "Включить стереоскопическое 3D-видео"
 
 msgctxt "#30021"
 msgid "Show fanart"
@@ -127,11 +127,11 @@ msgstr "Размер кэша (Мб)"
 
 msgctxt "#30025"
 msgid "Enable Setup Wizard"
-msgstr ""
+msgstr "Включить мастер настройки"
 
 msgctxt "#30026"
 msgid "Override views"
-msgstr ""
+msgstr "Переопределить представления"
 
 msgctxt "#30027"
 msgid "View: Default"
@@ -147,11 +147,11 @@ msgstr "Вид: Фильмы"
 
 msgctxt "#30030"
 msgid "Configure %s?"
-msgstr ""
+msgstr "Настроить %s?"
 
 msgctxt "#30031"
 msgid "Requests cache size (MB)"
-msgstr ""
+msgstr "Размер кэша запросов (МБ)"
 
 msgctxt "#30032"
 msgid "View: TV Shows"
@@ -185,11 +185,11 @@ msgstr "ID плейлиста для истории"
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
 msgid "Bookmarks"
-msgstr ""
+msgstr "Закладки"
 
 msgctxt "#30101"
 msgid "Bookmark"
-msgstr ""
+msgstr "Закладка"
 
 msgctxt "#30102"
 msgid "Search"
@@ -205,11 +205,11 @@ msgstr ""
 
 msgctxt "#30105"
 msgid "filtered"
-msgstr ""
+msgstr "отфильтровано"
 
 msgctxt "#30106"
 msgid "Next page: %d"
-msgstr ""
+msgstr "Следующая страница: %d"
 
 msgctxt "#30107"
 msgid "Watch Later"
@@ -217,11 +217,11 @@ msgstr "Отложенный просмотр"
 
 msgctxt "#30108"
 msgid "Enter the name of the bookmark"
-msgstr ""
+msgstr "Введите название закладки"
 
 msgctxt "#30109"
 msgid "Enter a valid YouTube or plugin URL for the bookmark"
-msgstr ""
+msgstr "Введите действительный URL-адрес YouTube или плагина для закладки"
 
 msgctxt "#30110"
 msgid "New Search"
@@ -236,8 +236,8 @@ msgid "Sign Out"
 msgstr "Выйти"
 
 msgctxt "#30113"
-msgid ""
-msgstr ""
+msgid "Related to \"%s\""
+msgstr "Относится к \"%s\""
 
 msgctxt "#30114"
 msgid "Confirm delete"
@@ -256,7 +256,7 @@ msgid "Remove \"%s\"?"
 msgstr "Удалить \"%s\"?"
 
 msgctxt "#30118"
-msgid ""
+msgid "Links from \"%s\""
 msgstr ""
 
 msgctxt "#30119"
@@ -488,7 +488,7 @@ msgid "Please complete all login prompts"
 msgstr ""
 
 msgctxt "#30547"
-msgid "You may be prompted to enable two applications so that YouTube is functioning properly."
+msgid "You may be prompted to login and enable access to multiple applications so that this addon can function properly."
 msgstr ""
 
 msgctxt "#30548"
@@ -648,19 +648,19 @@ msgid "Blacklist"
 msgstr "Черный список"
 
 msgctxt "#30587"
-msgid ""
+msgid "Hide \"Playlists\" folder"
 msgstr ""
 
 msgctxt "#30588"
-msgid ""
+msgid "Hide \"Search\" folder"
 msgstr ""
 
 msgctxt "#30589"
-msgid ""
+msgid "Hide \"Shorts\" folder"
 msgstr ""
 
 msgctxt "#30590"
-msgid ""
+msgid "Hide \"Live\" folder"
 msgstr ""
 
 msgctxt "#30591"
@@ -688,7 +688,7 @@ msgid "Strict"
 msgstr "Строгий"
 
 msgctxt "#30597"
-msgid ""
+msgid "Hide \"Members only\" folder"
 msgstr ""
 
 msgctxt "#30598"
@@ -796,7 +796,7 @@ msgid "Install InputStream Helper"
 msgstr "Установить InputStream Helper"
 
 msgctxt "#30624"
-msgid ""
+msgid "Members only"
 msgstr ""
 
 msgctxt "#30625"
@@ -1532,7 +1532,7 @@ msgid "Use channel name as"
 msgstr ""
 
 msgctxt "#30808"
-msgid "Hide videos from listings"
+msgid "Hide items from listings"
 msgstr ""
 
 msgctxt "#30809"
