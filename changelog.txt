@@ -1,3 +1,7 @@
+## v7.3.0+beta.6
+### Fixed
+Fix typo in YouTubePlayerClient error hook
+
 ## v7.3.0+beta.5
 ### Fixed
 - Fix not resolving single playable items when using the uri2addon plugin endpoint #1300
