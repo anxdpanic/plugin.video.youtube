@@ -829,7 +829,7 @@ def search_sort_by(context, params, order):
         ),
         context_menu_uri(
             context,
-            (PATHS.ROUTE, PATHS.SEARCH, 'query',),
+            (PATHS.ROUTE, context.get_path(),),
             params=dict(params,
                         order=order,
                         page=1,
