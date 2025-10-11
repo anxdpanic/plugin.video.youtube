@@ -36,7 +36,12 @@ class AccessManager(JSONStore):
     }
 
     def __init__(self, context):
+        self._user = None
+        self._last_origin = None
         super(AccessManager, self).__init__('access_manager.json', context)
+
+    def init(self):
+        super(AccessManager, self).init()
         access_manager_data = self._data['access_manager']
         self._user = access_manager_data.get('current_user', 0)
         self._last_origin = access_manager_data.get('last_origin', ADDON_ID)
@@ -204,7 +209,8 @@ class AccessManager(JSONStore):
         Returns users
         :return: users
         """
-        return self._data['access_manager'].get('users', {})
+        data = self._data if self._loaded else self.get_data()
+        return data['access_manager'].get('users', {})
 
     def add_user(self, username='', user=None):
         """
@@ -546,7 +552,8 @@ class AccessManager(JSONStore):
         Returns developers
         :return: dict, developers
         """
-        return self._data['access_manager'].get('developers', {})
+        data = self._data if self._loaded else self.get_data()
+        return data['access_manager'].get('developers', {})
 
     def add_new_developer(self, addon_id):
         """

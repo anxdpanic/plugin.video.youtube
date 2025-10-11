@@ -56,6 +56,7 @@ VALUE_TO_STR = {
 # Flags
 ABORT_FLAG = 'abort_requested'
 BUSY_FLAG = 'busy'
+SERVICE_RUNNING_FLAG = 'service_monitor_running'
 WAIT_END_FLAG = 'builtin_completed'
 TRAKT_PAUSE_FLAG = 'script.trakt.paused'
 
@@ -220,6 +221,7 @@ __all__ = (
     # Flags
     'ABORT_FLAG',
     'BUSY_FLAG',
+    'SERVICE_RUNNING_FLAG',
     'TRAKT_PAUSE_FLAG',
     'WAIT_END_FLAG',
 

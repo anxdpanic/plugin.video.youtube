@@ -38,9 +38,17 @@ class JSONStore(object):
             self.filepath = None
 
         self._context = context
+        self._loaded = False
         self._data = {}
-        self.load(stacklevel=3)
-        self.set_defaults()
+        self.init()
+
+    def init(self):
+        if self.load(stacklevel=4):
+            self._loaded = True
+            self.set_defaults()
+        else:
+            self.set_defaults(reset=True)
+        return self._loaded
 
     def set_defaults(self, reset=False):
         raise NotImplementedError
@@ -81,6 +89,7 @@ class JSONStore(object):
                     FILE_WRITE,
                     timeout=5,
                     payload={'filepath': filepath},
+                    raise_exc=True,
                 )
                 if response is False:
                     raise IOError
@@ -92,7 +101,7 @@ class JSONStore(object):
             else:
                 with open(filepath, mode='w', encoding='utf-8') as file:
                     file.write(to_unicode(_data))
-        except (IOError, OSError):
+        except (RuntimeError, IOError, OSError):
             self.log.exception(('Access error', 'File: %s'),
                                filepath,
                                stacklevel=stacklevel)
@@ -119,6 +128,7 @@ class JSONStore(object):
                         FILE_READ,
                         timeout=5,
                         payload={'filepath': filepath},
+                        raise_exc=True,
                 ) is not False:
                     data = self._context.get_ui().get_property(
                         '-'.join((FILE_READ, filepath)),
@@ -135,17 +145,23 @@ class JSONStore(object):
                 data,
                 object_pairs_hook=(self._process_data if process else None),
             )
-        except (IOError, OSError):
+        except (RuntimeError, IOError, OSError):
             self.log.exception(('Access error', 'File: %s'),
                                filepath,
                                stacklevel=stacklevel)
+            return False
         except (TypeError, ValueError):
             self.log.exception(('Invalid data', 'Data: {data!r}'),
                                data=data,
                                stacklevel=stacklevel)
+            return False
+        return True
 
     def get_data(self, process=True, fallback=True, stacklevel=2):
+        if not self._loaded:
+            self.init()
         data = self._data
+
         try:
             if not data:
                 raise ValueError
@@ -160,7 +176,9 @@ class JSONStore(object):
             if fallback:
                 self.set_defaults(reset=True)
                 return self.get_data(process=process, fallback=False)
-            raise exc
+            if self._loaded:
+                raise exc
+            return data
 
     def load_data(self, data, process=True, stacklevel=2):
         try:
