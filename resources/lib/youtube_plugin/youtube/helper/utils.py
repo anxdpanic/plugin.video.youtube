@@ -1238,6 +1238,7 @@ if PREFER_WEBP_THUMBS:
     THUMB_URL = 'https://i.ytimg.com/vi_webp/{0}/{1}{2}.webp'
 else:
     THUMB_URL = 'https://i.ytimg.com/vi/{0}/{1}{2}.jpg'
+RE_CUSTOM_THUMB = re_compile(r'_custom_[0-9]')
 THUMB_TYPES = {
     'default': {
         'name': 'default',
@@ -1326,10 +1327,17 @@ def get_thumbnail(thumb_size, thumbnails, default_thumb=None):
     url = (thumbnail[1] if is_dict else thumbnail).get('url')
     if not url:
         return default_thumb
-    if PREFER_WEBP_THUMBS and '/vi_webp/' not in url and '?' not in url:
-        url = url.replace('/vi/', '/vi_webp/', 1).replace('.jpg', '.webp', 1)
     if url.startswith('//'):
         url = 'https:' + url
+    if '?' in url:
+        url = urlsplit(url)
+        url = url._replace(
+            netloc='i.ytimg.com',
+            path=RE_CUSTOM_THUMB.sub('', url.path),
+            query=None,
+        ).geturl()
+    elif PREFER_WEBP_THUMBS and '/vi_webp/' not in url:
+        url = url.replace('/vi/', '/vi_webp/', 1).replace('.jpg', '.webp', 1)
     return url
 
 
