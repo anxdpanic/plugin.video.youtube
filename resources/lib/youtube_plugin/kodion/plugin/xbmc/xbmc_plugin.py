@@ -409,10 +409,13 @@ class XbmcPlugin(AbstractPlugin):
             if any(sync_items):
                 context.send_notification(SYNC_LISTITEM, sync_items)
 
-            if forced and is_same_path and (not played_video_id or route):
-                container = ui.get_property(CONTAINER_ID)
-                position = ui.get_property(CONTAINER_POSITION)
-                if container and position:
+            container = ui.get_property(CONTAINER_ID)
+            position = ui.get_property(CONTAINER_POSITION)
+
+            if is_same_path:
+                if (container and position
+                        and (forced or position == 'current')
+                        and (not played_video_id or route)):
                     post_run_actions.append((
                         context.send_notification,
                         {

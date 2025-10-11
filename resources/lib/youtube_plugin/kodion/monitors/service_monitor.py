@@ -384,6 +384,11 @@ class ServiceMonitor(xbmc.Monitor):
                 elif position == 'previous':
                     position = ui.get_container_info(CURRENT_ITEM, container_id)
                     offset -= 1
+                elif position == 'current':
+                    position = (
+                            ui.get_property(CONTAINER_POSITION)
+                            or ui.get_container_info(CURRENT_ITEM, container_id)
+                    )
                 try:
                     position = int(position)
                 except (TypeError, ValueError):
