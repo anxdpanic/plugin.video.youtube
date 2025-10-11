@@ -962,6 +962,8 @@ class XbmcContext(AbstractContext):
         attrs = (
             '_ui',
             '_playlist',
+            '_api_store',
+            '_access_manager',
         )
         for attr in attrs:
             try:

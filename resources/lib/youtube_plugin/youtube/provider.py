@@ -2210,7 +2210,6 @@ class Provider(AbstractProvider):
         attrs = (
             '_resource_manager',
             '_client',
-            '_api_check',
         )
         for attr in attrs:
             try:
