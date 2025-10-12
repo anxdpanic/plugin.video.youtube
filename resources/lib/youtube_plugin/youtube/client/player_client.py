@@ -826,18 +826,18 @@ class YouTubePlayerClient(YouTubeDataClient):
         self._auth_client = {}
         self._client_groups = (
             ('custom', clients if clients else ()),
-            ('auth_enabled_initial_request', (
+            ('auth_enabled|initial_request|no_playable_streams', (
                 'tv_embed',
                 'tv_unplugged',
                 'tv',
             )),
-            ('auth_disabled_kids_vp9_avc1', (
+            ('auth_disabled|kids|av1|vp9|vp9.2|avc1|stereo_sound|multi_audio', (
                 'ios_testsuite_params',
             )),
-            ('auth_disabled_kids_av1_avc1', (
+            ('auth_disabled|kids|av1|vp9.2|avc1|surround_sound|multi_audio', (
                 'android_testsuite_params',
             )),
-            ('auth_enabled_no_kids', (
+            ('auth_enabled|no_kids|av1|vp9.2|avc1|surround_sound', (
                 'android_vr',
             )),
             ('mpd', (
@@ -1670,17 +1670,17 @@ class YouTubePlayerClient(YouTubeDataClient):
         for name, clients in self._client_groups:
             if not clients:
                 continue
-            if name == 'auth_enabled_initial_request':
+            if name == 'mpd' and not use_mpd:
+                continue
+            if name == 'ask' and use_mpd and not ask_for_quality:
+                continue
+            if name.startswith('auth_enabled|initial_request'):
                 if visitor_data and not logged_in:
                     continue
                 allow_skip = False
                 client_data['_auth_requested'] = True
             else:
                 allow_skip = True
-            if name == 'mpd' and not use_mpd:
-                continue
-            if name == 'ask' and use_mpd and not ask_for_quality:
-                continue
 
             exclude_retry = set()
             restart = None
