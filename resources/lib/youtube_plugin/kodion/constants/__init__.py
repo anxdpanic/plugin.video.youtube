@@ -53,6 +53,13 @@ VALUE_TO_STR = {
     1: 'true',
 }
 
+YOUTUBE_HOSTNAMES = {
+    'youtube.com',
+    'www.youtube.com',
+    'm.youtube.com',
+    'www.youtubekids.com',
+}
+
 # Flags
 ABORT_FLAG = 'abort_requested'
 BUSY_FLAG = 'busy'
@@ -217,6 +224,7 @@ __all__ = (
     # Const values
     'BOOL_FROM_STR',
     'VALUE_TO_STR',
+    'YOUTUBE_HOSTNAMES',
 
     # Flags
     'ABORT_FLAG',
