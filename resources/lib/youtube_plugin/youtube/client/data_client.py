@@ -156,6 +156,12 @@ class YouTubeDataClient(YouTubeLoginClient):
                 'browseEndpoint',
                 'browseId',
             ),
+            'playlist_id': (
+                'tileRenderer',
+                'onSelectCommand',
+                'watchEndpoint',
+                'playlistId',
+            ),
             'continuation': (
                 'contents',
                 'tvBrowseRenderer',
@@ -1072,12 +1078,16 @@ class YouTubeDataClient(YouTubeLoginClient):
         if playlist_id_upper == 'HL':
             browse_id = 'FEhistory'
             json_path = self.JSON_PATHS['tv_grid']
+            response_type = 'videos'
         else:
             browse_id = 'VL' + playlist_id_upper
             json_path = self.JSON_PATHS['tv_playlist']
+            response_type = 'playlistItems'
 
         return self.get_browse_items(
             browse_id=browse_id,
+            playlist_id=playlist_id,
+            response_type=response_type,
             client='tv',
             do_auth=True,
             page_token=page_token,
@@ -1315,6 +1325,7 @@ class YouTubeDataClient(YouTubeLoginClient):
     def get_browse_items(self,
                          browse_id=None,
                          channel_id=None,
+                         playlist_id=None,
                          skip_ids=None,
                          params=None,
                          route=None,
@@ -1340,7 +1351,12 @@ class YouTubeDataClient(YouTubeLoginClient):
                                      'youtube#playlistListResponse',
                                      'youtube#playlist',
                                      'contentId',
-                             )
+                             ),
+                             'playlistItems': (
+                                     'youtube#playlistItemListResponse',
+                                     'youtube#playlistItem',
+                                     'contentId',
+                             ),
                          },
                          data=None,
                          client=None,
@@ -1448,6 +1464,13 @@ class YouTubeDataClient(YouTubeLoginClient):
                     )
                     if skip_ids and _channel_id in skip_ids:
                         continue
+                if playlist_id:
+                    _playlist_id = playlist_id
+                else:
+                    _playlist_id = self.json_traverse(
+                        item,
+                        json_path.get('playlist_id'),
+                    )
                 items.append({
                     'kind': item_kind,
                     'id': item_id,
@@ -1470,6 +1493,7 @@ class YouTubeDataClient(YouTubeLoginClient):
                             ),
                         ),
                         'channelId': _channel_id,
+                        'playlistId': _playlist_id,
                     }
                 })
         if not items:
