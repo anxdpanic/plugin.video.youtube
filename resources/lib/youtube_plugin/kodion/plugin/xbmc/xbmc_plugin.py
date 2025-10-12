@@ -372,7 +372,12 @@ class XbmcPlugin(AbstractPlugin):
                         listitem=item,
                     )
                 elif options.get(provider.FORCE_REFRESH):
-                    _post_run_action = ui.refresh_container
+                    _post_run_action = (
+                        context.send_notification,
+                        {
+                            'method': REFRESH_CONTAINER,
+                        },
+                    )
                 else:
                     if context.is_plugin_path(
                             ui.get_container_info(FOLDER_URI, container_id=None)
