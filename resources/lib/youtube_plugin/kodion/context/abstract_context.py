@@ -210,7 +210,7 @@ class AbstractContext(object):
             self.parse_params(params)
 
         self._uri = None
-        self._path = path
+        self._path = None
         self._path_parts = []
         self.set_path(path, force=True)
 
