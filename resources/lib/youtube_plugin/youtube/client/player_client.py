@@ -1285,7 +1285,11 @@ class YouTubePlayerClient(YouTubeDataClient):
                 else:
                     new_url = url
 
-                new_url = self._process_url_params(new_url, mpd=False)
+                new_url = self._process_url_params(new_url,
+                                                   mpd=False,
+                                                   headers=headers,
+                                                   referrer=None,
+                                                   visitor_data=None)
                 if not new_url:
                     continue
 
