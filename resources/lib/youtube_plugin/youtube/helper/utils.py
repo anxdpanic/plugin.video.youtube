@@ -401,7 +401,8 @@ def update_playlist_items(provider, context, playlist_id_dict,
     show_details = settings.show_detailed_description()
     item_count_color = settings.get_label_color('itemCount')
 
-    fanart_type = context.get_param(FANART_TYPE)
+    params = context.get_params()
+    fanart_type = params.get(FANART_TYPE)
     if fanart_type is None:
         fanart_type = settings.fanart_selection()
     thumb_size = settings.get_thumbnail_size()
@@ -443,6 +444,7 @@ def update_playlist_items(provider, context, playlist_id_dict,
     cxm_play_recently_added = menu_items.playlist_play_recently_added(context)
     cxm_view_playlist = menu_items.playlist_view(context)
     cxm_play_shuffled_playlist = menu_items.playlist_shuffle(context)
+    cxm_refresh_listing = menu_items.refresh_listing(context, path, params)
     cxm_remove_saved_playlist = menu_items.playlist_remove_from_library(context)
     cxm_save_playlist = (
         menu_items.playlist_save_to_library(context)
@@ -585,6 +587,7 @@ def update_playlist_items(provider, context, playlist_id_dict,
             cxm_play_recently_added,
             cxm_view_playlist,
             cxm_play_shuffled_playlist,
+            cxm_refresh_listing,
             cxm_separator,
             cxm_save_playlist,
             menu_items.bookmark_add(
