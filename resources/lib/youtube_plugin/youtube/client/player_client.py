@@ -790,6 +790,29 @@ class YouTubePlayerClient(YouTubeDataClient):
         '-1': ('original', 'main', -6),
     }
 
+    FAILURE_REASONS = {
+        'abort': frozenset((
+            'country',
+            'not available',
+        )),
+        'reauth': frozenset((
+            'confirm your age',
+            'inappropriate',
+            'member',
+            'not a bot',
+            'please sign in',
+        )),
+        'retry': frozenset((
+            'try again later',
+            'unavailable',
+            'unknown',
+        )),
+        'skip': frozenset((
+            'error code: 6',
+            'latest version',
+        )),
+    }
+
     def __init__(self,
                  context,
                  clients=None,
@@ -1626,26 +1649,7 @@ class YouTubePlayerClient(YouTubeDataClient):
         responses = {}
         stream_list = {}
 
-        abort_reasons = {
-            'country',
-            'not available',
-        }
-        reauth_reasons = {
-            'confirm your age',
-            'inappropriate',
-            'please sign in',
-            'not a bot',
-            'member',
-        }
-        skip_reasons = {
-            'latest version',
-            'error code: 6',
-        }
-        retry_reasons = {
-            'try again later',
-            'unavailable',
-            'unknown',
-        }
+        fail = self.FAILURE_REASONS
         abort = False
 
         logged_in = self.logged_in
@@ -1796,8 +1800,8 @@ class YouTubePlayerClient(YouTubeDataClient):
                                          video_id=video_id,
                                          client=_client_name,
                                          has_auth=_has_auth)
-                        compare_reason = _reason.lower()
-                        if any(why in compare_reason for why in reauth_reasons):
+                        fail_reason = _reason.lower()
+                        if any(why in fail_reason for why in fail['reauth']):
                             if _client.get('_auth_required') == 'ignore_fail':
                                 continue
                             elif client_data.get('_auth_required'):
@@ -1807,13 +1811,13 @@ class YouTubePlayerClient(YouTubeDataClient):
                                 client_data['_auth_required'] = True
                                 restart = True
                             break
-                        if any(why in compare_reason for why in abort_reasons):
+                        elif any(why in fail_reason for why in fail['abort']):
                             abort = True
                             break
-                        if any(why in compare_reason for why in skip_reasons):
+                        elif any(why in fail_reason for why in fail['skip']):
                             if allow_skip:
                                 break
-                        if any(why in compare_reason for why in retry_reasons):
+                        elif any(why in fail_reason for why in fail['retry']):
                             continue
                     else:
                         self.log.warning('Unknown playabilityStatus: {status!r}',
