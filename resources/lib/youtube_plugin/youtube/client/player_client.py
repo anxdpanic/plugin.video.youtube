@@ -795,12 +795,14 @@ class YouTubePlayerClient(YouTubeDataClient):
             'country',
             'not available',
         )),
+        'auth': frozenset((
+            'not a bot',
+            'please sign in',
+        )),
         'reauth': frozenset((
             'confirm your age',
             'inappropriate',
             'member',
-            'not a bot',
-            'please sign in',
         )),
         'retry': frozenset((
             'try again later',
@@ -1801,7 +1803,16 @@ class YouTubePlayerClient(YouTubeDataClient):
                                          client=_client_name,
                                          has_auth=_has_auth)
                         fail_reason = _reason.lower()
-                        if any(why in fail_reason for why in fail['reauth']):
+                        if any(why in fail_reason for why in fail['auth']):
+                            if _has_auth:
+                                restart = False
+                            elif restart is None and logged_in:
+                                client_data['_auth_requested'] = True
+                                restart = True
+                            else:
+                                continue
+                            break
+                        elif any(why in fail_reason for why in fail['reauth']):
                             if _client.get('_auth_required') == 'ignore_fail':
                                 continue
                             elif client_data.get('_auth_required'):
