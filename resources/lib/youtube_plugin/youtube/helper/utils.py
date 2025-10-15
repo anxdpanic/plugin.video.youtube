@@ -36,7 +36,13 @@ from ...kodion.constants import (
     PATHS,
     PLAYLIST_ID,
 )
-from ...kodion.items import AudioItem, CommandItem, DirectoryItem, menu_items
+from ...kodion.items import (
+    AudioItem,
+    CommandItem,
+    DirectoryItem,
+    MediaItem,
+    menu_items,
+)
 from ...kodion.utils.convert_format import friendly_number, strip_html_from_text
 from ...kodion.utils.datetime import (
     get_scheduled_start,
@@ -1371,6 +1377,7 @@ def add_related_video_to_playlist(provider, context, client, v3, video_id):
             next_item = next((
                 item for item in result_items
                 if (item
+                    and isinstance(item, MediaItem)
                     and not any((
                         item.get_uri() == playlist_item.get('file')
                         or item.get_name() == playlist_item.get('title')
