@@ -53,12 +53,13 @@ VALUE_TO_STR = {
     1: 'true',
 }
 
-YOUTUBE_HOSTNAMES = {
+YOUTUBE_HOSTNAMES = frozenset((
     'youtube.com',
     'www.youtube.com',
     'm.youtube.com',
     'www.youtubekids.com',
-}
+    'music.youtube.com',
+))
 
 # Flags
 ABORT_FLAG = 'abort_requested'
