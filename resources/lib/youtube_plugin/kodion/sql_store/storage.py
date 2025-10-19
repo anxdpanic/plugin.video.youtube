@@ -24,15 +24,32 @@ from ..utils.file_system import make_dirs
 class StorageLock(object):
     def __init__(self):
         self._lock = RLock()
+        self._num_accessing = 0
         self._num_waiting = 0
 
     def __enter__(self):
         self._num_waiting += 1
-        self._lock.acquire()
+        locked = not self._lock.acquire(timeout=3)
         self._num_waiting -= 1
+        return locked
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self._lock.release()
+        try:
+            self._lock.release()
+        except RuntimeError:
+            pass
+
+    def accessing(self, start=False, done=False):
+        if start:
+            self._num_accessing += 1
+        elif done:
+            self._num_accessing -= 1
+        num = self._num_accessing
+        if num > 0:
+            return True
+        if num < 0:
+            self._num_accessing = 0
+        return False
 
     def waiting(self):
         return self._num_waiting > 0
@@ -206,7 +223,6 @@ class Storage(object):
         self.uuid = filepath[1]
         self._filepath = os.path.join(*filepath)
         self._db = None
-        self._cursor = None
         self._lock = StorageLock()
         self._close_timer = None
         self._max_item_count = -1 if migrate else max_item_count
@@ -253,21 +269,23 @@ class Storage(object):
         if close_timer:
             close_timer.cancel()
             self._close_timer = None
-        if self._db and self._cursor:
-            return self._db, self._cursor
-        return self._open()
+        self._lock.accessing(start=True)
+        db = self._db or self._open()
+        cursor = db.cursor()
+        cursor.arraysize = 100
+        return db, cursor
 
     def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
         close_timer = self._close_timer
         if close_timer:
             close_timer.cancel()
-        if self._lock.waiting():
+        if not self._lock.accessing(done=True) and not self._lock.waiting():
+            close_timer = Timer(5, self._close)
+            close_timer.daemon = True
+            close_timer.start()
+            self._close_timer = close_timer
+        else:
             self._close_timer = None
-            return
-        close_timer = Timer(5, self._close)
-        close_timer.daemon = True
-        close_timer.start()
-        self._close_timer = close_timer
 
     def _open(self):
         statements = []
@@ -281,24 +299,23 @@ class Storage(object):
         for attempt in range(1, 4):
             try:
                 db = sqlite3.connect(self._filepath,
+                                     # cached_statements=0,
                                      check_same_thread=False,
                                      isolation_level=None)
                 break
             except (sqlite3.Error, sqlite3.OperationalError) as exc:
                 if attempt < 3 and isinstance(exc, sqlite3.OperationalError):
-                    self.log.warning('Retry, attempt %d of 3',
+                    self.log.warning('Attempt %d of 3',
                                      attempt,
                                      exc_info=True)
                     time.sleep(0.1)
                 else:
                     self.log.exception('Failed')
-                    return None, None
-
+                    return None
         else:
-            return None, None
+            return None
 
         cursor = db.cursor()
-        cursor.arraysize = 100
 
         sql_script = [
             'PRAGMA busy_timeout = 1000;',
@@ -335,21 +352,19 @@ class Storage(object):
 
         self._base._table_updated = True
         self._db = db
-        self._cursor = cursor
-        return db, cursor
+        return db
 
-    def _close(self):
-        cursor = self._cursor
-        if cursor:
-            self._execute(cursor, 'PRAGMA optimize')
-            cursor.close()
-            self._cursor = None
+    def _close(self, commit=False):
         db = self._db
-        if db:
-            # Not needed if using db as a context manager
-            # db.commit()
-            db.close()
-            self._db = None
+        if not db or self._lock.accessing() or self._lock.waiting():
+            return False
+        self._execute(db.cursor(), 'PRAGMA optimize')
+        # Not needed if using db as a context manager
+        if commit:
+            db.commit()
+        db.close()
+        self._db = None
+        return True
 
     def _execute(self, cursor, query, values=None, many=False, script=False):
         if not cursor:
@@ -370,14 +385,19 @@ class Storage(object):
                     return cursor.executescript(query)
                 return cursor.execute(query, values)
             except (sqlite3.Error, sqlite3.OperationalError) as exc:
-                if attempt < 3 and isinstance(exc, sqlite3.OperationalError):
-                    self.log.warning('Retry, attempt %d of 3',
+                if attempt < 3:
+                    if isinstance(exc, sqlite3.OperationalError):
+                        time.sleep(0.1)
+                    elif isinstance(exc, sqlite3.InterfaceError):
+                        cursor = self._db.cursor()
+                    else:
+                        self.log.exception('Failed')
+                        break
+                    self.log.warning('Attempt %d of 3',
                                      attempt,
                                      exc_info=True)
-                    time.sleep(0.1)
                 else:
                     self.log.exception('Failed')
-                    return []
         return []
 
     def _optimize_file_size(self, defer=False):
@@ -385,11 +405,12 @@ class Storage(object):
         if self._max_file_size_kb <= 0:
             return False
 
-        with self._lock, self as (db, cursor), db:
+        with self as (db, cursor):
             result = self._execute(cursor, self._sql['get_total_data_size'])
-
-        if result:
-            size_kb = result.fetchone()[0] // 1024
+            result = result.fetchone() if result else None
+            result = result[0] if result else None
+        if result is not None:
+            size_kb = result // 1024
         else:
             try:
                 size_kb = (os.path.getsize(self._filepath) // 1024)
@@ -403,7 +424,9 @@ class Storage(object):
         query = self._sql['prune_by_size'].format(prune_size)
         if defer:
             return query
-        with self._lock, self as (db, cursor), db:
+        with self._lock as locked, self as (db, cursor), db:
+            if locked:
+                return False
             self._execute(cursor, query)
             self._execute(cursor, 'VACUUM')
         return True
@@ -424,7 +447,9 @@ class Storage(object):
         )
         if defer:
             return query
-        with self._lock, self as (db, cursor), db:
+        with self._lock as locked, self as (db, cursor), db:
+            if locked:
+                return False
             self._execute(cursor, query)
             self._execute(cursor, 'VACUUM')
         return True
@@ -432,11 +457,14 @@ class Storage(object):
     def _set(self, item_id, item, timestamp=None):
         values = self._encode(item_id, item, timestamp)
         optimize_query = self._optimize_item_count(1, defer=True)
-        with self._lock, self as (db, cursor), db:
-            self._execute(cursor, 'BEGIN')
+        with self._lock as locked, self as (db, cursor), db:
+            if locked:
+                return False
             if optimize_query:
+                self._execute(cursor, 'BEGIN')
                 self._execute(cursor, optimize_query)
             self._execute(cursor, self._sql['set'], values=values)
+        return True
 
     def _set_many(self, items, flatten=False):
         now = since_epoch()
@@ -455,35 +483,44 @@ class Storage(object):
             query = self._sql['set']
 
         optimize_query = self._optimize_item_count(num_items, defer=True)
-        with self._lock, self as (db, cursor), db:
-            self._execute(cursor, 'BEGIN')
+        with self._lock as locked, self as (db, cursor), db:
+            if locked:
+                return False
             if optimize_query:
+                self._execute(cursor, 'BEGIN')
                 self._execute(cursor, optimize_query)
             self._execute(cursor, query, many=(not flatten), values=values)
-            self._execute(cursor, 'COMMIT')
-        self._optimize_file_size()
+        return True
 
     def _refresh(self, item_id, timestamp=None):
         values = (timestamp or since_epoch(), to_str(item_id))
-        with self._lock, self as (db, cursor), db:
+        with self._lock as locked, self as (db, cursor), db:
+            if locked:
+                return False
             self._execute(cursor, self._sql['refresh'], values=values)
+        return True
 
     def _update(self, item_id, item, timestamp=None):
         values = self._encode(item_id, item, timestamp, for_update=True)
-        with self._lock, self as (db, cursor), db:
+        with self._lock as locked, self as (db, cursor), db:
+            if locked:
+                return False
             self._execute(cursor, self._sql['update'], values=values)
+        return True
 
     def clear(self, defer=False):
         query = self._sql['clear']
         if defer:
             return query
-        with self._lock, self as (db, cursor), db:
+        with self._lock as locked, self as (db, cursor), db:
+            if locked:
+                return False
             self._execute(cursor, query)
             self._execute(cursor, 'VACUUM')
         return True
 
     def is_empty(self):
-        with self as (db, cursor), db:
+        with self as (db, cursor):
             result = self._execute(cursor, self._sql['is_empty'])
             for item in result:
                 is_empty = item[0] == 0
@@ -520,10 +557,10 @@ class Storage(object):
              seconds=None,
              as_dict=False,
              with_timestamp=False):
-        with self._lock, self as (db, cursor), db:
-            result = self._execute(cursor, self._sql['get'], [to_str(item_id)])
+        with self as (db, cursor):
+            result = self._execute(cursor, self._sql['get'], (to_str(item_id),))
             item = result.fetchone() if result else None
-            if not item:
+            if not item or not all(item):
                 return None
         cut_off = since_epoch() - seconds if seconds else 0
         if not cut_off or item[1] >= cut_off:
@@ -569,9 +606,11 @@ class Storage(object):
 
         epoch = since_epoch()
         cut_off = epoch - seconds if seconds else 0
-        with self._lock, self as (db, cursor), db:
+        with self as (db, cursor):
             result = self._execute(cursor, query, item_ids)
-            if as_dict:
+            if not result:
+                pass
+            elif as_dict:
                 if values_only:
                     result = {
                         item[0]: self._decode(item[2], process, item)
@@ -600,12 +639,18 @@ class Storage(object):
         return result
 
     def _remove(self, item_id):
-        with self._lock, self as (db, cursor), db:
+        with self._lock as locked, self as (db, cursor), db:
+            if locked:
+                return False
             self._execute(cursor, self._sql['remove'], [item_id])
+        return True
 
     def _remove_many(self, item_ids):
         num_ids = len(item_ids)
         query = self._sql['remove_by_key'].format('?,' * (num_ids - 1) + '?')
-        with self._lock, self as (db, cursor), db:
+        with self._lock as locked, self as (db, cursor), db:
+            if locked:
+                return False
             self._execute(cursor, query, tuple(item_ids))
             self._execute(cursor, 'VACUUM')
+        return True

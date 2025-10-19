@@ -75,6 +75,7 @@ class DataCache(Storage):
 
     def set_items(self, items):
         self._set_many(items)
+        self._optimize_file_size()
 
     def del_item(self, content_id):
         self._remove(content_id)
