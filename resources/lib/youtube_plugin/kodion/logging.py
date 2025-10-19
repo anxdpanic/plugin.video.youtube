@@ -337,7 +337,13 @@ class KodiLogger(logging.Logger):
             msg = MessageFormatter(msg, *args[1:-1], **kwargs)
             args = ()
 
-        stack_info = stack_info and (exc_info or self.stack_info)
+        if stack_info:
+            if exc_info or self.stack_info:
+                pass
+            elif stack_info == 'forced':
+                stack_info = True
+            else:
+                stack_info = False
         sinfo = None
         if _srcfiles:
             try:
