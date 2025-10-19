@@ -149,6 +149,7 @@ def make_comment_item(context, snippet, uri, reply_count=0):
             category_label=' - '.join(
                 (author, context.format_date_short(local_datetime))
             ),
+            special_sort=False,
         )
     else:
         comment_item = CommandItem(

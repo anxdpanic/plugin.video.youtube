@@ -400,6 +400,9 @@ class Provider(AbstractProvider):
                     },
                     '_available': True,
                     '_partial': True,
+                    '_params': {
+                        'special_sort': 'top',
+                    },
                 },
                 {
                     'kind': 'youtube#playlistShortsFolder',
@@ -412,6 +415,9 @@ class Provider(AbstractProvider):
                         }},
                     },
                     '_partial': True,
+                    '_params': {
+                        'special_sort': 'top',
+                    },
                 } if not params.get(HIDE_SHORTS) else None,
                 {
                     'kind': 'youtube#playlistLiveFolder',
@@ -424,6 +430,9 @@ class Provider(AbstractProvider):
                         }},
                     },
                     '_partial': True,
+                    '_params': {
+                        'special_sort': 'top',
+                    },
                 } if not params.get(HIDE_LIVE) else None,
             ]
         else:
@@ -760,6 +769,7 @@ class Provider(AbstractProvider):
                             'title': context.localize('playlists'),
                             'image': '{media}/playlist.png',
                             CHANNEL_ID: channel_id,
+                            'special_sort': 'top',
                         },
                     } if not params.get(HIDE_PLAYLISTS) else None,
                     {
@@ -768,6 +778,7 @@ class Provider(AbstractProvider):
                             'title': context.localize('search'),
                             'image': '{media}/search.png',
                             CHANNEL_ID: channel_id,
+                            'special_sort': 'top',
                         },
                     } if not params.get(HIDE_SEARCH) else None,
                     {
@@ -781,6 +792,9 @@ class Provider(AbstractProvider):
                             }},
                         },
                         '_partial': True,
+                        '_params': {
+                            'special_sort': 'top',
+                        },
                     } if uploads and not params.get(HIDE_SHORTS) else None,
                     {
                         'kind': 'youtube#playlistLiveFolder',
@@ -793,6 +807,9 @@ class Provider(AbstractProvider):
                             }},
                         },
                         '_partial': True,
+                        '_params': {
+                            'special_sort': 'top',
+                        },
                     } if uploads and not params.get(HIDE_LIVE) else None,
                     {
                         'kind': 'youtube#playlistMembersFolder',
@@ -805,6 +822,9 @@ class Provider(AbstractProvider):
                             }},
                         },
                         '_partial': True,
+                        '_params': {
+                            'special_sort': 'top',
+                        },
                     } if uploads and not params.get(HIDE_MEMBERS) else None,
                 ],
             }

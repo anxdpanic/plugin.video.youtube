@@ -544,6 +544,7 @@ def _process_my_subscriptions(provider,
                             'name': context.localize('my_subscriptions'),
                             'uri': context.create_uri(my_subscriptions_path),
                             'image': '{media}/new_uploads.png',
+                            'special_sort': 'top',
                         },
                     },
                     None
@@ -556,6 +557,7 @@ def _process_my_subscriptions(provider,
                                 (my_subscriptions_path, 'shorts')
                             ),
                             'image': '{media}/shorts.png',
+                            'special_sort': 'top',
                         },
                     },
                     None
@@ -568,6 +570,7 @@ def _process_my_subscriptions(provider,
                                 (my_subscriptions_path, 'live')
                             ),
                             'image': '{media}/live.png',
+                            'special_sort': 'top',
                         },
                     },
                 ],

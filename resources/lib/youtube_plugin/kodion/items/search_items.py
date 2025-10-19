@@ -95,7 +95,7 @@ class NewSearchItem(DirectoryItem):
                  channel_id='',
                  addon_id='',
                  location=False,
-                 **_kwargs):
+                 **kwargs):
         if not name:
             name = context.get_ui().bold(
                 title or context.localize('search.new')
@@ -120,7 +120,8 @@ class NewSearchItem(DirectoryItem):
                                                 params=params,
                                             ),
                                             image=image,
-                                            fanart=fanart)
+                                            fanart=fanart,
+                                            **kwargs)
 
         if context.is_plugin_path(context.get_uri(), ((PATHS.SEARCH, 'list'),)):
             context_menu = [

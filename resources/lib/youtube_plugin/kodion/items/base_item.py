@@ -28,7 +28,7 @@ class BaseItem(object):
     _version = 3
     _playable = False
 
-    def __init__(self, name, uri, image=None, fanart=None, **kwargs):
+    def __init__(self, name, uri, image=None, fanart=None, **_kwargs):
         super(BaseItem, self).__init__()
         self._name = None
         self.set_name(name)
