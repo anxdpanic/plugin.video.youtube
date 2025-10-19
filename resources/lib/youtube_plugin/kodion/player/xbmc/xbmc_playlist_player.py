@@ -174,14 +174,14 @@ class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
     def get_items(self, properties=None, start=0, end=-1, dumps=False):
         if properties is None:
             properties = ('title', 'file')
+        limits = {'start': start}
+        if end != -1:
+            limits['end'] = end
         response = jsonrpc(method='Playlist.GetItems',
                            params={
                                'properties': properties,
                                'playlistid': self._playlist.getPlayListId(),
-                               'limits': {
-                                   'start': start,
-                                   'end': end,
-                               },
+                               'limits': limits,
                            })
 
         try:

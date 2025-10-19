@@ -145,7 +145,10 @@ def _config_actions(context, action, *_args):
         base_kodi_language = kodi_language.partition('-')[0]
 
         json_data = client.get_supported_languages(kodi_language)
-        items = json_data.get('items') or DEFAULT_LANGUAGES['items']
+        if json_data:
+            items = json_data.get('items') or DEFAULT_LANGUAGES['items']
+        else:
+            items = DEFAULT_LANGUAGES['items']
 
         selected_language = [None]
 
@@ -184,7 +187,10 @@ def _config_actions(context, action, *_args):
             return
 
         json_data = client.get_supported_regions(language=language_id)
-        items = json_data.get('items') or DEFAULT_REGIONS['items']
+        if json_data:
+            items = json_data.get('items') or DEFAULT_REGIONS['items']
+        else:
+            items = DEFAULT_REGIONS['items']
 
         selected_region = [None]
 

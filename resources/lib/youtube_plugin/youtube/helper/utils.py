@@ -36,7 +36,13 @@ from ...kodion.constants import (
     PATHS,
     PLAYLIST_ID,
 )
-from ...kodion.items import AudioItem, CommandItem, DirectoryItem, menu_items
+from ...kodion.items import (
+    AudioItem,
+    CommandItem,
+    DirectoryItem,
+    MediaItem,
+    menu_items,
+)
 from ...kodion.utils.convert_format import friendly_number, strip_html_from_text
 from ...kodion.utils.datetime import (
     get_scheduled_start,
@@ -401,7 +407,8 @@ def update_playlist_items(provider, context, playlist_id_dict,
     show_details = settings.show_detailed_description()
     item_count_color = settings.get_label_color('itemCount')
 
-    fanart_type = context.get_param(FANART_TYPE)
+    params = context.get_params()
+    fanart_type = params.get(FANART_TYPE)
     if fanart_type is None:
         fanart_type = settings.fanart_selection()
     thumb_size = settings.get_thumbnail_size()
@@ -443,6 +450,7 @@ def update_playlist_items(provider, context, playlist_id_dict,
     cxm_play_recently_added = menu_items.playlist_play_recently_added(context)
     cxm_view_playlist = menu_items.playlist_view(context)
     cxm_play_shuffled_playlist = menu_items.playlist_shuffle(context)
+    cxm_refresh_listing = menu_items.refresh_listing(context, path, params)
     cxm_remove_saved_playlist = menu_items.playlist_remove_from_library(context)
     cxm_save_playlist = (
         menu_items.playlist_save_to_library(context)
@@ -585,6 +593,7 @@ def update_playlist_items(provider, context, playlist_id_dict,
             cxm_play_recently_added,
             cxm_view_playlist,
             cxm_play_shuffled_playlist,
+            cxm_refresh_listing,
             cxm_separator,
             cxm_save_playlist,
             menu_items.bookmark_add(
@@ -1238,6 +1247,7 @@ if PREFER_WEBP_THUMBS:
     THUMB_URL = 'https://i.ytimg.com/vi_webp/{0}/{1}{2}.webp'
 else:
     THUMB_URL = 'https://i.ytimg.com/vi/{0}/{1}{2}.jpg'
+RE_CUSTOM_THUMB = re_compile(r'_custom_[0-9]')
 THUMB_TYPES = {
     'default': {
         'name': 'default',
@@ -1326,10 +1336,17 @@ def get_thumbnail(thumb_size, thumbnails, default_thumb=None):
     url = (thumbnail[1] if is_dict else thumbnail).get('url')
     if not url:
         return default_thumb
-    if PREFER_WEBP_THUMBS and '/vi_webp/' not in url and '?' not in url:
-        url = url.replace('/vi/', '/vi_webp/', 1).replace('.jpg', '.webp', 1)
     if url.startswith('//'):
         url = 'https:' + url
+    if '?' in url:
+        url = urlsplit(url)
+        url = url._replace(
+            netloc='i.ytimg.com',
+            path=RE_CUSTOM_THUMB.sub('', url.path),
+            query=None,
+        ).geturl()
+    elif PREFER_WEBP_THUMBS and '/vi_webp/' not in url:
+        url = url.replace('/vi/', '/vi_webp/', 1).replace('.jpg', '.webp', 1)
     return url
 
 
@@ -1360,6 +1377,7 @@ def add_related_video_to_playlist(provider, context, client, v3, video_id):
             next_item = next((
                 item for item in result_items
                 if (item
+                    and isinstance(item, MediaItem)
                     and not any((
                         item.get_uri() == playlist_item.get('file')
                         or item.get_name() == playlist_item.get('title')

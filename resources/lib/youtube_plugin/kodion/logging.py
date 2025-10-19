@@ -433,7 +433,7 @@ class KodiLogger(logging.Logger):
                 **kwargs
             )
 
-    def waring_trace(self, msg, *args, **kwargs):
+    def warning_trace(self, msg, *args, **kwargs):
         if self.isEnabledFor(WARNING):
             self._log(
                 WARNING,

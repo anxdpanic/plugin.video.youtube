@@ -67,11 +67,8 @@ def run(context=_context,
         log.verbose_logging = False
         profiler.disable()
 
-    old_path, old_params = context.parse_uri(
-        ui.get_container_info(FOLDER_URI, container_id=None),
-        parse_params=False,
-    )
-    old_path = old_path.rstrip('/')
+    old_path = context.get_path().rstrip('/')
+    old_uri = ui.get_container_info(FOLDER_URI, container_id=None)
     context.init()
     current_path = context.get_path().rstrip('/')
     current_params = context.get_original_params()
@@ -79,13 +76,28 @@ def run(context=_context,
 
     new_params = {}
     new_kwargs = {}
-    params = context.get_params()
 
+    params = context.get_params()
     refresh = context.refresh_requested(params=params)
-    is_same_path = refresh != 0 and current_path == old_path
-    forced = (current_handle != -1
-              and (old_path == PATHS.PLAY
-                   or (is_same_path and current_params == old_params)))
+    was_playing = old_path == PATHS.PLAY
+    is_same_path = current_path == old_path
+
+    if was_playing or is_same_path or refresh:
+        old_path, old_params = context.parse_uri(
+            old_uri,
+            parse_params=False,
+        )
+        old_path = old_path.rstrip('/')
+        is_same_path = current_path == old_path
+        if was_playing and current_handle != -1:
+            forced = True
+        elif is_same_path and current_params == old_params:
+            forced = True
+        else:
+            forced = False
+    else:
+        forced = False
+
     if forced:
         refresh = context.refresh_requested(force=True, off=True, params=params)
         new_params['refresh'] = refresh if refresh else 0

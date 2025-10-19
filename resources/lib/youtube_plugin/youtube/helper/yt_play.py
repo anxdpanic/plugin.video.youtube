@@ -74,7 +74,7 @@ def _play_stream(provider, context):
         ask_for_quality = settings.ask_for_video_quality()
         if ui.pop_property(PLAY_PROMPT_QUALITY) and not screensaver:
             ask_for_quality = True
-        elif ui.pop_property(PLAY_FORCE_AUDIO):
+        if ui.pop_property(PLAY_FORCE_AUDIO):
             audio_only = True
         else:
             audio_only = settings.audio_only()
@@ -97,6 +97,7 @@ def _play_stream(provider, context):
 
         if not streams:
             ui.show_notification(context.localize('error.no_streams_found'))
+            logging.debug('No streams found')
             return False
 
         stream = _select_stream(
@@ -106,7 +107,6 @@ def _play_stream(provider, context):
             audio_only=audio_only,
             use_mpd=use_mpd,
         )
-
         if stream is None:
             return False
 
@@ -345,7 +345,6 @@ def _select_stream(context,
 
     stream_list.sort(key=_stream_sort, reverse=True)
     num_streams = len(stream_list)
-    ask_for_quality = ask_for_quality and num_streams >= 1
 
     if logging.debugging:
         def _default_NA():
@@ -362,7 +361,7 @@ def _select_stream(context,
                           idx=idx,
                           stream=defaultdict(_default_NA, stream))
 
-    if ask_for_quality:
+    if ask_for_quality and num_streams > 1:
         selected_stream = context.get_ui().on_select(
             context.localize('select_video_quality'),
             [stream['title'] for stream in stream_list],

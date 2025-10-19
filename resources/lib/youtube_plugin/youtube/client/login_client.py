@@ -18,20 +18,9 @@ from ...kodion import logging
 class YouTubeLoginClient(YouTubeRequestClient):
     log = logging.getLogger(__name__)
 
-    ANDROID_CLIENT_AUTH_URL = 'https://android.clients.google.com/auth'
     DOMAIN_SUFFIX = '.apps.googleusercontent.com'
     DEVICE_CODE_URL = 'https://accounts.google.com/o/oauth2/device/code'
     REVOKE_URL = 'https://accounts.google.com/o/oauth2/revoke'
-    SERVICE_URLS = 'oauth2:' + 'https://www.googleapis.com/auth/'.join((
-        'youtube '
-        'youtube.force-ssl '
-        'plus.me '
-        'emeraldsea.mobileapps.doritos.cookie '
-        'plus.stream.read '
-        'plus.stream.write '
-        'plus.pages.manage '
-        'identity.plus.page.impersonation',
-    ))
     TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token'
     TOKEN_TYPES = {
         0: 'tv',

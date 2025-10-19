@@ -364,8 +364,12 @@ def _process_list_response(provider,
             item.available = yt_item.get('_available', False)
 
         elif kind_type == 'playlistitem':
-            playlist_item_id = item_id
-            video_id = snippet['resourceId']['videoId']
+            video_id = snippet.get('resourceId', {}).get('videoId')
+            if video_id:
+                playlist_item_id = item_id
+            else:
+                video_id = item_id
+                playlist_item_id = None
             channel_id = (snippet.get('videoOwnerChannelId')
                           or snippet.get('channelId'))
             playlist_id = snippet.get('playlistId')

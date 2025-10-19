@@ -1,6 +1,27 @@
+## v7.3.0+beta.7
+### Fixed
+- Only add playable items to playlist when adding related items
+- Fix using invalid default end limit with Playlist.GetItems JSONRPC method
+- Fix conversion of SRT subtitles to WebVTT #1256
+- Workaround playback failure of progressive streams
+- Fix re-sorting live search lists
+- Disable use of custom thumbnail urls #1245
+- Workaround addon service not starting prior to plugin invocation #1298
+- Fix unofficial version using localised sort order #1309
+- Fix parsing of logged_in query parameter
+
+### Changed
+- Ignore player request failures that may incorrectly indicate a need to sign-in #1312
+- Include playlist_id listitem property for items from virtual playlists
+
+### New
+- Add refresh to context menu of playlists
+- Allow watch urls from music.youtube.com to be directly handled by the addon
+- Allow urls from www.youtubekids.com to be directly handled by the addon
+
 ## v7.3.0+beta.6
 ### Fixed
-Fix typo in YouTubePlayerClient error hook
+- Fix typo in YouTubePlayerClient error hook
 
 ## v7.3.0+beta.5
 ### Fixed
