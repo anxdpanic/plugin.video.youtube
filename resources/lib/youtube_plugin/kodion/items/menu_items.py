@@ -139,14 +139,26 @@ def media_play_using(context, video_id=VIDEO_ID_INFOLABEL):
     )
 
 
-def refresh_listing(context):
+def refresh_listing(context, path=None, params=None):
+    if path is None:
+        path = (PATHS.ROUTE, context.get_path(),)
+    elif isinstance(path, tuple):
+        path = (PATHS.ROUTE,) + path
+    else:
+        path = (PATHS.ROUTE, path,)
+    if params is None:
+        params = context.get_params()
     return (
         context.localize('refresh'),
         context_menu_uri(
             context,
-            (PATHS.ROUTE, context.get_path(),),
-            dict(context.get_params(),
-                 refresh=context.refresh_requested(force=True, on=True)),
+            path,
+            dict(params,
+                 refresh=context.refresh_requested(
+                     force=True,
+                     on=True,
+                     params=params,
+                 )),
         ),
     )
 
@@ -829,7 +841,7 @@ def search_sort_by(context, params, order):
         ),
         context_menu_uri(
             context,
-            (PATHS.ROUTE, PATHS.SEARCH, 'query',),
+            (PATHS.ROUTE, context.get_path(),),
             params=dict(params,
                         order=order,
                         page=1,

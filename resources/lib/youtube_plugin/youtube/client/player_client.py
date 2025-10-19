@@ -790,6 +790,31 @@ class YouTubePlayerClient(YouTubeDataClient):
         '-1': ('original', 'main', -6),
     }
 
+    FAILURE_REASONS = {
+        'abort': frozenset((
+            'country',
+            'not available',
+        )),
+        'auth': frozenset((
+            'not a bot',
+            'please sign in',
+        )),
+        'reauth': frozenset((
+            'confirm your age',
+            'inappropriate',
+            'member',
+        )),
+        'retry': frozenset((
+            'try again later',
+            'unavailable',
+            'unknown',
+        )),
+        'skip': frozenset((
+            'error code: 6',
+            'latest version',
+        )),
+    }
+
     def __init__(self,
                  context,
                  clients=None,
@@ -826,18 +851,18 @@ class YouTubePlayerClient(YouTubeDataClient):
         self._auth_client = {}
         self._client_groups = (
             ('custom', clients if clients else ()),
-            ('auth_enabled_initial_request', (
+            ('auth_enabled|initial_request|no_playable_streams', (
                 'tv_embed',
                 'tv_unplugged',
                 'tv',
             )),
-            ('auth_disabled_kids_vp9_avc1', (
+            ('auth_disabled|kids|av1|vp9|vp9.2|avc1|stereo_sound|multi_audio', (
                 'ios_testsuite_params',
             )),
-            ('auth_disabled_kids_av1_avc1', (
+            ('auth_disabled|kids|av1|vp9.2|avc1|surround_sound|multi_audio', (
                 'android_testsuite_params',
             )),
-            ('auth_enabled_no_kids', (
+            ('auth_enabled|no_kids|av1|vp9.2|avc1|surround_sound', (
                 'android_vr',
             )),
             ('mpd', (
@@ -1285,7 +1310,11 @@ class YouTubePlayerClient(YouTubeDataClient):
                 else:
                     new_url = url
 
-                new_url = self._process_url_params(new_url, mpd=False)
+                new_url = self._process_url_params(new_url,
+                                                   mpd=False,
+                                                   headers=headers,
+                                                   referrer=None,
+                                                   visitor_data=None)
                 if not new_url:
                     continue
 
@@ -1622,26 +1651,7 @@ class YouTubePlayerClient(YouTubeDataClient):
         responses = {}
         stream_list = {}
 
-        abort_reasons = {
-            'country',
-            'not available',
-        }
-        reauth_reasons = {
-            'confirm your age',
-            'inappropriate',
-            'please sign in',
-            'not a bot',
-            'member',
-        }
-        skip_reasons = {
-            'latest version',
-            'error code: 6',
-        }
-        retry_reasons = {
-            'try again later',
-            'unavailable',
-            'unknown',
-        }
+        fail = self.FAILURE_REASONS
         abort = False
 
         logged_in = self.logged_in
@@ -1670,17 +1680,17 @@ class YouTubePlayerClient(YouTubeDataClient):
         for name, clients in self._client_groups:
             if not clients:
                 continue
-            if name == 'auth_enabled_initial_request':
+            if name == 'mpd' and not use_mpd:
+                continue
+            if name == 'ask' and use_mpd and not ask_for_quality:
+                continue
+            if name.startswith('auth_enabled|initial_request'):
                 if visitor_data and not logged_in:
                     continue
                 allow_skip = False
                 client_data['_auth_requested'] = True
             else:
                 allow_skip = True
-            if name == 'mpd' and not use_mpd:
-                continue
-            if name == 'ask' and use_mpd and not ask_for_quality:
-                continue
 
             exclude_retry = set()
             restart = None
@@ -1792,8 +1802,17 @@ class YouTubePlayerClient(YouTubeDataClient):
                                          video_id=video_id,
                                          client=_client_name,
                                          has_auth=_has_auth)
-                        compare_reason = _reason.lower()
-                        if any(why in compare_reason for why in reauth_reasons):
+                        fail_reason = _reason.lower()
+                        if any(why in fail_reason for why in fail['auth']):
+                            if _has_auth:
+                                restart = False
+                            elif restart is None and logged_in:
+                                client_data['_auth_requested'] = True
+                                restart = True
+                            else:
+                                continue
+                            break
+                        elif any(why in fail_reason for why in fail['reauth']):
                             if _client.get('_auth_required') == 'ignore_fail':
                                 continue
                             elif client_data.get('_auth_required'):
@@ -1803,13 +1822,13 @@ class YouTubePlayerClient(YouTubeDataClient):
                                 client_data['_auth_required'] = True
                                 restart = True
                             break
-                        if any(why in compare_reason for why in abort_reasons):
+                        elif any(why in fail_reason for why in fail['abort']):
                             abort = True
                             break
-                        if any(why in compare_reason for why in skip_reasons):
+                        elif any(why in fail_reason for why in fail['skip']):
                             if allow_skip:
                                 break
-                        if any(why in compare_reason for why in retry_reasons):
+                        elif any(why in fail_reason for why in fail['retry']):
                             continue
                     else:
                         self.log.warning('Unknown playabilityStatus: {status!r}',

@@ -32,6 +32,7 @@ from ...kodion.constants import (
     START,
     VIDEO_ID,
     VIDEO_IDS,
+    YOUTUBE_HOSTNAMES,
 )
 from ...kodion.items import DirectoryItem, UriItem, VideoItem
 from ...kodion.utils.convert_format import duration_to_seconds
@@ -41,11 +42,6 @@ class UrlToItemConverter(object):
     log = logging.getLogger(__name__)
 
     RE_PATH_ID = re_compile(r'/[^/]*?[/@](?P<id>[^/?#]+)', IGNORECASE)
-    VALID_HOSTNAMES = {
-        'youtube.com',
-        'www.youtube.com',
-        'm.youtube.com',
-    }
 
     def __init__(self, flatten=True):
         self._flatten = flatten
@@ -67,7 +63,7 @@ class UrlToItemConverter(object):
     def add_url(self, url):
         parsed_url = urlsplit(url)
         if (not parsed_url.hostname
-                or parsed_url.hostname.lower() not in self.VALID_HOSTNAMES):
+                or parsed_url.hostname.lower() not in YOUTUBE_HOSTNAMES):
             self.log.debug('Unknown hostname "{hostname}" in url "{url}"',
                            hostname=parsed_url.hostname,
                            url=url)

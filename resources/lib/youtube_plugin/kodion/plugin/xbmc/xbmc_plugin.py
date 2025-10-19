@@ -374,7 +374,12 @@ class XbmcPlugin(AbstractPlugin):
                         listitem=item,
                     )
                 elif options.get(provider.FORCE_REFRESH):
-                    _post_run_action = ui.refresh_container
+                    _post_run_action = (
+                        context.send_notification,
+                        {
+                            'method': REFRESH_CONTAINER,
+                        },
+                    )
                 else:
                     if context.is_plugin_path(
                             ui.get_container_info(FOLDER_URI, container_id=None)
@@ -411,20 +416,8 @@ class XbmcPlugin(AbstractPlugin):
             if any(sync_items):
                 context.send_notification(SYNC_LISTITEM, sync_items)
 
-            if forced and is_same_path and (not played_video_id or route):
-                container = ui.get_property(CONTAINER_ID)
-                position = ui.get_property(CONTAINER_POSITION)
-                if container and position:
-                    post_run_actions.append((
-                        context.send_notification,
-                        {
-                            'method': CONTAINER_FOCUS,
-                            'data': {
-                                CONTAINER_ID: container,
-                                CONTAINER_POSITION: position,
-                            },
-                        },
-                    ))
+            container = ui.get_property(CONTAINER_ID)
+            position = ui.get_property(CONTAINER_POSITION)
 
             # set alternative view mode
             view_manager = ui.get_view_manager()
@@ -438,22 +431,30 @@ class XbmcPlugin(AbstractPlugin):
 
             if is_same_path:
                 sort_method = kwargs.get(SORT_METHOD)
-                if sort_method:
+                sort_dir = kwargs.get(SORT_DIR)
+                if sort_method and sort_dir:
                     post_run_actions.append((
                         view_manager.apply_sort_method,
                         {
                             'context': context,
                             SORT_METHOD: sort_method,
+                            SORT_DIR: sort_dir,
+                            CONTAINER_POSITION: position if forced else None,
                         },
                     ))
+                    position = None
 
-                sort_dir = kwargs.get(SORT_DIR)
-                if sort_dir:
+                if (container and position
+                        and (forced or position == 'current')
+                        and (not played_video_id or route)):
                     post_run_actions.append((
-                        view_manager.apply_sort_dir,
+                        context.send_notification,
                         {
-                            'context': context,
-                            SORT_DIR: sort_dir,
+                            'method': CONTAINER_FOCUS,
+                            'data': {
+                                CONTAINER_ID: container,
+                                CONTAINER_POSITION: position,
+                            },
                         },
                     ))
 

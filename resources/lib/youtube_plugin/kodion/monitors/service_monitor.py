@@ -18,8 +18,6 @@ from ..compatibility import urlsplit, xbmc, xbmcgui
 from ..constants import (
     ACTION,
     ADDON_ID,
-    BOOL_FROM_STR,
-    BUSY_FLAG,
     CHECK_SETTINGS,
     CONTAINER_FOCUS,
     CONTAINER_ID,
@@ -112,81 +110,11 @@ class ServiceMonitor(xbmc.Monitor):
         xbmcgui.Window(10000).setProperty(_property_id, value)
         return value
 
-    def get_property(self,
-                     property_id,
-                     stacklevel=2,
-                     process=None,
-                     log_value=None,
-                     log_process=None,
-                     raw=False,
-                     as_bool=False,
-                     default=False):
-        _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
-        value = xbmcgui.Window(10000).getProperty(_property_id)
-        if log_value is None:
-            log_value = value
-        if log_process:
-            log_value = log_process(log_value)
-        self.log.debug_trace('Get property {property_id!r}: {value!r}',
-                             property_id=property_id,
-                             value=log_value,
-                             stacklevel=stacklevel)
-        if process:
-            value = process(value)
-        return BOOL_FROM_STR.get(value, default) if as_bool else value
-
-    def pop_property(self,
-                     property_id,
-                     stacklevel=2,
-                     process=None,
-                     log_value=None,
-                     log_process=None,
-                     raw=False,
-                     as_bool=False,
-                     default=False):
-        _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
-        window = xbmcgui.Window(10000)
-        value = window.getProperty(_property_id)
-        if value:
-            window.clearProperty(_property_id)
-            if process:
-                value = process(value)
-        if log_value is None:
-            log_value = value
-        if log_value and log_process:
-            log_value = log_process(log_value)
-        self.log.debug_trace('Pop property {property_id!r}: {value!r}',
-                             property_id=property_id,
-                             value=log_value,
-                             stacklevel=stacklevel)
-        return BOOL_FROM_STR.get(value, default) if as_bool else value
-
-    def clear_property(self, property_id, stacklevel=2, raw=False):
-        self.log.debug_trace('Clear property {property_id!r}',
-                             property_id=property_id,
-                             stacklevel=stacklevel)
-        _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
-        xbmcgui.Window(10000).clearProperty(_property_id)
-        return None
-
-    def refresh_container(self, deferred=False):
-        if deferred:
+    def refresh_container(self, force=False):
+        if force:
             self.refresh = False
-            if self.get_property(REFRESH_CONTAINER) == BUSY_FLAG:
-                self.set_property(REFRESH_CONTAINER)
-                xbmc.executebuiltin('Container.Refresh')
-            return
-
-        container = self._context.get_ui().get_container()
-        if not container['is_plugin'] or not container['is_loaded']:
-            self.log.debug('No plugin container loaded - cancelling refresh')
-            return
-        if container['is_active']:
-            self.set_property(REFRESH_CONTAINER)
-            xbmc.executebuiltin('Container.Refresh')
-        else:
-            self.set_property(REFRESH_CONTAINER, BUSY_FLAG)
-            self.log.debug('Plugin container not active - deferring refresh')
+        refreshed = self._context.get_ui().refresh_container(force=force)
+        if refreshed is None:
             self.refresh = True
 
     def onNotification(self, sender, method, data):
@@ -317,7 +245,7 @@ class ServiceMonitor(xbmc.Monitor):
                             response = False
                     else:
                         with write_access:
-                            content = self.pop_property(
+                            content = self._context.get_ui().pop_property(
                                 '-'.join((FILE_WRITE, filepath)),
                                 log_value='<redacted>',
                             )
@@ -347,52 +275,11 @@ class ServiceMonitor(xbmc.Monitor):
         elif event == CONTAINER_FOCUS:
             if data:
                 data = json.loads(data)
-            if not data:
-                return
-
-            context = self._context
-            ui = context.get_ui()
-
-            container = ui.get_container()
-            if not all(container.values()):
-                return
-
-            container_id = data.get(CONTAINER_ID)
-            if container_id is None:
-                container_id = container['id']
-            elif not container_id:
-                return
-            if not isinstance(container_id, int):
-                try:
-                    container_id = int(container_id)
-                except (TypeError, ValueError):
-                    return
-
-            position = data.get(CONTAINER_POSITION)
-            if position is None:
-                return
-
-            if ui.get_container_bool(HAS_PARENT, container_id):
-                offset = 0
-            else:
-                offset = -1
-
-            if not isinstance(position, int):
-                if position == 'next':
-                    position = ui.get_container_info(CURRENT_ITEM, container_id)
-                    offset += 1
-                elif position == 'previous':
-                    position = ui.get_container_info(CURRENT_ITEM, container_id)
-                    offset -= 1
-                try:
-                    position = int(position)
-                except (TypeError, ValueError):
-                    return
-
-            context.execute('SetFocus({0},{1},absolute)'.format(
-                container_id,
-                position + offset,
-            ))
+            if data:
+                self._context.get_ui().focus_container(
+                    container_id=data.get(CONTAINER_ID),
+                    position=data.get(CONTAINER_POSITION),
+                )
 
         elif event == RELOAD_ACCESS_MANAGER:
             self._context.reload_access_manager()

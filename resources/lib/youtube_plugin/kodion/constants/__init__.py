@@ -53,9 +53,18 @@ VALUE_TO_STR = {
     1: 'true',
 }
 
+YOUTUBE_HOSTNAMES = frozenset((
+    'youtube.com',
+    'www.youtube.com',
+    'm.youtube.com',
+    'www.youtubekids.com',
+    'music.youtube.com',
+))
+
 # Flags
 ABORT_FLAG = 'abort_requested'
 BUSY_FLAG = 'busy'
+SERVICE_RUNNING_FLAG = 'service_monitor_running'
 WAIT_END_FLAG = 'builtin_completed'
 TRAKT_PAUSE_FLAG = 'script.trakt.paused'
 
@@ -218,10 +227,12 @@ __all__ = (
     # Const values
     'BOOL_FROM_STR',
     'VALUE_TO_STR',
+    'YOUTUBE_HOSTNAMES',
 
     # Flags
     'ABORT_FLAG',
     'BUSY_FLAG',
+    'SERVICE_RUNNING_FLAG',
     'TRAKT_PAUSE_FLAG',
     'WAIT_END_FLAG',
 

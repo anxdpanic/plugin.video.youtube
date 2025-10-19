@@ -12,7 +12,13 @@ from __future__ import absolute_import, division, unicode_literals
 
 from ... import logging
 from ...compatibility import xbmc
-from ...constants import CONTENT, SORT, SORT_DIR, SORT_METHOD
+from ...constants import (
+    CONTAINER_POSITION,
+    CONTENT,
+    SORT,
+    SORT_DIR,
+    SORT_METHOD,
+)
 
 
 class ViewManager(object):
@@ -267,54 +273,70 @@ class ViewManager(object):
     @classmethod
     def apply_sort_method(cls, context, **kwargs):
         execute = context.execute
-        get_infolabel = xbmc.getInfoLabel
+        get_infobool = xbmc.getCondVisibility
 
-        sort_method = (kwargs.get(SORT_METHOD)
-                       or CONTENT.VIDEO_CONTENT.join(('__', '__'))).lower()
+        sort_method = (
+                kwargs.get(SORT_METHOD)
+                or CONTENT.VIDEO_CONTENT.join(('__', '__'))
+        )
         sort_id = SORT.SORT_ID_MAPPING.get(sort_method)
         if sort_id is None:
             cls.log.warning('Unknown sort method: %r', sort_method)
             return
 
-        _sort_method = get_infolabel('Container.SortMethod').lower()
-        _sort_id = SORT.SORT_ID_MAPPING.get(_sort_method)
-        # Check if hardcoded sort method to ID mapping has changed
-        if not xbmc.getCondVisibility('Container.SortMethod(%s)' % _sort_id):
-            cls.log.warning('Sort method mismatch: {method!r} ID is not {id}',
-                            method=_sort_method,
-                            id=_sort_id)
+        sort_dir = kwargs.get(SORT_DIR)
+        _sort_dir = SORT.SORT_DIR.get(sort_dir)
+        if _sort_dir is None:
+            cls.log.warning('Invalid sort direction: %r', sort_dir)
+            return
+
+        position = kwargs.get(CONTAINER_POSITION)
+        if position is not None:
+            context.get_ui().focus_container(position=position)
 
         # Workaround for Container.SetSortMethod failing for some sort methods
-        num_attempts_remaining = 3
-        while num_attempts_remaining and not context.sleep(0.1):
-            cls.log.debug('Applying sort method: {method!r} ({id})',
-                          method=sort_method,
-                          id=sort_id)
+        num_attempts = 0
+        while num_attempts < 4:
             # Workaround for Container.SetSortMethod(0) being a noop
             # https://github.com/xbmc/xbmc/blob/7e1a55cb861342cd9062745161d88aca08dcead1/xbmc/windows/GUIMediaWindow.cpp#L502
             if sort_id == 0:
                 # Sort by track number to reset sort order to default order
-                _sort_id = SORT.SORT_ID_MAPPING.get(SORT.TRACKNUM)
-                execute('Container.SetSortMethod(%s)' % _sort_id)
+                if not num_attempts % 2:
+                    _sort_method = 'TRACKNUM'
+                    _sort_id = SORT.SORT_ID_MAPPING.get(_sort_method)
+                    sort_action = 'Container.SetSortMethod(%s)' % _sort_id
                 # Then switch to previous sort method which is default/unsorted
                 # as per the order set in XbmcContext.apply_content
-                execute('Container.PreviousSortMethod')
+                else:
+                    _sort_method = 'UNSORTED'
+                    _sort_id = SORT.SORT_ID_MAPPING.get(_sort_method)
+                    sort_action = 'Container.PreviousSortMethod'
             else:
-                execute('Container.SetSortMethod(%s)' % sort_id)
-            if get_infolabel('Container.SortMethod').lower() == sort_method:
-                break
-            num_attempts_remaining -= 1
-        else:
-            cls.log.warning('Unable to apply sort method: {method!r} ({id})',
-                            method=sort_method,
-                            id=sort_id)
+                _sort_method = sort_method
+                _sort_id = sort_id
+                sort_action = 'Container.SetSortMethod(%s)' % _sort_id
 
-    @classmethod
-    def apply_sort_dir(cls, context, **kwargs):
-        sort_dir = kwargs.get(SORT_DIR, 'ascending')
-        if not xbmc.getCondVisibility('Container.SortDirection(%s)' % sort_dir):
-            cls.log.debug('Applying sort direction: %r', sort_dir)
-            # This builtin should be Container.SortDirection but has been broken
-            # since Kodi v16
-            # https://github.com/xbmc/xbmc/commit/ac870b64b16dfd0fc2bd0496c14529cf6d563f41
-            context.execute('Container.SetSortDirection')
+            cls.log.debug('Applying sort method: {method!r} ({id})',
+                          method=_sort_method,
+                          id=_sort_id)
+            execute(sort_action)
+            context.sleep(0.1)
+
+            if not get_infobool('Container.SortDirection(%s)' % _sort_dir):
+                cls.log.debug('Applying sort direction: %r', sort_dir)
+                # This builtin should be Container.SortDirection but has been
+                # broken since Kodi v16
+                # https://github.com/xbmc/xbmc/commit/ac870b64b16dfd0fc2bd0496c14529cf6d563f41
+                execute('Container.SetSortDirection')
+                context.sleep(0.1)
+
+            num_attempts += 1
+
+            if get_infobool('Container.SortMethod(%s)' % sort_id):
+                break
+        else:
+            cls.log.warning('Unable to apply sorting:'
+                            ' {sort_method!r} ({sort_id}) {sort_dir!r}',
+                            sort_method=sort_method,
+                            sort_id=sort_id,
+                            sort_dir=sort_dir)

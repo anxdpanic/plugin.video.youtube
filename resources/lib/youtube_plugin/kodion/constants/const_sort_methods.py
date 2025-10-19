@@ -88,7 +88,7 @@ for name, label_id, sort_by in methods:
     if sort_by is not None:
         SORT_ID_MAPPING.update((
             (name, sort_by),
-            (xbmc.getLocalizedString(label_id).lower(), sort_by),
+            (xbmc.getLocalizedString(label_id), sort_by),
             (sort_method, sort_by if sort_method else 0),
         ))
 
@@ -98,6 +98,11 @@ SORT_ID_MAPPING.update((
     (CONTENT.COMMENTS.join(('__', '__')), SORT.CHANNEL),
     (CONTENT.HISTORY.join(('__', '__')), SORT.LASTPLAYED),
 ))
+
+SORT_DIR = {
+    xbmc.getLocalizedString(584): 'ascending',
+    xbmc.getLocalizedString(585): 'descending',
+}
 
 # Label mask token details:
 # https://github.com/xbmc/xbmc/blob/master/xbmc/utils/LabelFormatter.cpp#L33-L105

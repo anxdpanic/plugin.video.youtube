@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from datetime import timedelta
 from math import floor, log
-from re import MULTILINE, compile as re_compile
+from re import DOTALL, compile as re_compile
 
 from ..compatibility import byte_string_type
 
@@ -103,10 +103,10 @@ def timedelta_to_timestamp(delta, offset=None, multiplier=1.0):
 def _srt_to_vtt(content,
                 srt_re=re_compile(
                     br'\d+[\r\n]'
-                    br'(?P<start>\d+:\d+:\d+,\d+) --> '
-                    br'(?P<end>\d+:\d+:\d+,\d+)[\r\n]'
-                    br'(?P<text>.+)(?=[\r\n]{2,})',
-                    flags=MULTILINE,
+                    br'(?P<start>[\d:,]+) --> '
+                    br'(?P<end>[\d:,]+)[\r\n]'
+                    br'(?P<text>.+?)[\r\n][\r\n]',
+                    flags=DOTALL,
                 )):
     subtitle_iter = srt_re.finditer(content)
     try:
@@ -136,6 +136,7 @@ def _srt_to_vtt(content,
         except StopIteration:
             if subtitle == next_subtitle:
                 break
+            subtitle = None
             next_subtitle = None
 
         if next_subtitle and end > next_start:

@@ -19,12 +19,14 @@ from ...compatibility import string_type, xbmc, xbmcgui
 from ...constants import (
     ADDON_ID,
     BOOL_FROM_STR,
+    BUSY_FLAG,
     CONTAINER_FOCUS,
     CONTAINER_ID,
     CONTAINER_LISTITEM_INFO,
     CONTAINER_LISTITEM_PROP,
     CONTAINER_POSITION,
     CURRENT_CONTAINER_INFO,
+    CURRENT_ITEM,
     HAS_FILES,
     HAS_FOLDERS,
     HAS_PARENT,
@@ -200,8 +202,76 @@ class XbmcContextUI(AbstractContextUI):
     def on_busy():
         return XbmcBusyDialog()
 
-    def refresh_container(self):
-        self._context.send_notification(REFRESH_CONTAINER)
+    def refresh_container(self, force=False, stacklevel=None):
+        if force:
+            if self.get_property(REFRESH_CONTAINER) == BUSY_FLAG:
+                self.set_property(REFRESH_CONTAINER)
+                xbmc.executebuiltin('Container.Refresh')
+            return True
+
+        stacklevel = 2 if stacklevel is None else stacklevel + 1
+
+        container = self.get_container()
+        if not container['is_plugin'] or not container['is_loaded']:
+            self.log.debug('No plugin container loaded - cancelling refresh',
+                           stacklevel=stacklevel)
+            return False
+
+        if container['is_active']:
+            self.set_property(REFRESH_CONTAINER)
+            xbmc.executebuiltin('Container.Refresh')
+            return True
+
+        self.set_property(REFRESH_CONTAINER, BUSY_FLAG)
+        self.log.debug('Plugin container not active - deferring refresh',
+                       stacklevel=stacklevel)
+        return None
+
+    def focus_container(self, container_id=None, position=None):
+        if position is None:
+            return
+
+        container = self.get_container()
+        if not all(container.values()):
+            return
+
+        if container_id is None:
+            container_id = container['id']
+        elif not container_id:
+            return
+
+        if not isinstance(container_id, int):
+            try:
+                container_id = int(container_id)
+            except (TypeError, ValueError):
+                return
+
+        if self.get_container_bool(HAS_PARENT, container_id):
+            offset = 0
+        else:
+            offset = -1
+
+        if not isinstance(position, int):
+            if position == 'next':
+                position = self.get_container_info(CURRENT_ITEM, container_id)
+                offset += 1
+            elif position == 'previous':
+                position = self.get_container_info(CURRENT_ITEM, container_id)
+                offset -= 1
+            elif position == 'current':
+                position = (
+                        self.get_property(CONTAINER_POSITION)
+                        or self.get_container_info(CURRENT_ITEM, container_id)
+                )
+            try:
+                position = int(position)
+            except (TypeError, ValueError):
+                return
+
+        xbmc.executebuiltin('SetFocus({0},{1},absolute)'.format(
+            container_id,
+            position + offset,
+        ))
 
     @staticmethod
     def get_infobool(name, _bool=xbmc.getCondVisibility):

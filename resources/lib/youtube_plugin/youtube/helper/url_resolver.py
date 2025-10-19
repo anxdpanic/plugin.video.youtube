@@ -14,6 +14,7 @@ from re import compile as re_compile
 
 from ...kodion import logging
 from ...kodion.compatibility import parse_qsl, unescape, urlencode, urlsplit
+from ...kodion.constants import YOUTUBE_HOSTNAMES
 from ...kodion.network import BaseRequestsClass
 
 
@@ -63,16 +64,16 @@ class YouTubeResolver(AbstractResolver):
                                   r'|(?P<is_clip>"clipConfig":\{)'
                                   r'|("startTimeMs":"(?P<start_time>\d+)")'
                                   r'|("endTimeMs":"(?P<end_time>\d+)")')
+    _RE_MUSIC_VIDEO_ID = re_compile(r'"INITIAL_ENDPOINT":.+?videoId\\":\\"'
+                                    r'(?P<video_id>[^\\"]+)'
+                                    r'\\"')
 
     def __init__(self, *args, **kwargs):
         super(YouTubeResolver, self).__init__(*args, **kwargs)
 
     def supports_url(self, url, url_components):
-        if url_components.hostname not in {
-            'www.youtube.com',
-            'youtube.com',
-            'm.youtube.com',
-        }:
+        hostname = url_components.hostname
+        if hostname not in YOUTUBE_HOSTNAMES:
             return False
 
         path = url_components.path.lower()
@@ -91,8 +92,12 @@ class YouTubeResolver(AbstractResolver):
                 '/redirect',
                 '/shorts',
                 '/supported_browsers',
-                '/watch',
         )):
+            return 'HEAD'
+
+        if path.startswith('/watch'):
+            if hostname.startswith('music.'):
+                return 'GET'
             return 'HEAD'
 
         # user channel in the form of youtube.com/username
@@ -192,7 +197,17 @@ class YouTubeResolver(AbstractResolver):
                 query=urlencode(new_params)
             ).geturl()
 
-        # we try to extract the channel id from the html content
+        # try to extract the real videoId from the html content
+        elif method == 'GET' and url_components.hostname.startswith('music.'):
+            match = self._RE_MUSIC_VIDEO_ID.search(response_text)
+            if match:
+                params = dict(parse_qsl(url_components.query))
+                params['v'] = match.group('video_id')
+                return url_components._replace(
+                    query=urlencode(params)
+                ).geturl()
+
+        # try to extract the channel id from the html content
         # With the channel id we can construct a URL we already work with
         # https://www.youtube.com/channel/<CHANNEL_ID>
         elif method == 'GET':
@@ -217,11 +232,7 @@ class CommonResolver(AbstractResolver):
         super(CommonResolver, self).__init__(*args, **kwargs)
 
     def supports_url(self, url, url_components):
-        if url_components.hostname in {
-            'www.youtube.com',
-            'youtube.com',
-            'm.youtube.com',
-        }:
+        if url_components.hostname in YOUTUBE_HOSTNAMES:
             return False
         return 'HEAD'
 

@@ -28,12 +28,14 @@ from ...compatibility import (
 from ...constants import (
     ABORT_FLAG,
     ADDON_ID,
+    BUSY_FLAG,
     CHANNEL_ID,
     CONTENT,
     FOLDER_NAME,
     PLAYLIST_ID,
     PLAY_FORCE_AUDIO,
     SERVICE_IPC,
+    SERVICE_RUNNING_FLAG,
     SORT,
     URI,
     VIDEO_ID,
@@ -963,6 +965,8 @@ class XbmcContext(AbstractContext):
         attrs = (
             '_ui',
             '_playlist',
+            '_api_store',
+            '_access_manager',
         )
         for attr in attrs:
             try:
@@ -971,7 +975,15 @@ class XbmcContext(AbstractContext):
             except AttributeError:
                 pass
 
-    def ipc_exec(self, target, timeout=None, payload=None):
+    def ipc_exec(self, target, timeout=None, payload=None, raise_exc=False):
+        if not XbmcContextUI.get_property(SERVICE_RUNNING_FLAG, as_bool=True):
+            msg = 'Service IPC - Monitor has not started'
+            XbmcContextUI.set_property(SERVICE_RUNNING_FLAG, BUSY_FLAG)
+            if raise_exc:
+                raise RuntimeError(msg)
+            self.log.warning_trace(msg)
+            return None
+
         data = {'target': target, 'response_required': bool(timeout)}
         if payload:
             data.update(payload)

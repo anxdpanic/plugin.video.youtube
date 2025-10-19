@@ -181,6 +181,7 @@ class AbstractContext(object):
         'visitor',
     ))
     _STRING_BOOL_PARAMS = frozenset((
+        'logged_in',
         'reload_path',
     ))
     _STRING_INT_PARAMS = frozenset((
@@ -213,7 +214,7 @@ class AbstractContext(object):
             self.parse_params(params)
 
         self._uri = None
-        self._path = path
+        self._path = None
         self._path_parts = []
         self.set_path(path, force=True)
 
@@ -540,7 +541,12 @@ class AbstractContext(object):
                 value = unquote(value)
             try:
                 if param in self._BOOL_PARAMS:
-                    parsed_value = BOOL_FROM_STR.get(str(value), False)
+                    parsed_value = BOOL_FROM_STR.get(
+                        str(value),
+                        bool(value)
+                        if param in self._STRING_BOOL_PARAMS else
+                        False
+                    )
                 elif param in self._INT_PARAMS:
                     parsed_value = int(
                         (BOOL_FROM_STR.get(str(value), value) or 0)
@@ -682,7 +688,7 @@ class AbstractContext(object):
     def tear_down(self):
         pass
 
-    def ipc_exec(self, target, timeout=None, payload=None):
+    def ipc_exec(self, target, timeout=None, payload=None, raise_exc=False):
         raise NotImplementedError()
 
     @staticmethod

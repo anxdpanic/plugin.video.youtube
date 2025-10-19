@@ -1488,13 +1488,14 @@ class Provider(AbstractProvider):
         # watch later
         if settings_bool(settings.SHOW_WATCH_LATER, True):
             if watch_later_id:
+                path = (
+                    (PATHS.VIRTUAL_PLAYLIST, watch_later_id)
+                    if watch_later_id.lower() == 'wl' else
+                    (PATHS.MY_PLAYLIST, watch_later_id)
+                )
                 watch_later_item = DirectoryItem(
                     localize('watch_later'),
-                    create_uri(
-                        (PATHS.VIRTUAL_PLAYLIST, watch_later_id)
-                        if watch_later_id.lower() == 'wl' else
-                        (PATHS.MY_PLAYLIST, watch_later_id)
-                    ),
+                    create_uri(path),
                     image='{media}/watch_later.png',
                 )
                 context_menu = [
@@ -1509,6 +1510,9 @@ class Provider(AbstractProvider):
                     ),
                     menu_items.playlist_shuffle(
                         context, watch_later_id
+                    ),
+                    menu_items.refresh_listing(
+                        context, path, {}
                     ),
                 ]
                 watch_later_item.add_context_menu(context_menu)
@@ -1541,9 +1545,10 @@ class Provider(AbstractProvider):
             playlists = resource_manager.get_related_playlists('mine')
             if playlists and 'likes' in playlists:
                 liked_list_id = playlists['likes'] or 'LL'
+                path = (PATHS.VIRTUAL_PLAYLIST, liked_list_id)
                 liked_videos_item = DirectoryItem(
                     localize('video.liked'),
-                    create_uri((PATHS.VIRTUAL_PLAYLIST, liked_list_id)),
+                    create_uri(path),
                     image='{media}/likes.png',
                 )
                 context_menu = [
@@ -1558,6 +1563,9 @@ class Provider(AbstractProvider):
                     ),
                     menu_items.playlist_shuffle(
                         context, liked_list_id
+                    ),
+                    menu_items.refresh_listing(
+                        context, path, {}
                     ),
                 ]
                 liked_videos_item.add_context_menu(context_menu)
@@ -1575,13 +1583,14 @@ class Provider(AbstractProvider):
         # history
         if settings_bool(settings.SHOW_HISTORY, True):
             if history_id:
+                path = (
+                    (PATHS.VIRTUAL_PLAYLIST, history_id)
+                    if history_id.lower() == 'hl' else
+                    (PATHS.MY_PLAYLIST, history_id)
+                )
                 watch_history_item = DirectoryItem(
                     localize('history'),
-                    create_uri(
-                        (PATHS.VIRTUAL_PLAYLIST, history_id)
-                        if history_id.lower() == 'hl' else
-                        (PATHS.MY_PLAYLIST, history_id)
-                    ),
+                    create_uri(path),
                     image='{media}/history.png',
                 )
                 context_menu = [
@@ -1596,6 +1605,9 @@ class Provider(AbstractProvider):
                     ),
                     menu_items.playlist_shuffle(
                         context, history_id
+                    ),
+                    menu_items.refresh_listing(
+                        context, path, {}
                     ),
                 ]
                 watch_history_item.add_context_menu(context_menu)
@@ -2210,7 +2222,6 @@ class Provider(AbstractProvider):
         attrs = (
             '_resource_manager',
             '_client',
-            '_api_check',
         )
         for attr in attrs:
             try:

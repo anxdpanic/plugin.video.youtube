@@ -15,6 +15,7 @@ from .constants import (
     ABORT_FLAG,
     ARTIST,
     BOOKMARK_ID,
+    BUSY_FLAG,
     CHANNEL_ID,
     CONTAINER_ID,
     CONTAINER_POSITION,
@@ -24,6 +25,7 @@ from .constants import (
     PLAYLIST_ITEM_ID,
     PLAY_COUNT,
     PLUGIN_SLEEPING,
+    SERVICE_RUNNING_FLAG,
     SUBSCRIPTION_ID,
     TEMP_PATH,
     TITLE,
@@ -67,6 +69,9 @@ def run():
     localize = context.localize
 
     clear_property(ABORT_FLAG)
+    if ui.get_property(SERVICE_RUNNING_FLAG) == BUSY_FLAG:
+        monitor.refresh_container()
+    set_property(SERVICE_RUNNING_FLAG)
 
     # wipe add-on temp folder on updates/restarts (subtitles, and mpd files)
     rm_dir(TEMP_PATH)
@@ -173,7 +178,7 @@ def run():
                 monitor.interrupt = True
 
             if monitor.refresh and all(container.values()):
-                monitor.refresh_container(deferred=True)
+                monitor.refresh_container(force=True)
                 break
 
             if (monitor.interrupt
@@ -240,6 +245,7 @@ def run():
             break
 
     set_property(ABORT_FLAG)
+    clear_property(SERVICE_RUNNING_FLAG)
 
     # clean up any/all playback monitoring threads
     player.cleanup_threads(only_ended=False)

@@ -62,13 +62,15 @@ class AbstractContextUI(object):
     def on_busy():
         raise NotImplementedError()
 
-    @staticmethod
-    def refresh_container():
+    def refresh_container(self, force=False, stacklevel=None):
         """
         Needs to be implemented by a mock for testing or the real deal.
         This will refresh the current container or list.
         :return:
         """
+        raise NotImplementedError()
+
+    def focus_container(self, container_id=None, position=None):
         raise NotImplementedError()
 
     @staticmethod
