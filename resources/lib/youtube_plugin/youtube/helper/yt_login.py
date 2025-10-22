@@ -56,6 +56,7 @@ def _do_login(provider, context, client=None, **kwargs):
     access_manager = context.get_access_manager()
     addon_id = context.get_param('addon_id', None)
     localize = context.localize
+    function_cache = context.get_function_cache()
     ui = context.get_ui()
 
     ui.on_ok(localize('sign.multi.title'), localize('sign.multi.text'))
@@ -82,6 +83,13 @@ def _do_login(provider, context, client=None, **kwargs):
                 continue
         except IndexError:
             pass
+
+        if not function_cache.run(
+                client.internet_available,
+                function_cache.ONE_MINUTE * 5,
+                _refresh=True,
+        ):
+            break
 
         new_token = ('', expiry_timestamp, '')
         try:

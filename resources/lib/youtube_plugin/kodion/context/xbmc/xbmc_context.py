@@ -203,6 +203,7 @@ class XbmcContext(AbstractContext):
         'httpd.connect.wait': 13028,
         'httpd.connect.failed': 1001,
         'inputstreamhelper.is_installed': 30625,
+        'internet.connection.required': 21451,
         'isa.enable.check': 30579,
         'key.requirement': 30731,
         'liked.video': 30716,

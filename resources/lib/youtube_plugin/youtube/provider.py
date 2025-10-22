@@ -135,7 +135,7 @@ class Provider(AbstractProvider):
             )
             self._client.reinit(**kwargs)
 
-    def get_client(self, context):
+    def get_client(self, context, refresh=False):
         access_manager = context.get_access_manager()
         api_store = context.get_api_store()
         settings = context.get_settings()
@@ -262,8 +262,15 @@ class Provider(AbstractProvider):
             access_manager.update_access_token(dev_id, access_token='')
             return client
 
+        # create new access tokens
         with client:
-            # create new access tokens
+            function_cache = context.get_function_cache()
+            if not function_cache.run(
+                    client.internet_available,
+                    function_cache.ONE_MINUTE * 5,
+                    _refresh=refresh or context.refresh_requested(),
+            ):
+                num_refresh_tokens = 0
             if num_refresh_tokens and num_access_tokens != num_refresh_tokens:
                 access_tokens = [None, None, None, None]
                 token_expiry = 0
@@ -957,7 +964,7 @@ class Provider(AbstractProvider):
             re_match.group('mode'),
             provider,
             context,
-            client=provider.get_client(context),
+            client=provider.get_client(context, refresh=True),
         )
 
     def _search_channel_or_playlist(self,
