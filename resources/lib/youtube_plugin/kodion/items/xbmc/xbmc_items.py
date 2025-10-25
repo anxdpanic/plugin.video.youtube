@@ -590,6 +590,11 @@ def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
             special_sort = _special_sort
             props[BOOKMARK_ID] = prop_value
 
+        prop_value = is_action and getattr(directory_item, VIDEO_ID, None)
+        if prop_value:
+            special_sort = _special_sort
+            props[VIDEO_ID] = prop_value
+
         if special_sort:
             props['specialSort'] = special_sort
 
