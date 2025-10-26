@@ -102,11 +102,15 @@ class ResourceManager(object):
                 None if forced_cache else data_cache.ONE_DAY,
                 memory_store=self.new_data,
             )
-        to_update = [id_ for id_ in ids
-                     if id_
-                     and (id_ not in result
-                          or not result[id_]
-                          or result[id_].get('_partial'))]
+        to_update = (
+            []
+            if forced_cache else
+            [id_ for id_ in ids
+             if id_
+             and (id_ not in result
+                  or not result[id_]
+                  or result[id_].get('_partial'))]
+        )
 
         if result:
             self.log.debugging and self.log.debug(
@@ -192,11 +196,15 @@ class ResourceManager(object):
                 None if forced_cache else data_cache.ONE_MONTH,
                 memory_store=self.new_data,
             ))
-        to_update = [id_ for id_ in ids
-                     if id_
-                     and (id_ not in result
-                          or not result[id_]
-                          or result[id_].get('_partial'))]
+        to_update = (
+            []
+            if forced_cache else
+            [id_ for id_ in ids
+             if id_
+             and (id_ not in result
+                  or not result[id_]
+                  or result[id_].get('_partial'))]
+        )
 
         if result:
             self.log.debugging and self.log.debug(
@@ -299,11 +307,15 @@ class ResourceManager(object):
                 None if forced_cache else data_cache.ONE_DAY,
                 memory_store=self.new_data,
             )
-        to_update = [id_ for id_ in ids
-                     if id_
-                     and (id_ not in result
-                          or not result[id_]
-                          or result[id_].get('_partial'))]
+        to_update = (
+            []
+            if forced_cache else
+            [id_ for id_ in ids
+             if id_
+             and (id_ not in result
+                  or not result[id_]
+                  or result[id_].get('_partial'))]
+        )
 
         if result:
             self.log.debugging and self.log.debug(
@@ -410,11 +422,15 @@ class ResourceManager(object):
                         as_dict=True,
                     )
                 if not batch:
-                    to_update.append(batch_id)
+                    if not forced_cache:
+                        to_update.append(batch_id)
                     break
                 age = batch.get('age')
                 batch = batch.get('value')
-                if forced_cache:
+                if not batch:
+                    to_update.append(batch_id)
+                    break
+                elif forced_cache:
                     result[batch_id] = batch
                 elif page_token:
                     if age <= data_cache.ONE_DAY:
@@ -564,14 +580,18 @@ class ResourceManager(object):
                 None if forced_cache else data_cache.ONE_MONTH,
                 memory_store=self.new_data,
             )
-        to_update = [id_ for id_ in ids
-                     if id_
-                     and (id_ not in result
-                          or not result[id_]
-                          or result[id_].get('_partial')
-                          or (yt_items_dict
-                              and yt_items_dict.get(id_)
-                              and result[id_].get('_unavailable')))]
+        to_update = (
+            []
+            if forced_cache else
+            [id_ for id_ in ids
+             if id_
+             and (id_ not in result
+                  or not result[id_]
+                  or result[id_].get('_partial')
+                  or (yt_items_dict
+                      and yt_items_dict.get(id_)
+                      and result[id_].get('_unavailable')))]
+        )
 
         if result:
             self.log.debugging and self.log.debug(

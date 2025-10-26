@@ -149,6 +149,7 @@ def make_comment_item(context, snippet, uri, reply_count=0):
             category_label=' - '.join(
                 (author, context.format_date_short(local_datetime))
             ),
+            special_sort=False,
         )
     else:
         comment_item = CommandItem(
@@ -890,7 +891,9 @@ def update_video_items(provider, context, video_id_dict,
 
         label_stats = []
         stats = []
-        rating = [0, 0]
+        rating = 0
+        likes = 0
+        views = 0
         if 'statistics' in yt_item:
             for stat, value in yt_item['statistics'].items():
                 label = context.LOCAL_MAP.get('stats.' + stat)
@@ -912,21 +915,23 @@ def update_video_items(provider, context, video_id_dict,
                 )))))
 
                 if stat == 'likeCount':
-                    rating[0] = value
+                    likes = value
                 elif stat == 'viewCount':
-                    rating[1] = value
-                    media_item.set_count(value)
+                    views = value
+                    media_item.set_count(views)
 
             label_stats = ' | '.join(label_stats)
             stats = ' | '.join(stats)
 
-            if 0 < rating[0] <= rating[1]:
-                if rating[0] == rating[1]:
+            if 0 < likes <= views:
+                if likes == views:
                     rating = 10
                 else:
                     # This is a completely made up, arbitrary ranking score
-                    rating = (10 * (log10(rating[1]) * log10(rating[0]))
-                              / (log10(rating[0] + rating[1]) ** 2))
+                    rating = (
+                            10 * (log10(views) * log10(likes))
+                            / (log10(likes + views) ** 2)
+                    )
                 media_item.set_rating(rating)
 
         # Used for label2, but is poorly supported in skins

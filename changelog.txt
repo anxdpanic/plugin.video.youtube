@@ -1,3 +1,16 @@
+## v7.3.0+beta.8
+### Fixed
+- Fix regression in handling audio only setting after d154325c5b672dccc6a17413063cfdeb32256ffd
+- Fix comments not using correct sort methods
+- Fix incorrectly using playlist cache entries that have been invalidated by playlist modification
+- Fix some context menu actions failing for video item bookmarks
+- Ensure listings and items added by the addon have correct sort order
+- Fix resetting client region when playing media with subtitles enabled
+
+### Changed
+- Improve offline access to cached data
+- Updates to SQLite database lock handling
+
 ## v7.3.0+beta.7
 ### Fixed
 - Only add playable items to playlist when adding related items

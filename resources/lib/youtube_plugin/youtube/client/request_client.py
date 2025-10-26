@@ -984,13 +984,16 @@ class YouTubeRequestClient(BaseRequestsClass):
 
         return client
 
-    def internet_available(self):
+    def internet_available(self, notify=True):
         response = self.request(**self.CLIENTS['generate_204'])
-        if response is None:
-            return False
-        with response:
-            if response.status_code == 204:
-                return True
+        if response is not None:
+            with response:
+                if response.status_code == 204:
+                    return True
+        if notify:
+            self._context.get_ui().show_notification(
+                self._context.localize('internet.connection.required')
+            )
         return False
 
     @classmethod

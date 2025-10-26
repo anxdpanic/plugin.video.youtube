@@ -71,6 +71,7 @@ class NextPageItem(DirectoryItem):
             image=image,
             fanart=fanart,
             category_label='__inherit__',
+            special_sort='bottom',
         )
 
         self.next_page = page
