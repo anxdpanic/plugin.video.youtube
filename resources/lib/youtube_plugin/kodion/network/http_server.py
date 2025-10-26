@@ -181,8 +181,11 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             return
         except (HTTPError, OSError) as exc:
             self.close_connection = True
-            if exc.errno not in self.SWALLOWED_ERRORS:
-                raise exc
+            self.log.exception('Request failed')
+            if (isinstance(exc, HTTPError)
+                    or getattr(exc, 'errno', None) in self.SWALLOWED_ERRORS):
+                return
+            raise exc
 
     def ip_address_status(self, ip_address):
         is_whitelisted = ip_address in self.whitelist_ips
