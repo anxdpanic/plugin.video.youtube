@@ -427,7 +427,10 @@ class ResourceManager(object):
                     break
                 age = batch.get('age')
                 batch = batch.get('value')
-                if forced_cache:
+                if not batch:
+                    to_update.append(batch_id)
+                    break
+                elif forced_cache:
                     result[batch_id] = batch
                 elif page_token:
                     if age <= data_cache.ONE_DAY:
