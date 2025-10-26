@@ -135,7 +135,7 @@ class Provider(AbstractProvider):
             )
             self._client.reinit(**kwargs)
 
-    def get_client(self, context):
+    def get_client(self, context, refresh=False):
         access_manager = context.get_access_manager()
         api_store = context.get_api_store()
         settings = context.get_settings()
@@ -262,8 +262,15 @@ class Provider(AbstractProvider):
             access_manager.update_access_token(dev_id, access_token='')
             return client
 
+        # create new access tokens
         with client:
-            # create new access tokens
+            function_cache = context.get_function_cache()
+            if not function_cache.run(
+                    client.internet_available,
+                    function_cache.ONE_MINUTE * 5,
+                    _refresh=refresh or context.refresh_requested(),
+            ):
+                num_refresh_tokens = 0
             if num_refresh_tokens and num_access_tokens != num_refresh_tokens:
                 access_tokens = [None, None, None, None]
                 token_expiry = 0
@@ -400,6 +407,9 @@ class Provider(AbstractProvider):
                     },
                     '_available': True,
                     '_partial': True,
+                    '_params': {
+                        'special_sort': 'top',
+                    },
                 },
                 {
                     'kind': 'youtube#playlistShortsFolder',
@@ -412,6 +422,9 @@ class Provider(AbstractProvider):
                         }},
                     },
                     '_partial': True,
+                    '_params': {
+                        'special_sort': 'top',
+                    },
                 } if not params.get(HIDE_SHORTS) else None,
                 {
                     'kind': 'youtube#playlistLiveFolder',
@@ -424,6 +437,9 @@ class Provider(AbstractProvider):
                         }},
                     },
                     '_partial': True,
+                    '_params': {
+                        'special_sort': 'top',
+                    },
                 } if not params.get(HIDE_LIVE) else None,
             ]
         else:
@@ -760,6 +776,7 @@ class Provider(AbstractProvider):
                             'title': context.localize('playlists'),
                             'image': '{media}/playlist.png',
                             CHANNEL_ID: channel_id,
+                            'special_sort': 'top',
                         },
                     } if not params.get(HIDE_PLAYLISTS) else None,
                     {
@@ -768,6 +785,7 @@ class Provider(AbstractProvider):
                             'title': context.localize('search'),
                             'image': '{media}/search.png',
                             CHANNEL_ID: channel_id,
+                            'special_sort': 'top',
                         },
                     } if not params.get(HIDE_SEARCH) else None,
                     {
@@ -781,6 +799,9 @@ class Provider(AbstractProvider):
                             }},
                         },
                         '_partial': True,
+                        '_params': {
+                            'special_sort': 'top',
+                        },
                     } if uploads and not params.get(HIDE_SHORTS) else None,
                     {
                         'kind': 'youtube#playlistLiveFolder',
@@ -793,6 +814,9 @@ class Provider(AbstractProvider):
                             }},
                         },
                         '_partial': True,
+                        '_params': {
+                            'special_sort': 'top',
+                        },
                     } if uploads and not params.get(HIDE_LIVE) else None,
                     {
                         'kind': 'youtube#playlistMembersFolder',
@@ -805,6 +829,9 @@ class Provider(AbstractProvider):
                             }},
                         },
                         '_partial': True,
+                        '_params': {
+                            'special_sort': 'top',
+                        },
                     } if uploads and not params.get(HIDE_MEMBERS) else None,
                 ],
             }
@@ -937,7 +964,7 @@ class Provider(AbstractProvider):
             re_match.group('mode'),
             provider,
             context,
-            client=provider.get_client(context),
+            client=provider.get_client(context, refresh=True),
         )
 
     def _search_channel_or_playlist(self,

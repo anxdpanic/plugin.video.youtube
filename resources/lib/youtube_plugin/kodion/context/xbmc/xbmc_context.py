@@ -203,6 +203,7 @@ class XbmcContext(AbstractContext):
         'httpd.connect.wait': 13028,
         'httpd.connect.failed': 1001,
         'inputstreamhelper.is_installed': 30625,
+        'internet.connection.required': 21451,
         'isa.enable.check': 30579,
         'key.requirement': 30731,
         'liked.video': 30716,
@@ -711,31 +712,30 @@ class XbmcContext(AbstractContext):
             xbmcplugin.setPluginCategory(self._plugin_handle, category_label)
 
         detailed_labels = self.get_settings().show_detailed_labels()
-        if content_type == CONTENT.VIDEO_CONTENT:
-            if sub_type == CONTENT.HISTORY:
-                self.add_sort_method(
-                    SORT.HISTORY_CONTENT_DETAILED
-                    if detailed_labels else
-                    SORT.HISTORY_CONTENT_SIMPLE
-                )
-            elif sub_type == CONTENT.COMMENTS:
-                self.add_sort_method(
-                    SORT.COMMENTS_CONTENT_DETAILED
-                    if detailed_labels else
-                    SORT.COMMENTS_CONTENT_SIMPLE
-                )
-            elif sub_type == CONTENT.PLAYLIST:
-                self.add_sort_method(
-                    SORT.PLAYLIST_CONTENT_DETAILED
-                    if detailed_labels else
-                    SORT.PLAYLIST_CONTENT_SIMPLE
-                )
-            else:
-                self.add_sort_method(
-                    SORT.VIDEO_CONTENT_DETAILED
-                    if detailed_labels else
-                    SORT.VIDEO_CONTENT_SIMPLE
-                )
+        if sub_type == CONTENT.HISTORY:
+            self.add_sort_method(
+                SORT.HISTORY_CONTENT_DETAILED
+                if detailed_labels else
+                SORT.HISTORY_CONTENT_SIMPLE
+            )
+        elif sub_type == CONTENT.COMMENTS:
+            self.add_sort_method(
+                SORT.COMMENTS_CONTENT_DETAILED
+                if detailed_labels else
+                SORT.COMMENTS_CONTENT_SIMPLE
+            )
+        elif sub_type == CONTENT.PLAYLIST:
+            self.add_sort_method(
+                SORT.PLAYLIST_CONTENT_DETAILED
+                if detailed_labels else
+                SORT.PLAYLIST_CONTENT_SIMPLE
+            )
+        elif content_type == CONTENT.VIDEO_CONTENT:
+            self.add_sort_method(
+                SORT.VIDEO_CONTENT_DETAILED
+                if detailed_labels else
+                SORT.VIDEO_CONTENT_SIMPLE
+            )
         else:
             self.add_sort_method(
                 SORT.LIST_CONTENT_DETAILED

@@ -1239,7 +1239,7 @@ class YouTubeDataClient(YouTubeLoginClient):
             max_results = self.max_results()
         params = {
             'part': 'snippet,contentDetails,brandingSettings,statistics',
-            'maxResults': str(max_results),
+            'maxResults': max_results,
         }
 
         if channel_id == 'mine':

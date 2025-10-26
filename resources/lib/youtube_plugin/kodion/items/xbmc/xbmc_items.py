@@ -562,31 +562,38 @@ def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
     if directory_item.next_page:
         props['specialSort'] = 'bottom'
     else:
-        special_sort = directory_item.get_special_sort()
-        if special_sort is None:
+        _special_sort = directory_item.get_special_sort()
+        if _special_sort is None:
             special_sort = 'top'
-        elif special_sort is False:
+        elif _special_sort is False:
             special_sort = None
+        else:
+            special_sort = _special_sort
 
         prop_value = directory_item.subscription_id
         if prop_value:
-            special_sort = None
+            special_sort = _special_sort
             props[SUBSCRIPTION_ID] = prop_value
 
         prop_value = directory_item.channel_id
         if prop_value:
-            special_sort = None
+            special_sort = _special_sort
             props[CHANNEL_ID] = prop_value
 
         prop_value = directory_item.playlist_id
         if prop_value:
-            special_sort = None
+            special_sort = _special_sort
             props[PLAYLIST_ID] = prop_value
 
         prop_value = directory_item.bookmark_id
         if prop_value:
-            special_sort = None
+            special_sort = _special_sort
             props[BOOKMARK_ID] = prop_value
+
+        prop_value = is_action and getattr(directory_item, VIDEO_ID, None)
+        if prop_value:
+            special_sort = _special_sort
+            props[VIDEO_ID] = prop_value
 
         if special_sort:
             props['specialSort'] = special_sort

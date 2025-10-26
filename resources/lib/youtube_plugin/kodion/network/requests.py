@@ -402,7 +402,7 @@ class BaseRequestsClass(object):
                                stacklevel=stacklevel)
                 cache.set(request_id)
                 response = cached_response
-            else:
+            elif response is not None:
                 self.log.debug(('Saving response to cache',
                                 'Request ID: {request_id}',
                                 'Etag:       {etag}',

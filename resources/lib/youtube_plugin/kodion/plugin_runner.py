@@ -71,6 +71,7 @@ def run(context=_context,
 
     old_path = context.get_path().rstrip('/')
     old_uri = ui.get_container_info(FOLDER_URI, container_id=None)
+    old_handle = context.get_handle()
     context.init()
     current_path = context.get_path().rstrip('/')
     current_params = context.get_original_params()
@@ -82,7 +83,7 @@ def run(context=_context,
     params = context.get_params()
     refresh = context.refresh_requested(params=params)
     was_playing = old_path == PATHS.PLAY
-    is_same_path = current_path == old_path
+    is_same_path = current_path == old_path and old_handle != -1
 
     if was_playing or is_same_path or refresh:
         old_path, old_params = context.parse_uri(
