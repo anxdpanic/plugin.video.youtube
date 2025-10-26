@@ -74,10 +74,9 @@ def _play_stream(provider, context):
         ask_for_quality = settings.ask_for_video_quality()
         if ui.pop_property(PLAY_PROMPT_QUALITY) and not screensaver:
             ask_for_quality = True
+        audio_only = not ask_for_quality and settings.audio_only()
         if ui.pop_property(PLAY_FORCE_AUDIO):
             audio_only = True
-        else:
-            audio_only = settings.audio_only()
         use_mpd = ((not is_external or settings.alternative_player_mpd())
                    and settings.use_mpd_videos()
                    and context.ipc_exec(SERVER_WAKEUP, timeout=5))
