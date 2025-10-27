@@ -19,6 +19,7 @@ from .. import logging
 from ..compatibility import pickle, to_str
 from ..utils.datetime import fromtimestamp, since_epoch
 from ..utils.file_system import make_dirs
+from ..utils.system_version import current_system_version
 
 
 class StorageLock(object):
@@ -27,11 +28,18 @@ class StorageLock(object):
         self._num_accessing = 0
         self._num_waiting = 0
 
-    def __enter__(self):
-        self._num_waiting += 1
-        locked = not self._lock.acquire(timeout=3)
-        self._num_waiting -= 1
-        return locked
+    if current_system_version.compatible(19):
+        def __enter__(self):
+            self._num_waiting += 1
+            locked = not self._lock.acquire(timeout=3)
+            self._num_waiting -= 1
+            return locked
+    else:
+        def __enter__(self):
+            self._num_waiting += 1
+            locked = not self._lock.acquire(blocking=False)
+            self._num_waiting -= 1
+            return locked
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         try:
