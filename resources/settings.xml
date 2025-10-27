@@ -243,6 +243,7 @@
                     </constraints>
                     <control format="integer" type="slider">
                         <popup>false</popup>
+                        <formatlabel>21436</formatlabel>
                     </control>
                 </setting>
                 <setting id="youtube.view.hide_videos" type="list[string]" label="30808" help="">
@@ -757,6 +758,7 @@
                     </constraints>
                     <control format="integer" type="slider">
                         <popup>false</popup>
+                        <formatlabel>37122</formatlabel>
                     </control>
                 </setting>
                 <setting id="kodion.search.size" type="integer" label="30023" help="">
@@ -769,6 +771,7 @@
                     </constraints>
                     <control format="integer" type="slider">
                         <popup>false</popup>
+                        <formatlabel>21436</formatlabel>
                     </control>
                 </setting>
             </group>
@@ -793,6 +796,7 @@
                     </constraints>
                     <control format="integer" type="slider">
                         <popup>false</popup>
+                        <formatlabel>14045</formatlabel>
                     </control>
                 </setting>
                 <setting id="youtube.view.filter.list" type="string" label="587" help="30583">
@@ -968,6 +972,7 @@
                     </constraints>
                     <control format="integer" type="slider">
                         <popup>false</popup>
+                        <formatlabel>14047</formatlabel>
                     </control>
                 </setting>
                 <setting id="youtube.playlist.watchlater.autoremove" type="boolean" label="30515" help="">
@@ -1023,6 +1028,7 @@
                     </constraints>
                     <control format="integer" type="slider">
                         <popup>false</popup>
+                        <formatlabel>37122</formatlabel>
                     </control>
                 </setting>
                 <setting id="requests.proxy.source" type="integer" label="713" help="36380">
