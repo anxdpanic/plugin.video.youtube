@@ -464,7 +464,8 @@ class AbstractSettings(object):
         ip_address = '.'.join(map(str, octets))
 
         if value is not None:
-            return self.set_string(SETTINGS.HTTPD_LISTEN, ip_address)
+            if not self.set_string(SETTINGS.HTTPD_LISTEN, ip_address):
+                return False
         return ip_address
 
     def httpd_whitelist(self):
