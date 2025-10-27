@@ -1,3 +1,17 @@
+## v7.3.0+beta.9
+### Fixed
+- Disable label masks being used in Kodi 18 #1327
+- Python 2 compatibility workaround for lack of timeout when trying to acquire an RLock #1327
+- More expansive handling of inconsistent urllib3 exception re-raising
+
+### Changed
+- Improve robustness of fetching recommended and related videos
+- Improve workarounds for SQLite concurrency issues
+- Remove possibly invalid access token if an authentication error occurs
+- Better organise and use standard labels for http server address and port settings
+- Try to make http server IP address selection even more obvious when running Setup Wizard #1320
+- Improve logging of errors caused by localised strings that have been incorrectly translated
+
 ## v7.3.0+beta.8
 ### Fixed
 - Fix regression in handling audio only setting after d154325c5b672dccc6a17413063cfdeb32256ffd
