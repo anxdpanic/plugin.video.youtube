@@ -1116,14 +1116,14 @@
                 </setting>
             </group>
             <group id="http_server" label="30628">
-                <setting id="kodion.http.listen" type="string" label="30643" help="">
+                <setting id="kodion.http.listen" type="string" label="1006" help="">
                     <level>0</level>
                     <default>127.0.0.1</default>
                     <control format="ip" type="edit">
-                        <heading>30643</heading>
+                        <heading>14068</heading>
                     </control>
                 </setting>
-                <setting id="kodion.http.listen.select" type="action" label="30644" help="">
+                <setting id="kodion.http.listen.select" type="action" parent="kodion.view.override" label="30644" help="">
                     <level>0</level>
                     <constraints>
                         <allowempty>true</allowempty>
@@ -1133,7 +1133,15 @@
                         <close>true</close>
                     </control>
                 </setting>
-                <setting id="kodion.http.port" type="integer" label="730" help="">
+                <setting id="kodion.http.client.ip" type="action" parent="kodion.view.override" label="30698" help="">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <data>RunScript($ID,config/show_client_ip)</data>
+                    <control format="action" type="button"/>
+                </setting>
+                <setting id="kodion.http.port" type="integer" label="1013" help="">
                     <level>0</level>
                     <default>50152</default>
                     <constraints>
@@ -1141,7 +1149,7 @@
                         <maximum>65535</maximum>
                     </constraints>
                     <control format="integer" type="edit">
-                        <heading>730</heading>
+                        <heading>1018</heading>
                     </control>
                 </setting>
                 <setting id="kodion.http.ip.whitelist" type="string" label="30629" help="">
@@ -1153,14 +1161,6 @@
                     <control format="string" type="edit">
                         <heading>30629</heading>
                     </control>
-                </setting>
-                <setting id="kodion.http.client.ip" type="action" label="30698" help="">
-                    <level>0</level>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <data>RunScript($ID,config/show_client_ip)</data>
-                    <control format="action" type="button"/>
                 </setting>
                 <setting id="youtube.http.idle_sleep" type="boolean" label="13018" help="">
                     <level>0</level>
