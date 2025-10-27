@@ -684,8 +684,9 @@ class XbmcContext(AbstractContext):
                 return result % _args
             except TypeError:
                 self.log.exception(('Localization error',
-                                    'text_id: {text_id!r}',
-                                    'args:    {original_args!r}'),
+                                    'String: {result!r} ({text_id!r})',
+                                    'args:   {original_args!r}'),
+                                   result=result,
                                    text_id=text_id,
                                    original_args=args)
         return result
