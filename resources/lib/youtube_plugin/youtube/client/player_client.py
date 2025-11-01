@@ -852,7 +852,6 @@ class YouTubePlayerClient(YouTubeDataClient):
         self._client_groups = (
             ('custom', clients if clients else ()),
             ('auth_enabled|initial_request|no_playable_streams', (
-                'tv_embed',
                 'tv_unplugged',
                 'tv',
             )),
@@ -1541,7 +1540,7 @@ class YouTubePlayerClient(YouTubeDataClient):
             '_visitor_data': self._visitor_data[self._visitor_data_key],
         }
 
-        for client_name in ('tv_embed', 'web'):
+        for client_name in ('tv_unplugged', 'web'):
             client = self.build_client(client_name, client_data)
             if not client:
                 continue
