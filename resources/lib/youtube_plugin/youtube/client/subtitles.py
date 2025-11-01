@@ -451,7 +451,6 @@ class Subtitles(YouTubeRequestClient):
 
         subtitle_url = self._set_query_param(
             base_url,
-            ('type', 'track'),
             ('fmt', sub_format),
             ('tlang', tlang),
             ('xosf', None),

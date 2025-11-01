@@ -416,7 +416,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                         'list': priority_list,
                     }
             elif original_path == '/api/timedtext':
-                stream_type = (params.get('type', empty)[0],
+                stream_type = (params.get('type', ['track'])[0],
                                params.get('fmt', empty)[0],
                                params.get('kind', empty)[0])
                 priority_list = []
