@@ -14,7 +14,7 @@ from base64 import urlsafe_b64encode
 from json import dumps as json_dumps, loads as json_loads
 from os import path as os_path
 from random import choice as random_choice
-from re import compile as re_compile
+from re import compile as re_compile, sub as re_sub
 
 from .data_client import YouTubeDataClient
 from .subtitles import SUBTITLE_SELECTIONS, Subtitles
@@ -1135,12 +1135,22 @@ class YouTubePlayerClient(YouTubeDataClient):
 
             headers = response['client']['headers']
 
-            if '?' in url:
-                url += '&mpd_version=5'
-            elif url.endswith('/'):
-                url += 'mpd_version/5'
+            url_components = urlsplit(url)
+            if url_components.query:
+                params = dict(parse_qs(url_components.query))
+                params['mpd_version'] = ['7']
+                url = url_components._replace(
+                    query=urlencode(params, doseq=True),
+                ).geturl()
             else:
-                url += '/mpd_version/5'
+                path = re_sub(
+                    r'/mpd_version/\d+|/?$',
+                    '/mpd_version/7',
+                    url_components.path,
+                )
+                url = url_components._replace(
+                    path=path,
+                ).geturl()
 
             stream_list[itag] = self._get_stream_format(
                 itag=itag,
