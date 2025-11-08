@@ -466,8 +466,8 @@ class Storage(object):
             self._execute(cursor, 'VACUUM')
         return True
 
-    def _set(self, item_id, item, timestamp=None):
-        values = self._encode(item_id, item, timestamp)
+    def _set(self, item_id, item):
+        values = self._encode(item_id, item)
         optimize_query = self._optimize_item_count(1, defer=True)
         with self._lock as locked, self as (db, cursor), db:
             if locked:
