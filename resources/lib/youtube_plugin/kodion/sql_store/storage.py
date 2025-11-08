@@ -279,7 +279,11 @@ class Storage(object):
             self._close_timer = None
         self._lock.accessing(start=True)
         db = self._db or self._open()
-        cursor = db.cursor()
+        try:
+            cursor = db.cursor()
+        except sqlite3.ProgrammingError:
+            db = self._open()
+            cursor = db.cursor()
         cursor.arraysize = 100
         return db, cursor
 
@@ -366,12 +370,12 @@ class Storage(object):
         db = self._db
         if not db or self._lock.accessing() or self._lock.waiting():
             return False
+        self._db = None
         self._execute(db.cursor(), 'PRAGMA optimize')
         # Not needed if using db as a context manager
         if commit:
             db.commit()
         db.close()
-        self._db = None
         return True
 
     def _execute(self, cursor, query, values=None, many=False, script=False):
