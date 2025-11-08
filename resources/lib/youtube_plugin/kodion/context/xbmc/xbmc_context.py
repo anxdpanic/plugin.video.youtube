@@ -744,13 +744,19 @@ class XbmcContext(AbstractContext):
             )
 
     if current_system_version.compatible(19):
-        def add_sort_method(self, sort_methods):
+        def add_sort_method(self,
+                            sort_methods,
+                            _add_sort_method=xbmcplugin.addSortMethod):
+            handle = self._plugin_handle
             for sort_method in sort_methods:
-                xbmcplugin.addSortMethod(self._plugin_handle, *sort_method)
+                _add_sort_method(handle, *sort_method)
     else:
-        def add_sort_method(self, sort_methods):
+        def add_sort_method(self,
+                            sort_methods,
+                            _add_sort_method=xbmcplugin.addSortMethod):
+            handle = self._plugin_handle
             for sort_method in sort_methods:
-                xbmcplugin.addSortMethod(self._plugin_handle, *sort_method[:2])
+                _add_sort_method(handle, *sort_method[:3:2])
 
     def clone(self, new_path=None, new_params=None):
         if not new_path:
