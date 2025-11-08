@@ -100,7 +100,6 @@ class ResourceManager(object):
             result = data_cache.get_items(
                 ids,
                 None if forced_cache else data_cache.ONE_DAY,
-                memory_store=self.new_data,
             )
         to_update = (
             []
@@ -194,7 +193,6 @@ class ResourceManager(object):
             result.update(data_cache.get_items(
                 to_check,
                 None if forced_cache else data_cache.ONE_MONTH,
-                memory_store=self.new_data,
             ))
         to_update = (
             []
@@ -305,7 +303,6 @@ class ResourceManager(object):
             result = data_cache.get_items(
                 ids,
                 None if forced_cache else data_cache.ONE_DAY,
-                memory_store=self.new_data,
             )
         to_update = (
             []
@@ -578,7 +575,6 @@ class ResourceManager(object):
             result = data_cache.get_items(
                 ids,
                 None if forced_cache else data_cache.ONE_MONTH,
-                memory_store=self.new_data,
             )
         to_update = (
             []
@@ -658,33 +654,25 @@ class ResourceManager(object):
         return result
 
     def cache_data(self, data=None, defer=False):
-        if defer:
-            if data:
-                self.new_data.update(data)
-            return
+        if not data:
+            return None
 
-        if self.new_data:
-            flush = True
-            if data:
-                self.new_data.update(data)
-            data = self.new_data
-        else:
-            flush = False
-        if data:
-            if self._incognito:
-                self.log.debugging and self.log.debug(
-                    ('Incognito mode active - discarded data for {num} item(s)',
-                     'IDs: {ids}'),
-                    num=len(data),
-                    ids=list(data),
-                )
-            else:
-                self.log.debugging and self.log.debug(
-                    ('Storing new data to cache for {num} item(s)',
-                     'IDs: {ids}'),
-                    num=len(data),
-                    ids=list(data),
-                )
-                self._context.get_data_cache().set_items(data)
-        if flush:
-            self.new_data = {}
+        incognito = self._incognito
+        if not defer and self.log.debugging:
+            self.log.debug(
+                (
+                    'Incognito mode active - discarded data for {num} item(s)',
+                    'IDs: {ids}'
+                ) if incognito else (
+                    'Storing new data to cache for {num} item(s)',
+                    'IDs: {ids}'
+                ),
+                num=len(data),
+                ids=list(data)
+            )
+
+        return self._context.get_data_cache().set_items(
+            data,
+            defer=defer,
+            flush=incognito,
+        )

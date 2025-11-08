@@ -18,6 +18,8 @@ class DataCache(Storage):
     _table_updated = False
     _sql = {}
 
+    memory_store = {}
+
     def __init__(self, filepath, max_file_size_mb=5):
         max_file_size_kb = max_file_size_mb * 1024
         super(DataCache, self).__init__(filepath,
@@ -27,25 +29,11 @@ class DataCache(Storage):
                   content_ids,
                   seconds=None,
                   as_dict=True,
-                  values_only=True,
-                  memory_store=None):
-        if memory_store:
-            in_memory_result = {}
-            _content_ids = []
-            for key in content_ids:
-                if key in memory_store:
-                    in_memory_result[key] = memory_store[key]
-                else:
-                    _content_ids.append(key)
-            content_ids = _content_ids
-        else:
-            in_memory_result = None
+                  values_only=True):
         result = self._get_by_ids(content_ids,
                                   seconds=seconds,
                                   as_dict=as_dict,
                                   values_only=values_only)
-        if in_memory_result:
-            result.update(in_memory_result)
         return result
 
     def get_items_like(self, content_id, seconds=None):
@@ -70,12 +58,11 @@ class DataCache(Storage):
         result = self._get(content_id, seconds=seconds, as_dict=as_dict)
         return result
 
-    def set_item(self, content_id, item):
-        self._set(content_id, item)
+    def set_item(self, content_id, item, defer=False, flush=False):
+        self._set(content_id, item, defer=defer, flush=flush)
 
-    def set_items(self, items):
-        self._set_many(items)
-        self._optimize_file_size()
+    def set_items(self, items, defer=False, flush=False):
+        self._set_many(items, defer=defer, flush=flush)
 
     def del_item(self, content_id):
         self._remove(content_id)

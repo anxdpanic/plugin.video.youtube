@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+import atexit
 import os
 import sqlite3
 import time
@@ -48,16 +49,13 @@ class StorageLock(object):
             pass
 
     def accessing(self, start=False, done=False):
-        if start:
-            self._num_accessing += 1
-        elif done:
-            self._num_accessing -= 1
         num = self._num_accessing
-        if num > 0:
-            return True
-        if num < 0:
-            self._num_accessing = 0
-        return False
+        if start:
+            num += 1
+        elif done and num > 0:
+            num -= 1
+        self._num_accessing = num
+        return num > 0
 
     def waiting(self):
         return self._num_waiting > 0
@@ -233,8 +231,10 @@ class Storage(object):
         self._db = None
         self._lock = StorageLock()
         self._close_timer = None
+        self._close_actions = False
         self._max_item_count = -1 if migrate else max_item_count
         self._max_file_size_kb = -1 if migrate else max_file_size_kb
+        atexit.register(self._close, event='shutdown')
 
         if migrate:
             self._base = self
@@ -272,16 +272,20 @@ class Storage(object):
     def set_max_file_size_kb(self, max_file_size_kb):
         self._max_file_size_kb = max_file_size_kb
 
+    def __del__(self):
+        self._close(event='deleted')
+
     def __enter__(self):
+        self._lock.accessing(start=True)
+
         close_timer = self._close_timer
         if close_timer:
             close_timer.cancel()
-            self._close_timer = None
-        self._lock.accessing(start=True)
+
         db = self._db or self._open()
         try:
             cursor = db.cursor()
-        except sqlite3.ProgrammingError:
+        except (AttributeError, sqlite3.ProgrammingError):
             db = self._open()
             cursor = db.cursor()
         cursor.arraysize = 100
@@ -291,13 +295,16 @@ class Storage(object):
         close_timer = self._close_timer
         if close_timer:
             close_timer.cancel()
-        if not self._lock.accessing(done=True) and not self._lock.waiting():
+
+        if self._lock.accessing(done=True) or self._lock.waiting():
+            return
+
+        with self._lock as locked:
+            if locked or self._close_timer:
+                return
             close_timer = Timer(5, self._close)
-            close_timer.daemon = True
             close_timer.start()
             self._close_timer = close_timer
-        else:
-            self._close_timer = None
 
     def _open(self):
         statements = []
@@ -311,7 +318,7 @@ class Storage(object):
         for attempt in range(1, 4):
             try:
                 db = sqlite3.connect(self._filepath,
-                                     # cached_statements=0,
+                                     cached_statements=0,
                                      check_same_thread=False,
                                      isolation_level=None)
                 break
@@ -366,16 +373,38 @@ class Storage(object):
         self._db = db
         return db
 
-    def _close(self, commit=False):
-        db = self._db
-        if not db or self._lock.accessing() or self._lock.waiting():
+    def _close(self, commit=False, event=None):
+        close_timer = self._close_timer
+        if close_timer:
+            close_timer.cancel()
+
+        if self._lock.accessing() or self._lock.waiting():
             return False
-        self._db = None
+
+        db = self._db
+        if not db and self._close_actions:
+            db = self._open()
+        else:
+            return None
+
+        if self._close_actions:
+            memory_store = getattr(self, 'memory_store', None)
+            if memory_store:
+                self._set_many(items=None, memory_store=memory_store)
+            self._optimize_item_count()
+            self._optimize_file_size()
+            self._close_actions = False
+
         self._execute(db.cursor(), 'PRAGMA optimize')
+
         # Not needed if using db as a context manager
         if commit:
             db.commit()
-        db.close()
+
+        if event:
+            db.close()
+            self._db = None
+        self._close_timer = None
         return True
 
     def _execute(self, cursor, query, values=None, many=False, script=False):
@@ -405,9 +434,9 @@ class Storage(object):
                     else:
                         self.log.exception('Failed')
                         break
-                    self.log.warning('Attempt %d of 3',
-                                     attempt,
-                                     exc_info=True)
+                    self.log.warning_trace('Attempt %d of 3',
+                                           attempt,
+                                           exc_info=True)
                 else:
                     self.log.exception('Failed')
         return []
@@ -436,12 +465,18 @@ class Storage(object):
         query = self._sql['prune_by_size'].format(prune_size)
         if defer:
             return query
-        with self._lock as locked, self as (db, cursor), db:
-            if locked:
-                return False
-            self._execute(cursor, query)
-            self._execute(cursor, 'VACUUM')
-        return True
+        with self as (db, cursor), db:
+            self._execute(
+                cursor,
+                '\n'.join((
+                    'BEGIN IMMEDIATE;',
+                    query,
+                    'COMMIT;',
+                    'VACUUM;',
+                )),
+                script=True,
+            )
+        return None
 
     def _optimize_item_count(self, limit=-1, defer=False):
         # do nothing - optimize only if max item limit has been set
@@ -459,26 +494,71 @@ class Storage(object):
         )
         if defer:
             return query
-        with self._lock as locked, self as (db, cursor), db:
-            if locked:
-                return False
-            self._execute(cursor, query)
-            self._execute(cursor, 'VACUUM')
-        return True
+        with self as (db, cursor), db:
+            self._execute(
+                cursor,
+                '\n'.join((
+                    'BEGIN IMMEDIATE;',
+                    query,
+                    'COMMIT;',
+                    'VACUUM;',
+                )),
+                script=True,
+            )
+        return None
 
-    def _set(self, item_id, item):
+    def _set(self, item_id, item, defer=False, flush=False, memory_store=None):
+        if memory_store is None:
+            memory_store = getattr(self, 'memory_store', None)
+        if memory_store is not None:
+            if defer:
+                memory_store[item_id] = item
+                self._close_actions = True
+                return None
+            if flush:
+                memory_store.clear()
+                return False
+            if memory_store:
+                memory_store[item_id] = item
+                return self._set_many(items=None, memory_store=memory_store)
+
         values = self._encode(item_id, item)
-        optimize_query = self._optimize_item_count(1, defer=True)
-        with self._lock as locked, self as (db, cursor), db:
-            if locked:
-                return False
-            if optimize_query:
-                self._execute(cursor, 'BEGIN')
-                self._execute(cursor, optimize_query)
-            self._execute(cursor, self._sql['set'], values=values)
+        with self as (db, cursor), db:
+            self._execute(
+                cursor,
+                '\n'.join((
+                    'BEGIN IMMEDIATE;',
+                    self._sql['set'],
+                    'COMMIT;',
+                )),
+                values,
+                script=True,
+            )
+            self._close_actions = True
         return True
 
-    def _set_many(self, items, flatten=False):
+    def _set_many(self,
+                  items,
+                  flatten=False,
+                  defer=False,
+                  flush=False,
+                  memory_store=None):
+        if memory_store is None:
+            memory_store = getattr(self, 'memory_store', None)
+        if memory_store is not None:
+            if defer:
+                memory_store.update(items)
+                self._close_actions = True
+                return None
+            if flush:
+                memory_store.clear()
+                return False
+            if memory_store:
+                if items:
+                    memory_store.update(items)
+                items = memory_store
+                flush = True
+
         now = since_epoch()
         num_items = len(items)
 
@@ -494,42 +574,73 @@ class Storage(object):
                       for item in items.items()]
             query = self._sql['set']
 
-        optimize_query = self._optimize_item_count(num_items, defer=True)
-        with self._lock as locked, self as (db, cursor), db:
-            if locked:
-                return False
-            if optimize_query:
-                self._execute(cursor, 'BEGIN')
-                self._execute(cursor, optimize_query)
-            self._execute(cursor, query, many=(not flatten), values=values)
+        with self as (db, cursor), db:
+            if flatten:
+                self._execute(
+                    cursor,
+                    '\n'.join((
+                        'BEGIN IMMEDIATE;',
+                        query,
+                        'COMMIT;',
+                    )),
+                    values,
+                    script=True,
+                )
+            else:
+                self._execute(cursor, 'BEGIN IMMEDIATE')
+                self._execute(cursor, query, many=True, values=values)
+            self._close_actions = True
+
+        if flush:
+            memory_store.clear()
         return True
 
     def _refresh(self, item_id, timestamp=None):
         values = (timestamp or since_epoch(), to_str(item_id))
-        with self._lock as locked, self as (db, cursor), db:
-            if locked:
-                return False
-            self._execute(cursor, self._sql['refresh'], values=values)
+        with self as (db, cursor), db:
+            self._execute(
+                cursor,
+                '\n'.join((
+                    'BEGIN IMMEDIATE;',
+                    self._sql['refresh'],
+                    'COMMIT;',
+                )),
+                values,
+                script=True,
+            )
         return True
 
     def _update(self, item_id, item, timestamp=None):
         values = self._encode(item_id, item, timestamp, for_update=True)
-        with self._lock as locked, self as (db, cursor), db:
-            if locked:
-                return False
-            self._execute(cursor, self._sql['update'], values=values)
+        with self as (db, cursor), db:
+            self._execute(
+                cursor,
+                '\n'.join((
+                    'BEGIN IMMEDIATE;',
+                    self._sql['update'],
+                    'COMMIT;',
+                )),
+                values,
+                script=True,
+            )
         return True
 
     def clear(self, defer=False):
         query = self._sql['clear']
         if defer:
             return query
-        with self._lock as locked, self as (db, cursor), db:
-            if locked:
-                return False
-            self._execute(cursor, query)
-            self._execute(cursor, 'VACUUM')
-        return True
+        with self as (db, cursor), db:
+            self._execute(
+                cursor,
+                '\n'.join((
+                    'BEGIN IMMEDIATE;',
+                    query,
+                    'COMMIT;',
+                    'VACUUM;',
+                )),
+                script=True,
+            )
+        return None
 
     def is_empty(self):
         with self as (db, cursor):
@@ -543,7 +654,10 @@ class Storage(object):
 
     @staticmethod
     def _decode(obj, process=None, item=None):
-        decoded_obj = pickle.loads(obj)
+        if item and item[3] is None:
+            decoded_obj = obj
+        else:
+            decoded_obj = pickle.loads(obj)
         if process:
             return process(decoded_obj, item)
         return decoded_obj
@@ -591,6 +705,10 @@ class Storage(object):
     def _get_by_ids(self, item_ids=None, oldest_first=True, limit=-1,
                     wildcard=False, seconds=None, process=None,
                     as_dict=False, values_only=True, excluding=None):
+        epoch = since_epoch()
+        cut_off = epoch - seconds if seconds else 0
+        in_memory_result = None
+
         if not item_ids:
             if oldest_first:
                 query = self._sql['get_many']
@@ -611,58 +729,100 @@ class Storage(object):
                 )
                 item_ids = tuple(item_ids) + tuple(excluding)
             else:
-                query = self._sql['get_by_key'].format(
-                    '?,' * (len(item_ids) - 1) + '?'
-                )
-                item_ids = tuple(item_ids)
-
-        epoch = since_epoch()
-        cut_off = epoch - seconds if seconds else 0
-        with self as (db, cursor):
-            result = self._execute(cursor, query, item_ids)
-            if not result:
-                pass
-            elif as_dict:
-                if values_only:
-                    result = {
-                        item[0]: self._decode(item[2], process, item)
-                        for item in result if not cut_off or item[1] >= cut_off
-                    }
+                memory_store = getattr(self, 'memory_store', None)
+                if memory_store:
+                    in_memory_result = []
+                    _item_ids = []
+                    for key in item_ids:
+                        if key in memory_store:
+                            in_memory_result.append((
+                                key,
+                                epoch,
+                                memory_store[key],
+                                None,
+                            ))
+                        else:
+                            _item_ids.append(key)
+                    item_ids = _item_ids
                 else:
-                    result = {
-                        item[0]: {
-                            'age': epoch - item[1],
-                            'value': self._decode(item[2], process, item),
-                        }
-                        for item in result if not cut_off or item[1] >= cut_off
-                    }
-            elif values_only:
-                result = [
-                    self._decode(item[2], process, item)
+                    in_memory_result = None
+
+                if item_ids:
+                    query = self._sql['get_by_key'].format(
+                        '?,' * (len(item_ids) - 1) + '?'
+                    )
+                    item_ids = tuple(item_ids)
+                else:
+                    query = None
+
+        if query:
+            with self as (db, cursor):
+                result = self._execute(cursor, query, item_ids)
+                if result:
+                    result = result.fetchall()
+        else:
+            result = None
+
+        if in_memory_result:
+            if result:
+                in_memory_result.extend(result)
+            result = in_memory_result
+
+        if as_dict:
+            if values_only:
+                result = {
+                    item[0]: self._decode(item[2], process, item)
                     for item in result if not cut_off or item[1] >= cut_off
-                ]
+                }
             else:
-                result = [
-                    (item[0],
-                     fromtimestamp(item[1]),
-                     self._decode(item[2], process, item))
+                result = {
+                    item[0]: {
+                        'age': epoch - item[1],
+                        'value': self._decode(item[2], process, item),
+                    }
                     for item in result if not cut_off or item[1] >= cut_off
-                ]
+                }
+        elif values_only:
+            result = [
+                self._decode(item[2], process, item)
+                for item in result if not cut_off or item[1] >= cut_off
+            ]
+        else:
+            result = [
+                (item[0],
+                 fromtimestamp(item[1]),
+                 self._decode(item[2], process, item))
+                for item in result if not cut_off or item[1] >= cut_off
+            ]
         return result
 
     def _remove(self, item_id):
-        with self._lock as locked, self as (db, cursor), db:
-            if locked:
-                return False
-            self._execute(cursor, self._sql['remove'], [item_id])
+        with self as (db, cursor), db:
+            self._execute(
+                cursor,
+                '\n'.join((
+                    'BEGIN IMMEDIATE;',
+                    self._sql['remove'],
+                    'COMMIT;',
+                )),
+                [item_id],
+                script=True,
+            )
         return True
 
     def _remove_many(self, item_ids):
         num_ids = len(item_ids)
         query = self._sql['remove_by_key'].format('?,' * (num_ids - 1) + '?')
-        with self._lock as locked, self as (db, cursor), db:
-            if locked:
-                return False
-            self._execute(cursor, query, tuple(item_ids))
-            self._execute(cursor, 'VACUUM')
+        with self as (db, cursor), db:
+            self._execute(
+                cursor,
+                '\n'.join((
+                    'BEGIN IMMEDIATE;',
+                    query,
+                    'COMMIT;',
+                    'VACUUM;',
+                )),
+                tuple(item_ids),
+                script=True,
+            )
         return True

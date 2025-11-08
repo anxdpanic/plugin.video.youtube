@@ -22,6 +22,8 @@ class FunctionCache(Storage):
     _table_updated = False
     _sql = {}
 
+    memory_store = {}
+
     _BUILTIN = str.__module__
     SCOPE_NONE = 0
     SCOPE_BUILTINS = 1
@@ -134,7 +136,7 @@ class FunctionCache(Storage):
         if callable(process):
             data = process(data, _data)
         if data != ignore_value:
-            self._set(cache_id, data)
+            self._set(cache_id, data, defer=True)
         elif oneshot:
             self._remove(cache_id)
 
