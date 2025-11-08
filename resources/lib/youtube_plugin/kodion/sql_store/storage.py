@@ -10,10 +10,10 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import atexit
 import os
 import sqlite3
 import time
+from atexit import register as atexit_register
 from threading import RLock, Timer
 
 from .. import logging
@@ -234,7 +234,7 @@ class Storage(object):
         self._close_actions = False
         self._max_item_count = -1 if migrate else max_item_count
         self._max_file_size_kb = -1 if migrate else max_file_size_kb
-        atexit.register(self._close, event='shutdown')
+        atexit_register(self._close, event='shutdown')
 
         if migrate:
             self._base = self

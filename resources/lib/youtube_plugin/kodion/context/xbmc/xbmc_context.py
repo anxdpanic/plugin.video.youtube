@@ -10,9 +10,9 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import atexit
 import json
 import sys
+from atexit import register as atexit_register
 from timeit import default_timer
 from weakref import proxy
 
@@ -461,7 +461,7 @@ class XbmcContext(AbstractContext):
         self._ui = None
         self._playlist = None
 
-        atexit.register(self.tear_down)
+        atexit_register(self.tear_down)
 
     def init(self):
         num_args = len(sys.argv)
