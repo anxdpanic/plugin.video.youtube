@@ -89,23 +89,33 @@ class YouTubeDataClient(YouTubeLoginClient):
                 'tvSurfaceContentRenderer',
                 'content',
                 'sectionListRenderer',
-                'contents',
-                0,
-                'shelfRenderer',
-                'content',
-                'horizontalListRenderer',
-                'continuations',
-                0,
-                'nextContinuationData',
+                (
+                    (
+                        'contents',
+                        slice(None),
+                        None,
+                        'shelfRenderer',
+                        'content',
+                        ('horizontalListRenderer', 'verticalListRenderer'),
+                        'continuations',
+                        0,
+                        'nextContinuationData',
+                    ),
+                    (
+                        'continuations',
+                        0,
+                        'nextContinuationData'
+                    )
+                ),
             ),
             'continuation_items': (
                 'continuationContents',
-                'horizontalListContinuation',
+                ('horizontalListContinuation', 'sectionListContinuation'),
                 'items',
             ),
             'continuation_continuation': (
                 'continuationContents',
-                'horizontalListContinuation',
+                ('horizontalListContinuation', 'sectionListContinuation'),
                 'continuations',
                 0,
                 'nextContinuationData',
@@ -200,7 +210,7 @@ class YouTubeDataClient(YouTubeLoginClient):
                 slice(None),
                 'shelfRenderer',
                 'content',
-                'horizontalListRenderer',
+                ('horizontalListRenderer', 'verticalListRenderer'),
                 'items',
             ),
             'item_id': (
@@ -244,23 +254,43 @@ class YouTubeDataClient(YouTubeLoginClient):
                 'tvSurfaceContentRenderer',
                 'content',
                 'sectionListRenderer',
-                'contents',
-                0,
-                'shelfRenderer',
-                'content',
-                'horizontalListRenderer',
-                'continuations',
-                0,
-                'nextContinuationData',
+                (
+                    (
+                        'contents',
+                        slice(None),
+                        None,
+                        'shelfRenderer',
+                        'content',
+                        ('horizontalListRenderer', 'verticalListRenderer'),
+                        'continuations',
+                        0,
+                        'nextContinuationData',
+                    ),
+                    (
+                        'continuations',
+                        0,
+                        'nextContinuationData'
+                    )
+                ),
             ),
             'continuation_items': (
                 'continuationContents',
-                'horizontalListContinuation',
-                'items',
+                ('horizontalListContinuation', 'sectionListContinuation'),
+                (
+                    ('items',),
+                    (
+                        'contents',
+                        slice(None),
+                        'shelfRenderer',
+                        'content',
+                        ('horizontalListRenderer', 'verticalListRenderer'),
+                        'items',
+                    ),
+                ),
             ),
             'continuation_continuation': (
                 'continuationContents',
-                'horizontalListContinuation',
+                ('horizontalListContinuation', 'sectionListContinuation'),
                 'continuations',
                 0,
                 'nextContinuationData',
@@ -282,7 +312,11 @@ class YouTubeDataClient(YouTubeLoginClient):
                 ('horizontalListRenderer', 'verticalListRenderer'),
                 'items',
                 slice(None),
-                ('gridVideoRenderer', 'compactVideoRenderer'),
+                (
+                    'gridVideoRenderer',
+                    'compactVideoRenderer',
+                    'tileRenderer',
+                ),
                 # 'videoId',
             ),
             'continuation': (
@@ -307,7 +341,11 @@ class YouTubeDataClient(YouTubeLoginClient):
                 ('horizontalListRenderer', 'verticalListRenderer'),
                 'items',
                 slice(None),
-                ('gridVideoRenderer', 'compactVideoRenderer'),
+                (
+                    'gridVideoRenderer',
+                    'compactVideoRenderer',
+                    'tileRenderer',
+                ),
                 # 'videoId',
             ),
             'continuation_continuation': (
@@ -1686,7 +1724,7 @@ class YouTubeDataClient(YouTubeLoginClient):
                2,
                'shelfRenderer',
                'content',
-               'horizontalListRenderer',
+               ('horizontalListRenderer', 'verticalListRenderer'),
                'items',
             ) if retry == 2 else (
                 'contents',
