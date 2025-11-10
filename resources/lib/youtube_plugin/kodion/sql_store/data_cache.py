@@ -18,7 +18,7 @@ class DataCache(Storage):
     _table_updated = False
     _sql = {}
 
-    memory_store = {}
+    _memory_store = {}
 
     def __init__(self, filepath, max_file_size_mb=5):
         max_file_size_kb = max_file_size_mb * 1024
