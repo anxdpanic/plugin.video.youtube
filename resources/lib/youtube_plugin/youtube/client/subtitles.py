@@ -103,26 +103,33 @@ class Subtitles(YouTubeRequestClient):
 
         use_isa = not self.pre_download and use_mpd
         self.use_isa = use_isa
+        default_format = None
+        fallback_format = None
         if use_isa:
             if ('ttml' in stream_features
                     and context.inputstream_adaptive_capabilities('ttml')):
-                self.FORMATS['_default'] = 'ttml'
-                self.FORMATS['_fallback'] = 'ttml'
+                default_format = 'ttml'
+                fallback_format = 'ttml'
+
             if context.inputstream_adaptive_capabilities('vtt'):
                 if 'vtt' in stream_features:
-                    self.FORMATS.setdefault('_default', 'vtt')
-                    self.FORMATS['_fallback'] = 'vtt'
+                    default_format = default_format or 'vtt'
+                    fallback_format = 'vtt'
                 else:
-                    self.FORMATS.setdefault('_default', 'srt')
-                    self.FORMATS['_fallback'] = 'srt'
-        else:
+                    default_format = default_format or 'srt'
+                    fallback_format = 'srt'
+
+        if not default_format or not use_isa:
             if ('vtt' in stream_features
                     and context.get_system_version().compatible(20)):
-                self.FORMATS['_default'] = 'vtt'
-                self.FORMATS['_fallback'] = 'vtt'
+                default_format = 'vtt'
+                fallback_format = 'vtt'
             else:
-                self.FORMATS['_default'] = 'srt'
-                self.FORMATS['_fallback'] = 'srt'
+                default_format = 'srt'
+                fallback_format = 'srt'
+
+        self.FORMATS['_default'] = default_format
+        self.FORMATS['_fallback'] = fallback_format
 
         kodi_sub_lang = context.get_subtitle_language()
         plugin_lang = settings.get_language()
@@ -451,7 +458,6 @@ class Subtitles(YouTubeRequestClient):
 
         subtitle_url = self._set_query_param(
             base_url,
-            ('type', 'track'),
             ('fmt', sub_format),
             ('tlang', tlang),
             ('xosf', None),

@@ -10,9 +10,9 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import atexit
 import json
 import sys
+from atexit import register as atexit_register
 from timeit import default_timer
 from weakref import proxy
 
@@ -461,7 +461,7 @@ class XbmcContext(AbstractContext):
         self._ui = None
         self._playlist = None
 
-        atexit.register(self.tear_down)
+        atexit_register(self.tear_down)
 
     def init(self):
         num_args = len(sys.argv)
@@ -684,8 +684,9 @@ class XbmcContext(AbstractContext):
                 return result % _args
             except TypeError:
                 self.log.exception(('Localization error',
-                                    'text_id: {text_id!r}',
-                                    'args:    {original_args!r}'),
+                                    'String: {result!r} ({text_id!r})',
+                                    'args:   {original_args!r}'),
+                                   result=result,
                                    text_id=text_id,
                                    original_args=args)
         return result
@@ -743,13 +744,19 @@ class XbmcContext(AbstractContext):
             )
 
     if current_system_version.compatible(19):
-        def add_sort_method(self, sort_methods):
+        def add_sort_method(self,
+                            sort_methods,
+                            _add_sort_method=xbmcplugin.addSortMethod):
+            handle = self._plugin_handle
             for sort_method in sort_methods:
-                xbmcplugin.addSortMethod(self._plugin_handle, *sort_method)
+                _add_sort_method(handle, *sort_method)
     else:
-        def add_sort_method(self, sort_methods):
+        def add_sort_method(self,
+                            sort_methods,
+                            _add_sort_method=xbmcplugin.addSortMethod):
+            handle = self._plugin_handle
             for sort_method in sort_methods:
-                xbmcplugin.addSortMethod(self._plugin_handle, *sort_method[:2])
+                _add_sort_method(handle, *sort_method[:3:2])
 
     def clone(self, new_path=None, new_params=None):
         if not new_path:

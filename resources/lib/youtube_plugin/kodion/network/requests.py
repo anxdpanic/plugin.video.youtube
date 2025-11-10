@@ -9,8 +9,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import atexit
 import socket
+from atexit import register as atexit_register
 
 from requests import Request, Session
 from requests.adapters import HTTPAdapter, Retry
@@ -79,7 +79,7 @@ class BaseRequestsClass(object):
             allowed_methods=None,
         )
     ))
-    atexit.register(_session.close)
+    atexit_register(_session.close)
 
     _context = None
     _verify = True
@@ -390,27 +390,28 @@ class BaseRequestsClass(object):
                     raise raise_exc
                 raise exc
 
-        if cache:
-            if cached_response is not None:
-                self.log.debug(('Using cached response',
-                                'Request ID: {request_id}',
-                                'Etag:       {etag}',
-                                'Modified:   {timestamp}'),
-                               request_id=request_id,
-                               etag=etag,
-                               timestamp=timestamp,
-                               stacklevel=stacklevel)
-                cache.set(request_id)
-                response = cached_response
-            elif response is not None:
-                self.log.debug(('Saving response to cache',
-                                'Request ID: {request_id}',
-                                'Etag:       {etag}',
-                                'Modified:   {timestamp}'),
-                               request_id=request_id,
-                               etag=etag,
-                               timestamp=timestamp,
-                               stacklevel=stacklevel)
-                cache.set(request_id, response, etag)
+        if not cache:
+            pass
+        elif cached_response is not None:
+            self.log.debug(('Using cached response',
+                            'Request ID: {request_id}',
+                            'Etag:       {etag}',
+                            'Modified:   {timestamp}'),
+                           request_id=request_id,
+                           etag=etag,
+                           timestamp=timestamp,
+                           stacklevel=stacklevel)
+            cache.set(request_id)
+            response = cached_response
+        elif response is not None:
+            self.log.debug(('Saving response to cache',
+                            'Request ID: {request_id}',
+                            'Etag:       {etag}',
+                            'Modified:   {timestamp}'),
+                           request_id=request_id,
+                           etag=etag,
+                           timestamp=timestamp,
+                           stacklevel=stacklevel)
+            cache.set(request_id, response, etag)
 
         return response

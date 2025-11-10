@@ -72,9 +72,37 @@ class YouTubeLoginClient(YouTubeRequestClient):
     def reinit(self, **kwargs):
         super(YouTubeLoginClient, self).reinit(**kwargs)
 
+    @classmethod
+    def convert_access_tokens(cls,
+                              access_tokens=None,
+                              to_dict=False,
+                              to_list=False):
+        if access_tokens is None:
+            access_tokens = cls._access_tokens
+        if to_dict or isinstance(access_tokens, (list, tuple)):
+            access_tokens = {
+                cls.TOKEN_TYPES[token_idx]: token
+                for token_idx, token in enumerate(access_tokens)
+                if token and token_idx in cls.TOKEN_TYPES
+            }
+        elif to_list or isinstance(access_tokens, dict):
+            _access_tokens = [None, None, None, None]
+            for token_type, token in access_tokens.items():
+                token_idx = cls.TOKEN_TYPES.get(token_type)
+                if token_idx is None:
+                    continue
+                _access_tokens[token_idx] = token
+            access_tokens = _access_tokens
+        return access_tokens
+
     def set_access_token(self, access_tokens=None):
         existing_access_tokens = type(self)._access_tokens
         if access_tokens:
+            if isinstance(access_tokens, (list, tuple)):
+                access_tokens = self.convert_access_tokens(
+                    access_tokens,
+                    to_dict=True,
+                )
             token_status = 0
             for token_type, token in existing_access_tokens.items():
                 if token_type in access_tokens:

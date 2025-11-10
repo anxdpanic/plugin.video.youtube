@@ -399,7 +399,14 @@ class AbstractContext(object):
 
         command = 'command://' if command else ''
         if run:
-            return ''.join((command, 'RunPlugin(', uri, ')'))
+            return ''.join((command,
+                            'RunAddon('
+                            if run == 'addon' else
+                            'RunScript('
+                            if run == 'script' else
+                            'RunPlugin(',
+                            uri,
+                            ')'))
         if play is not None:
             return ''.join((
                 command,

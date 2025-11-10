@@ -18,6 +18,8 @@ class RequestCache(Storage):
     _table_updated = False
     _sql = {}
 
+    memory_store = {}
+
     def __init__(self, filepath, max_file_size_mb=20):
         max_file_size_kb = max_file_size_mb * 1024
         super(RequestCache, self).__init__(filepath,
@@ -36,8 +38,7 @@ class RequestCache(Storage):
             if timestamp:
                 self._update(request_id, item, timestamp)
             else:
-                self._set(request_id, item)
-                self._optimize_file_size()
+                self._set(request_id, item, defer=True)
         else:
             self._refresh(request_id, timestamp)
 

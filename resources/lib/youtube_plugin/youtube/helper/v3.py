@@ -120,15 +120,14 @@ def _process_list_response(provider,
         item_params = yt_item.get('_params') or {}
         item_params.update(new_params)
 
-        item_id = None
+        item_id = yt_item.get('id')
+        snippet = yt_item.get('snippet', {})
+
         video_id = None
         playlist_id = None
         channel_id = None
 
         if is_youtube:
-            item_id = yt_item.get('id')
-            snippet = yt_item.get('snippet', {})
-
             localised_info = snippet.get('localized') or {}
             title = (localised_info.get('title')
                      or snippet.get('title')

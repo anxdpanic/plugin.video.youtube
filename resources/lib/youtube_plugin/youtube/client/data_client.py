@@ -89,23 +89,33 @@ class YouTubeDataClient(YouTubeLoginClient):
                 'tvSurfaceContentRenderer',
                 'content',
                 'sectionListRenderer',
-                'contents',
-                0,
-                'shelfRenderer',
-                'content',
-                'horizontalListRenderer',
-                'continuations',
-                0,
-                'nextContinuationData',
+                (
+                    (
+                        'contents',
+                        slice(None),
+                        None,
+                        'shelfRenderer',
+                        'content',
+                        ('horizontalListRenderer', 'verticalListRenderer'),
+                        'continuations',
+                        0,
+                        'nextContinuationData',
+                    ),
+                    (
+                        'continuations',
+                        0,
+                        'nextContinuationData'
+                    )
+                ),
             ),
             'continuation_items': (
                 'continuationContents',
-                'horizontalListContinuation',
+                ('horizontalListContinuation', 'sectionListContinuation'),
                 'items',
             ),
             'continuation_continuation': (
                 'continuationContents',
-                'horizontalListContinuation',
+                ('horizontalListContinuation', 'sectionListContinuation'),
                 'continuations',
                 0,
                 'nextContinuationData',
@@ -200,7 +210,7 @@ class YouTubeDataClient(YouTubeLoginClient):
                 slice(None),
                 'shelfRenderer',
                 'content',
-                'horizontalListRenderer',
+                ('horizontalListRenderer', 'verticalListRenderer'),
                 'items',
             ),
             'item_id': (
@@ -244,23 +254,43 @@ class YouTubeDataClient(YouTubeLoginClient):
                 'tvSurfaceContentRenderer',
                 'content',
                 'sectionListRenderer',
-                'contents',
-                0,
-                'shelfRenderer',
-                'content',
-                'horizontalListRenderer',
-                'continuations',
-                0,
-                'nextContinuationData',
+                (
+                    (
+                        'contents',
+                        slice(None),
+                        None,
+                        'shelfRenderer',
+                        'content',
+                        ('horizontalListRenderer', 'verticalListRenderer'),
+                        'continuations',
+                        0,
+                        'nextContinuationData',
+                    ),
+                    (
+                        'continuations',
+                        0,
+                        'nextContinuationData'
+                    )
+                ),
             ),
             'continuation_items': (
                 'continuationContents',
-                'horizontalListContinuation',
-                'items',
+                ('horizontalListContinuation', 'sectionListContinuation'),
+                (
+                    ('items',),
+                    (
+                        'contents',
+                        slice(None),
+                        'shelfRenderer',
+                        'content',
+                        ('horizontalListRenderer', 'verticalListRenderer'),
+                        'items',
+                    ),
+                ),
             ),
             'continuation_continuation': (
                 'continuationContents',
-                'horizontalListContinuation',
+                ('horizontalListContinuation', 'sectionListContinuation'),
                 'continuations',
                 0,
                 'nextContinuationData',
@@ -282,7 +312,11 @@ class YouTubeDataClient(YouTubeLoginClient):
                 ('horizontalListRenderer', 'verticalListRenderer'),
                 'items',
                 slice(None),
-                ('gridVideoRenderer', 'compactVideoRenderer'),
+                (
+                    'gridVideoRenderer',
+                    'compactVideoRenderer',
+                    'tileRenderer',
+                ),
                 # 'videoId',
             ),
             'continuation': (
@@ -307,7 +341,11 @@ class YouTubeDataClient(YouTubeLoginClient):
                 ('horizontalListRenderer', 'verticalListRenderer'),
                 'items',
                 slice(None),
-                ('gridVideoRenderer', 'compactVideoRenderer'),
+                (
+                    'gridVideoRenderer',
+                    'compactVideoRenderer',
+                    'tileRenderer',
+                ),
                 # 'videoId',
             ),
             'continuation_continuation': (
@@ -1686,7 +1724,7 @@ class YouTubeDataClient(YouTubeLoginClient):
                2,
                'shelfRenderer',
                'content',
-               'horizontalListRenderer',
+               ('horizontalListRenderer', 'verticalListRenderer'),
                'items',
             ) if retry == 2 else (
                 'contents',
@@ -2956,22 +2994,34 @@ class YouTubeDataClient(YouTubeLoginClient):
         message = strip_html_from_text(details.get('message', 'Unknown error'))
 
         if getattr(exc, 'notify', True):
+            context = self._context
             ok_dialog = False
             if reason in {'accessNotConfigured', 'forbidden'}:
-                notification = self._context.localize('key.requirement')
+                notification = context.localize('key.requirement')
                 ok_dialog = True
             elif reason == 'keyInvalid' and message == 'Bad Request':
-                notification = self._context.localize('api.key.incorrect')
+                notification = context.localize('api.key.incorrect')
             elif reason in {'quotaExceeded', 'dailyLimitExceeded'}:
+                notification = message
+            elif reason == 'authError':
+                auth_type = kwargs.get('_auth_type')
+                if auth_type:
+                    if auth_type in self._access_tokens:
+                        self._access_tokens[auth_type] = None
+                    self.set_access_token(self._access_tokens)
+                    context.get_access_manager().update_access_token(
+                        context.get_param('addon_id'),
+                        access_token=self.convert_access_tokens(to_list=True),
+                    )
                 notification = message
             else:
                 notification = message
 
-            title = ': '.join((self._context.get_name(), reason))
+            title = ': '.join((context.get_name(), reason))
             if ok_dialog:
-                self._context.get_ui().on_ok(title, notification)
+                context.get_ui().on_ok(title, notification)
             else:
-                self._context.get_ui().show_notification(notification, title)
+                context.get_ui().show_notification(notification, title)
 
         info = (
             'Reason:   {error_reason}',

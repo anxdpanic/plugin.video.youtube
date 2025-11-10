@@ -313,14 +313,7 @@ class Provider(AbstractProvider):
                         access_token='',
                         refresh_token=refresh_token,
                     )
-
-            client.set_access_token({
-                client.TOKEN_TYPES[idx]: token
-                for idx, token in enumerate(access_tokens)
-                if token
-
-            })
-
+            client.set_access_token(access_tokens)
         return client
 
     def get_resource_manager(self, context, progress_dialog=None):
