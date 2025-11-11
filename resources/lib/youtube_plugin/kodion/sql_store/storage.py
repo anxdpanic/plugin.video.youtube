@@ -185,6 +185,11 @@ class Storage(object):
             '  ) <= {{0}}'
             ' );'
         ),
+        'prune_invalid': (
+            'DELETE'
+            ' FROM {table}'
+            ' WHERE key IS NULL;'
+        ),
         'refresh': (
             'UPDATE'
             ' {table}'
@@ -402,6 +407,7 @@ class Storage(object):
             elif self._close_actions:
                 queries = (
                     'BEGIN IMMEDIATE;',
+                    self._sql['prune_invalid'],
                     self._set_many(items=None, defer=True, flush=True),
                     self._optimize_item_count(defer=True),
                     self._optimize_file_size(defer=True),
@@ -412,6 +418,7 @@ class Storage(object):
             else:
                 queries = (
                     'BEGIN IMMEDIATE;',
+                    self._sql['prune_invalid'],
                     'COMMIT;',
                     'VACUUM;',
                     'PRAGMA optimize;',
