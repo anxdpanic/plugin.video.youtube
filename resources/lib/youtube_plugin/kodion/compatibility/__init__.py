@@ -15,8 +15,6 @@ __all__ = (
     'available_cpu_count',
     'byte_string_type',
     'datetime_infolabel',
-    'default_quote',
-    'default_quote_plus',
     'entity_escape',
     'generate_hash',
     'parse_qs',
@@ -120,70 +118,6 @@ try:
         for ordinal in range(128, 256)
     })
 
-
-    def default_quote(string,
-                      safe='',
-                      encoding=None,
-                      errors=None,
-                      _encoding='utf-8',
-                      _errors='strict',
-                      _reserved=reserved,
-                      _non_ascii=non_ascii,
-                      _encode=str.encode,
-                      _is_ascii=str.isascii,
-                      _replace=str.replace,
-                      _old='\\x',
-                      _new='%',
-                      _slice=slice(2, -1),
-                      _str=str,
-                      _translate=str.translate):
-        _string = _translate(string, _reserved)
-        if _is_ascii(_string):
-            return _string
-        _string = _str(_encode(_string, _encoding, _errors))[_slice]
-        if _string == string:
-            if _is_ascii(_string):
-                return _string
-            return _translate(_string, _non_ascii)
-        if _is_ascii(_string):
-            return _replace(_string, _old, _new)
-        return _translate(_replace(_string, _old, _new), _non_ascii)
-
-
-    def default_quote_plus(string,
-                           safe='',
-                           encoding=None,
-                           errors=None,
-                           _encoding='utf-8',
-                           _errors='strict',
-                           _reserved=reserved_plus,
-                           _non_ascii=non_ascii,
-                           _encode=str.encode,
-                           _is_ascii=str.isascii,
-                           _replace=str.replace,
-                           _old='\\x',
-                           _new='%',
-                           _slice=slice(2, -1),
-                           _str=str,
-                           _translate=str.translate):
-        if (not safe and encoding is None and errors is None
-                and isinstance(string, str)):
-            _string = _translate(string, _reserved)
-            if _is_ascii(_string):
-                return _string
-            _string = _str(_encode(_string, _encoding, _errors))[_slice]
-            if _string == string:
-                if _is_ascii(_string):
-                    return _string
-                return _translate(_string, _non_ascii)
-            if _is_ascii(_string):
-                return _replace(_string, _old, _new)
-            return _translate(_replace(_string, _old, _new), _non_ascii)
-        return quote_plus(string, safe, encoding, errors)
-
-
-    urlencode.__defaults__ = (False, '', None, None, default_quote_plus)
-
 # Compatibility shims for Kodi v18 and Python v2.7
 except ImportError:
     import cPickle as pickle
@@ -220,14 +154,8 @@ except ImportError:
         return _quote(to_str(data), *args, **kwargs)
 
 
-    default_quote = quote
-
-
     def quote_plus(data, *args, **kwargs):
         return _quote_plus(to_str(data), *args, **kwargs)
-
-
-    default_quote_plus = quote_plus
 
 
     def unquote(data):

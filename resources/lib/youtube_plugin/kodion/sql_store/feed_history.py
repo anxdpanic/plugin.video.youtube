@@ -17,6 +17,8 @@ class FeedHistory(Storage):
     _table_updated = False
     _sql = {}
 
+    _memory_store = {}
+
     def __init__(self, filepath):
         super(FeedHistory, self).__init__(filepath)
 
@@ -32,7 +34,7 @@ class FeedHistory(Storage):
         return result
 
     def set_items(self, items):
-        self._set_many(items)
+        self._set_many(items, defer=True)
 
     def _optimize_item_count(self, limit=-1, defer=False):
         return False

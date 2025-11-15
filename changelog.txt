@@ -1,3 +1,8 @@
+## v7.3.0+beta.10
+### Fixed
+- Prune invalid entries from DB when closing connection #1331
+- Fix regressions with SQLite db operations #1331
+
 ## v7.3.0+beta.9
 ### Fixed
 - Disable label masks being used in Kodi 18 #1327

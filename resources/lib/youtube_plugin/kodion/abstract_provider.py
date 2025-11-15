@@ -375,7 +375,7 @@ class AbstractProvider(object):
                 self.log.warning('Multiple busy dialogs active'
                                  ' - Rerouting workaround')
                 return UriItem('command://{0}'.format(action))
-            context.sleep(1)
+            context.sleep(0.1)
         else:
             context.execute(
                 action,

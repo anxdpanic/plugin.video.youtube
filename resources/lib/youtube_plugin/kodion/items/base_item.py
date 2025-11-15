@@ -348,12 +348,15 @@ class _Encoder(json.JSONEncoder):
     def encode(self, obj, nested=False):
         if isinstance(obj, (date, datetime)):
             class_name = obj.__class__.__name__
-            if 'fromisoformat' in dir(obj):
-                obj = {
-                    '__class__': class_name,
-                    '__isoformat__': obj.isoformat(),
-                }
-            else:
+            try:
+                if obj.fromisoformat:
+                    obj = {
+                        '__class__': class_name,
+                        '__isoformat__': obj.isoformat(),
+                    }
+                else:
+                    raise AttributeError
+            except AttributeError:
                 if class_name == 'datetime':
                     if obj.tzinfo:
                         format_string = '%Y-%m-%dT%H:%M:%S%z'
