@@ -872,8 +872,8 @@ msgid "Delete access_manager.json"
 msgstr "Poista \"access_manager.json\" -tiedosto"
 
 msgctxt "#30643"
-msgid "Listen on IP"
-msgstr "Kuunneltava IP-osoite"
+msgid ""
+msgstr ""
 
 msgctxt "#30644"
 msgid "Select listen IP"
@@ -1582,6 +1582,10 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30643"
+#~ msgid "Listen on IP"
+#~ msgstr "Kuunneltava IP-osoite"
 
 #~ msgctxt "#30808"
 #~ msgid "Hide videos from listings"

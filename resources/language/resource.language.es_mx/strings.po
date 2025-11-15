@@ -872,8 +872,8 @@ msgid "Delete access_manager.json"
 msgstr "Eliminar access_manager.json"
 
 msgctxt "#30643"
-msgid "Listen on IP"
-msgstr "Escuchando en IP"
+msgid ""
+msgstr ""
 
 msgctxt "#30644"
 msgid "Select listen IP"
@@ -1582,6 +1582,10 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30643"
+#~ msgid "Listen on IP"
+#~ msgstr "Escuchando en IP"
 
 # empty strings 30019
 #~ msgctxt "#30020"

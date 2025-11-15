@@ -873,8 +873,8 @@ msgid "Delete access_manager.json"
 msgstr "Verwijder access_manager.json"
 
 msgctxt "#30643"
-msgid "Listen on IP"
-msgstr "Luister op IP"
+msgid ""
+msgstr ""
 
 msgctxt "#30644"
 msgid "Select listen IP"
@@ -1583,6 +1583,10 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30643"
+#~ msgid "Listen on IP"
+#~ msgstr "Luister op IP"
 
 # empty strings 30019
 #~ msgctxt "#30020"
