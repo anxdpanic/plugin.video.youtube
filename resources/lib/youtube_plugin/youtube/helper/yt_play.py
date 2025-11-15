@@ -481,7 +481,7 @@ def process_items_for_playlist(context,
                 command = playlist_player.play_playlist_item(position,
                                                              defer=True)
                 return UriItem(command)
-            context.sleep(1)
+            context.sleep(0.1)
         else:
             playlist_player.play_playlist_item(position)
     return items[position - 1]

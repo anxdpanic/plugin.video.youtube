@@ -439,7 +439,7 @@ class XbmcPlugin(AbstractPlugin):
     @staticmethod
     def post_run(context, ui, *actions, **kwargs):
         timeout = kwargs.get('timeout', 30)
-        interval = kwargs.get('interval', 0.1)
+        interval = kwargs.get('interval', 0.01)
         for action in actions:
             while not ui.get_container(container_type=None, check_ready=True):
                 timeout -= interval
