@@ -18,7 +18,7 @@ from cProfile import Profile
 from functools import wraps
 from inspect import getargvalues
 from os.path import normpath
-from pstats import Stats
+import pstats
 from traceback import extract_stack, format_list
 from weakref import ref
 
@@ -99,7 +99,6 @@ class Profiler(object):
         '_print_callees',
         '_profiler',
         '_reuse',
-        '_sort_by',
         '_timer',
     )
 
@@ -121,14 +120,12 @@ class Profiler(object):
                  num_lines=20,
                  print_callees=False,
                  reuse=False,
-                 sort_by=('cumulative', 'time'),
                  timer=None):
         self._enabled = enabled
         self._num_lines = num_lines
         self._print_callees = print_callees
         self._profiler = None
         self._reuse = reuse
-        self._sort_by = sort_by
         self._timer = timer
 
         if enabled and not lazy:
@@ -205,8 +202,7 @@ class Profiler(object):
                   flush=True,
                   num_lines=20,
                   print_callees=False,
-                  reuse=False,
-                  sort_by=('cumulative', 'time')):
+                  reuse=False):
         if not (self._enabled and self._profiler):
             return None
 
@@ -218,10 +214,14 @@ class Profiler(object):
                 self._profiler,
                 stream=output_stream
             )
-            stats.strip_dirs().sort_stats(*sort_by)
+            stats.strip_dirs()
             if print_callees:
+                stats.sort_stats('cumulative')
                 stats.print_callees(num_lines)
             else:
+                stats.sort_stats('cumpercall')
+                stats.print_stats(num_lines)
+                stats.sort_stats('totalpercall')
                 stats.print_stats(num_lines)
             output = output_stream.getvalue()
         # Occurs when no stats were able to be generated from profiler
@@ -242,12 +242,87 @@ class Profiler(object):
                           num_lines=self._num_lines,
                           print_callees=self._print_callees,
                           reuse=self._reuse,
-                          sort_by=self._sort_by,
                       ),
                       stacklevel=3)
 
     def tear_down(self):
         self.__class__._instances.discard(self)
+
+
+class Stats(pstats.Stats):
+    """
+    Custom Stats class that adds functionality to sort by
+      - Cumulative time per call ("cumpercall")
+      - Total time per call ("totalpercall")
+    Code by alexnvdias from https://bugs.python.org/issue18795
+    """
+
+    sort_arg_dict_default = {
+        "calls"       : (((1,-1),              ), "call count"),
+        "ncalls"      : (((1,-1),              ), "call count"),
+        "cumtime"     : (((4,-1),              ), "cumulative time"),
+        "cumulative"  : (((4,-1),              ), "cumulative time"),
+        "filename"    : (((6, 1),              ), "file name"),
+        "line"        : (((7, 1),              ), "line number"),
+        "module"      : (((6, 1),              ), "file name"),
+        "name"        : (((8, 1),              ), "function name"),
+        "nfl"         : (((8, 1),(6, 1),(7, 1),), "name/file/line"),
+        "pcalls"      : (((0,-1),              ), "primitive call count"),
+        "stdname"     : (((9, 1),              ), "standard name"),
+        "time"        : (((2,-1),              ), "internal time"),
+        "tottime"     : (((2,-1),              ), "internal time"),
+        "cumpercall"  : (((5,-1),              ), "cumulative time per call"),
+        "totalpercall": (((3,-1),              ), "total time per call"),
+    }
+
+    def sort_stats(self, *field):
+        if not field:
+            self.fcn_list = 0
+            return self
+        if len(field) == 1 and isinstance(field[0], int):
+            # Be compatible with old profiler
+            field = [{-1: "stdname",
+                      0: "calls",
+                      1: "time",
+                      2: "cumulative"}[field[0]]]
+        elif len(field) >= 2:
+            for arg in field[1:]:
+                if type(arg) != type(field[0]):
+                    raise TypeError("Can't have mixed argument type")
+
+        sort_arg_defs = self.get_sort_arg_defs()
+
+        sort_tuple = ()
+        self.sort_type = ""
+        connector = ""
+        for word in field:
+            if isinstance(word, pstats.SortKey):
+                word = word.value
+            sort_tuple = sort_tuple + sort_arg_defs[word][0]
+            self.sort_type += connector + sort_arg_defs[word][1]
+            connector = ", "
+
+        stats_list = []
+        for func, (cc, nc, tt, ct, callers) in self.stats.items():
+            if nc == 0:
+                npc = 0
+            else:
+                npc = float(tt) / nc
+
+            if cc == 0:
+                cpc = 0
+            else:
+                cpc = float(ct) / cc
+
+            stats_list.append((cc, nc, tt, npc, ct, cpc) + func +
+                              (pstats.func_std_string(func), func))
+
+        stats_list.sort(key=pstats.cmp_to_key(pstats.TupleComp(sort_tuple).compare))
+
+        self.fcn_list = fcn_list = []
+        for tuple in stats_list:
+            fcn_list.append(tuple[-1])
+        return self
 
 
 class ExecTimeout(object):
