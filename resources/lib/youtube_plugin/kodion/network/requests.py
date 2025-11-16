@@ -317,6 +317,8 @@ class BaseRequestsClass(object):
                 hooks=hooks,
             ))
 
+        if stream:
+            cache = False
         if cache is not False:
             if prepared_request:
                 method = prepared_request.method
