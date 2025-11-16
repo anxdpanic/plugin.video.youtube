@@ -16,7 +16,11 @@ from functools import partial
 from itertools import chain, islice
 from random import randint
 from re import compile as re_compile
-from xml.etree.ElementTree import Element as ET_Element, XML as ET_XML
+from xml.etree.ElementTree import (
+    Element as ET_Element,
+    XML as ET_XML,
+    XMLPullParser as ET_XMLPullParser,
+)
 
 from .login_client import YouTubeLoginClient
 from ..helper.utils import channel_filter_split
@@ -2403,7 +2407,9 @@ class YouTubeDataClient(YouTubeLoginClient):
                       channel_id=None,
                       playlist_id=None,
                       feed_type=feed_type,
-                      headers=headers):
+                      headers=headers,
+                      stream=True,
+                      cache=False):
             if channel_id:
                 item_id = channel_id.replace(
                     'UC',
@@ -2422,6 +2428,8 @@ class YouTubeDataClient(YouTubeLoginClient):
                          '/feeds/videos.xml?playlist_id=',
                          item_id)),
                 headers=headers,
+                stream=stream,
+                cache=cache,
             )
             if response is None:
                 return False, True
@@ -2430,9 +2438,16 @@ class YouTubeDataClient(YouTubeLoginClient):
                     content = None
                 elif response.status_code == 429:
                     return False, True
+                elif stream:
+                    parser = ET_XMLPullParser(('start',))
+                    for chunk in response.iter_content(chunk_size=(8 * 1024)):
+                        if chunk:
+                            parser.feed(chunk)
+
+                    _, content = next(parser.read_events())
                 else:
                     response.encoding = 'utf-8'
-                    content = response.content
+                    content = ET_XML(response.content)
 
             _output = {
                 'channel_id': channel_id,
@@ -2471,6 +2486,7 @@ class YouTubeDataClient(YouTubeLoginClient):
             dict_get = {}.get
             find = ET_Element.find
             findtext = ET_Element.findtext
+            iterfind = ET_Element.iterfind
 
             all_items = {}
             new_cache = {}
@@ -2479,10 +2495,9 @@ class YouTubeDataClient(YouTubeLoginClient):
                 channel_name = feed.get('channel_name')
                 cached_items = feed.get('cached_items')
                 refresh_feed = feed.get('refresh')
-                content = feed.get('content')
+                root = feed.get('content')
 
-                if refresh_feed and content:
-                    root = ET_XML(content)
+                if refresh_feed and root is not None:
                     channel_name = findtext(
                         root,
                         'atom:author/atom:name',
@@ -2532,7 +2547,7 @@ class YouTubeDataClient(YouTubeLoginClient):
                             ), 'get', dict_get)('views', 0),
                         },
                         '_partial': True,
-                    } for item in root.findall('atom:entry', ns)]
+                    } for item in iterfind(root, 'atom:entry', ns)]
                 else:
                     feed_items = []
 
