@@ -2758,38 +2758,49 @@ class YouTubeDataClient(YouTubeLoginClient):
                     del _params['pageToken']
                 return True, True
 
-            # playlist_params = {
-            #     'part': 'snippet',
-            #     'maxResults': 50,
-            #     'order': 'alphabetical',
-            #     'mine': True,
-            # }
-            #
-            # def _get_playlists(output,
-            #                    _params=playlist_params,
-            #                    _refresh=refresh,
-            #                    _force_cache=force_cache,
-            #                    function_cache=function_cache):
-            #     json_data = function_cache.run(
-            #         self.get_saved_playlists,
-            #         function_cache.ONE_HOUR
-            #         if _force_cache or 'pageToken' in _params else
-            #         5 * function_cache.ONE_MINUTE,
-            #         _refresh=_refresh,
-            #         **kwargs
-            #     )
-            #     if not json_data:
-            #         return False, True
-            #
-            #     output['playlist_ids'].extend([{
-            #         'playlist_id': item['snippet']['resourceId']['playlistId']
-            #     } for item in json_data.get('items', [])])
-            #
-            #     subs_page_token = json_data.get('nextPageToken')
-            #     if subs_page_token:
-            #         _params['pageToken'] = subs_page_token
-            #         return True, False
-            #     return True, True
+            playlist_params = {
+                'part': 'snippet',
+                'maxResults': 50,
+                'order': 'alphabetical',
+                'mine': True,
+            }
+
+            def _get_playlists(output,
+                               _params=playlist_params,
+                               _refresh=refresh,
+                               _force_cache=force_cache,
+                               function_cache=function_cache):
+                own_channel = self.channel_id
+                if own_channel:
+                    own_channel = (own_channel,)
+
+                json_data = function_cache.run(
+                    self.get_browse_items,
+                    function_cache.ONE_HOUR
+                    if _force_cache or 'pageToken' in _params else
+                    5 * function_cache.ONE_MINUTE,
+                    _refresh=_refresh,
+                    browse_id='FEplaylist_aggregation',
+                    client='tv',
+                    skip_ids=own_channel,
+                    response_type='playlists',
+                    do_auth=True,
+                    json_path=self.JSON_PATHS['tv_grid'],
+                    **kwargs
+                )
+                if not json_data:
+                    return False, True
+
+                output['playlist_ids'].extend([
+                    item['id']
+                    for item in json_data.get('items', [])
+                ])
+
+                subs_page_token = json_data.get('nextPageToken')
+                if subs_page_token:
+                    _params['pageToken'] = subs_page_token
+                    return True, False
+                return True, True
 
             payloads[1] = {
                 'worker': _get_channels,
@@ -2801,15 +2812,16 @@ class YouTubeDataClient(YouTubeLoginClient):
                 'check_inputs': False,
                 'inputs_to_check': None,
             }
-            # payloads[2] = {
-            #     'worker': _get_playlists,
-            #     'kwargs': True,
-            #     'output': threaded_output,
-            #     'threads': threads,
-            #     'limit': 1,
-            #     'check_inputs': False,
-            #     'inputs_to_check': None,
-            # }
+            payloads[2] = {
+                'worker': _get_playlists,
+                'kwargs': True,
+                'do_batch': False,
+                'output': threaded_output,
+                'threads': threads,
+                'limit': 1,
+                'check_inputs': False,
+                'inputs_to_check': None,
+            }
         payloads[3] = {
             'worker': partial(_get_cached_feed, item_type='channel_id'),
             'kwargs': threaded_output['channel_ids'],
@@ -2827,10 +2839,8 @@ class YouTubeDataClient(YouTubeLoginClient):
             'output': threaded_output,
             'threads': threads,
             'limit': None,
-            # 'check_inputs': threading.Event(),
-            # 'inputs_to_check': {2},
-            'check_inputs': False,
-            'inputs_to_check': None,
+            'check_inputs': threading.Event(),
+            'inputs_to_check': {2},
         }
         payloads[5] = {
             'worker': _get_feed,
