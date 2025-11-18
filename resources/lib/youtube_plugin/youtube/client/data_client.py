@@ -2908,6 +2908,7 @@ class YouTubeDataClient(YouTubeLoginClient):
             elif available <= 0:
                 continue
 
+            counter.acquire(True)
             new_thread = threading.Thread(
                 target=_threaded_fetch,
                 kwargs=payload,
@@ -2915,7 +2916,6 @@ class YouTubeDataClient(YouTubeLoginClient):
             new_thread.daemon = True
             counts[pool_id] += 1
             counts['all'] += 1
-            counter.acquire(True)
             new_thread.start()
 
         items = _parse_feeds(
