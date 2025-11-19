@@ -2783,7 +2783,7 @@ class YouTubePlayerClient(YouTubeDataClient):
                     # + ''.join([''.join([
                     # '\t\t\t\t<BaseURL>', entity_escape(url), '</BaseURL>\n',
                     # ]) for url in stream['baseUrl'] if url]) +
-                    '\t\t\t\t<SegmentBase indexRange="{indexRange}">\n'
+                    '\t\t\t\t<SegmentBase indexRange="{indexRange}" timescale="1000">\n'
                     '\t\t\t\t\t<Initialization range="{initRange}"/>\n'
                     '\t\t\t\t</SegmentBase>\n'
                     '\t\t\t</Representation>\n'
