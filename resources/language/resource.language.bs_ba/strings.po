@@ -872,8 +872,8 @@ msgid "Delete access_manager.json"
 msgstr "Obriši datoteku access_manager.json"
 
 msgctxt "#30643"
-msgid "Listen on IP"
-msgstr "Slušajte putem IP-a"
+msgid ""
+msgstr ""
 
 msgctxt "#30644"
 msgid "Select listen IP"
@@ -1582,6 +1582,10 @@ msgstr "Reproduciraj od početka"
 msgctxt "#30820"
 msgid "Podcast"
 msgstr "Podcast"
+
+#~ msgctxt "#30643"
+#~ msgid "Listen on IP"
+#~ msgstr "Slušajte putem IP-a"
 
 #~ msgctxt "#30547"
 #~ msgid "You may be prompted to enable two applications so that YouTube is functioning properly."
