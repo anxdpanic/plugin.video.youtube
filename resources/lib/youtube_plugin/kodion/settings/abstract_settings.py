@@ -682,20 +682,24 @@ class AbstractSettings(object):
 
     def subscriptions_filter_enabled(self, value=None):
         if value is not None:
-            return self.set_bool(SETTINGS.SUBSCRIPTIONS_FILTER_ENABLED, value)
-        return self.get_bool(SETTINGS.SUBSCRIPTIONS_FILTER_ENABLED, True)
+            return self.set_bool(
+                SETTINGS.MY_SUBSCRIPTIONS_FILTER_ENABLED, value
+            )
+        return self.get_bool(SETTINGS.MY_SUBSCRIPTIONS_FILTER_ENABLED, True)
 
     def subscriptions_filter_blacklist(self, value=None):
         if value is not None:
-            return self.set_bool(SETTINGS.SUBSCRIPTIONS_FILTER_BLACKLIST, value)
-        return self.get_bool(SETTINGS.SUBSCRIPTIONS_FILTER_BLACKLIST, True)
+            return self.set_bool(
+                SETTINGS.MY_SUBSCRIPTIONS_FILTER_BLACKLIST, value
+            )
+        return self.get_bool(SETTINGS.MY_SUBSCRIPTIONS_FILTER_BLACKLIST, True)
 
     def subscriptions_filter(self, value=None):
         if value is not None:
             if isinstance(value, (list, tuple, set)):
                 value = ','.join(value).lstrip(',')
-            return self.set_string(SETTINGS.SUBSCRIPTIONS_FILTER_LIST, value)
-        return self.get_string(SETTINGS.SUBSCRIPTIONS_FILTER_LIST).replace(
+            return self.set_string(SETTINGS.MY_SUBSCRIPTIONS_FILTER_LIST, value)
+        return self.get_string(SETTINGS.MY_SUBSCRIPTIONS_FILTER_LIST).replace(
             ', ', ','
         )
 
