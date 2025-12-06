@@ -809,6 +809,15 @@ def update_video_items(provider, context, video_id_dict,
         elif upload_status == 'uploaded' and not duration:
             media_item.live = True
 
+        if 'player' in yt_item:
+            player = yt_item['player']
+            height = player.get('embedHeight')
+            width = player.get('embedWidth')
+            if height and width:
+                height = int(height)
+                width = int(width)
+                media_item.set_aspect_ratio(width / height)
+
         if 'liveStreamingDetails' in yt_item:
             streaming_details = yt_item['liveStreamingDetails']
             if 'actualStartTime' in streaming_details:

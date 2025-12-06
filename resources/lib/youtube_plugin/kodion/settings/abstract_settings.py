@@ -574,6 +574,12 @@ class AbstractSettings(object):
                                            reverse=True)
                 if value >= key]
 
+    def max_video_height(self):
+        if self.use_mpd_videos():
+            qualities = self.mpd_video_qualities()
+            return qualities[0]['nom_height']
+        return self.fixed_video_quality()
+
     def stream_features(self, value=None):
         if value is not None:
             return self.set_string_list(SETTINGS.MPD_STREAM_FEATURES, value)

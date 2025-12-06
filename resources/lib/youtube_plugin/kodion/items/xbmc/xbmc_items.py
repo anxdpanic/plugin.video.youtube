@@ -42,9 +42,9 @@ from ...utils.system_version import current_system_version
 
 
 def set_info(list_item, item, properties, set_play_count=True, resume=True):
+    stream_details = {}
     if not current_system_version.compatible(20):
         info_labels = {}
-        info_type = None
 
         if isinstance(item, MediaItem):
             if isinstance(item, VideoItem):
@@ -57,6 +57,10 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
                 value = item.get_season()
                 if value is not None:
                     info_labels['season'] = value
+
+                value = item.get_aspect_ratio()
+                if value is not None:
+                    stream_details['aspect'] = value
 
             elif isinstance(item, AudioItem):
                 info_type = 'music'
@@ -117,7 +121,7 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
             if duration > 0:
                 properties['TotalTime'] = str(duration)
                 if info_type == 'video':
-                    list_item.addStreamInfo(info_type, {'duration': duration})
+                    stream_details['duration'] = duration
                 info_labels['duration'] = duration
 
         elif isinstance(item, DirectoryItem):
@@ -177,8 +181,11 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
         if properties:
             list_item.setProperties(properties)
 
-        if info_labels and info_type:
-            list_item.setInfo(info_type, info_labels)
+        if info_type:
+            if info_labels:
+                list_item.setInfo(info_type, info_labels)
+            if stream_details:
+                list_item.addStreamInfo(info_type, stream_details)
         return
 
     if isinstance(item, MediaItem):
@@ -228,6 +235,15 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
             # value = item.get_imdb_id()
             # if value is not None:
             #     info_tag.setIMDBNumber(value)
+
+            # video width x height is not accurate, use aspect ratio only
+            # value = item.get_stream_details()
+            # if value is not None:
+            #     stream_details = value
+
+            value = item.get_aspect_ratio()
+            if value is not None:
+                stream_details['aspect'] = value
 
         elif isinstance(item, AudioItem):
             info_tag = list_item.getMusicInfoTag()
@@ -316,9 +332,7 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
                 else:
                     info_tag.setResumePoint(resume_time)
             if duration > 0:
-                info_tag.addVideoStream(xbmc.VideoStreamDetail(
-                    duration=duration,
-                ))
+                stream_details['duration'] = duration
         elif info_type == 'music':
             # These properties are deprecated but there is no other way to set
             # these details for a ListItem with a MusicInfoTag
@@ -408,6 +422,9 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
 
     if properties:
         list_item.setProperties(properties)
+
+    if stream_details:
+        info_tag.addVideoStream(xbmc.VideoStreamDetail(**stream_details))
 
 
 def playback_item(context, media_item, show_fanart=None, **_kwargs):

@@ -1316,6 +1316,7 @@ class YouTubeDataClient(YouTubeLoginClient):
                    video_id,
                    live_details=False,
                    max_results=None,
+                   _part='snippet,contentDetails,player,status,statistics',
                    **kwargs):
         """
         Returns a list of videos that match the API request parameters
@@ -1325,12 +1326,9 @@ class YouTubeDataClient(YouTubeLoginClient):
                             in the result set, from 0 to 50, inclusive
         :return:
         """
+
         params = {
-            'part': (
-                'snippet,contentDetails,status,statistics,liveStreamingDetails'
-                if live_details else
-                'snippet,contentDetails,status,statistics'
-            ),
+            'part': _part + ',liveStreamingDetails' if live_details else _part,
             'id': (
                 video_id
                 if isinstance(video_id, string_type) else
@@ -1341,6 +1339,7 @@ class YouTubeDataClient(YouTubeLoginClient):
                 if max_results is None else
                 max_results
             ),
+            'maxHeight': self._context.get_settings().max_video_height(),
         }
         return self.api_request(method='GET', path='videos',
                                 params=params,
