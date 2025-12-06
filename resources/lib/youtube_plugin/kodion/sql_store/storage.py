@@ -61,6 +61,18 @@ class StorageLock(object):
         return self._num_waiting > 0
 
 
+class ExistingDBConnection(object):
+    def __init__(self, db):
+        self._db = db
+
+    def __enter__(self):
+        db = self._db
+        return db, db.cursor() if db else None
+
+    def __exit__(self, *excinfo):
+        pass
+
+
 class Storage(object):
     log = logging.getLogger(__name__)
 
@@ -399,18 +411,22 @@ class Storage(object):
                 queries = (
                     'BEGIN IMMEDIATE;',
                     self._set_many(items=None, defer=True, flush=True),
+                    'COMMIT;',
+                    'BEGIN IMMEDIATE;',
                     self._optimize_item_count(defer=True),
-                    self._optimize_file_size(defer=True),
+                    self._optimize_file_size(defer=True, db=db),
                     'COMMIT;',
                     'VACUUM;',
                 )
             elif self._close_actions:
                 queries = (
                     'BEGIN IMMEDIATE;',
-                    self._sql['prune_invalid'],
                     self._set_many(items=None, defer=True, flush=True),
+                    'COMMIT;',
+                    'BEGIN IMMEDIATE;',
+                    self._sql['prune_invalid'],
                     self._optimize_item_count(defer=True),
-                    self._optimize_file_size(defer=True),
+                    self._optimize_file_size(defer=True, db=db),
                     'COMMIT;',
                     'VACUUM;',
                     'PRAGMA optimize;',
@@ -436,7 +452,7 @@ class Storage(object):
         self._close_timer = None
         return True
 
-    def _execute(self, cursor, queries, values=None, many=False, script=False):
+    def _execute(self, cursor, queries, values=(), many=False, script=False):
         result = []
         if not cursor:
             self.log.error_trace('Database not available')
@@ -455,7 +471,7 @@ class Storage(object):
                 query, _values, _many = query
             else:
                 _many = many
-                _values = values or ()
+                _values = values
 
             # Retry DB operation 3 times in case DB is locked or busy
             abort = False
@@ -496,12 +512,12 @@ class Storage(object):
                 break
         return result
 
-    def _optimize_file_size(self, defer=False):
+    def _optimize_file_size(self, defer=False, db=None):
         # do nothing - optimize only if max size limit has been set
         if self._max_file_size_kb <= 0:
             return False
 
-        with self as (db, cursor):
+        with ExistingDBConnection(db) if db else self as (db, cursor):
             result = self._execute(cursor, self._sql['get_total_data_size'])
             result = result.fetchone() if result else None
             result = result[0] if result else None
@@ -520,7 +536,7 @@ class Storage(object):
         query = self._sql['prune_by_size'].format(prune_size)
         if defer:
             return query
-        with self as (db, cursor), db:
+        with self as (db, cursor):
             self._execute(
                 cursor,
                 (
@@ -548,7 +564,7 @@ class Storage(object):
         )
         if defer:
             return query
-        with self as (db, cursor), db:
+        with self as (db, cursor):
             self._execute(
                 cursor,
                 (
@@ -656,12 +672,13 @@ class Storage(object):
             if defer:
                 return query, values, many
 
-            with self as (db, cursor), db:
+            with self as (db, cursor):
                 self._execute(
                     cursor,
                     (
                         'BEGIN IMMEDIATE;',
                         (query, values, many),
+                        'COMMIT;',
                     ),
                 )
                 self._close_actions = True
@@ -686,12 +703,13 @@ class Storage(object):
             del memory_store[key]
 
         values = (timestamp, key)
-        with self as (db, cursor), db:
+        with self as (db, cursor):
             self._execute(
                 cursor,
                 (
                     'BEGIN IMMEDIATE;',
                     (self._sql['refresh'], values, False),
+                    'COMMIT;',
                 ),
             )
         return True
@@ -714,12 +732,13 @@ class Storage(object):
             del memory_store[key]
 
         values = self._encode(item_id, item, timestamp, for_update=True)
-        with self as (db, cursor), db:
+        with self as (db, cursor):
             self._execute(
                 cursor,
                 (
                     'BEGIN IMMEDIATE;',
                     (self._sql['update'], values, False),
+                    'COMMIT;',
                 ),
             )
         return True
@@ -817,7 +836,7 @@ class Storage(object):
             return self._decode(item[2], process, item)
         return None
 
-    def _get_by_ids(self, item_ids=None, oldest_first=True, limit=-1,
+    def _get_by_ids(self, item_ids=(), oldest_first=True, limit=-1,
                     wildcard=False, seconds=None, process=None,
                     as_dict=False, values_only=True, excluding=None):
         in_memory_result = None
@@ -917,12 +936,13 @@ class Storage(object):
         if memory_store and key in memory_store:
             del memory_store[key]
 
-        with self as (db, cursor), db:
+        with self as (db, cursor):
             self._execute(
                 cursor,
                 (
                     'BEGIN IMMEDIATE;',
                     (self._sql['remove'], (key,), False),
+                    'COMMIT;',
                 ),
             )
             self._close_actions = True
@@ -942,12 +962,13 @@ class Storage(object):
 
         num_ids = len(item_ids)
         query = self._sql['remove_by_key'].format('?,' * (num_ids - 1) + '?')
-        with self as (db, cursor), db:
+        with self as (db, cursor):
             self._execute(
                 cursor,
                 (
                     'BEGIN IMMEDIATE;',
                     (query, tuple(map(to_str, item_ids)), False),
+                    'COMMIT;',
                 ),
             )
             self._close_actions = True
