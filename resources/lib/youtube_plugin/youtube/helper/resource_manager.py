@@ -152,7 +152,7 @@ class ResourceManager(object):
 
         # Re-sort result to match order of requested IDs
         # Will only work in Python v3.7+
-        if handles or list(result) != ids[:len(result)]:
+        if result and (handles or list(result) != ids[:len(result)]):
             result = {
                 handles.get(id_, id_): result[id_]
                 for id_ in ids
@@ -242,6 +242,9 @@ class ResourceManager(object):
             )
             result.update(new_data)
             self.cache_data(new_data, defer=defer_cache)
+
+        if not result:
+            return result
 
         banners = (
             'bannerTvMediumImageUrl',
@@ -355,7 +358,7 @@ class ResourceManager(object):
 
         # Re-sort result to match order of requested IDs
         # Will only work in Python v3.7+
-        if list(result) != ids[:len(result)]:
+        if result and list(result) != ids[:len(result)]:
             result = {
                 id_: result[id_]
                 for id_ in ids
@@ -489,6 +492,9 @@ class ResourceManager(object):
                 '{0},{1}'.format(*batch_id): batch
                 for batch_id, batch in new_data.items()
             }, defer=defer_cache)
+
+        if not result:
+            return result
 
         # Re-sort result to match order of requested IDs
         # Will only work in Python v3.7+
@@ -631,9 +637,12 @@ class ResourceManager(object):
             result.update(new_data)
             self.cache_data(new_data, defer=defer_cache)
 
-        if not result and not new_data and yt_items_dict:
-            result = yt_items_dict
-            self.cache_data(result, defer=defer_cache)
+        if not result:
+            if yt_items_dict:
+                result = yt_items_dict
+                self.cache_data(result, defer=defer_cache)
+            else:
+                return result
 
         # Re-sort result to match order of requested IDs
         # Will only work in Python v3.7+
