@@ -38,5 +38,5 @@ class BookmarksList(Storage):
     def _optimize_item_count(self, limit=-1, defer=False):
         return False
 
-    def _optimize_file_size(self, limit=-1, defer=False):
+    def _optimize_file_size(self, defer=False, db=None):
         return False

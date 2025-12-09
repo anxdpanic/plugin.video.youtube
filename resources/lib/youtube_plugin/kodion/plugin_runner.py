@@ -43,8 +43,6 @@ def run(context=_context,
         plugin=_plugin,
         provider=_provider,
         profiler=_profiler):
-    gc.disable()
-
     ui = context.get_ui()
 
     if ui.pop_property(CHECK_SETTINGS):
@@ -144,14 +142,16 @@ def run(context=_context,
              params=log_params,
              forced=forced)
 
-    plugin.run(provider,
-               context,
-               forced=forced,
-               is_same_path=is_same_path,
-               **new_kwargs)
-
-    if log_level:
-        profiler.print_stats()
-
-    gc.enable()
-    gc.collect()
+    gc_threshold = gc.get_threshold()
+    gc.set_threshold(0)
+    try:
+        plugin.run(provider,
+                   context,
+                   forced=forced,
+                   is_same_path=is_same_path,
+                   **new_kwargs)
+    finally:
+        if log_level:
+            profiler.print_stats()
+        gc.collect()
+        gc.set_threshold(*gc_threshold)
