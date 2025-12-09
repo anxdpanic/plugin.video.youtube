@@ -1,3 +1,10 @@
+## v7.3.0.1
+### Fixed
+- Workaround crash caused by non-thread safe behaviour of sqlite connection when used as context manager #1346
+
+### Changed
+- Delay gc collection rather than disabling
+
 ## v7.3.0
 ### Fixed
 - Revert change to busy polling interval #1339
