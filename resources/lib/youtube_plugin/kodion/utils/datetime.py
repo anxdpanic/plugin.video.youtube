@@ -288,7 +288,18 @@ def strptime(datetime_str, fmt=None, _strptime=modules['_strptime']):
             datetime_str = time_part
 
     if timezone:
-        return _strptime._strptime_datetime(datetime, datetime_str, fmt)
+        tt, fraction, gmtoff_fraction = _strptime._strptime(datetime_str, fmt)
+        tzname, gmtoff = tt[-2:]
+        args = tt[:6] + (fraction,)
+        if gmtoff is None:
+            return datetime(*args)
+        else:
+            tzdelta = timedelta(seconds=gmtoff, microseconds=gmtoff_fraction)
+            if tzname:
+                tz = timezone(tzdelta, tzname)
+            else:
+                tz = timezone(tzdelta)
+            return datetime(*args, tz)
     return datetime(*(_strptime._strptime(datetime_str, fmt)[0][0:6]))
 
 
