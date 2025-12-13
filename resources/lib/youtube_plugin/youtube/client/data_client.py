@@ -3124,45 +3124,26 @@ class YouTubeDataClient(YouTubeLoginClient):
             del client['json']
 
         params = client.get('params')
-        if params:
-            log_params = params.copy()
-
-            if 'key' in params:
-                key = params['key']
-                if key:
-                    abort = False
-                    log_params['key'] = ('...'.join((key[:3], key[-3:]))
-                                         if len(key) > 9 else
-                                         '...')
-                elif not client['_has_auth']:
-                    abort = True
-
-            if 'location' in params:
-                log_params['location'] = 'xx.xxxx,xx.xxxx'
-        else:
-            log_params = None
-
-        headers = client.get('headers')
-        if headers:
-            log_headers = headers.copy()
-            if 'Authorization' in log_headers:
-                log_headers['Authorization'] = '<redacted>'
-        else:
-            log_headers = None
+        if params and 'key' in params:
+            key = params['key']
+            if key:
+                abort = False
+            elif not client['_has_auth']:
+                abort = True
 
         context = self._context
         self.log.debug(('{request_name} API request',
                         'method:    {method!r}',
-                        'path:      {path!r}',
-                        'params:    {params!r}',
-                        'post_data: {data!r}',
-                        'headers:   {headers!r}'),
+                        'path:      {path!u}',
+                        'params:    {params!p}',
+                        'post_data: {data!p}',
+                        'headers:   {headers!h}'),
                        request_name=client.get('_name'),
                        method=method,
-                       path=path,
-                       params=log_params,
+                       path=path or url,
+                       params=params,
                        data=client.get('json'),
-                       headers=log_headers,
+                       headers=client.get('headers'),
                        stacklevel=2)
         if abort:
             if kwargs.get('notify', True):
