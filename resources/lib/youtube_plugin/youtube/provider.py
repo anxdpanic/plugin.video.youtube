@@ -29,7 +29,7 @@ from .helper import (
     yt_subscriptions,
     yt_video,
 )
-from .helper.utils import channel_filter_split, update_duplicate_items
+from .helper.utils import update_duplicate_items
 from .youtube_exceptions import InvalidGrant, LoginException
 from ..kodion import AbstractProvider, logging
 from ..kodion.constants import (
@@ -61,7 +61,11 @@ from ..kodion.items import (
     VideoItem,
     menu_items,
 )
-from ..kodion.utils.convert_format import strip_html_from_text, to_unicode
+from ..kodion.utils.convert_format import (
+    channel_filter_split,
+    strip_html_from_text,
+    to_unicode,
+)
 from ..kodion.utils.datetime import now, since_epoch
 
 

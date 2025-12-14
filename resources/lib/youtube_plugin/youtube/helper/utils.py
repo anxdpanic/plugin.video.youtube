@@ -43,7 +43,11 @@ from ...kodion.items import (
     MediaItem,
     menu_items,
 )
-from ...kodion.utils.convert_format import friendly_number, strip_html_from_text
+from ...kodion.utils.convert_format import (
+    channel_filter_split,
+    friendly_number,
+    strip_html_from_text,
+)
 from ...kodion.utils.datetime import (
     get_scheduled_start,
     parse_to_dt,
@@ -1530,28 +1534,6 @@ def filter_parse(item,
             criteria_met = True
             break
     return criteria_met
-
-
-def channel_filter_split(filters_string):
-    custom_filters = []
-    channel_filters = {
-        filter_string
-        for filter_string in filters_string.split(',')
-        if filter_string and custom_filter_split(filter_string, custom_filters)
-    }
-    return filters_string, channel_filters, custom_filters
-
-
-def custom_filter_split(filter_string,
-                        custom_filters,
-                        criteria_re=re_compile(
-                            r'{?{([^}]+)}{([^}]+)}{([^}]+)}}?'
-                        )):
-    criteria = criteria_re.findall(filter_string)
-    if not criteria:
-        return True
-    custom_filters.append(criteria)
-    return False
 
 
 def update_duplicate_items(updated_item,

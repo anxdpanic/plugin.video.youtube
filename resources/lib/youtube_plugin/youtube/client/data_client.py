@@ -23,14 +23,16 @@ from xml.etree.ElementTree import (
 )
 
 from .login_client import YouTubeLoginClient
-from ..helper.utils import channel_filter_split
 from ..helper.v3 import pre_fill
 from ..youtube_exceptions import InvalidJSON, YouTubeException
 from ...kodion import logging
 from ...kodion.compatibility import available_cpu_count, string_type
 from ...kodion.constants import CHANNEL_ID, PLAYLIST_ID
 from ...kodion.items import DirectoryItem
-from ...kodion.utils.convert_format import strip_html_from_text
+from ...kodion.utils.convert_format import (
+    channel_filter_split,
+    strip_html_from_text,
+)
 from ...kodion.utils.datetime import (
     since_epoch,
     strptime,
