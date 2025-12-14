@@ -68,7 +68,8 @@ class SettingsProxy(object):
             return self.ref.setSettingString(*args, **kwargs)
 
         def get_str_list(self, setting):
-            return self.ref.getSetting(setting).split(',')
+            value = self.ref.getSetting(setting)
+            return value.split(',') if value else []
 
         def set_str_list(self, setting, value):
             value = ','.join(value)
@@ -282,7 +283,7 @@ class XbmcPluginSettings(AbstractSettings):
         error = False
         try:
             value = self._proxy.get_str_list(setting)
-            if not value:
+            if not isinstance(value, list):
                 value = [] if default is None else default
         except (RuntimeError, TypeError) as exc:
             error = exc
