@@ -20,13 +20,17 @@ def _process_rate_video(provider,
                         re_match=None,
                         video_id=None,
                         current_rating=None,
+                        new_rating=None,
                         _ratings=('like', 'dislike', 'none')):
     ui = context.get_ui()
     li_path = ui.get_listitem_info(URI)
 
     localize = context.localize
 
-    rating_param = context.get_param('rating', '')
+    if new_rating is None:
+        rating_param = context.get_param('rating', '')
+    else:
+        rating_param = new_rating
     if rating_param:
         rating_param = rating_param.lower()
         if rating_param not in _ratings:
