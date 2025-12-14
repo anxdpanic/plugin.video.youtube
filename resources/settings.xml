@@ -272,28 +272,6 @@
                     </control>
                 </setting>
             </group>
-            <group id="post_play">
-                <setting id="youtube.suggested_videos" type="boolean" label="30582" help="">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="youtube.post.play.rate" type="boolean" label="30627" help="">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="youtube.post.play.rate.playlists" type="boolean" parent="youtube.post.play.rate" label="30712" help="">
-                    <level>0</level>
-                    <default>false</default>
-                    <dependencies>
-                        <dependency type="enable">
-                            <condition setting="youtube.post.play.rate" operator="is">true</condition>
-                        </dependency>
-                    </dependencies>
-                    <control type="toggle"/>
-                </setting>
-            </group>
             <group id="content_restrictions">
                 <setting id="kodion.safe.search" type="integer" label="30594" help="">
                     <level>0</level>
@@ -961,7 +939,7 @@
                     </control>
                 </setting>
             </group>
-            <group id="post_play" label="16103">
+            <group id="post_play" label="16102">
                 <setting id="kodion.play_count.percent" type="integer" label="30668" help="">
                     <level>0</level>
                     <default>90</default>
@@ -975,9 +953,32 @@
                         <formatlabel>14047</formatlabel>
                     </control>
                 </setting>
+                <setting id="youtube.suggested_videos" type="boolean" label="30582" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="youtube.playlist.watchlater.autoremove" type="boolean" label="30515" help="">
                     <level>0</level>
                     <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="youtube.post.play.rate" type="boolean" label="30627" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="youtube.post.play.rate.playlists" type="boolean" parent="youtube.post.play.rate" label="30712" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition setting="youtube.post.play.rate" operator="is">true</condition>
+                        </dependency>
+                        <dependency type="visible">
+                            <condition setting="youtube.post.play.rate" operator="is">true</condition>
+                        </dependency>
+                    </dependencies>
                     <control type="toggle"/>
                 </setting>
                 <setting id="youtube.post.play.refresh" type="boolean" label="30645" help="">
