@@ -2327,6 +2327,14 @@ class YouTubeDataClient(YouTubeLoginClient):
             'to_refresh': [],
         }
 
+        (use_subscriptions,
+         use_saved_playlists,
+         use_bookmarked_channels,
+         use_bookmarked_playlists) = settings.subscriptions_sources()
+        if not self.logged_in:
+            use_subscriptions = False
+            use_saved_playlists = False
+
         bookmarks = context.get_bookmarks_list().get_items()
         if bookmarks:
             channel_ids = threaded_output['channel_ids']
@@ -2334,13 +2342,13 @@ class YouTubeDataClient(YouTubeLoginClient):
             for item_id, item in bookmarks.items():
                 if isinstance(item, DirectoryItem):
                     item_id = getattr(item, PLAYLIST_ID, None)
-                    if item_id:
+                    if item_id and use_bookmarked_playlists:
                         playlist_ids.append(item_id)
                         continue
                     item_id = getattr(item, CHANNEL_ID, None)
                 elif not isinstance(item, float):
                     continue
-                if item_id:
+                if item_id and use_bookmarked_channels:
                     channel_ids.append(item_id)
 
         headers = {
@@ -2665,11 +2673,9 @@ class YouTubeDataClient(YouTubeLoginClient):
             'counts': counts,
             'active_thread_ids': active_thread_ids,
         }
-
         payloads = {}
-        if self.logged_in:
-            function_cache = context.get_function_cache()
 
+        if use_subscriptions:
             channel_params = {
                 'part': 'snippet,contentDetails',
                 'maxResults': 50,
@@ -2759,6 +2765,18 @@ class YouTubeDataClient(YouTubeLoginClient):
                     del _params['pageToken']
                 return True, True
 
+            payloads[1] = {
+                'worker': _get_channels,
+                'kwargs': True,
+                'do_batch': False,
+                'output': threaded_output,
+                'threads': threads,
+                'limit': 1,
+                'check_inputs': False,
+                'inputs_to_check': None,
+            }
+
+        if use_saved_playlists:
             playlist_params = {
                 'part': 'snippet',
                 'maxResults': 50,
@@ -2803,16 +2821,6 @@ class YouTubeDataClient(YouTubeLoginClient):
                     return True, False
                 return True, True
 
-            payloads[1] = {
-                'worker': _get_channels,
-                'kwargs': True,
-                'do_batch': False,
-                'output': threaded_output,
-                'threads': threads,
-                'limit': 1,
-                'check_inputs': False,
-                'inputs_to_check': None,
-            }
             payloads[2] = {
                 'worker': _get_playlists,
                 'kwargs': True,
@@ -2823,6 +2831,7 @@ class YouTubeDataClient(YouTubeLoginClient):
                 'check_inputs': False,
                 'inputs_to_check': None,
             }
+
         payloads[3] = {
             'worker': partial(_get_cached_feed, item_type='channel_id'),
             'kwargs': threaded_output['channel_ids'],
@@ -2833,6 +2842,7 @@ class YouTubeDataClient(YouTubeLoginClient):
             'check_inputs': threading.Event(),
             'inputs_to_check': {1},
         }
+
         payloads[4] = {
             'worker': partial(_get_cached_feed, item_type='playlist_id'),
             'kwargs': threaded_output['playlist_ids'],
@@ -2843,6 +2853,7 @@ class YouTubeDataClient(YouTubeLoginClient):
             'check_inputs': threading.Event(),
             'inputs_to_check': {2},
         }
+
         payloads[5] = {
             'worker': _get_feed,
             'kwargs': threaded_output['to_refresh'],

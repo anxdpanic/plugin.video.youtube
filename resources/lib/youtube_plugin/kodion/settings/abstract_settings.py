@@ -680,6 +680,23 @@ class AbstractSettings(object):
 
         return filter_types
 
+    def subscriptions_sources(self,
+                              value=None,
+                              default=('subscriptions',
+                                       'saved_playlists',
+                                       'bookmark_channels',
+                                       'bookmark_playlists')):
+        if value is not None:
+            return self.set_string_list(SETTINGS.MY_SUBSCRIPTIONS_SOURCES,
+                                        value)
+        sources = frozenset(
+            self.get_string_list(SETTINGS.MY_SUBSCRIPTIONS_SOURCES) or default
+        )
+        return tuple([
+            source in sources
+            for source in default
+        ])
+
     def subscriptions_filter_enabled(self, value=None):
         if value is not None:
             return self.set_bool(

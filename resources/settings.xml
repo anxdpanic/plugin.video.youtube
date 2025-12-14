@@ -350,6 +350,42 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="youtube.folder.my_subscriptions.sources" type="list[string]" parent="youtube.folder.my_subscriptions.show" label="14226" help="">
+                    <level>0</level>
+                    <!--
+                    Setting default value causes errors with the dependency condition evaluation
+                    Disable default value and set default within plugin code instead
+                    <default>subscriptions,saved_playlists,bookmark_channels,bookmark_playlists</default>
+                    -->
+                    <constraints>
+                        <options>
+                            <option label="30504">subscriptions</option>
+                            <option label="30611">saved_playlists</option>
+                            <option label="30531">bookmark_channels</option>
+                            <option label="30532">bookmark_playlists</option>
+                        </options>
+                        <delimiter>,</delimiter>
+                        <minimumitems>1</minimumitems>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible">
+                            <or>
+                                <condition setting="youtube.folder.my_subscriptions.show" operator="is">true</condition>
+                                <condition setting="youtube.folder.my_subscriptions_filtered.show" operator="is">true</condition>
+                            </or>
+                        </dependency>
+                        <dependency type="enable">
+                            <or>
+                                <condition setting="youtube.folder.my_subscriptions.show" operator="is">true</condition>
+                                <condition setting="youtube.folder.my_subscriptions_filtered.show" operator="is">true</condition>
+                            </or>
+                        </dependency>
+                    </dependencies>
+                    <control type="list" format="string">
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
+                </setting>
                 <setting id="youtube.folder.my_subscriptions_filtered.show" type="boolean" label="30584" help="">
                     <level>0</level>
                     <default>false</default>
