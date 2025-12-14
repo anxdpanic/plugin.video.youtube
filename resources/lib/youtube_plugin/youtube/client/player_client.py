@@ -848,7 +848,6 @@ class YouTubePlayerClient(YouTubeDataClient):
             INCOGNITO: None,
         }
         self._visitor_data_key = 'current'
-        self._auth_client = {}
         self._client_groups = (
             ('custom', clients if clients else ()),
             ('auth_enabled|initial_request|no_playable_streams', (
@@ -1654,6 +1653,7 @@ class YouTubePlayerClient(YouTubeDataClient):
         _status = None
         _reason = None
 
+        auth_client = None
         visitor_data = self._visitor_data[visitor_data_key]
         video_details = {}
         microformat = {}
@@ -1872,8 +1872,8 @@ class YouTubePlayerClient(YouTubeDataClient):
                     compare_str=True,
                 )
 
-                if not self._auth_client and _has_auth:
-                    self._auth_client = {
+                if not auth_client and _has_auth:
+                    auth_client = {
                         'client': _client.copy(),
                         'result': _result,
                     }
@@ -1969,15 +1969,15 @@ class YouTubePlayerClient(YouTubeDataClient):
             'subtitles': None,
         }
 
-        if use_remote_history and self._auth_client:
+        if use_remote_history and auth_client:
             playback_stats = {
                 'playback_url': 'videostatsPlaybackUrl',
                 'watchtime_url': 'videostatsWatchtimeUrl',
             }
-            playback_tracking = (self._auth_client
+            playback_tracking = (auth_client
                                  .get('result', {})
                                  .get('playbackTracking', {}))
-            cpn = self._auth_client.get('_cpn') or self._generate_cpn()
+            cpn = auth_client.get('_cpn') or self._generate_cpn()
 
             for key, url_key in playback_stats.items():
                 url = playback_tracking.get(url_key, {}).get('baseUrl')
@@ -2783,7 +2783,7 @@ class YouTubePlayerClient(YouTubeDataClient):
                     # + ''.join([''.join([
                     # '\t\t\t\t<BaseURL>', entity_escape(url), '</BaseURL>\n',
                     # ]) for url in stream['baseUrl'] if url]) +
-                    '\t\t\t\t<SegmentBase indexRange="{indexRange}">\n'
+                    '\t\t\t\t<SegmentBase indexRange="{indexRange}" timescale="1000">\n'
                     '\t\t\t\t\t<Initialization range="{initRange}"/>\n'
                     '\t\t\t\t</SegmentBase>\n'
                     '\t\t\t</Representation>\n'

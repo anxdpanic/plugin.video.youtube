@@ -43,7 +43,11 @@ from ...kodion.items import (
     MediaItem,
     menu_items,
 )
-from ...kodion.utils.convert_format import friendly_number, strip_html_from_text
+from ...kodion.utils.convert_format import (
+    channel_filter_split,
+    friendly_number,
+    strip_html_from_text,
+)
 from ...kodion.utils.datetime import (
     get_scheduled_start,
     parse_to_dt,
@@ -809,6 +813,15 @@ def update_video_items(provider, context, video_id_dict,
         elif upload_status == 'uploaded' and not duration:
             media_item.live = True
 
+        if 'player' in yt_item:
+            player = yt_item['player']
+            height = player.get('embedHeight')
+            width = player.get('embedWidth')
+            if height and width:
+                height = int(height)
+                width = int(width)
+                media_item.set_aspect_ratio(width / height)
+
         if 'liveStreamingDetails' in yt_item:
             streaming_details = yt_item['liveStreamingDetails']
             if 'actualStartTime' in streaming_details:
@@ -1521,28 +1534,6 @@ def filter_parse(item,
             criteria_met = True
             break
     return criteria_met
-
-
-def channel_filter_split(filters_string):
-    custom_filters = []
-    channel_filters = {
-        filter_string
-        for filter_string in filters_string.split(',')
-        if filter_string and custom_filter_split(filter_string, custom_filters)
-    }
-    return filters_string, channel_filters, custom_filters
-
-
-def custom_filter_split(filter_string,
-                        custom_filters,
-                        criteria_re=re_compile(
-                            r'{?{([^}]+)}{([^}]+)}{([^}]+)}}?'
-                        )):
-    criteria = criteria_re.findall(filter_string)
-    if not criteria:
-        return True
-    custom_filters.append(criteria)
-    return False
 
 
 def update_duplicate_items(updated_item,

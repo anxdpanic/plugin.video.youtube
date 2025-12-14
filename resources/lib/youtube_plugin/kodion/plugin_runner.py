@@ -104,18 +104,13 @@ def run(context=_context,
     if new_params:
         context.set_params(**new_params)
 
-    log_params = params.copy()
-    for key in ('api_key', 'client_id', 'client_secret'):
-        if key in log_params:
-            log_params[key] = '<redacted>'
-
     system_version = context.get_system_version()
     log.info(('Running v{version}',
               'Kodi:   v{kodi}',
               'Python: v{python}',
               'Handle: {handle}',
               'Path:   {path!r} ({path_link})',
-              'Params: {params!r}',
+              'Params: {params!p}',
               'Forced: {forced!r}'),
              version=context.get_version(),
              kodi=str(system_version),
@@ -123,7 +118,7 @@ def run(context=_context,
              handle=current_handle,
              path=current_path,
              path_link='linked' if is_same_path else 'new',
-             params=log_params,
+             params=params,
              forced=forced)
 
     gc_threshold = gc.get_threshold()

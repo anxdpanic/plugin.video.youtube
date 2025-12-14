@@ -68,7 +68,8 @@ class SettingsProxy(object):
             return self.ref.setSettingString(*args, **kwargs)
 
         def get_str_list(self, setting):
-            return self.ref.getSetting(setting).split(',')
+            value = self.ref.getSetting(setting)
+            return value.split(',') if value else []
 
         def set_str_list(self, setting, value):
             value = ','.join(value)
@@ -248,22 +249,9 @@ class XbmcPluginSettings(AbstractSettings):
             value = default
 
         if echo_level and self._echo_level:
-            if setting == self.LOCATION:
-                log_value = 'xx.xxxx,xx.xxxx'
-            elif setting == self.API_ID:
-                log_value = ('...'.join((value[:3], value[-5:]))
-                             if len(value) > 11 else
-                             '...')
-            elif setting in {self.API_KEY, self.API_SECRET}:
-                log_value = ('...'.join((value[:3], value[-3:]))
-                             if len(value) > 9 else
-                             '...')
-            else:
-                log_value = value
-            self.log.debug_trace('Get setting {name!r}:'
-                                 ' {value!r} (str, {state})',
-                                 name=setting,
-                                 value=log_value,
+            log_setting = {setting: value}
+            self.log.debug_trace('Get setting {setting!q} (str, {state})',
+                                 setting=log_setting,
                                  state=(error if error else 'success'),
                                  stacklevel=echo_level)
         self._cache[setting] = value
@@ -281,22 +269,9 @@ class XbmcPluginSettings(AbstractSettings):
             error = exc
 
         if echo_level and self._echo_level:
-            if setting == self.LOCATION:
-                log_value = 'xx.xxxx,xx.xxxx'
-            elif setting == self.API_ID:
-                log_value = ('...'.join((value[:3], value[-5:]))
-                             if len(value) > 11 else
-                             '...')
-            elif setting in {self.API_KEY, self.API_SECRET}:
-                log_value = ('...'.join((value[:3], value[-3:]))
-                             if len(value) > 9 else
-                             '...')
-            else:
-                log_value = value
-            self.log.debug_trace('Set setting {name!r}:'
-                                 ' {value!r} (str, {state})',
-                                 name=setting,
-                                 value=log_value,
+            log_setting = {setting: value}
+            self.log.debug_trace('Set setting {setting!q} (str, {state})',
+                                 setting=log_setting,
                                  state=(error if error else 'success'),
                                  stacklevel=echo_level)
         return not error
@@ -308,7 +283,7 @@ class XbmcPluginSettings(AbstractSettings):
         error = False
         try:
             value = self._proxy.get_str_list(setting)
-            if not value:
+            if not isinstance(value, list):
                 value = [] if default is None else default
         except (RuntimeError, TypeError) as exc:
             error = exc

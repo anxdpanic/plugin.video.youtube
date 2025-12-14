@@ -272,28 +272,6 @@
                     </control>
                 </setting>
             </group>
-            <group id="post_play">
-                <setting id="youtube.suggested_videos" type="boolean" label="30582" help="">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="youtube.post.play.rate" type="boolean" label="30627" help="">
-                    <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="youtube.post.play.rate.playlists" type="boolean" parent="youtube.post.play.rate" label="30712" help="">
-                    <level>0</level>
-                    <default>false</default>
-                    <dependencies>
-                        <dependency type="enable">
-                            <condition setting="youtube.post.play.rate" operator="is">true</condition>
-                        </dependency>
-                    </dependencies>
-                    <control type="toggle"/>
-                </setting>
-            </group>
             <group id="content_restrictions">
                 <setting id="kodion.safe.search" type="integer" label="30594" help="">
                     <level>0</level>
@@ -371,6 +349,42 @@
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
+                </setting>
+                <setting id="youtube.folder.my_subscriptions.sources" type="list[string]" parent="youtube.folder.my_subscriptions.show" label="14226" help="">
+                    <level>0</level>
+                    <!--
+                    Setting default value causes errors with the dependency condition evaluation
+                    Disable default value and set default within plugin code instead
+                    <default>subscriptions,saved_playlists,bookmark_channels,bookmark_playlists</default>
+                    -->
+                    <constraints>
+                        <options>
+                            <option label="30504">subscriptions</option>
+                            <option label="30611">saved_playlists</option>
+                            <option label="30531">bookmark_channels</option>
+                            <option label="30532">bookmark_playlists</option>
+                        </options>
+                        <delimiter>,</delimiter>
+                        <minimumitems>1</minimumitems>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible">
+                            <or>
+                                <condition setting="youtube.folder.my_subscriptions.show" operator="is">true</condition>
+                                <condition setting="youtube.folder.my_subscriptions_filtered.show" operator="is">true</condition>
+                            </or>
+                        </dependency>
+                        <dependency type="enable">
+                            <or>
+                                <condition setting="youtube.folder.my_subscriptions.show" operator="is">true</condition>
+                                <condition setting="youtube.folder.my_subscriptions_filtered.show" operator="is">true</condition>
+                            </or>
+                        </dependency>
+                    </dependencies>
+                    <control type="list" format="string">
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
                 <setting id="youtube.folder.my_subscriptions_filtered.show" type="boolean" label="30584" help="">
                     <level>0</level>
@@ -961,7 +975,7 @@
                     </control>
                 </setting>
             </group>
-            <group id="post_play" label="16103">
+            <group id="post_play" label="16102">
                 <setting id="kodion.play_count.percent" type="integer" label="30668" help="">
                     <level>0</level>
                     <default>90</default>
@@ -975,9 +989,32 @@
                         <formatlabel>14047</formatlabel>
                     </control>
                 </setting>
+                <setting id="youtube.suggested_videos" type="boolean" label="30582" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="youtube.playlist.watchlater.autoremove" type="boolean" label="30515" help="">
                     <level>0</level>
                     <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="youtube.post.play.rate" type="boolean" label="30627" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="youtube.post.play.rate.playlists" type="boolean" parent="youtube.post.play.rate" label="30712" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition setting="youtube.post.play.rate" operator="is">true</condition>
+                        </dependency>
+                        <dependency type="visible">
+                            <condition setting="youtube.post.play.rate" operator="is">true</condition>
+                        </dependency>
+                    </dependencies>
                     <control type="toggle"/>
                 </setting>
                 <setting id="youtube.post.play.refresh" type="boolean" label="30645" help="">
