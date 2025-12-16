@@ -1,3 +1,7 @@
+## v7.4.0+beta.2
+### Fixed
+- Fix retrieving items from local history database #1356
+
 ## v7.4.0+beta.1
 ### Fixed
 - Fix fallback method for retrieving string list setting when setting has no value
