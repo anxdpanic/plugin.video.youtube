@@ -25,10 +25,10 @@ class PlaybackHistory(Storage):
         value['last_played'] = fromtimestamp(item[1])
         return value
 
-    def get_items(self, keys=None, limit=-1, process=None, excluding=None):
+    def get_items(self, item_ids=(), limit=-1, process=None, excluding=None):
         if process is None:
             process = self._add_last_played
-        result = self._get_by_ids(keys,
+        result = self._get_by_ids(item_ids=item_ids,
                                   excluding=excluding,
                                   oldest_first=False,
                                   process=process,
