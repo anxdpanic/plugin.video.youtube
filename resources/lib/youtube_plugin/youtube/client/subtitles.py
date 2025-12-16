@@ -91,7 +91,6 @@ class Subtitles(YouTubeRequestClient):
 
         self.defaults = None
         self.headers = None
-        self.renderer = None
         self.caption_tracks = None
         self.translation_langs = None
 
@@ -157,14 +156,14 @@ class Subtitles(YouTubeRequestClient):
             headers.pop('Content-Type', None)
         self.headers = headers
 
-        self.renderer = captions.get('playerCaptionsTracklistRenderer', {})
-        self.caption_tracks = self.renderer.get('captionTracks', [])
-        self.translation_langs = self.renderer.get('translationLanguages', [])
+        renderer = captions.get('playerCaptionsTracklistRenderer', {})
+        self.caption_tracks = renderer.get('captionTracks', [])
+        self.translation_langs = renderer.get('translationLanguages', [])
         self.translation_langs.extend(TRANSLATION_LANGUAGES)
 
         try:
-            default_audio = self.renderer.get('defaultAudioTrackIndex')
-            default_audio = self.renderer.get('audioTracks')[default_audio]
+            default_audio = renderer.get('defaultAudioTrackIndex')
+            default_audio = renderer.get('audioTracks')[default_audio]
         except (IndexError, TypeError):
             default_audio = None
 
@@ -178,7 +177,7 @@ class Subtitles(YouTubeRequestClient):
         if default_audio is None:
             return
 
-        default_caption = self.renderer.get(
+        default_caption = renderer.get(
             'defaultTranslationSourceTrackIndices', [None]
         )[0]
 

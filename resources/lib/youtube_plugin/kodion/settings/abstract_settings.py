@@ -574,6 +574,12 @@ class AbstractSettings(object):
                                            reverse=True)
                 if value >= key]
 
+    def max_video_height(self):
+        if self.use_mpd_videos():
+            qualities = self.mpd_video_qualities()
+            return qualities[0]['nom_height']
+        return self.fixed_video_quality()
+
     def stream_features(self, value=None):
         if value is not None:
             return self.set_string_list(SETTINGS.MPD_STREAM_FEATURES, value)
@@ -674,22 +680,43 @@ class AbstractSettings(object):
 
         return filter_types
 
+    def subscriptions_sources(self,
+                              value=None,
+                              default=('subscriptions',
+                                       'saved_playlists',
+                                       'bookmark_channels',
+                                       'bookmark_playlists')):
+        if value is not None:
+            return self.set_string_list(SETTINGS.MY_SUBSCRIPTIONS_SOURCES,
+                                        value)
+        sources = frozenset(
+            self.get_string_list(SETTINGS.MY_SUBSCRIPTIONS_SOURCES) or default
+        )
+        return tuple([
+            source in sources
+            for source in default
+        ])
+
     def subscriptions_filter_enabled(self, value=None):
         if value is not None:
-            return self.set_bool(SETTINGS.SUBSCRIPTIONS_FILTER_ENABLED, value)
-        return self.get_bool(SETTINGS.SUBSCRIPTIONS_FILTER_ENABLED, True)
+            return self.set_bool(
+                SETTINGS.MY_SUBSCRIPTIONS_FILTER_ENABLED, value
+            )
+        return self.get_bool(SETTINGS.MY_SUBSCRIPTIONS_FILTER_ENABLED, True)
 
     def subscriptions_filter_blacklist(self, value=None):
         if value is not None:
-            return self.set_bool(SETTINGS.SUBSCRIPTIONS_FILTER_BLACKLIST, value)
-        return self.get_bool(SETTINGS.SUBSCRIPTIONS_FILTER_BLACKLIST, True)
+            return self.set_bool(
+                SETTINGS.MY_SUBSCRIPTIONS_FILTER_BLACKLIST, value
+            )
+        return self.get_bool(SETTINGS.MY_SUBSCRIPTIONS_FILTER_BLACKLIST, True)
 
     def subscriptions_filter(self, value=None):
         if value is not None:
             if isinstance(value, (list, tuple, set)):
                 value = ','.join(value).lstrip(',')
-            return self.set_string(SETTINGS.SUBSCRIPTIONS_FILTER_LIST, value)
-        return self.get_string(SETTINGS.SUBSCRIPTIONS_FILTER_LIST).replace(
+            return self.set_string(SETTINGS.MY_SUBSCRIPTIONS_FILTER_LIST, value)
+        return self.get_string(SETTINGS.MY_SUBSCRIPTIONS_FILTER_LIST).replace(
             ', ', ','
         )
 

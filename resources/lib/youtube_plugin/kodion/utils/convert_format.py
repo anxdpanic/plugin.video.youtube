@@ -179,3 +179,25 @@ def fix_subtitle_stream(stream_type,
     elif sub_format == 'srt':
         content = _srt_to_vtt(content)
     return content
+
+
+def channel_filter_split(filters_string):
+    custom_filters = []
+    channel_filters = {
+        filter_string
+        for filter_string in filters_string.split(',')
+        if filter_string and custom_filter_split(filter_string, custom_filters)
+    }
+    return filters_string, channel_filters, custom_filters
+
+
+def custom_filter_split(filter_string,
+                        custom_filters,
+                        criteria_re=re_compile(
+                            r'{?{([^}]+)}{([^}]+)}{([^}]+)}}?'
+                        )):
+    criteria = criteria_re.findall(filter_string)
+    if not criteria:
+        return True
+    custom_filters.append(criteria)
+    return False

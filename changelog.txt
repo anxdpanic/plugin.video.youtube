@@ -1,3 +1,25 @@
+## v7.4.0+beta.2
+### Fixed
+- Fix retrieving items from local history database #1356
+
+## v7.4.0+beta.1
+### Fixed
+- Fix fallback method for retrieving string list setting when setting has no value
+- Update workaround for Python strptime bug
+- Fix not updating authorised client request result used for playback tracking #1343
+- Don't process results in resource_manager methods if no items are available
+- Set default MPEG-DASH timescale to 1000
+- Disable request cache if response is streamed
+
+### Changed
+- Re-organise post play settings
+- Enable streaming for My Subscriptions feed requests
+
+### New
+- Add setting to choose what sources are used for My Subscriptions
+- Add aspect ratio info to video ListItem #1348
+- Enable using saved playlists in My Subscriptions
+
 ## v7.3.0.1
 ### Fixed
 - Workaround crash caused by non-thread safe behaviour of sqlite connection when used as context manager #1346

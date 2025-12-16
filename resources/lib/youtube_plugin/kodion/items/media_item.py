@@ -459,6 +459,9 @@ class VideoItem(MediaItem):
         )
         self._directors = None
         self._imdb_id = None
+        self._video_aspect = None
+        self._video_height = None
+        self._video_width = None
 
     def add_directors(self, director):
         if director:
@@ -481,3 +484,44 @@ class VideoItem(MediaItem):
 
     def get_imdb_id(self):
         return self._imdb_id
+
+    def set_stream_details_from_player(self, player):
+        height = player.get('embedHeight')
+        width = player.get('embedWidth')
+        if not height or not width:
+            return
+
+        height = int(height)
+        width = int(width)
+        aspect_ratio = round(width / height, 2)
+
+        self._video_aspect = aspect_ratio
+        self._video_height = height
+        self._video_width = width
+
+    def get_stream_details(self):
+        if self._video_aspect is None:
+            return None
+        return {
+            'aspect': self._video_aspect,
+            'height': self._video_height,
+            'width': self._video_width,
+        }
+
+    def set_aspect_ratio(self, aspect_ratio):
+        self._video_aspect = round(aspect_ratio, 2)
+
+    def get_aspect_ratio(self):
+        return self._video_aspect
+
+    def set_video_width(self, width):
+        self._video_width = int(width)
+
+    def get_video_width(self):
+        return self._video_width
+
+    def set_video_height(self, height):
+        self._video_height = int(height)
+
+    def get_video_height(self):
+        return self._video_height

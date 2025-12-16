@@ -366,7 +366,7 @@ msgid "Related Videos"
 msgstr ""
 
 msgctxt "#30515"
-msgid "Auto-Remove from Watch Later"
+msgid "Auto-remove from Watch Later"
 msgstr ""
 
 msgctxt "#30516"
@@ -430,11 +430,11 @@ msgid "I dislike this"
 msgstr ""
 
 msgctxt "#30531"
-msgid ""
+msgid "Bookmarked Channels"
 msgstr ""
 
 msgctxt "#30532"
-msgid ""
+msgid "Bookmarked Playlists"
 msgstr ""
 
 msgctxt "#30533"
@@ -634,7 +634,7 @@ msgid "Are you sure you want to reset access manager?"
 msgstr ""
 
 msgctxt "#30582"
-msgid "Autoplay suggested videos"
+msgid "Auto-play suggested videos"
 msgstr ""
 
 msgctxt "#30583"
