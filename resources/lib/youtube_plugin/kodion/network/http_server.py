@@ -440,6 +440,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                        'Method: {method!r}',
                        'Server: {server!r}',
                        'Target: {target!r}',
+                       'Range:  {range!r}',
                        'Status: {status} {reason}')
 
             response = None
@@ -493,6 +494,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                         method=method,
                         server=server,
                         target=target,
+                        range=self.headers.get('Range'),
                         status=-1,
                         reason='Failed',
                     )
@@ -547,6 +549,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                         method=method,
                         server=server,
                         target=target,
+                        range=self.headers.get('Range'),
                         status=status,
                         reason=reason,
                     )
