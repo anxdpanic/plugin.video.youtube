@@ -323,8 +323,8 @@ class XbmcContextUI(AbstractContextUI):
         return {
             'is_plugin': is_plugin,
             'id': container_id,
-            'is_loaded': is_active,
-            'is_active': is_loaded,
+            'is_active': is_active,
+            'is_loaded': is_loaded,
         }
 
     @classmethod
