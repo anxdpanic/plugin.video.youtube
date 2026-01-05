@@ -2976,21 +2976,19 @@ class YouTubeDataClient(YouTubeLoginClient):
             return None, None
         with response:
             headers = response.headers
-            if kwargs.get('extended_debug'):
-                self.log.debug(('Request response',
-                                'Status:  {response.status_code!r}',
-                                'Headers: {headers!r}',
-                                'Content: {response.text}'),
-                               response=response,
-                               headers=headers._store if headers else None,
-                               stacklevel=4)
+            if self.log.verbose_logging:
+                log_msg = ('Request response',
+                           'Status:  {response.status_code!r}',
+                           'Headers: {headers!r}',
+                           'Content: {response.text}')
             else:
-                self.log.debug(('Request response',
-                                'Status:  {response.status_code!r}',
-                                'Headers: {headers!r}'),
-                               response=response,
-                               headers=headers._store if headers else None,
-                               stacklevel=4)
+                log_msg = ('Request response',
+                           'Status:  {response.status_code!r}',
+                           'Headers: {headers!r}')
+            self.log.debug(log_msg,
+                           response=response,
+                           headers=headers._store if headers else None,
+                           stacklevel=4)
 
             if response.status_code == 204 and 'no_content' in kwargs:
                 return None, True
@@ -3166,8 +3164,6 @@ class YouTubeDataClient(YouTubeLoginClient):
                 )
             self.log.warning('Aborted', stacklevel=2)
             return {}
-        if context.get_settings().log_level() & 2:
-            kwargs.setdefault('extended_debug', True)
         if cache is None and 'no_content' in kwargs:
             cache = False
         elif cache is not False and self._context.refresh_requested():
