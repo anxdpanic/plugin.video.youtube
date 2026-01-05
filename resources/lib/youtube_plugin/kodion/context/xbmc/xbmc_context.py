@@ -377,7 +377,7 @@ class XbmcContext(AbstractContext):
         'video.play.timeshift': 30819,
         'video.play.using': 15213,
         'video.play.with_subtitles': 30702,
-        'video.queue': 30511,
+        'video.queue': 13347,
         'video.rate': 30528,
         'video.rate.dislike': 30530,
         'video.rate.like': 30529,
