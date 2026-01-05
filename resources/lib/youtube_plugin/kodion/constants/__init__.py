@@ -77,6 +77,7 @@ FOLDER_URI = 'FolderPath'
 HAS_FILES = 'HasFiles'
 HAS_FOLDERS = 'HasFolders'
 HAS_PARENT = 'HasParent'
+NUM_ALL_ITEMS = 'NumAllItems'
 SCROLLING = 'Scrolling'
 UPDATING = 'IsUpdating'
 
@@ -243,6 +244,7 @@ __all__ = (
     'HAS_FILES',
     'HAS_FOLDERS',
     'HAS_PARENT',
+    'NUM_ALL_ITEMS',
     'SCROLLING',
     'UPDATING',
 

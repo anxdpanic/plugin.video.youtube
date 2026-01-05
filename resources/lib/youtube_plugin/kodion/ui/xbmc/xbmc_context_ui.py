@@ -32,6 +32,7 @@ from ...constants import (
     HIDE_PROGRESS,
     LISTITEM_INFO,
     LISTITEM_PROP,
+    NUM_ALL_ITEMS,
     PLUGIN_CONTAINER_INFO,
     PROPERTY,
     REFRESH_CONTAINER,
@@ -298,6 +299,12 @@ class XbmcContextUI(AbstractContextUI):
                         stacklevel=stacklevel,
                     )
                     and (
+                            self.get_container_info(
+                                NUM_ALL_ITEMS,
+                                _container_id,
+                                stacklevel=stacklevel,
+                            )
+                            or
                             self.get_container_bool(
                                 HAS_FOLDERS,
                                 _container_id,

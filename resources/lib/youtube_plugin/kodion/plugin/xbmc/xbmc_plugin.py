@@ -441,7 +441,7 @@ class XbmcPlugin(AbstractPlugin):
         timeout = kwargs.get('timeout', 30)
         interval = kwargs.get('interval', 0.1)
         for action in actions:
-            while not ui.get_container(container_type=None, check_ready=True):
+            while not ui.get_container(container_type=False, check_ready=True):
                 timeout -= interval
                 if timeout < 0:
                     logging.error('Container not ready'
