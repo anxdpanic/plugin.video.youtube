@@ -901,3 +901,23 @@ def goto_page(context, params=None):
             params or context.get_params(),
         ),
     )
+
+
+def open_settings(context):
+    return (
+        context.localize('settings'),
+        context_menu_uri(
+            context,
+            PATHS.SETTINGS,
+        ),
+    )
+
+
+def open_setup_wizard(context):
+    return (
+        context.localize('setup_wizard'),
+        context_menu_uri(
+            context,
+            PATHS.SETUP_WIZARD,
+        ),
+    )

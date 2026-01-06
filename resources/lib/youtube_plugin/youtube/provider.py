@@ -1771,19 +1771,27 @@ class Provider(AbstractProvider):
         if settings_bool(settings.SHOW_SETUP_WIZARD, True):
             settings_menu_item = DirectoryItem(
                 localize('setup_wizard'),
-                create_uri(('config', 'setup_wizard')),
+                create_uri(PATHS.SETUP_WIZARD),
                 image='{media}/settings.png',
                 action=True,
             )
+            context_menu = [
+                menu_items.open_settings(context)
+            ]
+            settings_menu_item.add_context_menu(context_menu)
             result.append(settings_menu_item)
 
         if settings_bool(settings.SHOW_SETTINGS):
             settings_menu_item = DirectoryItem(
                 localize('settings'),
-                create_uri(('config', 'youtube')),
+                create_uri(PATHS.SETTINGS),
                 image='{media}/settings.png',
                 action=True,
             )
+            context_menu = [
+                menu_items.open_setup_wizard(context)
+            ]
+            settings_menu_item.add_context_menu(context_menu)
             result.append(settings_menu_item)
 
         return result, options
