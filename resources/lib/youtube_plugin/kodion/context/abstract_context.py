@@ -364,7 +364,8 @@ class AbstractContext(object):
                    run=False,
                    play=None,
                    window=None,
-                   command=False):
+                   command=False,
+                   **kwargs):
         if isinstance(path, (list, tuple)):
             uri = self.create_path(*path, is_uri=True)
         elif path:
@@ -398,22 +399,7 @@ class AbstractContext(object):
             uri = '?'.join((uri, params))
 
         command = 'command://' if command else ''
-        if run:
-            return ''.join((command,
-                            'RunAddon('
-                            if run == 'addon' else
-                            'RunScript('
-                            if run == 'script' else
-                            'RunPlugin(',
-                            uri,
-                            ')'))
-        if play is not None:
-            return ''.join((
-                command,
-                'PlayMedia(',
-                uri,
-                ',playlist_type_hint=', str(play), ')',
-            ))
+
         if window:
             if not isinstance(window, dict):
                 window = {}
@@ -443,6 +429,35 @@ class AbstractContext(object):
                 ',return' if window_return else '',
                 ',replace' if history_replace else '',
                 ')'
+            ))
+
+        kwargs = ',' + ','.join([
+            '%s=%s' % (kwarg, value)
+            if value is not None else
+            kwarg
+            for kwarg, value in kwargs.items()
+        ]) if kwargs else ''
+
+        if run:
+            return ''.join((
+                command,
+                'RunAddon('
+                if run == 'addon' else
+                'RunScript('
+                if run == 'script' else
+                'RunPlugin(',
+                uri,
+                kwargs,
+                ')'
+            ))
+        if play is not None:
+            return ''.join((
+                command,
+                'PlayMedia(',
+                uri,
+                kwargs,
+                ',playlist_type_hint=', str(play),
+                ')',
             ))
         return uri
 
