@@ -694,8 +694,7 @@ class AbstractContext(object):
     def ipc_exec(self, target, timeout=None, payload=None, raise_exc=False):
         raise NotImplementedError()
 
-    @staticmethod
-    def is_plugin_folder(folder_name=None):
+    def is_plugin_folder(self, folder_name=None):
         raise NotImplementedError()
 
     def refresh_requested(self, force=False, on=False, off=False, params=None):
