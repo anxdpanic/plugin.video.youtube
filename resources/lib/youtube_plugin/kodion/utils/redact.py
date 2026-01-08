@@ -51,12 +51,15 @@ def redact_params(params, _seq_types=(list, tuple)):
 
     log_params = params.copy()
     for param, value in params.items():
-        if param in {'key',
-                     'api_key',
-                     API_KEY,
-                     'api_secret',
-                     API_SECRET,
-                     'client_secret'}:
+        if isinstance(value, dict):
+            log_value = redact_params(value)
+        elif param in {'key',
+                       'api_key',
+                       API_KEY,
+                       'api_secret',
+                       API_SECRET,
+                       'client_secret',
+                       'secret'}:
             log_value = (
                 ['...'.join((val[:3], val[-3:]))
                  if len(val) > 9 else
