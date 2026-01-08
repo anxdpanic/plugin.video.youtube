@@ -1131,27 +1131,11 @@ class YouTubePlayerClient(YouTubeDataClient):
             headers = response['client']['headers']
             url = self._process_url_params(
                 response['mpd_manifest'],
+                mpd_manifest=True,
                 headers=headers,
             )
             if not url:
                 continue
-
-            url_components = urlsplit(url)
-            if url_components.query:
-                params = dict(parse_qs(url_components.query))
-                params['mpd_version'] = ['7']
-                url = url_components._replace(
-                    query=urlencode(params, doseq=True),
-                ).geturl()
-            else:
-                path = re_sub(
-                    r'/mpd_version/\d+|/?$',
-                    '/mpd_version/7',
-                    url_components.path,
-                )
-                url = url_components._replace(
-                    path=path,
-                ).geturl()
 
             stream_list[itag] = self._get_stream_format(
                 itag=itag,
@@ -1420,6 +1404,7 @@ class YouTubePlayerClient(YouTubeDataClient):
     def _process_url_params(self,
                             url,
                             stream_proxy=False,
+                            mpd_manifest=False,
                             headers=None,
                             cpn=False,
                             referrer=None,
@@ -1498,15 +1483,23 @@ class YouTubePlayerClient(YouTubeDataClient):
             if cpn is not False:
                 new_params['cpn'] = cpn or self._generate_cpn()
 
-            params.update(new_params)
-            query_str = urlencode(params, doseq=True)
-
-            return parts._replace(
+            parts = parts._replace(
                 scheme='http',
                 netloc=get_connect_address(self._context, as_netloc=True),
                 path=PATHS.STREAM_PROXY,
-                query=query_str,
-            ).geturl()
+            )
+
+        elif mpd_manifest:
+            if 'mpd_version' in params:
+                new_params['mpd_version'] = ['7']
+            else:
+                parts = parts._replace(
+                    path=re_sub(
+                        r'/mpd_version/\d+|/?$',
+                        '/mpd_version/7',
+                        parts.path,
+                    ),
+                )
 
         elif 'ratebypass' not in params and 'range' not in params:
             content_length = params.get('clen', [''])[0]
@@ -1515,7 +1508,7 @@ class YouTubePlayerClient(YouTubeDataClient):
         if new_params:
             params.update(new_params)
             query_str = urlencode(params, doseq=True)
-            return parts._replace(query=query_str).geturl()
+            parts = parts._replace(query=query_str)
 
         return parts.geturl()
 
