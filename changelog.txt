@@ -1,3 +1,22 @@
+## v7.4.0+beta.3
+### Fixed
+- Avoid creating PlayerMonitorThread as a subclass of threading.Thread
+- Additional workarounds for JSON file operations failing due to addon service start delays #1362
+- Avoid unnecessary window navigation when opening More... context menu dialog
+- Fix typo in evaluating whether plugin container is loaded or active
+- Fix possible exception when using default fallback for failed search
+
+### Changed
+- Update and trigger Setup Wizard to set default value for My Subscription sources
+- Pass additional headers to all player request and manifest urls by default
+- Workaround Kodi not executing Play action on listitems in non-video containers
+- Improve context menu runtime checks when used with widget containers
+
+### New
+- Add context menu items to open Settings/Setup Wizard from Setup Wizard/Settings main menu entries
+- Log summary of stream proxy request and response details #1363
+- Log stream proxy request range #1363
+
 ## v7.4.0+beta.2
 ### Fixed
 - Fix retrieving items from local history database #1356
