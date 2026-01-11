@@ -345,8 +345,8 @@ msgid "My Subscriptions"
 msgstr "Abonamentele mele"
 
 msgctxt "#30511"
-msgid "Queue video"
-msgstr "Adaugă în lista de redare"
+msgid ""
+msgstr ""
 
 msgctxt "#30512"
 msgid "Browse Channels"
@@ -1583,6 +1583,10 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30511"
+#~ msgid "Queue video"
+#~ msgstr "Adaugă în lista de redare"
 
 #~ msgctxt "#30020"
 #~ msgid "Allow 3D"
