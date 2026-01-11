@@ -360,8 +360,8 @@ msgid "Related Videos"
 msgstr "Povezani videozapisi"
 
 msgctxt "#30515"
-msgid "Auto-Remove from Watch Later"
-msgstr "Automatsko uklanjanje iz rubrike Gledaj kasnije"
+msgid "Auto-remove from Watch Later"
+msgstr ""
 
 msgctxt "#30516"
 msgid "Folders"
@@ -424,11 +424,11 @@ msgid "I dislike this"
 msgstr "Ne sviđa mi se ovo"
 
 msgctxt "#30531"
-msgid ""
+msgid "Bookmarked Channels"
 msgstr ""
 
 msgctxt "#30532"
-msgid ""
+msgid "Bookmarked Playlists"
 msgstr ""
 
 msgctxt "#30533"
@@ -628,8 +628,8 @@ msgid "Are you sure you want to reset access manager?"
 msgstr "Jeste li sigurni da želite resetirati upravitelja pristupa?"
 
 msgctxt "#30582"
-msgid "Autoplay suggested videos"
-msgstr "Automatska reprodukcija predloženih videozapisa"
+msgid "Auto-play suggested videos"
+msgstr ""
 
 msgctxt "#30583"
 msgid "Filters can be channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel', and/or custom video filters in the form '{ATTR}{OP}{VALUE}' eg. '{duration}{>=}{180}{artists_string}{=}{\"The Best Channel\"},{duration}{<}{180}'"
@@ -872,8 +872,8 @@ msgid "Delete access_manager.json"
 msgstr "Obriši datoteku access_manager.json"
 
 msgctxt "#30643"
-msgid "Listen on IP"
-msgstr "Slušajte putem IP-a"
+msgid ""
+msgstr ""
 
 msgctxt "#30644"
 msgid "Select listen IP"
@@ -1582,6 +1582,18 @@ msgstr "Reproduciraj od početka"
 msgctxt "#30820"
 msgid "Podcast"
 msgstr "Podcast"
+
+#~ msgctxt "#30515"
+#~ msgid "Auto-Remove from Watch Later"
+#~ msgstr "Automatsko uklanjanje iz rubrike Gledaj kasnije"
+
+#~ msgctxt "#30582"
+#~ msgid "Autoplay suggested videos"
+#~ msgstr "Automatska reprodukcija predloženih videozapisa"
+
+#~ msgctxt "#30643"
+#~ msgid "Listen on IP"
+#~ msgstr "Slušajte putem IP-a"
 
 #~ msgctxt "#30547"
 #~ msgid "You may be prompted to enable two applications so that YouTube is functioning properly."
