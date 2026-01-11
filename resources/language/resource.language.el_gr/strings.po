@@ -344,8 +344,8 @@ msgid "My Subscriptions"
 msgstr "Οι συνδρομές μου"
 
 msgctxt "#30511"
-msgid "Queue video"
-msgstr "Προσθήκη βίντεο στην ουρά"
+msgid ""
+msgstr ""
 
 msgctxt "#30512"
 msgid "Browse Channels"
@@ -1582,6 +1582,10 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30511"
+#~ msgid "Queue video"
+#~ msgstr "Προσθήκη βίντεο στην ουρά"
 
 #~ msgctxt "#30582"
 #~ msgid "Autoplay suggested videos"

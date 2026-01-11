@@ -344,8 +344,8 @@ msgid "My Subscriptions"
 msgstr "Абонаменти"
 
 msgctxt "#30511"
-msgid "Queue video"
-msgstr "Добави към опашката"
+msgid ""
+msgstr ""
 
 msgctxt "#30512"
 msgid "Browse Channels"
@@ -1582,6 +1582,10 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30511"
+#~ msgid "Queue video"
+#~ msgstr "Добави към опашката"
 
 #~ msgctxt "#30020"
 #~ msgid "Allow 3D"
