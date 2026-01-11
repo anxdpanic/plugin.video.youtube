@@ -361,7 +361,7 @@ msgid "Related Videos"
 msgstr "Gerelateerde Video's"
 
 msgctxt "#30515"
-msgid "Auto-Remove from Watch Later"
+msgid "Auto-remove from Watch Later"
 msgstr ""
 
 msgctxt "#30516"
@@ -425,11 +425,11 @@ msgid "I dislike this"
 msgstr "Niet leuk"
 
 msgctxt "#30531"
-msgid ""
+msgid "Bookmarked Channels"
 msgstr ""
 
 msgctxt "#30532"
-msgid ""
+msgid "Bookmarked Playlists"
 msgstr ""
 
 msgctxt "#30533"
@@ -629,8 +629,8 @@ msgid "Are you sure you want to reset access manager?"
 msgstr "Weet je zeker dat je inlogbeheer wilt resetten?"
 
 msgctxt "#30582"
-msgid "Autoplay suggested videos"
-msgstr "Speel aanbevolen video's automatisch af"
+msgid "Auto-play suggested videos"
+msgstr ""
 
 msgctxt "#30583"
 msgid "Filters can be channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel', and/or custom video filters in the form '{ATTR}{OP}{VALUE}' eg. '{duration}{>=}{180}{artists_string}{=}{\"The Best Channel\"},{duration}{<}{180}'"
@@ -873,8 +873,8 @@ msgid "Delete access_manager.json"
 msgstr "Verwijder access_manager.json"
 
 msgctxt "#30643"
-msgid "Listen on IP"
-msgstr "Luister op IP"
+msgid ""
+msgstr ""
 
 msgctxt "#30644"
 msgid "Select listen IP"
@@ -1583,6 +1583,14 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30582"
+#~ msgid "Autoplay suggested videos"
+#~ msgstr "Speel aanbevolen video's automatisch af"
+
+#~ msgctxt "#30643"
+#~ msgid "Listen on IP"
+#~ msgstr "Luister op IP"
 
 # empty strings 30019
 #~ msgctxt "#30020"

@@ -360,7 +360,7 @@ msgid "Related Videos"
 msgstr "Lignende videoer"
 
 msgctxt "#30515"
-msgid "Auto-Remove from Watch Later"
+msgid "Auto-remove from Watch Later"
 msgstr ""
 
 msgctxt "#30516"
@@ -424,11 +424,11 @@ msgid "I dislike this"
 msgstr "Jeg kan ikke lide dette"
 
 msgctxt "#30531"
-msgid ""
+msgid "Bookmarked Channels"
 msgstr ""
 
 msgctxt "#30532"
-msgid ""
+msgid "Bookmarked Playlists"
 msgstr ""
 
 msgctxt "#30533"
@@ -628,8 +628,8 @@ msgid "Are you sure you want to reset access manager?"
 msgstr "Er du sikker på, at du vil nulstille adgangsadministrering?"
 
 msgctxt "#30582"
-msgid "Autoplay suggested videos"
-msgstr "Automatisk afspilning af foreslåede videoer"
+msgid "Auto-play suggested videos"
+msgstr ""
 
 msgctxt "#30583"
 msgid "Filters can be channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel', and/or custom video filters in the form '{ATTR}{OP}{VALUE}' eg. '{duration}{>=}{180}{artists_string}{=}{\"The Best Channel\"},{duration}{<}{180}'"
@@ -872,8 +872,8 @@ msgid "Delete access_manager.json"
 msgstr "Slet access_manager.json"
 
 msgctxt "#30643"
-msgid "Listen on IP"
-msgstr "Lyt på IP"
+msgid ""
+msgstr ""
 
 msgctxt "#30644"
 msgid "Select listen IP"
@@ -1582,6 +1582,14 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30582"
+#~ msgid "Autoplay suggested videos"
+#~ msgstr "Automatisk afspilning af foreslåede videoer"
+
+#~ msgctxt "#30643"
+#~ msgid "Listen on IP"
+#~ msgstr "Lyt på IP"
 
 # empty strings 30019
 #~ msgctxt "#30020"

@@ -23,6 +23,12 @@ from ...kodion.utils.datetime import since_epoch, strptime
 def process_pre_run(context):
     context.get_function_cache().clear()
 
+    settings = context.get_settings()
+    if not settings.subscriptions_sources(default=False, raw_values=True):
+        settings.subscriptions_sources(
+            settings.subscriptions_sources(raw_values=True)
+        )
+
 
 def process_language(context, step, steps, **_kwargs):
     localize = context.localize

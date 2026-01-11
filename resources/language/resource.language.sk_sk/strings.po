@@ -360,7 +360,7 @@ msgid "Related Videos"
 msgstr "Súvisiace videá"
 
 msgctxt "#30515"
-msgid "Auto-Remove from Watch Later"
+msgid "Auto-remove from Watch Later"
 msgstr ""
 
 msgctxt "#30516"
@@ -424,11 +424,11 @@ msgid "I dislike this"
 msgstr "Nepáči sa mi to"
 
 msgctxt "#30531"
-msgid ""
+msgid "Bookmarked Channels"
 msgstr ""
 
 msgctxt "#30532"
-msgid ""
+msgid "Bookmarked Playlists"
 msgstr ""
 
 msgctxt "#30533"
@@ -628,8 +628,8 @@ msgid "Are you sure you want to reset access manager?"
 msgstr "Naozaj chcete odstrániť údaje Správcu prístupu?"
 
 msgctxt "#30582"
-msgid "Autoplay suggested videos"
-msgstr "Automaticky prehrávať navrhované videá"
+msgid "Auto-play suggested videos"
+msgstr ""
 
 msgctxt "#30583"
 msgid "Filters can be channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel', and/or custom video filters in the form '{ATTR}{OP}{VALUE}' eg. '{duration}{>=}{180}{artists_string}{=}{\"The Best Channel\"},{duration}{<}{180}'"
@@ -872,8 +872,8 @@ msgid "Delete access_manager.json"
 msgstr "Odstrániť access_manager.json"
 
 msgctxt "#30643"
-msgid "Listen on IP"
-msgstr "Počúvať na IP adrese"
+msgid ""
+msgstr ""
 
 msgctxt "#30644"
 msgid "Select listen IP"
@@ -1582,6 +1582,14 @@ msgstr "Prehrať od začiatku"
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30582"
+#~ msgid "Autoplay suggested videos"
+#~ msgstr "Automaticky prehrávať navrhované videá"
+
+#~ msgctxt "#30643"
+#~ msgid "Listen on IP"
+#~ msgstr "Počúvať na IP adrese"
 
 #~ msgctxt "#30808"
 #~ msgid "Hide videos from listings"

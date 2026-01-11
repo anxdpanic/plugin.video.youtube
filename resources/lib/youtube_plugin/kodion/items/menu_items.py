@@ -46,12 +46,12 @@ URI_INFOLABEL = PROPERTY_AS_LABEL % URI
 VIDEO_ID_INFOLABEL = PROPERTY_AS_LABEL % VIDEO_ID
 
 
-def context_menu_uri(context, path, params=None):
+def context_menu_uri(context, path, params=None, run=True, play=False):
     if params is None:
         params = {CONTEXT_MENU: True}
     else:
         params[CONTEXT_MENU] = True
-    return context.create_uri(path, params, run=True)
+    return context.create_uri(path, params, run=run, play=play)
 
 
 def video_more_for(context,
@@ -178,10 +178,16 @@ def folder_play(context, path, order='normal'):
     )
 
 
-def media_play(context):
+def media_play(context, video_id=VIDEO_ID_INFOLABEL):
     return (
         context.localize('video.play'),
-        'Action(Play)'
+        context_menu_uri(
+            context,
+            (PATHS.PLAY,),
+            {
+                VIDEO_ID: video_id,
+            },
+        ),
     )
 
 
@@ -899,5 +905,25 @@ def goto_page(context, params=None):
             context,
             (PATHS.GOTO_PAGE, context.get_path(),),
             params or context.get_params(),
+        ),
+    )
+
+
+def open_settings(context):
+    return (
+        context.localize('settings'),
+        context_menu_uri(
+            context,
+            PATHS.SETTINGS,
+        ),
+    )
+
+
+def open_setup_wizard(context):
+    return (
+        context.localize('setup_wizard'),
+        context_menu_uri(
+            context,
+            PATHS.SETUP_WIZARD,
         ),
     )

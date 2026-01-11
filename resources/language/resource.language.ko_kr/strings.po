@@ -360,8 +360,8 @@ msgid "Related Videos"
 msgstr "관련 동영상"
 
 msgctxt "#30515"
-msgid "Auto-Remove from Watch Later"
-msgstr "나중에 보기에서 자동 지움"
+msgid "Auto-remove from Watch Later"
+msgstr ""
 
 msgctxt "#30516"
 msgid "Folders"
@@ -424,11 +424,11 @@ msgid "I dislike this"
 msgstr "싫어함"
 
 msgctxt "#30531"
-msgid ""
+msgid "Bookmarked Channels"
 msgstr ""
 
 msgctxt "#30532"
-msgid ""
+msgid "Bookmarked Playlists"
 msgstr ""
 
 msgctxt "#30533"
@@ -628,8 +628,8 @@ msgid "Are you sure you want to reset access manager?"
 msgstr "접근 관리자를 초기화할까요?"
 
 msgctxt "#30582"
-msgid "Autoplay suggested videos"
-msgstr "추천 동영상 자동 재생"
+msgid "Auto-play suggested videos"
+msgstr ""
 
 msgctxt "#30583"
 msgid "Filters can be channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel', and/or custom video filters in the form '{ATTR}{OP}{VALUE}' eg. '{duration}{>=}{180}{artists_string}{=}{\"The Best Channel\"},{duration}{<}{180}'"
@@ -872,8 +872,8 @@ msgid "Delete access_manager.json"
 msgstr "access_manager.json 지움"
 
 msgctxt "#30643"
-msgid "Listen on IP"
-msgstr "참조 IP"
+msgid ""
+msgstr ""
 
 msgctxt "#30644"
 msgid "Select listen IP"
@@ -1582,6 +1582,18 @@ msgstr "처음부터 재생"
 msgctxt "#30820"
 msgid "Podcast"
 msgstr "팟캐스트"
+
+#~ msgctxt "#30515"
+#~ msgid "Auto-Remove from Watch Later"
+#~ msgstr "나중에 보기에서 자동 지움"
+
+#~ msgctxt "#30582"
+#~ msgid "Autoplay suggested videos"
+#~ msgstr "추천 동영상 자동 재생"
+
+#~ msgctxt "#30643"
+#~ msgid "Listen on IP"
+#~ msgstr "참조 IP"
 
 #~ msgctxt "#30547"
 #~ msgid "You may be prompted to enable two applications so that YouTube is functioning properly."

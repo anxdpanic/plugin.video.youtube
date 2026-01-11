@@ -29,7 +29,7 @@ from ..constants import (
 from ..utils.redact import redact_params
 
 
-class PlayerMonitorThread(threading.Thread):
+class PlayerMonitorThread(object):
     def __init__(self, player, provider, context, monitor, player_data):
         self.player_data = player_data
         video_id = player_data.get(VIDEO_ID)
@@ -53,11 +53,13 @@ class PlayerMonitorThread(threading.Thread):
             class_name=self.__class__.__name__,
             video_id=video_id,
         )
+        self.name = name
         self.log = logging.getLogger(name)
 
-        super(PlayerMonitorThread, self).__init__(name=name)
-        self.daemon = True
-        self.start()
+        thread = threading.Thread(name=name, target=self.run, args=(self,))
+        self._thread = thread
+        thread.daemon = True
+        thread.start()
 
     def abort_now(self):
         return (not self._player.isPlaying()
@@ -333,6 +335,9 @@ class PlayerMonitorThread(threading.Thread):
 
     def ended(self):
         return self._ended.is_set()
+
+    def join(self, timeout=None):
+        return self._thread.join(timeout)
 
 
 class PlayerMonitor(xbmc.Player):

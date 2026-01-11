@@ -230,7 +230,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             'log_uri': log_uri,
         }
 
-        if not path['path'].startswith(PATHS.PING):
+        if not path['path'].startswith(PATHS.PING) and self.log.verbose_logging:
             self.log.debug(('{status}',
                             'Method:      {method!r}',
                             'Path:        {path[path]!r}',
@@ -385,13 +385,14 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             params = path['params']
             original_path = params.pop('__path', empty)[0] or '/videoplayback'
             request_servers = params.pop('__host', empty)
-            stream_id = params.pop('__id', empty)[0]
+            stream_id = params.pop('__id', empty)
             method = params.pop('__method', empty)[0] or 'POST'
             if original_path == '/videoplayback':
-                stream_id = (stream_id, params.get('itag', empty)[0])
+                stream_id += params.get('itag', empty)
+                stream_id = tuple(stream_id)
                 stream_type = params.get('mime', empty)[0]
                 if stream_type:
-                    stream_type = stream_type.split('/')
+                    stream_type = tuple(stream_type.split('/'))
                 else:
                     stream_type = (None, None)
                 ids = self.server_priority_list['stream_ids']
@@ -416,11 +417,13 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                         'list': priority_list,
                     }
             elif original_path == '/api/timedtext':
+                stream_id = tuple(stream_id)
                 stream_type = (params.get('type', ['track'])[0],
                                params.get('fmt', empty)[0],
                                params.get('kind', empty)[0])
                 priority_list = []
             else:
+                stream_id = tuple(stream_id)
                 stream_type = (None, None)
                 priority_list = []
 
@@ -432,15 +435,51 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             else:
                 headers = self.headers
 
+            byte_range = headers.get('Range')
+            client = headers.get('X-YouTube-Client-Name')
+            if self.log.debugging:
+                if 'c' in params:
+                    if client:
+                        client = '%s (%s)' % (
+                            client,
+                            params.get('c', empty)[0],
+                        )
+                    else:
+                        client = params.get('c', empty)[0]
+
+                clen = params.get('clen', empty)[0]
+                duration = params.get('dur', empty)[0]
+                if (not byte_range
+                        or not clen
+                        or not duration
+                        or not byte_range.startswith('bytes=')):
+                    timestamp = ''
+                else:
+                    try:
+                        timestamp = ' (~%.2fs)' % (
+                                float(duration)
+                                *
+                                next(map(int, byte_range[6:].split('-')))
+                                /
+                                int(clen)
+                        )
+                    except (IndexError, StopIteration, ValueError):
+                        timestamp = ''
+            else:
+                timestamp = ''
+
             original_query_str = urlencode(params, doseq=True)
 
             stream_redirect = settings.httpd_stream_redirect()
 
             log_msg = ('Stream proxy response {success}',
+                       'Stream: {stream_id} - {stream_type}',
                        'Method: {method!r}',
                        'Server: {server!r}',
                        'Target: {target!r}',
-                       'Status: {status} {reason}')
+                       'Status: {status} {reason}',
+                       'Client: {client}',
+                       'Range:  {byte_range!r}{timestamp}')
 
             response = None
             server = None
@@ -490,11 +529,16 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                         level=logging.WARNING,
                         msg=log_msg,
                         success='not OK',
+                        stream_id=stream_id,
+                        stream_type=stream_type,
                         method=method,
                         server=server,
                         target=target,
                         status=-1,
                         reason='Failed',
+                        client=client,
+                        byte_range=byte_range,
+                        timestamp=timestamp,
                     )
                     break
                 with response:
@@ -544,11 +588,16 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                         level=log_level,
                         msg=log_msg,
                         success=('OK' if success else 'not OK'),
+                        stream_id=stream_id,
+                        stream_type=stream_type,
                         method=method,
                         server=server,
                         target=target,
                         status=status,
                         reason=reason,
+                        client=client,
+                        byte_range=byte_range,
+                        timestamp=timestamp,
                     )
 
                     if not success:

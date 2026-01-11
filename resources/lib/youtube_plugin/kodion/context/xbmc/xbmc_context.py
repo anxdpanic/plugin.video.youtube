@@ -377,7 +377,7 @@ class XbmcContext(AbstractContext):
         'video.play.timeshift': 30819,
         'video.play.using': 15213,
         'video.play.with_subtitles': 30702,
-        'video.queue': 30511,
+        'video.queue': 13347,
         'video.rate': 30528,
         'video.rate.dislike': 30530,
         'video.rate.like': 30529,
@@ -1028,7 +1028,7 @@ class XbmcContext(AbstractContext):
     def is_plugin_folder(self, folder_name=None):
         if folder_name is None:
             folder_name = XbmcContextUI.get_container_info(FOLDER_NAME,
-                                                           container_id=False)
+                                                           container_id=None)
         return folder_name == self._plugin_name
 
     def refresh_requested(self, force=False, on=False, off=False, params=None):

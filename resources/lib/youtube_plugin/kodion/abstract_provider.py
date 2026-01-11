@@ -16,6 +16,7 @@ from re import (
 )
 
 from . import logging
+from .compatibility import string_type
 from .constants import (
     CHECK_SETTINGS,
     CONTENT,
@@ -417,7 +418,8 @@ class AbstractProvider(object):
                     fallback = options.setdefault(
                         provider.FALLBACK, context.get_uri()
                     )
-                    ui.set_property(provider.FALLBACK, fallback)
+                    if fallback and isinstance(fallback, string_type):
+                        ui.set_property(provider.FALLBACK, fallback)
                 return result, options
             command = 'list'
             context.set_path(PATHS.SEARCH, command)

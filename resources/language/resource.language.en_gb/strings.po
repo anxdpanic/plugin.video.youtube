@@ -350,7 +350,7 @@ msgid "My Subscriptions"
 msgstr ""
 
 msgctxt "#30511"
-msgid "Queue video"
+msgid ""
 msgstr ""
 
 msgctxt "#30512"
