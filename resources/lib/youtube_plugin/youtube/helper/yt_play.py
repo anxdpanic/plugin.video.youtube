@@ -22,6 +22,7 @@ from ...kodion.constants import (
     BUSY_FLAG,
     CHANNEL_ID,
     CONTENT,
+    CONTEXT_MENU,
     FORCE_PLAY_PARAMS,
     INCOGNITO,
     ORDER,
@@ -535,8 +536,11 @@ def process(provider, context, **_kwargs):
 
         if context.get_handle() == -1:
             # This is required to trigger Kodi resume prompt, along with using
-            # RunPlugin. Prompt will not be used if using PlayMedia
-            if force_play_params and not params.get(PLAY_STRM):
+            # RunPlugin. Prompt will not be used if using PlayMedia, however
+            # Action(Play) does not work in non-video windows
+            if ((force_play_params or params.get(CONTEXT_MENU))
+                    and not params.get(PLAY_STRM)
+                    and context.is_plugin_folder()):
                 return UriItem('command://Action(Play)')
 
             return UriItem('command://{0}'.format(

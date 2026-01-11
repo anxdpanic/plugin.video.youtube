@@ -33,6 +33,9 @@ PLAYLIST = '/playlist'
 SUBSCRIPTIONS = '/subscriptions'
 VIDEO = '/video'
 
+SETTINGS = '/config/youtube'
+SETUP_WIZARD = '/config/setup_wizard'
+
 SPECIAL = '/special'
 DESCRIPTION_LINKS = SPECIAL + '/description_links'
 DISLIKED_VIDEOS = SPECIAL + '/disliked_videos'

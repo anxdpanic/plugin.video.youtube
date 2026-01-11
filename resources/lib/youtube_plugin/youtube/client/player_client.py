@@ -1128,28 +1128,14 @@ class YouTubePlayerClient(YouTubeDataClient):
             if itag in stream_list:
                 break
 
-            url = response['mpd_manifest']
+            headers = response['client']['headers']
+            url = self._process_url_params(
+                response['mpd_manifest'],
+                mpd_manifest=True,
+                headers=headers,
+            )
             if not url:
                 continue
-
-            headers = response['client']['headers']
-
-            url_components = urlsplit(url)
-            if url_components.query:
-                params = dict(parse_qs(url_components.query))
-                params['mpd_version'] = ['7']
-                url = url_components._replace(
-                    query=urlencode(params, doseq=True),
-                ).geturl()
-            else:
-                path = re_sub(
-                    r'/mpd_version/\d+|/?$',
-                    '/mpd_version/7',
-                    url_components.path,
-                )
-                url = url_components._replace(
-                    path=path,
-                ).geturl()
 
             stream_list[itag] = self._get_stream_format(
                 itag=itag,
@@ -1197,11 +1183,13 @@ class YouTubePlayerClient(YouTubeDataClient):
         itags = ('9995', '9996') if is_live else ('9993', '9994')
 
         for client_name, response in responses.items():
-            url = response['hls_manifest']
+            headers = response['client']['headers']
+            url = self._process_url_params(
+                response['hls_manifest'],
+                headers=headers,
+            )
             if not url:
                 continue
-
-            headers = response['client']['headers']
 
             result = self.request(
                 url,
@@ -1318,11 +1306,10 @@ class YouTubePlayerClient(YouTubeDataClient):
                 else:
                     new_url = url
 
-                new_url = self._process_url_params(new_url,
-                                                   mpd=False,
-                                                   headers=headers,
-                                                   referrer=None,
-                                                   visitor_data=None)
+                new_url = self._process_url_params(
+                    new_url,
+                    headers=headers,
+                )
                 if not new_url:
                     continue
 
@@ -1416,11 +1403,12 @@ class YouTubePlayerClient(YouTubeDataClient):
 
     def _process_url_params(self,
                             url,
-                            mpd=True,
+                            stream_proxy=False,
+                            mpd_manifest=False,
                             headers=None,
                             cpn=False,
-                            referrer=False,
-                            visitor_data=False,
+                            referrer=None,
+                            visitor_data=None,
                             method='POST',
                             digits_re=re_compile(r'\d+')):
         if not url:
@@ -1473,7 +1461,7 @@ class YouTubePlayerClient(YouTubeDataClient):
                     or 'https://www.youtube.com/watch?v=%s' % self.video_id,
                 )
 
-        if mpd:
+        if stream_proxy:
             new_params['__id'] = self.video_id
             new_params['__method'] = method
             new_params['__host'] = [parts.hostname]
@@ -1495,15 +1483,23 @@ class YouTubePlayerClient(YouTubeDataClient):
             if cpn is not False:
                 new_params['cpn'] = cpn or self._generate_cpn()
 
-            params.update(new_params)
-            query_str = urlencode(params, doseq=True)
-
-            return parts._replace(
+            parts = parts._replace(
                 scheme='http',
                 netloc=get_connect_address(self._context, as_netloc=True),
                 path=PATHS.STREAM_PROXY,
-                query=query_str,
-            ).geturl()
+            )
+
+        elif mpd_manifest:
+            if 'mpd_version' in params:
+                new_params['mpd_version'] = ['7']
+            else:
+                parts = parts._replace(
+                    path=re_sub(
+                        r'/mpd_version/\d+|/?$',
+                        '/mpd_version/7',
+                        parts.path,
+                    ),
+                )
 
         elif 'ratebypass' not in params and 'range' not in params:
             content_length = params.get('clen', [''])[0]
@@ -1512,7 +1508,7 @@ class YouTubePlayerClient(YouTubeDataClient):
         if new_params:
             params.update(new_params)
             query_str = urlencode(params, doseq=True)
-            return parts._replace(query=query_str).geturl()
+            parts = parts._replace(query=query_str)
 
         return parts.geturl()
 
@@ -2406,6 +2402,7 @@ class YouTubePlayerClient(YouTubeDataClient):
 
                 urls = self._process_url_params(
                     unquote(url),
+                    stream_proxy=True,
                     headers=client['headers'],
                     cpn=client.get('_cpn'),
                 )
@@ -2851,9 +2848,8 @@ class YouTubePlayerClient(YouTubeDataClient):
 
                 url = entity_escape(unquote(self._process_url_params(
                     subtitle['url'],
+                    stream_proxy=True,
                     headers=headers,
-                    referrer=None,
-                    visitor_data=None,
                 )))
                 if not url:
                     continue
