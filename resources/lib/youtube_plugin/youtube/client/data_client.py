@@ -3125,21 +3125,25 @@ class YouTubeDataClient(YouTubeLoginClient):
             if access_token:
                 access_tokens[config_type] = access_token
 
-        client = self.build_client(client, client_data)
-        if not client:
-            client = {}
+        _client = self.build_client(client, client_data)
+        if _client:
+            client = _client
+
+            if clear_data and 'json' in client:
+                del client['json']
+
+            params = client.get('params')
+            if params and 'key' in params:
+                key = params['key']
+                if key:
+                    abort = False
+                elif not client['_has_auth']:
+                    abort = True
+        else:
+            client_data.setdefault('_name', client)
+            client = client_data
+            params = client.get('params')
             abort = True
-
-        if clear_data and 'json' in client:
-            del client['json']
-
-        params = client.get('params')
-        if params and 'key' in params:
-            key = params['key']
-            if key:
-                abort = False
-            elif not client['_has_auth']:
-                abort = True
 
         context = self._context
         self.log.debug(('{request_name} API request',
