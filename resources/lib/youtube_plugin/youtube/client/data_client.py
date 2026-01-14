@@ -19,7 +19,7 @@ from re import compile as re_compile
 from xml.etree.ElementTree import (
     Element as ET_Element,
     XML as ET_XML,
-    XMLPullParser as ET_XMLPullParser,
+    XMLParser as ET_XMLParser,
 )
 
 from .login_client import YouTubeLoginClient
@@ -2448,12 +2448,11 @@ class YouTubeDataClient(YouTubeLoginClient):
                 elif response.status_code == 429:
                     return False, True
                 elif stream:
-                    parser = ET_XMLPullParser(('start',))
+                    parser = ET_XMLParser(encoding='utf-8')
                     for chunk in response.iter_content(chunk_size=(8 * 1024)):
                         if chunk:
                             parser.feed(chunk)
-
-                    _, content = next(parser.read_events())
+                    content = parser.close()
                 else:
                     response.encoding = 'utf-8'
                     content = ET_XML(response.content)

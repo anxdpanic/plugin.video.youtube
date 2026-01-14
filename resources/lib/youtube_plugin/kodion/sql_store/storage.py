@@ -290,8 +290,9 @@ class Storage(object):
     def set_max_file_size_kb(self, max_file_size_kb):
         self._max_file_size_kb = max_file_size_kb
 
-    def __del__(self):
-        self._close(event='deleted')
+    if current_system_version.compatible(19):
+        def __del__(self):
+            self._close(event='deleted')
 
     def __enter__(self):
         self._lock.accessing(start=True)
