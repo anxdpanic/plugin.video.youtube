@@ -574,7 +574,8 @@ class XbmcContext(AbstractContext):
         language = get_kodi_setting_value('locale.subtitlelanguage')
         if language == 'default':
             language = get_kodi_setting_value('locale.language')
-            language = language.replace('resource.language.', '').split('_')[0]
+            if language != None:
+                language = language.replace('resource.language.', '').split('_')[0]
         elif language in self._KODI_UI_SUBTITLE_LANGUAGE_OPTIONS:
             language = None
         else:
