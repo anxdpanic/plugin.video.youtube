@@ -407,7 +407,7 @@ class BaseRequestsClass(object):
 
             log_msg = [
                 '{title}',
-                'URL:      {method} {url}',
+                'URL:      {method} {url!u}',
                 'Status:   {response_status} - {response_reason}',
                 'Response: {response_text}',
             ]
