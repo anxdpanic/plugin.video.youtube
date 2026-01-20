@@ -456,6 +456,7 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
         }
         props = {
             'isPlayable': VALUE_TO_STR[media_item.playable],
+            'ForceResolvePlugin': 'true',
             'playlist_type_hint': (
                 xbmc.PLAYLIST_MUSIC
                 if isinstance(media_item, AudioItem) else
