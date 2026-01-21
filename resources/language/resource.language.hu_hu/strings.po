@@ -344,8 +344,8 @@ msgid "My Subscriptions"
 msgstr "Feliratkozások"
 
 msgctxt "#30511"
-msgid "Queue video"
-msgstr "Várólista"
+msgid ""
+msgstr ""
 
 msgctxt "#30512"
 msgid "Browse Channels"
@@ -1582,6 +1582,10 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30511"
+#~ msgid "Queue video"
+#~ msgstr "Várólista"
 
 #~ msgctxt "#30582"
 #~ msgid "Autoplay suggested videos"

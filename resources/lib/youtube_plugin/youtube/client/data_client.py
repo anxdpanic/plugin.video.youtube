@@ -19,7 +19,7 @@ from re import compile as re_compile
 from xml.etree.ElementTree import (
     Element as ET_Element,
     XML as ET_XML,
-    XMLPullParser as ET_XMLPullParser,
+    XMLParser as ET_XMLParser,
 )
 
 from .login_client import YouTubeLoginClient
@@ -2448,12 +2448,11 @@ class YouTubeDataClient(YouTubeLoginClient):
                 elif response.status_code == 429:
                     return False, True
                 elif stream:
-                    parser = ET_XMLPullParser(('start',))
+                    parser = ET_XMLParser(encoding='utf-8')
                     for chunk in response.iter_content(chunk_size=(8 * 1024)):
                         if chunk:
                             parser.feed(chunk)
-
-                    _, content = next(parser.read_events())
+                    content = parser.close()
                 else:
                     response.encoding = 'utf-8'
                     content = ET_XML(response.content)
@@ -3126,21 +3125,25 @@ class YouTubeDataClient(YouTubeLoginClient):
             if access_token:
                 access_tokens[config_type] = access_token
 
-        client = self.build_client(client, client_data)
-        if not client:
-            client = {}
+        _client = self.build_client(client, client_data)
+        if _client:
+            client = _client
+
+            if clear_data and 'json' in client:
+                del client['json']
+
+            params = client.get('params')
+            if params and 'key' in params:
+                key = params['key']
+                if key:
+                    abort = False
+                elif not client['_has_auth']:
+                    abort = True
+        else:
+            client_data.setdefault('_name', client)
+            client = client_data
+            params = client.get('params')
             abort = True
-
-        if clear_data and 'json' in client:
-            del client['json']
-
-        params = client.get('params')
-        if params and 'key' in params:
-            key = params['key']
-            if key:
-                abort = False
-            elif not client['_has_auth']:
-                abort = True
 
         context = self._context
         self.log.debug(('{request_name} API request',

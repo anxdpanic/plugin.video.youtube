@@ -344,8 +344,8 @@ msgid "My Subscriptions"
 msgstr "Moje pretplate"
 
 msgctxt "#30511"
-msgid "Queue video"
-msgstr "Video u redu čekanja"
+msgid ""
+msgstr ""
 
 msgctxt "#30512"
 msgid "Browse Channels"
@@ -1582,6 +1582,10 @@ msgstr "Reproduciraj od početka"
 msgctxt "#30820"
 msgid "Podcast"
 msgstr "Podcast"
+
+#~ msgctxt "#30511"
+#~ msgid "Queue video"
+#~ msgstr "Video u redu čekanja"
 
 #~ msgctxt "#30515"
 #~ msgid "Auto-Remove from Watch Later"

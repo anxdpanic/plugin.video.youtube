@@ -1,3 +1,14 @@
+## v7.4.0+beta.4
+### Fixed
+- Add ForceResolvePlugin property to resolved ListItem #1371
+- Fix continuously loading SSL certificate when not required
+- Ensure logged URLs are redacted
+- Improve workarounds and fallbacks used to query Kodi language settings #1372
+- Fix error in PlayerMonitorThread.run #1368
+- Don't prevent JSON file writes if there is no existing file to read #1362
+- Improve sqlite3 exception handling
+- Various Python 2 compatibiliy fixes
+
 ## v7.4.0+beta.3
 ### Fixed
 - Avoid creating PlayerMonitorThread as a subclass of threading.Thread

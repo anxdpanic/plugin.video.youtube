@@ -775,7 +775,7 @@ def response_to_items(provider,
                 log.error_trace(('Unknown kind', 'Kind: %r'), kind)
                 break
 
-            pre_filler = json_data.get('_pre_filler')
+            pre_filler = json_data.pop('_pre_filler', None)
             if pre_filler:
                 if hasattr(pre_filler, '__nowrap__'):
                     _json_data = pre_filler(
@@ -833,7 +833,7 @@ def response_to_items(provider,
                                   filtered_out),
                     )
 
-            post_filler = json_data.get('_post_filler')
+            post_filler = json_data.pop('_post_filler', None)
             num_items = 0
             for item in items:
                 if post_filler and num_items >= remaining:
@@ -965,7 +965,7 @@ def pre_fill(filler, json_data, max_results, exclude=None):
         return None
 
     items = json_data.get('items') or []
-    post_filler = json_data.get('_post_filler')
+    post_filler = json_data.pop('_post_filler', None)
 
     all_items = []
     if exclude is not None:
@@ -1025,7 +1025,7 @@ def post_fill(filler, json_data):
         json_data['_post_filler'] = None
         return None
 
-    pre_filler = json_data.get('_pre_filler')
+    pre_filler = json_data.pop('_pre_filler', None)
 
     json_data = filler(
         page_token=page_token,

@@ -56,7 +56,7 @@ class PlayerMonitorThread(object):
         self.name = name
         self.log = logging.getLogger(name)
 
-        thread = threading.Thread(name=name, target=self.run, args=(self,))
+        thread = threading.Thread(name=name, target=self.run)
         self._thread = thread
         thread.daemon = True
         thread.start()

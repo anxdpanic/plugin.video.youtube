@@ -290,8 +290,9 @@ class Storage(object):
     def set_max_file_size_kb(self, max_file_size_kb):
         self._max_file_size_kb = max_file_size_kb
 
-    def __del__(self):
-        self._close(event='deleted')
+    if current_system_version.compatible(19):
+        def __del__(self):
+            self._close(event='deleted')
 
     def __enter__(self):
         self._lock.accessing(start=True)
@@ -333,26 +334,42 @@ class Storage(object):
             ))
             self._base._table_updated = True
 
+        abort = False
         for attempt in range(1, 4):
             try:
                 db = sqlite3.connect(self._filepath,
                                      cached_statements=0,
                                      check_same_thread=False,
                                      isolation_level=None)
+                cursor = db.cursor()
                 break
-            except (sqlite3.Error, sqlite3.OperationalError) as exc:
-                if attempt < 3 and isinstance(exc, sqlite3.OperationalError):
-                    self.log.warning('Attempt %d of 3',
-                                     attempt,
-                                     exc_info=True)
-                    time.sleep(0.1)
+            except Exception as exc:
+                if isinstance(exc, sqlite3.OperationalError):
+                    pass
                 else:
-                    self.log.exception('Failed')
-                    return None
-        else:
-            return None
+                    abort = True
 
-        cursor = db.cursor()
+                if abort or attempt >= 3:
+                    abort = True
+                    log_level = logging.ERROR
+                    status = 'Failed'
+                else:
+                    log_level = logging.WARNING
+                    status = 'Retry'
+                self.log.log(
+                    level=log_level,
+                    msg='{status} - Attempt {attempt} of 3',
+                    exc_info=True,
+                    status=status,
+                    attempt=attempt,
+                )
+            if abort:
+                break
+            time.sleep(0.1)
+        else:
+            abort = True
+        if abort:
+            return None
 
         queries = [
             'PRAGMA busy_timeout = 1000;',
@@ -484,30 +501,37 @@ class Storage(object):
                     else:
                         result = cursor.execute(query, _values)
                     break
-                except (sqlite3.Error, sqlite3.OperationalError) as exc:
-                    if attempt >= 3:
-                        abort = True
-                    elif isinstance(exc, sqlite3.OperationalError):
-                        time.sleep(0.1)
+                except Exception as exc:
+                    if isinstance(exc, sqlite3.OperationalError):
+                        pass
                     elif isinstance(exc, sqlite3.InterfaceError):
                         cursor = self._db.cursor()
                     else:
                         abort = True
-                    if abort:
-                        self.log.exception(('Failed',
-                                            'Query:  {query!r}',
-                                            'Values: {values!r}'),
-                                           attempt=attempt,
-                                           query=query,
-                                           values=values)
-                        break
-                    self.log.warning_trace(('Attempt {attempt} of 3',
-                                            'Query:  {query!r}',
-                                            'Values: {values!r}'),
-                                           attempt=attempt,
-                                           query=query,
-                                           values=values,
-                                           exc_info=True)
+
+                    if abort or attempt >= 3:
+                        abort = True
+                        log_level = logging.ERROR
+                        status = 'Failed'
+                    else:
+                        log_level = logging.WARNING
+                        status = 'Retry'
+                    self.log.log(
+                        level=log_level,
+                        msg=('{status} - Attempt {attempt} of 3',
+                             'Query:  {query!r}',
+                             'Values: {values!r}'),
+                        exc_info=True,
+                        status=status,
+                        attempt=attempt,
+                        query=query,
+                        values=values,
+                    )
+                if abort:
+                    break
+                time.sleep(0.1)
+            else:
+                abort = True
             if abort:
                 break
         return result

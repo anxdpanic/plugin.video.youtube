@@ -344,8 +344,8 @@ msgid "My Subscriptions"
 msgstr "Miaj abonoj"
 
 msgctxt "#30511"
-msgid "Queue video"
-msgstr "Vicigi videaĵon"
+msgid ""
+msgstr ""
 
 msgctxt "#30512"
 msgid "Browse Channels"
@@ -1582,6 +1582,10 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30511"
+#~ msgid "Queue video"
+#~ msgstr "Vicigi videaĵon"
 
 # empty strings 30019
 #~ msgctxt "#30020"

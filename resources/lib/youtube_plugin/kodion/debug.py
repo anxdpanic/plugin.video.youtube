@@ -257,6 +257,8 @@ class Stats(pstats.Stats):
     Code by alexnvdias from https://bugs.python.org/issue18795
     """
 
+    _SortKey = getattr(pstats, 'SortKey', None)
+
     sort_arg_dict_default = {
         "calls"       : (((1,-1),              ), "call count"),
         "ncalls"      : (((1,-1),              ), "call count"),
@@ -296,7 +298,7 @@ class Stats(pstats.Stats):
         self.sort_type = ""
         connector = ""
         for word in field:
-            if isinstance(word, pstats.SortKey):
+            if self._SortKey and isinstance(word, self._SortKey):
                 word = word.value
             sort_tuple = sort_tuple + sort_arg_defs[word][0]
             self.sort_type += connector + sort_arg_defs[word][1]

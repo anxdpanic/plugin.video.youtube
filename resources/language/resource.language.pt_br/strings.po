@@ -346,8 +346,8 @@ msgid "My Subscriptions"
 msgstr "Minhas Subscrições"
 
 msgctxt "#30511"
-msgid "Queue video"
-msgstr "Curtir Vídeo"
+msgid ""
+msgstr ""
 
 msgctxt "#30512"
 msgid "Browse Channels"
@@ -1589,6 +1589,10 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30511"
+#~ msgid "Queue video"
+#~ msgstr "Curtir Vídeo"
 
 #~ msgctxt "#30582"
 #~ msgid "Autoplay suggested videos"

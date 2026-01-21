@@ -230,13 +230,16 @@ class AbstractContext(object):
     def get_language():
         raise NotImplementedError()
 
-    def get_language_name(self, lang_id=None):
+    @classmethod
+    def get_language_name(cls, lang_id=None):
         raise NotImplementedError()
 
-    def get_player_language(self):
+    @classmethod
+    def get_player_language(cls):
         raise NotImplementedError()
 
-    def get_subtitle_language(self):
+    @classmethod
+    def get_subtitle_language(cls):
         raise NotImplementedError()
 
     def get_region(self):

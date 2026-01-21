@@ -344,8 +344,8 @@ msgid "My Subscriptions"
 msgstr "내 구독"
 
 msgctxt "#30511"
-msgid "Queue video"
-msgstr "재생순서 추가"
+msgid ""
+msgstr ""
 
 msgctxt "#30512"
 msgid "Browse Channels"
@@ -1582,6 +1582,10 @@ msgstr "처음부터 재생"
 msgctxt "#30820"
 msgid "Podcast"
 msgstr "팟캐스트"
+
+#~ msgctxt "#30511"
+#~ msgid "Queue video"
+#~ msgstr "재생순서 추가"
 
 #~ msgctxt "#30515"
 #~ msgid "Auto-Remove from Watch Later"
