@@ -11,6 +11,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import json
 import os
+import errno
 from io import open
 
 from .. import logging
@@ -171,10 +172,12 @@ class JSONStore(object):
                 object_pairs_hook=(self._process_data if process else None),
             )
             loaded = True
-        except (RuntimeError, IOError, OSError):
+        except (RuntimeError, EnvironmentError, IOError, OSError) as exc:
             self.log.exception(('Access error', 'File: %s'),
                                filepath or self._filename,
                                stacklevel=stacklevel)
+            if exc.errno == errno.ENOENT:
+                loaded = None
         except (TypeError, ValueError):
             self.log.exception(('Invalid data', 'Data: {data!r}'),
                                data=data,

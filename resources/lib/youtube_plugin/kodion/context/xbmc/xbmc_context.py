@@ -541,45 +541,89 @@ class XbmcContext(AbstractContext):
         return time_obj.strftime(str_format)
 
     @staticmethod
-    def get_language():
-        language = xbmc.getLanguage(format=xbmc.ISO_639_1, region=True)
-        lang_code, separator, region = language.partition('-')
-        if not lang_code:
-            language = xbmc.getLanguage(format=xbmc.ISO_639_2, region=False)
-            lang_code, separator, region = language.partition('-')
-            if lang_code != 'fil':
-                lang_code = lang_code[:2]
-            region = region[:2]
-        if not lang_code:
-            return 'en-US'
+    def get_language(region=True, separator='-', code_format=xbmc.ISO_639_1):
+        _code_format = xbmc.ISO_639_1
+        _language = xbmc.getLanguage(format=_code_format, region=region)
         if region:
-            return separator.join((lang_code.lower(), region.upper()))
-        return lang_code
-
-    def get_language_name(self, lang_id=None):
-        if lang_id is None:
-            lang_id = self.get_language()
-        return xbmc.convertLanguage(lang_id, xbmc.ENGLISH_NAME).split(';')[0]
-
-    def get_player_language(self):
-        language = get_kodi_setting_value('locale.audiolanguage')
-        if language == 'default':
-            language = get_kodi_setting_value('locale.language')
-            language = language.replace('resource.language.', '').split('_')[0]
-        elif language not in self._KODI_UI_PLAYER_LANGUAGE_OPTIONS:
-            language = xbmc.convertLanguage(language, xbmc.ISO_639_1)
-        return language, get_kodi_setting_bool('videoplayer.preferdefaultflag')
-
-    def get_subtitle_language(self):
-        language = get_kodi_setting_value('locale.subtitlelanguage')
-        if language == 'default':
-            language = get_kodi_setting_value('locale.language')
-            language = language.replace('resource.language.', '').split('_')[0]
-        elif language in self._KODI_UI_SUBTITLE_LANGUAGE_OPTIONS:
-            language = None
+            language, _, _region = _language.partition('-')
         else:
-            language = xbmc.convertLanguage(language, xbmc.ISO_639_1)
+            language = _language
+            _region = None
+
+        if not language:
+            _code_format = xbmc.ISO_639_2
+            _language = xbmc.getLanguage(format=_code_format, region=False)
+            if region:
+                language, _, _region = _language.partition('-')
+                _region = _region[:2]
+            else:
+                language = _language
+                _region = None
+
+        if language:
+            if code_format is not None and _code_format != code_format:
+                _language = xbmc.convertLanguage(language, code_format)
+                if _language:
+                    language = _language
+                elif code_format == xbmc.ISO_639_1 and language != 'fil':
+                    language = language[:2]
+        elif code_format == xbmc.ISO_639_2:
+            language = 'eng'
+        else:
+            language = 'en'
+
+        if region:
+            _region = _region.upper() if _region else 'US'
+            return separator.join((language, _region))
+
         return language
+
+    @classmethod
+    def get_language_name(cls, language=None):
+        if language is None:
+            language = cls.get_language(code_format=None)
+        return xbmc.convertLanguage(language, xbmc.ENGLISH_NAME).split(';')[0]
+
+    @classmethod
+    def get_player_language(cls):
+        language = get_kodi_setting_value('locale.audiolanguage')
+        prefer_default = get_kodi_setting_bool('videoplayer.preferdefaultflag')
+        if not language or language == 'default':
+            language = get_kodi_setting_value('locale.language')
+            if language:
+                code = language.replace('resource.language.', '').split('_')[0]
+            else:
+                code = None
+        elif language not in cls._KODI_UI_PLAYER_LANGUAGE_OPTIONS:
+            code = xbmc.convertLanguage(language, xbmc.ISO_639_1)
+        else:
+            return language, prefer_default
+        if not code:
+            code = cls.get_language(
+                region=False,
+                code_format=xbmc.ISO_639_1,
+            )
+        return code, prefer_default
+
+    @classmethod
+    def get_subtitle_language(cls):
+        language = get_kodi_setting_value('locale.subtitlelanguage')
+        if not language or language == 'default':
+            language = get_kodi_setting_value('locale.language')
+            if language:
+                code = language.replace('resource.language.', '').split('_')[0]
+            else:
+                code = None
+        elif language not in cls._KODI_UI_SUBTITLE_LANGUAGE_OPTIONS:
+            code = xbmc.convertLanguage(language, xbmc.ISO_639_1)
+        else:
+            return None
+        if not code:
+            code = cls.get_language(
+                region=False,
+                code_format=xbmc.ISO_639_1,
+            )
+        return code
 
     def reload_access_manager(self):
         access_manager = AccessManager(proxy(self))

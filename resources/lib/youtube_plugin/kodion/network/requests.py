@@ -12,6 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 import socket
 from atexit import register as atexit_register
 from collections import OrderedDict
+from os.path import exists, isdir
 
 from requests.adapters import HTTPAdapter, Retry
 from requests.exceptions import InvalidJSONError, RequestException, URLRequired
@@ -52,13 +53,18 @@ class SSLHTTPAdapter(HTTPAdapter):
         (socket.IPPROTO_TCP, getattr(socket, 'TCP_USER_TIMEOUT', None), 600),
     )
 
-    _ssl_context = create_urllib3_context()
-    _ssl_context.load_verify_locations(
-        capath=extract_zipped_paths(DEFAULT_CA_BUNDLE_PATH)
-    )
+    _SSL_CONTEXT = create_urllib3_context()
+    _CA_PATH = extract_zipped_paths(DEFAULT_CA_BUNDLE_PATH)
+    if not _CA_PATH or not exists(_CA_PATH):
+        _SSL_CONTEXT.load_default_certs()
+    else:
+        if isdir(_CA_PATH):
+            _SSL_CONTEXT.load_verify_locations(capath=_CA_PATH)
+        else:
+            _SSL_CONTEXT.load_verify_locations(cafile=_CA_PATH)
 
     def init_poolmanager(self, *args, **kwargs):
-        kwargs['ssl_context'] = self._ssl_context
+        kwargs['ssl_context'] = self._SSL_CONTEXT
 
         kwargs['socket_options'] = [
             socket_option for socket_option in self._SOCKET_OPTIONS
@@ -68,8 +74,14 @@ class SSLHTTPAdapter(HTTPAdapter):
         return super(SSLHTTPAdapter, self).init_poolmanager(*args, **kwargs)
 
     def cert_verify(self, conn, url, verify, cert):
-        self._ssl_context.check_hostname = bool(verify)
-        return super(SSLHTTPAdapter, self).cert_verify(conn, url, verify, cert)
+        if verify:
+            self._SSL_CONTEXT.check_hostname = True
+            conn.cert_reqs = 'CERT_REQUIRED'
+        else:
+            self._SSL_CONTEXT.check_hostname = False
+            conn.cert_reqs = 'CERT_NONE'
+        conn.ca_certs = None
+        conn.ca_cert_dir = None
 
 
 class CustomSession(Session):
@@ -407,7 +419,7 @@ class BaseRequestsClass(object):
 
             log_msg = [
                 '{title}',
-                'URL:      {method} {url}',
+                'URL:      {method} {url!u}',
                 'Status:   {response_status} - {response_reason}',
                 'Response: {response_text}',
             ]

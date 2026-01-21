@@ -2125,6 +2125,7 @@ class YouTubePlayerClient(YouTubeDataClient):
         localize = context.localize
 
         debugging = self.log.debugging
+        sep = {'__sep__': '   '}
 
         audio_data = {}
         video_data = {}
@@ -2447,12 +2448,14 @@ class YouTubePlayerClient(YouTubeDataClient):
                 mime_group[itag] = quality_group[itag] = details
 
                 if log_client:
-                    self.log.debug('{_:{_}^100}', _='=')
-                    self.log.debug('Streams found for %r client:', client_name)
+                    self.log.debug('{_:{_}^100}', _='=', extra=sep)
+                    self.log.debug('Streams found for %r client:',
+                                   client_name,
+                                   extra=sep)
                     log_client = False
                 if log_audio:
                     if log_audio_header:
-                        self.log.debug('{_:{_}^100}', _='-')
+                        self.log.debug('{_:{_}^100}', _='-', extra=sep)
                         self.log.debug('{itag:^3}'
                                        ' | {container:^4}'
                                        ' | {channels:^5}'
@@ -2468,8 +2471,9 @@ class YouTubePlayerClient(YouTubeDataClient):
                                        sample_rate='ASR',
                                        drc='DRC',
                                        codecs='CODECS',
-                                       info='INFO')
-                        self.log.debug('{_:{_}^100}', _='-')
+                                       info='INFO',
+                                       extra=sep)
+                        self.log.debug('{_:{_}^100}', _='-', extra=sep)
                         log_audio_header = False
                     self.log.debug('{itag:3}'
                                    ' | {container:4}'
@@ -2488,10 +2492,11 @@ class YouTubePlayerClient(YouTubeDataClient):
                                    drc='Y' if is_drc else '-',
                                    codecs='%s (%s)' % (codec, codecs),
                                    language=language,
-                                   role_type=role_type)
+                                   role_type=role_type,
+                                   extra=sep)
                 elif log_video:
                     if log_video_header:
-                        self.log.debug('{_:{_}^100}', _='-')
+                        self.log.debug('{_:{_}^100}', _='-', extra=sep)
                         self.log.debug('{itag:^3}'
                                        ' | {container:^4}'
                                        ' | {width:>4} x {height:<4}'
@@ -2510,8 +2515,9 @@ class YouTubePlayerClient(YouTubeDataClient):
                                        s3d='3D',
                                        vr='VR',
                                        bitrate='VBR',
-                                       codecs='CODECS')
-                        self.log.debug('{_:{_}^100}', _='-')
+                                       codecs='CODECS',
+                                       extra=sep)
+                        self.log.debug('{_:{_}^100}', _='-', extra=sep)
                         log_video_header = False
                     self.log.debug('{itag:3}'
                                    ' | {container:4}'
@@ -2531,7 +2537,8 @@ class YouTubePlayerClient(YouTubeDataClient):
                                    s3d='Y' if is_3d else '-',
                                    vr='Y' if is_vr else '-',
                                    bitrate=bitrate // 1000,
-                                   codecs='%s (%s)' % (codec, codecs))
+                                   codecs='%s (%s)' % (codec, codecs),
+                                   extra=sep)
 
         if not video_data and not audio_only:
             self.log.debug('No video mime-types found')

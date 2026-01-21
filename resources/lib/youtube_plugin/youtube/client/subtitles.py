@@ -462,7 +462,7 @@ class Subtitles(YouTubeRequestClient):
             ('xosf', None),
         )
         self.log.debug(('Found new subtitle for: {lang!r}',
-                        'URL: {url}'),
+                        'URL: {url!u}'),
                        lang=lang,
                        url=subtitle_url)
 

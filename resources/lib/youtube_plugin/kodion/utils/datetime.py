@@ -299,7 +299,7 @@ def strptime(datetime_str, fmt=None, _strptime=modules['_strptime']):
                 tz = timezone(tzdelta, tzname)
             else:
                 tz = timezone(tzdelta)
-            return datetime(*args, tz)
+            return datetime(*args, tzinfo=tz)
     return datetime(*(_strptime._strptime(datetime_str, fmt)[0][0:6]))
 
 

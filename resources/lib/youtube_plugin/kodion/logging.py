@@ -50,7 +50,10 @@ __all__ = (
 
 class RecordFormatter(logging.Formatter):
     def formatMessage(self, record):
-        record.__dict__['__sep__'] = '\n' if '\n' in record.message else ' - '
+        record.__dict__.setdefault(
+            '__sep__',
+            '\n' if record.stack_info or '\n' in record.message else ' - ',
+        )
         try:
             return self._style.format(record)
         except AttributeError:
@@ -271,7 +274,7 @@ class Handler(logging.Handler):
     )
     DEBUG_FORMATTER = RecordFormatter(
         fmt='[%(addon_id)s] %(module)s, line %(lineno)d, in %(funcName)s'
-            '\n%(message)s',
+            '%(__sep__)s%(message)s',
     )
 
     _stack_info = False
