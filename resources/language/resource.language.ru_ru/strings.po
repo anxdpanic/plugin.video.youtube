@@ -344,8 +344,8 @@ msgid "My Subscriptions"
 msgstr "Мои подписки"
 
 msgctxt "#30511"
-msgid "Queue video"
-msgstr "Добавить в очередь"
+msgid ""
+msgstr ""
 
 msgctxt "#30512"
 msgid "Browse Channels"
@@ -1582,6 +1582,10 @@ msgstr "Начать с начала"
 msgctxt "#30820"
 msgid "Podcast"
 msgstr "Подкаст"
+
+#~ msgctxt "#30511"
+#~ msgid "Queue video"
+#~ msgstr "Добавить в очередь"
 
 #~ msgctxt "#30582"
 #~ msgid "Autoplay suggested videos"
