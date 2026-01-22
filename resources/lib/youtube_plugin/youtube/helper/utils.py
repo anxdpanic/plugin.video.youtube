@@ -905,7 +905,6 @@ def update_video_items(provider, context, video_id_dict,
 
         label_stats = []
         stats = []
-        rating = 0
         likes = 0
         views = 0
         if 'statistics' in yt_item:
