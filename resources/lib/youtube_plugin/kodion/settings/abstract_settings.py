@@ -164,6 +164,8 @@ class AbstractSettings(object):
         return self.get_bool(SETTINGS.SUBTITLE_DOWNLOAD, False)
 
     def audio_only(self):
+        if self.ask_for_video_quality():
+            return False
         return self.get_bool(SETTINGS.AUDIO_ONLY, False)
 
     def get_subtitle_selection(self):
