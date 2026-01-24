@@ -780,9 +780,10 @@ def update_video_items(provider, context, video_id_dict,
                 media_item.playable = False
                 media_item.available = False
 
+        is_audio_item = isinstance(media_item, AudioItem)
         media_item.set_mediatype(
             CONTENT.AUDIO_TYPE
-            if isinstance(media_item, AudioItem) else
+            if is_audio_item else
             CONTENT.VIDEO_TYPE
         )
 
@@ -813,7 +814,7 @@ def update_video_items(provider, context, video_id_dict,
         elif upload_status == 'uploaded' and not duration:
             media_item.live = True
 
-        if 'player' in yt_item:
+        if not is_audio_item and 'player' in yt_item:
             player = yt_item['player']
             height = player.get('embedHeight')
             width = player.get('embedWidth')

@@ -1,3 +1,7 @@
+## v7.4.0+beta.5
+### Fixed
+- Fix exceptions caused by retrieving incorrect setting for audio only streams
+
 ## v7.4.0+beta.4
 ### Fixed
 - Add ForceResolvePlugin property to resolved ListItem #1371
