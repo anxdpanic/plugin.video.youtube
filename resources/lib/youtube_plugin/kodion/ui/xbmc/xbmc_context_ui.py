@@ -532,14 +532,15 @@ class XbmcContextUI(AbstractContextUI):
                      value='true',
                      stacklevel=2,
                      process=None,
-                     log_value=None,
-                     log_process=None,
+                     log_redact=False,
                      raw=False):
-        if log_value is None:
+        if log_redact is True:
+            log_msg = 'Set property {property_id!r}: {value!p}'
             log_value = value
-        if log_process:
-            log_value = log_process(log_value)
-        cls.log.debug_trace('Set property {property_id!r}: {value!r}',
+        else:
+            log_msg = 'Set property {property_id!r}: {value!r}'
+            log_value = log_redact or value
+        cls.log.debug_trace(log_msg,
                             property_id=property_id,
                             value=log_value,
                             stacklevel=stacklevel)
@@ -554,18 +555,19 @@ class XbmcContextUI(AbstractContextUI):
                      property_id,
                      stacklevel=2,
                      process=None,
-                     log_value=None,
-                     log_process=None,
+                     log_redact=False,
                      raw=False,
                      as_bool=False,
                      default=False):
         _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
         value = xbmcgui.Window(10000).getProperty(_property_id)
-        if log_value is None:
+        if log_redact is True:
+            log_msg = 'Get property {property_id!r}: {value!p}'
             log_value = value
-        if log_process:
-            log_value = log_process(log_value)
-        cls.log.debug_trace('Get property {property_id!r}: {value!r}',
+        else:
+            log_msg = 'Get property {property_id!r}: {value!r}'
+            log_value = log_redact or value
+        cls.log.debug_trace(log_msg,
                             property_id=property_id,
                             value=log_value,
                             stacklevel=stacklevel)
@@ -578,8 +580,7 @@ class XbmcContextUI(AbstractContextUI):
                      property_id,
                      stacklevel=2,
                      process=None,
-                     log_value=None,
-                     log_process=None,
+                     log_redact=False,
                      raw=False,
                      as_bool=False,
                      default=False):
@@ -590,11 +591,13 @@ class XbmcContextUI(AbstractContextUI):
             window.clearProperty(_property_id)
             if process:
                 value = process(value)
-        if log_value is None:
+        if log_redact is True:
+            log_msg = 'Pop property {property_id!r}: {value!p}'
             log_value = value
-        if log_value and log_process:
-            log_value = log_process(log_value)
-        cls.log.debug_trace('Pop property {property_id!r}: {value!r}',
+        else:
+            log_msg = 'Pop property {property_id!r}: {value!r}'
+            log_value = log_redact or value
+        cls.log.debug_trace(log_msg,
                             property_id=property_id,
                             value=log_value,
                             stacklevel=stacklevel)

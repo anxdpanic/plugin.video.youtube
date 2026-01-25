@@ -134,8 +134,7 @@ class AbstractContextUI(object):
                      value='true',
                      stacklevel=2,
                      process=None,
-                     log_value=None,
-                     log_process=None,
+                     log_redact=False,
                      raw=False):
         raise NotImplementedError()
 
@@ -144,8 +143,7 @@ class AbstractContextUI(object):
                      property_id,
                      stacklevel=2,
                      process=None,
-                     log_value=None,
-                     log_process=None,
+                     log_redact=False,
                      raw=False,
                      as_bool=False,
                      default=False):
@@ -156,8 +154,7 @@ class AbstractContextUI(object):
                      property_id,
                      stacklevel=2,
                      process=None,
-                     log_value=None,
-                     log_process=None,
+                     log_redact=False,
                      raw=False,
                      as_bool=False,
                      default=False):

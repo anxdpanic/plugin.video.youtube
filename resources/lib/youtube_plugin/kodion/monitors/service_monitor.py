@@ -213,7 +213,7 @@ class ServiceMonitor(xbmc.Monitor):
                                 self._context.get_ui().set_property(
                                     '-'.join((FILE_READ, filepath)),
                                     file.read(),
-                                    log_value='<redacted>',
+                                    log_redact='REDACTED',
                                 )
                                 response = True
                         except (IOError, OSError):
@@ -222,7 +222,7 @@ class ServiceMonitor(xbmc.Monitor):
                         with write_access:
                             content = self._context.get_ui().pop_property(
                                 '-'.join((FILE_WRITE, filepath)),
-                                log_value='<redacted>',
+                                log_redact='REDACTED',
                             )
                             response = None
                             if content:

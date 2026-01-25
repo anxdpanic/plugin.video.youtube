@@ -37,7 +37,6 @@ from ...constants import (
     VIDEO_ID,
 )
 from ...utils.datetime import datetime_to_since, utc_to_local
-from ...utils.redact import redact_ip_in_uri
 from ...utils.system_version import current_system_version
 
 
@@ -429,9 +428,9 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
 
 def playback_item(context, media_item, show_fanart=None, **_kwargs):
     uri = media_item.get_uri()
-    logging.debug('Converting %s for playback: %r',
-                  media_item.__class__.__name__,
-                  redact_ip_in_uri(uri))
+    logging.debug('Converting {type} for playback: {uri!u}',
+                  type=media_item.__class__.__name__,
+                  uri=uri)
 
     params = context.get_params()
     settings = context.get_settings()

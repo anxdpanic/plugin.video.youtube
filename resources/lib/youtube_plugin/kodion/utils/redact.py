@@ -73,6 +73,12 @@ def redact_params(params,
                           'refresh_token',
                           'token',
                   )),
+                  _path_params=frozenset((
+                          'conn',
+                  )),
+                  _query_params=frozenset((
+                          'stream',
+                  )),
                   _url_params=frozenset((
                           'playing_file',
                           'url',
@@ -122,6 +128,19 @@ def redact_params(params,
             log_value = [
                 'REDACTED'
                 for _ in value
+            ]
+        elif param in _path_params:
+            log_value = [
+                redact_ip(val)
+                for val in value
+            ]
+        elif param in _query_params:
+            log_value = [
+                parse_and_redact_uri(
+                    val if val.startswith('?') else '?' + val,
+                    redact_only=True,
+                )
+                for val in value
             ]
         elif param in _url_params:
             log_value = [

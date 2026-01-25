@@ -39,7 +39,6 @@ from ...kodion.network import get_connect_address
 from ...kodion.utils.datetime import fromtimestamp
 from ...kodion.utils.file_system import make_dirs
 from ...kodion.utils.methods import merge_dicts
-from ...kodion.utils.redact import redact_ip_in_uri
 
 
 class YouTubePlayerClient(YouTubeDataClient):
@@ -1232,21 +1231,21 @@ class YouTubePlayerClient(YouTubeDataClient):
                 if itag in stream_list:
                     continue
 
+                url = match.group('url')
                 yt_format = self._get_stream_format(
                     itag=itag,
                     max_height=selected_height,
                     title='',
-                    url=match.group('url'),
+                    url=url,
                     meta=meta_info,
                     headers=headers,
                     playback_stats=playback_stats,
                 )
                 if yt_format is None:
-                    stream_info = redact_ip_in_uri(match.group(1))
                     self.log.debug(('Unknown itag - {itag}',
-                                    '{stream}'),
+                                    '{url!u}'),
                                    itag=itag,
-                                   stream=stream_info)
+                                   url=url)
                 if (not yt_format
                         or (yt_format.get('hls/video')
                             and not yt_format.get('hls/audio'))):
@@ -1333,14 +1332,8 @@ class YouTubePlayerClient(YouTubeDataClient):
                     playback_stats=playback_stats,
                 )
                 if yt_format is None:
-                    if url:
-                        stream_map['url'] = redact_ip_in_uri(url)
-                    if conn:
-                        stream_map['conn'] = redact_ip_in_uri(conn)
-                    if stream:
-                        stream_map['stream'] = redact_ip_in_uri(stream)
                     self.log.debug(('Unknown itag - {itag}',
-                                    '{stream}'),
+                                    '{stream!p}'),
                                    itag=itag,
                                    stream=stream_map)
                 if (not yt_format

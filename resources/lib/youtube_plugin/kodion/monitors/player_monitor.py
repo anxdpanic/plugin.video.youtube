@@ -439,7 +439,7 @@ class PlayerMonitor(xbmc.Player):
 
         player_data = ui.pop_property(PLAYER_DATA,
                                       process=json.loads,
-                                      log_process=redact_params)
+                                      log_redact=True)
         if not player_data:
             return
         self.cleanup_threads()
