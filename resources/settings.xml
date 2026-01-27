@@ -1262,10 +1262,10 @@
                     <default>0</default>
                     <constraints>
                         <options>
-                            <option label="13106">0</option> <!-- Disabled -->
-                            <option label="305">1</option>   <!-- Enabled -->
-                            <option label="30621">2</option> <!-- Verbose -->
-                            <!-- <option label="666">4</option> -->   <!-- Component specific -->
+                            <option label="13106">4</option> <!-- Disabled (addon logging output disabled) -->
+                            <option label="16316">0</option> <!-- Auto (addon logging output enabled if Kodi debug logging enabled) -->
+                            <option label="13108">1</option> <!-- Always enabled (addon logging output enabled) -->
+                            <option label="30621">2</option> <!-- Verbose (additional addon logging output enabled)  -->
                         </options>
                     </constraints>
                     <control format="string" type="spinner"/>
