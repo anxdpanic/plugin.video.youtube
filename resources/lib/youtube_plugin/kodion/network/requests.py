@@ -461,6 +461,7 @@ class BaseRequestsClass(object):
                                response_reason=response_reason,
                                response_text=response_text,
                                stacklevel=stacklevel,
+                               extra={'__redact_exc__': True},
                                **kwargs)
 
             if raise_exc:
