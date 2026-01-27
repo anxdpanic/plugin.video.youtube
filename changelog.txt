@@ -1,3 +1,43 @@
+## v7.4.0
+### Fixed
+- Fix exceptions caused by retrieving incorrect setting for audio only streams
+- Add ForceResolvePlugin property to resolved ListItem #1371
+- Fix continuously loading SSL certificate when not required
+- Ensure logged URLs are redacted
+- Improve workarounds and fallbacks used to query Kodi language settings #1372
+- Fix error in PlayerMonitorThread.run #1368
+- Don't prevent JSON file writes if there is no existing file to read #1362
+- Improve sqlite3 exception handling
+- Various Python 2 compatibiliy fixes
+- Avoid creating PlayerMonitorThread as a subclass of threading.Thread
+- Additional workarounds for JSON file operations failing due to addon service start delays #1362
+- Avoid unnecessary window navigation when opening More... context menu dialog
+- Fix typo in evaluating whether plugin container is loaded or active
+- Fix possible exception when using default fallback for failed search
+- Fix retrieving items from local history database #1356
+- Fix fallback method for retrieving string list setting when setting has no value
+- Update workaround for Python strptime bug
+- Fix not updating authorised client request result used for playback tracking #1343
+- Don't process results in resource_manager methods if no items are available
+- Set default MPEG-DASH timescale to 1000
+- Disable request cache if response is streamed
+
+### Changed
+- Update and trigger Setup Wizard to set default value for My Subscription sources
+- Pass additional headers to all player request and manifest urls by default
+- Workaround Kodi not executing Play action on listitems in non-video containers
+- Improve context menu runtime checks when used with widget containers
+- Re-organise post play settings
+- Enable streaming for My Subscriptions feed requests
+
+### New
+- Add context menu items to open Settings/Setup Wizard from Setup Wizard/Settings main menu entries
+- Log summary of stream proxy request and response details #1363
+- Log stream proxy request range #1363
+- Add setting to choose what sources are used for My Subscriptions
+- Add aspect ratio info to video ListItem #1348
+- Enable using saved playlists in My Subscriptions
+
 ## v7.4.0+beta.5
 ### Fixed
 - Fix exceptions caused by retrieving incorrect setting for audio only streams
