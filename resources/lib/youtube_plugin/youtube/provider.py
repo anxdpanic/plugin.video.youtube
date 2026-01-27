@@ -1399,6 +1399,7 @@ class Provider(AbstractProvider):
             provider.CONTENT_TYPE: {
                 'category_label': localize('youtube'),
             },
+            provider.CACHE_TO_DISC: False,
         }
 
         # sign in
