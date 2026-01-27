@@ -217,20 +217,22 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         client_ip = self.client_address[0]
         ip_allowed, is_local, is_whitelisted = self.ip_address_status(client_ip)
 
-        parts, params, log_uri, log_params = parse_and_redact_uri(self.path)
+        uri = self.path
+        parts, params, log_uri, log_params, log_path = parse_and_redact_uri(uri)
         path = {
-            'full': self.path,
+            'uri': uri,
             'path': parts.path,
             'query': parts.query,
             'params': params,
-            'log_params': log_params,
             'log_uri': log_uri,
+            'log_path': log_path,
+            'log_params': log_params,
         }
 
         if not path['path'].startswith(PATHS.PING) and self.log.verbose_logging:
             self.log.debug(('{status}',
                             'Method:      {method!r}',
-                            'Path:        {path[path]!r}',
+                            'Path:        {path[log_path]!r}',
                             'Params:      {path[log_params]!r}',
                             'Address:     {client_ip!r}',
                             'Whitelisted: {is_whitelisted}',

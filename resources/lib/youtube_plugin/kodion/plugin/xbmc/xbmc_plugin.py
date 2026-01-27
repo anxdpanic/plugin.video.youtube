@@ -564,7 +564,7 @@ class XbmcPlugin(AbstractPlugin):
             result = False
 
         elif context.is_plugin_path(uri, PATHS.PLAY):
-            parts, params, log_uri, _ = parse_and_redact_uri(uri)
+            parts, params, log_uri, _, _ = parse_and_redact_uri(uri)
             if params.get(ACTION, [None])[0] == 'list':
                 log_action = 'Redirect queued'
                 action = context.create_uri(
@@ -587,7 +587,7 @@ class XbmcPlugin(AbstractPlugin):
 
         elif context.is_plugin_path(uri):
             log_action = 'Redirect queued'
-            parts, params, log_uri, _ = parse_and_redact_uri(uri)
+            parts, params, log_uri, _, _ = parse_and_redact_uri(uri)
             action = context.create_uri(
                 (PATHS.ROUTE, parts.path.rstrip('/') or PATHS.HOME),
                 params,
