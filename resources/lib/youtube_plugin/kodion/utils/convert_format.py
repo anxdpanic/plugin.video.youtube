@@ -17,6 +17,15 @@ from re import DOTALL, compile as re_compile
 from ..compatibility import byte_string_type
 
 
+__RE_URL = re_compile(r'(https?://\S+)')
+
+
+def urls_in_text(text, process=None, count=0):
+    if process:
+        return __RE_URL.sub(process, text, count=count)
+    return __RE_URL.findall(text)
+
+
 def to_unicode(text):
     if isinstance(text, byte_string_type):
         try:

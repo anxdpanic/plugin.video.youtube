@@ -66,12 +66,6 @@ __RE_SEASON_EPISODE = re_compile(
     r'\b(?:Season\s*|S)(\d+)|(?:\b(?:Part|Ep.|Episode)\s*|#|E)(\d+)'
 )
 
-__RE_URL = re_compile(r'(https?://\S+)')
-
-
-def extract_urls(text):
-    return __RE_URL.findall(text)
-
 
 def get_thumb_timestamp(minutes=15):
     seconds = minutes * 60
