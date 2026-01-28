@@ -14,9 +14,12 @@ import gc
 
 from . import logging
 from .constants import (
+    BUSY_FLAG,
     CHECK_SETTINGS,
     FOLDER_URI,
+    FORCE_PLAY_PARAMS,
     PATHS,
+    TRAKT_PAUSE_FLAG,
 )
 from .context import XbmcContext
 from .debug import Profiler
@@ -129,6 +132,11 @@ def run(context=_context,
                    forced=forced,
                    is_same_path=is_same_path,
                    **new_kwargs)
+    except Exception:
+        ui.clear_property(BUSY_FLAG)
+        ui.clear_property(TRAKT_PAUSE_FLAG, raw=True)
+        for param in FORCE_PLAY_PARAMS:
+            ui.clear_property(param)
     finally:
         if log_level:
             profiler.print_stats()
