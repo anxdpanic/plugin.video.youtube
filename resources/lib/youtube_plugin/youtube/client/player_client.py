@@ -2110,7 +2110,7 @@ class YouTubePlayerClient(YouTubeDataClient):
                                   default_lang_code='und',
                                   codec_re=re_compile(
                                       r'codecs='
-                                      r'"((?P<codec>.+?)\.(?P<props>.+))"'
+                                      r'"((?P<codec>.+?)(?:\.(?P<props>.+))?)"'
                                   )):
         context = self._context
         settings = context.get_settings()
@@ -2194,7 +2194,8 @@ class YouTubePlayerClient(YouTubeDataClient):
                     if codec.startswith(('vp9', 'vp09')):
                         codec = 'vp9'
                         preferred_codec = codec in stream_features
-                        if codec_properties.startswith(('2', '02.')):
+                        if (codec_properties
+                                and codec_properties.startswith(('2', '02.'))):
                             codec = 'vp9.2'
                     else:
                         if codec.startswith('dts'):
