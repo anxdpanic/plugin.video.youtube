@@ -1920,7 +1920,7 @@ class YouTubePlayerClient(YouTubeDataClient):
                 'duration': 'P' + video_details.get('lengthSeconds', '0') + 'S',
             },
             'statistics': {
-                'viewCount': video_details.get('viewCount', ''),
+                'viewCount': video_details.get('viewCount', '0'),
             },
             '_partial': True,
         }
