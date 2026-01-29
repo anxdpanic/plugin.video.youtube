@@ -910,6 +910,9 @@ def update_video_items(provider, context, video_id_dict,
         views = 0
         if 'statistics' in yt_item:
             for stat, value in yt_item['statistics'].items():
+                if not value:
+                    continue
+
                 label = context.LOCAL_MAP.get('stats.' + stat)
                 if not label:
                     continue

@@ -1,3 +1,7 @@
+## v7.4.0.1
+### Fixed
+- Use correct default value if view count is missing from player requests response #1386
+
 ## v7.4.0
 ### Fixed
 - Fix exceptions caused by retrieving incorrect setting for audio only streams
