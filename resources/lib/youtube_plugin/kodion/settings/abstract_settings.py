@@ -733,6 +733,30 @@ class AbstractSettings(object):
             ', ', ','
         )
 
+    def auto_like_enabled(self, value=None):
+        if value is not None:
+            return self.set_bool(
+                SETTINGS.AUTO_LIKE, value
+            )
+        return self.get_bool(SETTINGS.AUTO_LIKE, False)
+
+    def auto_like_filter_state(self, value=None):
+        default = SETTINGS.FILTER_DISABLED
+        if value is not None:
+            return self.set_int(
+                SETTINGS.AUTO_LIKE_FILTER_STATE, value
+            )
+        return self.get_int(SETTINGS.AUTO_LIKE_FILTER_STATE, default)
+
+    def auto_like_filter(self, value=None):
+        if value is not None:
+            if isinstance(value, (list, tuple, set)):
+                value = ','.join(value).lstrip(',')
+            return self.set_string(SETTINGS.AUTO_LIKE_FILTER_LIST, value)
+        return self.get_string(SETTINGS.AUTO_LIKE_FILTER_LIST).replace(
+            ', ', ','
+        )
+
     def shorts_duration(self, value=None):
         if value is not None:
             return self.set_int(SETTINGS.SHORTS_DURATION, value)
