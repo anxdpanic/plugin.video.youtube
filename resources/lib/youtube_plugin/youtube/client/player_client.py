@@ -894,18 +894,20 @@ class YouTubePlayerClient(YouTubeDataClient):
 
         if not json_data or 'error' not in json_data:
             info = (
-                'video_id: {video_id!r}',
-                'Client:   {client_name!r}',
-                'Auth:     {has_auth!r}',
+                'video_id:      {video_id!r}',
+                'Client:        {client_name!r}',
+                'Auth:          {has_auth!r}',
+                'Valid visitor: {has_visitor_data}',
             )
             return None, info, None, data, exception
 
         info = (
-            'Reason:   {error_reason}',
-            'Message:  {error_message}',
-            'video_id: {video_id!r}',
-            'Client:   {client_name!r}',
-            'Auth:     {has_auth!r}',
+            'Reason:        {error_reason!r}',
+            'Message:       {error_message!r}',
+            'video_id:      {video_id!r}',
+            'Client:        {client_name!r}',
+            'Auth:          {has_auth!r}',
+            'Valid visitor: {has_visitor_data}',
         )
         details = json_data['error']
         details = {
@@ -1092,7 +1094,8 @@ class YouTubePlayerClient(YouTubeDataClient):
             error_hook=self._player_error_hook,
             video_id=self.video_id,
             client_name=client_name,
-            has_auth=False,
+            has_auth=client.get('_has_auth'),
+            has_visitor_data=bool(client.get('_visitor_data')),
             cache=False,
         )
         if not result:
@@ -1191,7 +1194,8 @@ class YouTubePlayerClient(YouTubeDataClient):
         itags = ('9995', '9996') if is_live else ('9993', '9994')
 
         for client_name, response in responses.items():
-            headers = response['client']['headers']
+            client = response['client']
+            headers = client['headers']
             url = self._process_url_params(
                 response['hls_manifest'],
                 headers=headers,
@@ -1207,7 +1211,8 @@ class YouTubePlayerClient(YouTubeDataClient):
                 error_hook=self._player_error_hook,
                 video_id=self.video_id,
                 client_name=client_name,
-                has_auth=False,
+                has_auth=client.get('_has_auth'),
+                has_visitor_data=bool(client.get('_visitor_data')),
                 cache=False,
             )
             if not result:
@@ -1558,6 +1563,7 @@ class YouTubePlayerClient(YouTubeDataClient):
                 video_id=video_id,
                 client_name=client_name,
                 has_auth=client.get('_has_auth'),
+                has_visitor_data=bool(client.get('_visitor_data')),
                 cache=False,
                 **client
             )
@@ -1653,6 +1659,7 @@ class YouTubePlayerClient(YouTubeDataClient):
 
         auth_client = None
         visitor_data = self._visitor_data[visitor_data_key]
+        has_visitor_data = bool(visitor_data)
         video_details = {}
         microformat = {}
         responses = {}
@@ -1730,6 +1737,7 @@ class YouTubePlayerClient(YouTubeDataClient):
                         video_id=video_id,
                         client_name=_client_name,
                         has_auth=_has_auth,
+                        has_visitor_data=has_visitor_data,
                         cache=False,
                         pass_data=True,
                         raise_exc=False,
@@ -1762,6 +1770,8 @@ class YouTubePlayerClient(YouTubeDataClient):
                         if visitor_data:
                             client_data['_visitor_data'] = visitor_data
                             self._visitor_data[visitor_data_key] = visitor_data
+                            has_visitor_data = True
+
                     _video_details = _result.get('videoDetails', {})
                     _microformat = (_result
                                     .get('microformat', {})
@@ -1792,16 +1802,18 @@ class YouTubePlayerClient(YouTubeDataClient):
                         break
                     elif not _playability or _status in bad_statuses:
                         self.log.warning(('Failed to retrieve stream info',
-                                          'Status:   {status}',
-                                          'Reason:   {reason}',
-                                          'video_id: {video_id!r}',
-                                          'Client:   {client!r}',
-                                          'Auth:     {has_auth!r}'),
+                                          'Status:        {status!r}',
+                                          'Reason:        {reason!r}',
+                                          'video_id:      {video_id!r}',
+                                          'Client:        {client!r}',
+                                          'Auth:          {has_auth!r}',
+                                          'Valid visitor: {has_visitor_data}'),
                                          status=_status,
                                          reason=_reason or 'UNKNOWN',
                                          video_id=video_id,
                                          client=_client_name,
-                                         has_auth=_has_auth)
+                                         has_auth=_has_auth,
+                                         has_visitor_data=has_visitor_data)
 
                         fail_reason = _reason.lower()
 
@@ -1849,12 +1861,14 @@ class YouTubePlayerClient(YouTubeDataClient):
 
             if _status == 'OK':
                 self.log.debug(('Retrieved stream info:',
-                                'video_id: {video_id!r}',
-                                'Client:   {client!r}',
-                                'Auth:     {has_auth!r}'),
+                                'video_id:      {video_id!r}',
+                                'Client:        {client!r}',
+                                'Auth:          {has_auth!r}',
+                                'Valid visitor: {has_visitor_data}'),
                                video_id=video_id,
                                client=_client_name,
-                               has_auth=_has_auth)
+                               has_auth=_has_auth,
+                               has_visitor_data=has_visitor_data)
 
                 video_details = merge_dicts(
                     _video_details,
