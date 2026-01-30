@@ -996,6 +996,7 @@ class Provider(AbstractProvider):
             return False, {
                 self.CACHE_TO_DISC: False,
                 self.FALLBACK: query,
+                self.POST_RUN: True,
             }
 
         result = self._search_channel_or_playlist(context, query)
