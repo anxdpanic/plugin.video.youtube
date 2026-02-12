@@ -253,18 +253,15 @@ class Provider(AbstractProvider):
             num_refresh_tokens,
         ) = access_manager.get_refresh_tokens(dev_id)
 
-        if num_access_tokens and client.logged_in:
-            self.log.debug('User is %s logged in', client.logged_in)
-            return client
-        if num_access_tokens or num_refresh_tokens:
-            self.log.debug(('# Access tokens:  %d',
-                            '# Refresh tokens: %d'),
-                           num_access_tokens,
-                           num_refresh_tokens)
-        else:
-            self.log.debug('User is not logged in')
+        if not num_access_tokens and not num_refresh_tokens:
             access_manager.update_access_token(dev_id, access_token='')
             return client
+        if num_access_tokens == num_refresh_tokens and client.logged_in:
+            return client
+        self.log.debug(('# Access tokens:  %d',
+                        '# Refresh tokens: %d'),
+                       num_access_tokens,
+                       num_refresh_tokens)
 
         # create new access tokens
         with client:
