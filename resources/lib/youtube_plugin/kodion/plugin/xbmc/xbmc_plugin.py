@@ -467,8 +467,11 @@ class XbmcPlugin(AbstractPlugin):
                     action, action_kwargs = action
                 else:
                     action_kwargs = None
-                logging.debug('Executing queued post-run action: {action}',
+                logging.debug(('Executing queued post-run action',
+                               'Action:    {action}',
+                               'Arguments: {action_kwargs!p}'),
                               action=action,
+                              action_kwargs=action_kwargs,
                               stacklevel=2)
                 if callable(action):
                     if action_kwargs:
