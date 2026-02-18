@@ -14,7 +14,7 @@ from io import open
 from threading import Event, Lock, Thread
 
 from .. import logging
-from ..compatibility import urlsplit, xbmc, xbmcgui
+from ..compatibility import urlsplit, xbmc
 from ..constants import (
     ACTION,
     ADDON_ID,
@@ -22,10 +22,8 @@ from ..constants import (
     CONTAINER_FOCUS,
     CONTAINER_ID,
     CONTAINER_POSITION,
-    CURRENT_ITEM,
     FILE_READ,
     FILE_WRITE,
-    HAS_PARENT,
     MARK_AS_LABEL,
     PATHS,
     PLAYBACK_STOPPED,
@@ -88,28 +86,6 @@ class ServiceMonitor(xbmc.Monitor):
                         'message': method,
                         'data': data})
 
-    def set_property(self,
-                     property_id,
-                     value='true',
-                     stacklevel=2,
-                     process=None,
-                     log_value=None,
-                     log_process=None,
-                     raw=False):
-        if log_value is None:
-            log_value = value
-        if log_process:
-            log_value = log_process(log_value)
-        self.log.debug_trace('Set property {property_id!r}: {value!r}',
-                             property_id=property_id,
-                             value=log_value,
-                             stacklevel=stacklevel)
-        _property_id = property_id if raw else '-'.join((ADDON_ID, property_id))
-        if process:
-            value = process(value)
-        xbmcgui.Window(10000).setProperty(_property_id, value)
-        return value
-
     def refresh_container(self, force=False):
         if force:
             self.refresh = False
@@ -145,8 +121,7 @@ class ServiceMonitor(xbmc.Monitor):
                     if playing_file.path in {PATHS.MPD,
                                              PATHS.PLAY,
                                              PATHS.REDIRECT}:
-                        if not self.httpd:
-                            self.start_httpd()
+                        self.start_httpd()
                         if self.httpd_sleep_allowed:
                             self.httpd_sleep_allowed = None
                 except RuntimeError:
@@ -168,7 +143,7 @@ class ServiceMonitor(xbmc.Monitor):
                                           'Params: {params}'),
                                          path=path,
                                          params=params)
-                        self.set_property(PLAY_FORCED)
+                        context.get_ui().set_property(PLAY_FORCED)
                     elif params.get(ACTION) == 'list':
                         playlist_player.stop()
                         playlist_player.clear()
@@ -177,7 +152,7 @@ class ServiceMonitor(xbmc.Monitor):
                                           'Params: {params}'),
                                          path=path,
                                          params=params)
-                        self.set_property(PLAY_CANCELLED)
+                        context.get_ui().set_property(PLAY_CANCELLED)
 
             return
 
@@ -201,7 +176,7 @@ class ServiceMonitor(xbmc.Monitor):
                 response = True
 
             elif target == SERVER_WAKEUP:
-                if not self.httpd and self.httpd_required():
+                if self.httpd_required():
                     response = self.start_httpd()
                 else:
                     response = bool(self.httpd)
@@ -235,7 +210,7 @@ class ServiceMonitor(xbmc.Monitor):
                             with open(filepath, mode='r',
                                       encoding='utf-8') as file:
                                 read_access.wait()
-                                self.set_property(
+                                self._context.get_ui().set_property(
                                     '-'.join((FILE_READ, filepath)),
                                     file.read(),
                                     log_value='<redacted>',
@@ -292,7 +267,10 @@ class ServiceMonitor(xbmc.Monitor):
                 return
 
             if data.get('play_data', {}).get('play_count'):
-                self.set_property(PLAYER_VIDEO_ID, data.get(VIDEO_ID))
+                self._context.get_ui().set_property(
+                    PLAYER_VIDEO_ID,
+                    data.get(VIDEO_ID),
+                )
 
         elif event == SYNC_LISTITEM:
             video_ids = json.loads(data) if data else None
@@ -313,10 +291,12 @@ class ServiceMonitor(xbmc.Monitor):
                 play_count = ui.get_listitem_info(PLAY_COUNT)
                 resumable = ui.get_listitem_bool(RESUMABLE)
 
-                self.set_property(MARK_AS_LABEL,
-                                  context.localize('history.mark.unwatched')
-                                  if play_count else
-                                  context.localize('history.mark.watched'))
+                ui.set_property(
+                    MARK_AS_LABEL,
+                    context.localize('history.mark.unwatched')
+                    if play_count else
+                    context.localize('history.mark.watched'),
+                )
 
                 item_history = playback_history.get_item(video_id)
                 if item_history:
@@ -369,7 +349,7 @@ class ServiceMonitor(xbmc.Monitor):
             self.log.stack_info = False
             self.log.verbose_logging = False
 
-        self.set_property(CHECK_SETTINGS)
+        context.get_ui().set_property(CHECK_SETTINGS)
         self.refresh_container()
 
         httpd_started = bool(self.httpd)

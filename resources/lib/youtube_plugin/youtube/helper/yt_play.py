@@ -55,6 +55,7 @@ def _play_stream(provider, context):
     video_id = params.get(VIDEO_ID)
     if not video_id:
         ui.show_notification(context.localize('error.no_streams_found'))
+        logging.error('No video_id provided')
         return False
 
     client = provider.get_client(context)
@@ -97,7 +98,7 @@ def _play_stream(provider, context):
 
         if not streams:
             ui.show_notification(context.localize('error.no_streams_found'))
-            logging.debug('No streams found')
+            logging.error('No streams found')
             return False
 
         stream = _select_stream(
@@ -113,6 +114,7 @@ def _play_stream(provider, context):
     video_type = stream.get('video')
     if video_type and video_type.get('rtmpe'):
         ui.show_notification(context.localize('error.rtmpe_not_supported'))
+        logging.error('RTMPE streams are not supported')
         return False
 
     if not screensaver and settings.get_bool(settings.PLAY_SUGGESTED):

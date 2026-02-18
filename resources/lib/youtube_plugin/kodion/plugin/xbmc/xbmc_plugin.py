@@ -209,6 +209,8 @@ class XbmcPlugin(AbstractPlugin):
                 )
             else:
                 result, options = provider.navigate(context)
+                logging.debug('Plugin runner options: {options!r}',
+                              options=options)
                 if ui.get_property(REROUTE_PATH):
                     xbmcplugin.endOfDirectory(
                         handle,

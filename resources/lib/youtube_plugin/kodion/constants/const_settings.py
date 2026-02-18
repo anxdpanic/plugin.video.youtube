@@ -113,8 +113,16 @@ PLAY_COUNT_MIN_PERCENT = 'kodion.play_count.percent'  # (int)
 
 RATE_VIDEOS = 'youtube.post.play.rate'  # (bool)
 RATE_PLAYLISTS = 'youtube.post.play.rate.playlists'  # (bool)
-PLAY_REFRESH = 'youtube.post.play.refresh'  # (bool)
 
+AUTO_LIKE = 'youtube.post.play.auto_like'  # (bool)
+AUTO_LIKE_FILTER_LIST = 'youtube.post.play.auto_like.filter.list'  # (str)
+AUTO_LIKE_FILTER_STATE = 'youtube.post.play.auto_like.filter.state'  # (int)
+
+FILTER_DISABLED = 0
+FILTER_ENABLED = 1
+FILTER_BLACKLIST = 2
+
+PLAY_REFRESH = 'youtube.post.play.refresh'  # (bool)
 WATCH_LATER_REMOVE = 'youtube.playlist.watchlater.autoremove'  # (bool)
 
 VERIFY_SSL = 'requests.ssl.verify'  # (bool)

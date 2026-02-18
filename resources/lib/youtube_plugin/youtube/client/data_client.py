@@ -565,6 +565,7 @@ class YouTubeDataClient(YouTubeLoginClient):
                                     **kwargs)
 
         if playlist_id_upper == 'WL':
+            self._context.get_watch_later_list().add_item(video_id)
             post_data = {
                 'playlistId': playlist_id_upper,
                 'actions': [{
@@ -599,6 +600,7 @@ class YouTubeDataClient(YouTubeLoginClient):
                                     **kwargs)
 
         if playlist_id_upper == 'WL':
+            self._context.get_watch_later_list().del_item(video_id)
             post_data = {
                 'playlistId': playlist_id_upper,
                 'actions': [{

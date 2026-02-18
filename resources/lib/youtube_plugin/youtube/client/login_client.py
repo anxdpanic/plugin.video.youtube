@@ -107,18 +107,23 @@ class YouTubeLoginClient(YouTubeRequestClient):
                 if token_type in access_tokens:
                     token = access_tokens[token_type]
                     existing_access_tokens[token_type] = token
-                if token or token_type == 'dev':
-                    token_status |= 1
                 else:
+                    token = None
+                    existing_access_tokens[token_type] = None
+                if token:
                     token_status |= 2
+                elif token_type != 'dev':
+                    token_status |= 1
 
-            self.logged_in = (
-                'partially'
-                if token_status & 2 else
-                'fully'
-                if token_status & 1 else
-                False
-            )
+            if token_status & 1:
+                if token_status & 2:
+                    self.logged_in = 'partially'
+                else:
+                    self.logged_in = False
+            elif token_status & 2:
+                self.logged_in = 'fully'
+            else:
+                self.logged_in = False
             self.log.info('User is %s logged in', self.logged_in or 'not')
         else:
             for token_type in existing_access_tokens:
