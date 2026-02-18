@@ -1583,6 +1583,22 @@ msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
 
+msgctxt "#30821"
+msgid "Auto-like watched videos"
+msgstr ""
+
+msgctxt "#30822"
+msgid "Channel filtering"
+msgstr ""
+
+msgctxt "#30823"
+msgid "Disable filtering to auto-like all videos. Enable filtering to auto-like videos only from specific channels. Enable blacklist to auto-like all videos except from specific channels."
+msgstr ""
+
+msgctxt "#30824"
+msgid "Filter by channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel'"
+msgstr ""
+
 #~ msgctxt "#30511"
 #~ msgid "Queue video"
 #~ msgstr "Lisää video toistojonoon"
