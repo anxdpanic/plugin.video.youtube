@@ -196,15 +196,6 @@ class Provider(AbstractProvider):
                                user=user,
                                switch=switch)
 
-        if not client:
-            client = YouTubePlayerClient(
-                context=context,
-                language=settings.get_language(),
-                region=settings.get_region(),
-                configs=configs,
-            )
-            self._client = client
-
         if key_details:
             keys_changed = access_manager.keys_changed(
                 addon_id=dev_id,
@@ -225,14 +216,32 @@ class Provider(AbstractProvider):
                 self.log.info('API key set changed - Signing out')
                 yt_login.process(yt_login.SIGN_OUT, self, context)
 
-        if api_last_origin != origin:
-            self.log.info(('API key origin changed - Resetting client',
-                           'Previous: {old!r}',
-                           'Current:  {new!r}'),
-                          old=api_last_origin,
-                          new=origin)
-            access_manager.set_last_origin(origin)
-            client.initialised = False
+        (
+            access_tokens,
+            num_access_tokens,
+            _,
+        ) = access_manager.get_access_tokens(dev_id)
+
+        if client:
+            if api_last_origin != origin:
+                access_manager.set_last_origin(origin)
+                self.log.info(('API key origin changed - Resetting client',
+                               'Previous: {old!r}',
+                               'Current:  {new!r}'),
+                              old=api_last_origin,
+                              new=origin)
+                client.initialised = False
+        else:
+            client = YouTubePlayerClient(
+                context=context,
+                language=settings.get_language(),
+                region=settings.get_region(),
+                configs=configs,
+                access_tokens=access_tokens,
+            )
+            self._client = client
+            if api_last_origin != origin:
+                access_manager.set_last_origin(origin)
 
         if not client.initialised:
             self.reset_client(
@@ -241,13 +250,9 @@ class Provider(AbstractProvider):
                 region=settings.get_region(),
                 items_per_page=settings.items_per_page(),
                 configs=configs,
+                access_tokens=access_tokens,
             )
 
-        (
-            access_tokens,
-            num_access_tokens,
-            _,
-        ) = access_manager.get_access_tokens(dev_id)
         (
             refresh_tokens,
             num_refresh_tokens,
