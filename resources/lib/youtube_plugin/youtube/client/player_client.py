@@ -790,6 +790,15 @@ class YouTubePlayerClient(YouTubeDataClient):
         '-1': ('original', 'main', -6),
     }
 
+    BAD_STATUSES = frozenset((
+        'AGE_CHECK_REQUIRED',
+        'AGE_VERIFICATION_REQUIRED',
+        'CONTENT_CHECK_REQUIRED',
+        'LOGIN_REQUIRED',
+        'CONTENT_NOT_AVAILABLE_IN_THIS_APP',
+        'ERROR',
+        'UNPLAYABLE',
+    ))
     FAILURE_REASONS = {
         'abort': frozenset((
             'country',
@@ -804,7 +813,7 @@ class YouTubePlayerClient(YouTubeDataClient):
             'inappropriate',
             'member',
         )),
-        'retry': frozenset((
+        'ignore': frozenset((
             'try again later',
             'unavailable',
             'unknown',
@@ -1051,14 +1060,14 @@ class YouTubePlayerClient(YouTubeDataClient):
             player_config = self._get_player_config()
             if not player_config:
                 return ''
-            js_url = player_config.get('PLAYER_JS_URL')
 
-        if not js_url:
-            context = player_config.get('WEB_PLAYER_CONTEXT_CONFIGS', {})
-            for configs in context.values():
-                if 'jsUrl' in configs:
-                    js_url = configs['jsUrl']
-                    break
+            js_url = player_config.get('PLAYER_JS_URL')
+            if not js_url:
+                context = player_config.get('WEB_PLAYER_CONTEXT_CONFIGS', {})
+                for configs in context.values():
+                    if 'jsUrl' in configs:
+                        js_url = configs['jsUrl']
+                        break
 
         if not js_url:
             return ''
@@ -1656,6 +1665,7 @@ class YouTubePlayerClient(YouTubeDataClient):
         responses = {}
         stream_list = {}
 
+        bad_statuses = self.BAD_STATUSES
         fail = self.FAILURE_REASONS
         abort = False
 
@@ -1787,16 +1797,8 @@ class YouTubePlayerClient(YouTubeDataClient):
                         break
                     elif _status == 'OK':
                         break
-                    elif not _playability or _status in {
-                        'AGE_CHECK_REQUIRED',
-                        'AGE_VERIFICATION_REQUIRED',
-                        'CONTENT_CHECK_REQUIRED',
-                        'LOGIN_REQUIRED',
-                        'CONTENT_NOT_AVAILABLE_IN_THIS_APP',
-                        'ERROR',
-                        'UNPLAYABLE',
-                    }:
-                        self.log.warning(('Failed to retrieve video info',
+                    elif not _playability or _status in bad_statuses:
+                        self.log.warning(('Failed to retrieve stream info',
                                           'Status:   {status}',
                                           'Reason:   {reason}',
                                           'video_id: {video_id!r}',
@@ -1807,33 +1809,38 @@ class YouTubePlayerClient(YouTubeDataClient):
                                          video_id=video_id,
                                          client=_client_name,
                                          has_auth=_has_auth)
+
                         fail_reason = _reason.lower()
+
                         if any(why in fail_reason for why in fail['auth']):
                             if _has_auth:
                                 restart = False
                             elif restart is None and logged_in:
                                 client_data['_auth_requested'] = True
                                 restart = True
-                            else:
-                                continue
-                            break
-                        elif any(why in fail_reason for why in fail['reauth']):
+                            continue
+
+                        if any(why in fail_reason for why in fail['reauth']):
                             if _client.get('_auth_required') == 'ignore_fail':
                                 continue
-                            elif client_data.get('_auth_required'):
+                            if client_data.get('_auth_required'):
                                 restart = False
                                 abort = True
                             elif restart is None and logged_in:
                                 client_data['_auth_required'] = True
                                 restart = True
                             break
-                        elif any(why in fail_reason for why in fail['abort']):
+
+                        if any(why in fail_reason for why in fail['abort']):
                             abort = True
                             break
-                        elif any(why in fail_reason for why in fail['skip']):
+
+                        if any(why in fail_reason for why in fail['skip']):
                             if allow_skip:
                                 break
-                        elif any(why in fail_reason for why in fail['retry']):
+                            continue
+
+                        if any(why in fail_reason for why in fail['ignore']):
                             continue
                     else:
                         self.log.warning('Unknown playabilityStatus: {status!r}',
@@ -1848,7 +1855,7 @@ class YouTubePlayerClient(YouTubeDataClient):
                 break
 
             if _status == 'OK':
-                self.log.debug(('Retrieved video info:',
+                self.log.debug(('Retrieved stream info:',
                                 'video_id: {video_id!r}',
                                 'Client:   {client!r}',
                                 'Auth:     {has_auth!r}'),
@@ -1924,7 +1931,10 @@ class YouTubePlayerClient(YouTubeDataClient):
             },
             '_partial': True,
         }
-        is_live = video_details.get('isLiveContent') or video_details.get('hasLiveStreamingData')
+        is_live = (
+                video_details.get('isLiveContent')
+                or video_details.get('hasLiveStreamingData')
+        )
         if is_live:
             is_live = video_details.get('isLive', False)
             live_dvr = video_details.get('isLiveDvrEnabled', False)
@@ -2100,7 +2110,7 @@ class YouTubePlayerClient(YouTubeDataClient):
                                   default_lang_code='und',
                                   codec_re=re_compile(
                                       r'codecs='
-                                      r'"((?P<codec>.+?)\.(?P<props>.+))"'
+                                      r'"((?P<codec>.+?)(?:\.(?P<props>.+))?)"'
                                   )):
         context = self._context
         settings = context.get_settings()
@@ -2184,7 +2194,8 @@ class YouTubePlayerClient(YouTubeDataClient):
                     if codec.startswith(('vp9', 'vp09')):
                         codec = 'vp9'
                         preferred_codec = codec in stream_features
-                        if codec_properties.startswith(('2', '02.')):
+                        if (codec_properties
+                                and codec_properties.startswith(('2', '02.'))):
                             codec = 'vp9.2'
                     else:
                         if codec.startswith('dts'):

@@ -10,11 +10,11 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from time import strftime, gmtime
 from datetime import date, datetime, time as dt_time, timedelta
 from importlib import import_module
 from re import compile as re_compile
 from sys import modules
+from time import gmtime, strftime
 
 from ..exceptions import KodionException
 

@@ -39,11 +39,9 @@ from ..compatibility import (
     urlsplit,
     urlunsplit,
     xbmc,
-    xbmcgui,
     xbmcvfs,
 )
 from ..constants import (
-    ADDON_ID,
     LICENSE_TOKEN,
     LICENSE_URL,
     PATHS,
@@ -78,9 +76,8 @@ class HTTPServer(ThreadingMixIn, TCPServer):
                    and not wfile.closed
                    and not select((), (wfile,), (), 0.1)[1]):
                 pass
-            if handler._close_all or wfile.closed:
-                return
-            handler.finish()
+            if not handler._close_all and not wfile.closed:
+                handler.finish()
 
     def server_close(self):
         request_handler = self.RequestHandlerClass
@@ -683,17 +680,15 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             self.send_error(403)
             return
 
-        empty = [None]
-
         if path['path'].startswith(PATHS.DRM):
-            home = xbmcgui.Window(10000)
+            ui = self._context.get_ui()
 
-            lic_url = home.getProperty('-'.join((ADDON_ID, LICENSE_URL)))
+            lic_url = ui.get_property(LICENSE_URL)
             if not lic_url:
                 self.send_error(404)
                 return
 
-            lic_token = home.getProperty('-'.join((ADDON_ID, LICENSE_TOKEN)))
+            lic_token = ui.get_property(LICENSE_TOKEN)
             if not lic_token:
                 self.send_error(403)
                 return
@@ -1026,11 +1021,7 @@ def get_http_server(address, port, context):
                            'Address:  {address}:{port}'),
                           address=address,
                           port=port)
-        xbmcgui.Dialog().notification(context.get_name(),
-                                      str(exc),
-                                      context.get_icon(),
-                                      time=5000,
-                                      sound=False)
+        context.get_ui().show_notification(str(exc), audible=False)
         return None
 
 
@@ -1045,10 +1036,9 @@ def httpd_status(context, address=None):
     ))
     if not RequestHandler.requests:
         RequestHandler.requests = BaseRequestsClass(context=context)
+    result = None
     response = RequestHandler.requests.request(url, cache=False)
-    if response is None:
-        result = None
-    else:
+    if response is not None:
         with response:
             result = response.status_code
             if result == 204:
