@@ -451,6 +451,7 @@ class XbmcPlugin(AbstractPlugin):
     def post_run(context, ui, *actions, **kwargs):
         timeout = kwargs.get('timeout', 30)
         interval = kwargs.get('interval', 0.1)
+        busy = True
         for action in actions:
             while not ui.get_container(container_type=False, check_ready=True):
                 timeout -= interval
@@ -460,6 +461,8 @@ class XbmcPlugin(AbstractPlugin):
                     break
                 context.sleep(interval)
             else:
+                if busy:
+                    busy = ui.clear_property(BUSY_FLAG)
                 if isinstance(action, tuple):
                     action, action_kwargs = action
                 else:
