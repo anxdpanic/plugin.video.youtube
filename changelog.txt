@@ -1,3 +1,10 @@
+## v7.4.1+beta.2
+### Fixed
+- Fix unnecessary double resolve on playback #1371
+- Attempt to break busy dialog workaround loop if post run action succeeds #1386
+- Don't swallow unhandled plugin exceptions without logging and running listing end callback #1386
+- Python 2 compatibility fix for urllib3 only checking for str type when accessing module constants using getattr
+
 ## v7.4.1+beta.1
 ### Fixed
 - Always refresh missing access tokens if partially logged in and refresh tokens are available #1389
