@@ -78,6 +78,15 @@ class XbmcPlugin(AbstractPlugin):
     def __init__(self):
         super(XbmcPlugin, self).__init__()
 
+    @staticmethod
+    def end(handle, succeeded=True, update_listing=False, cache_to_disc=True):
+        xbmcplugin.endOfDirectory(
+            handle=handle,
+            succeeded=succeeded,
+            updateListing=update_listing,
+            cacheToDisc=cache_to_disc,
+        )
+
     def run(self,
             provider,
             context,
