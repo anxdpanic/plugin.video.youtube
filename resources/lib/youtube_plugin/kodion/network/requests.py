@@ -76,10 +76,10 @@ class SSLHTTPAdapter(HTTPAdapter):
     def cert_verify(self, conn, url, verify, cert):
         if verify:
             self._SSL_CONTEXT.check_hostname = True
-            conn.cert_reqs = 'CERT_REQUIRED'
+            conn.cert_reqs = str('CERT_REQUIRED')
         else:
             self._SSL_CONTEXT.check_hostname = False
-            conn.cert_reqs = 'CERT_NONE'
+            conn.cert_reqs = str('CERT_NONE')
         conn.ca_certs = None
         conn.ca_cert_dir = None
 
