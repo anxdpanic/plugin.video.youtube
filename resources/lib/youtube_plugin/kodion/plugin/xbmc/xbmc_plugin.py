@@ -78,6 +78,15 @@ class XbmcPlugin(AbstractPlugin):
     def __init__(self):
         super(XbmcPlugin, self).__init__()
 
+    @staticmethod
+    def end(handle, succeeded=True, update_listing=False, cache_to_disc=True):
+        xbmcplugin.endOfDirectory(
+            handle=handle,
+            succeeded=succeeded,
+            updateListing=update_listing,
+            cacheToDisc=cache_to_disc,
+        )
+
     def run(self,
             provider,
             context,
@@ -442,6 +451,7 @@ class XbmcPlugin(AbstractPlugin):
     def post_run(context, ui, *actions, **kwargs):
         timeout = kwargs.get('timeout', 30)
         interval = kwargs.get('interval', 0.1)
+        busy = True
         for action in actions:
             while not ui.get_container(container_type=False, check_ready=True):
                 timeout -= interval
@@ -451,6 +461,8 @@ class XbmcPlugin(AbstractPlugin):
                     break
                 context.sleep(interval)
             else:
+                if busy:
+                    busy = ui.clear_property(BUSY_FLAG)
                 if isinstance(action, tuple):
                     action, action_kwargs = action
                 else:
