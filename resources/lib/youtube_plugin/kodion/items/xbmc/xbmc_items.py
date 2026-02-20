@@ -456,7 +456,12 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
         }
         props = {
             'isPlayable': VALUE_TO_STR[media_item.playable],
-            'ForceResolvePlugin': 'true',
+            # ForceResolvePlugin was broken in Kodi v21+ after being added in
+            # Kodi v20.
+            # Set to false and use other workarounds as listitem is otherwise
+            # resolved twice when using PlayMedia, Player.Open, etc. leading to
+            # crashes or busy dialog workaround loops in Kodi 20.
+            'ForceResolvePlugin': 'false',
             'playlist_type_hint': (
                 xbmc.PLAYLIST_MUSIC
                 if isinstance(media_item, AudioItem) else
