@@ -2373,7 +2373,7 @@ class YouTubeDataClient(YouTubeLoginClient):
                              inputs,
                              item_type,
                              feed_type=feed_type,
-                             _refresh=refresh,
+                             refresh=refresh,
                              feed_history=feed_history,
                              ttl=feed_history.ONE_HOUR):
             feeds = output['feeds']
@@ -2392,10 +2392,11 @@ class YouTubeDataClient(YouTubeLoginClient):
                     item_id = item_id.replace('UC', channel_prefix, 1)
                 else:
                     channel_id = None
-                cached = feed_history.get_item(item_id, seconds=ttl)
 
+                cached = feed_history.get_item(item_id)
                 if cached:
                     feed_details = cached['value']
+                    _refresh = refresh or cached['age'] > ttl
                     feed_details['refresh'] = _refresh
                     if channel_id:
                         feed_details.setdefault('channel_id', channel_id)
@@ -2445,10 +2446,11 @@ class YouTubeDataClient(YouTubeLoginClient):
             if response is None:
                 return False, True
             with response:
-                if response.status_code == 404:
-                    content = None
-                elif response.status_code == 429:
+                status_code = response.status_code
+                if status_code == 429:
                     return False, True
+                if status_code == 404:
+                    content = None
                 elif stream:
                     parser = ET_XMLParser(encoding='utf-8')
                     for chunk in response.iter_content(chunk_size=(8 * 1024)):
@@ -2462,9 +2464,8 @@ class YouTubeDataClient(YouTubeLoginClient):
             _output = {
                 'channel_id': channel_id,
                 'content': content,
-                'refresh': True,
+                'refresh': content is not None,
             }
-
             feeds = output['feeds']
             if item_id in feeds:
                 feeds[item_id].update(_output)
