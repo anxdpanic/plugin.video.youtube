@@ -1,3 +1,7 @@
+## v7.4.1+beta.3
+### Changed
+- Always load cached My Subscriptions feed data and load cached data if feed update fails #1395
+
 ## v7.4.1+beta.2
 ### Fixed
 - Fix unnecessary double resolve on playback #1371
