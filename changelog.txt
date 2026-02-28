@@ -1,3 +1,24 @@
+## v7.4.1
+### Fixed
+- Fix unnecessary double resolve on playback #1371
+- Attempt to break busy dialog workaround loop if post run action succeeds #1386
+- Don't swallow unhandled plugin exceptions without logging and running listing end callback #1386
+- Python 2 compatibility fix for urllib3 only checking for str type when accessing module constants using getattr
+- Always refresh missing access tokens if partially logged in and refresh tokens are available #1389
+- Fix missing post run plugin runner option used when search input is a plugin url
+- Fix incorrectly identifying and removing Opus audio from list of available streams #537
+- Clean up window properties in case of exception during plugin invocation #1386
+
+### Changed
+- Simplify caching and fetching of updated subscriptions for My Subscriptions #1395
+- Always load cached My Subscriptions feed data and load cached data if feed update fails #1395
+- Use available access token when first initialising client rather than setting access tokens at later stage of client initialisation #1389
+- Don't cache main plugin menu so that Sign-In/Out item always reflects actual logged in status
+- Automatically add/remove items from local watch later list when using YouTube WL list
+
+### New
+- Add Auto-like after watch feature with optional channel filtering
+
 ## v7.4.1+beta.3
 ### Changed
 - Always load cached My Subscriptions feed data and load cached data if feed update fails #1395
