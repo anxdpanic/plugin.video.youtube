@@ -51,7 +51,11 @@ Please provide detailed steps for reproducing the issue.
 
 ### Log
 
-Nothing can or will be done about your issue report without a complete **debug** log. It is not enough to include an excerpt of the ordinary kodi log. Details on how a debug log can be produced are available on the Kodi Wiki: https://kodi.wiki/view/Log_file.
+Nothing can or will be done about your issue report without a complete **debug** log.
+
+It is not enough to include an excerpt of the ordinary Kodi event log.
+
+Details on how a debug log can be produced are available on the Kodi Wiki: https://kodi.wiki/view/Log_file.
 
 
 
