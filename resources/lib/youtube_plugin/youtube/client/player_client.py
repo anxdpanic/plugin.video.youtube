@@ -1425,7 +1425,7 @@ class YouTubePlayerClient(YouTubeDataClient):
         params = parse_qs(parts.query)
         new_params = {}
 
-        if 'n' not in params:
+        if 'n' not in params and '/n/' not in parts.path:
             pass
         elif not self._calculate_n:
             self.log.debug('Decoding of nsig value disabled')
