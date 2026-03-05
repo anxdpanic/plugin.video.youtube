@@ -401,21 +401,23 @@ def process_refresh_settings(context, step, steps, **_kwargs):
 
 def process_migrate_watch_history(context, step, steps, **_kwargs):
     localize = context.localize
+    settings = context.get_settings()
     access_manager = context.get_access_manager()
     watch_history_id = access_manager.get_watch_history_id().upper()
 
     step += 1
-    if (watch_history_id != 'HL' and context.get_ui().on_yes_no_input(
-            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
-                youtube=localize('youtube'),
-                setup_wizard=localize('setup_wizard'),
-                step=step,
-                steps=steps,
-            ),
-            localize('setup_wizard.prompt.migrate_watch_history'),
-    )):
+    if ((watch_history_id != 'HL' or not settings.use_remote_history())
+            and context.get_ui().on_yes_no_input(
+                '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                    youtube=localize('youtube'),
+                    setup_wizard=localize('setup_wizard'),
+                    step=step,
+                    steps=steps,
+                ),
+                localize('setup_wizard.prompt.migrate_watch_history'),
+            )):
         access_manager.set_watch_history_id('HL')
-        context.get_settings().use_remote_history(True)
+        settings.use_remote_history(True)
     return step
 
 
