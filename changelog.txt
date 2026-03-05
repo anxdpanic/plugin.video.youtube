@@ -1,3 +1,7 @@
+## v7.4.1.1
+### Fixed
+- Address possible race condition resulting in KeyError exception when calling pop() on an empty set
+
 ## v7.4.1
 ### Fixed
 - Fix unnecessary double resolve on playback #1371

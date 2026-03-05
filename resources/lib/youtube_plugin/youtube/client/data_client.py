@@ -2392,8 +2392,7 @@ class YouTubeDataClient(YouTubeLoginClient):
             else:
                 channel_prefix = False
 
-            batch = inputs.copy()
-            for item_id in batch:
+            for item_id in inputs:
                 if channel_prefix:
                     channel_id = item_id
                     item_id = item_id.replace('UC', channel_prefix, 1)
@@ -2419,7 +2418,6 @@ class YouTubeDataClient(YouTubeLoginClient):
                 else:
                     to_refresh.add(channel_id)
 
-            inputs -= batch
             return True, False
 
         def _get_feed(output,
@@ -2642,11 +2640,18 @@ class YouTubeDataClient(YouTubeLoginClient):
                     _kwargs = {}
                 elif kwargs:
                     if do_batch:
-                        _kwargs = {'inputs': kwargs}
-                    elif unpack:
-                        _kwargs = {'input': kwargs.pop()}
+                        batch = kwargs.copy()
+                        kwargs -= batch
+                        _kwargs = {'inputs': batch}
                     else:
-                        _kwargs = kwargs.pop()
+                        try:
+                            _kwargs = kwargs.pop()
+                        except KeyError:
+                            if check_inputs:
+                                check_inputs.clear()
+                            break
+                        if unpack:
+                            _kwargs = {'input': _kwargs}
                 elif check_inputs:
                     if check_inputs.wait(0.1) and kwargs:
                         continue
