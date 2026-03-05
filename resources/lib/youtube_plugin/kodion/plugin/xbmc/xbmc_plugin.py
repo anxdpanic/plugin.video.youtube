@@ -411,8 +411,9 @@ class XbmcPlugin(AbstractPlugin):
                 _post_run_action = None
 
         if ui.pop_property(PLAY_FORCED):
-            context.set_path(PATHS.PLAY)
-            return self.run(provider, context, forced=forced)
+            if force_resolve:
+                # Playback already resolved via setResolvedUrl — skip re-run
+                logging.warning('PLAY_FORCED was set but playback already resolved via force_resolve. Skipping re-run.')
 
         xbmcplugin.endOfDirectory(
             handle,

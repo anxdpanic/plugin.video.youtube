@@ -137,22 +137,19 @@ class ServiceMonitor(xbmc.Monitor):
 
                 if context.is_plugin_path(item_uri):
                     path, params = context.parse_uri(item_uri)
-                    if path.rstrip('/') != PATHS.PLAY:
+                    stripped_path = path.rstrip('/')
+
+                    if stripped_path == PATHS.PLAY:
+                        self.log.debug('Playlist.OnAdd item is a direct play command. Path: {path}', path=path)
+                    elif stripped_path == '/uri2addon':
+                        self.log.debug('Playlist.OnAdd item is a URI resolver request. Skipping PLAY_FORCED. Path: {path}', path=path)
+                    else:
                         self.log.warning(('Playlist.OnAdd item is not playable',
                                           'Path:   {path}',
                                           'Params: {params}'),
                                          path=path,
                                          params=params)
                         context.get_ui().set_property(PLAY_FORCED)
-                    elif params.get(ACTION) == 'list':
-                        playlist_player.stop()
-                        playlist_player.clear()
-                        self.log.warning(('Playlist.OnAdd item is a listing',
-                                          'Path:   {path}',
-                                          'Params: {params}'),
-                                         path=path,
-                                         params=params)
-                        context.get_ui().set_property(PLAY_CANCELLED)
 
             return
 
