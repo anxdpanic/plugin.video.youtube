@@ -499,7 +499,7 @@ class XbmcPlugin(AbstractPlugin):
             result = True
 
         elif uri.startswith('PlayMedia('):
-            log_action = 'Redirect for playback queued'
+            log_action = 'PlayMedia queued'
             log_uri = uri[len('PlayMedia('):-1].split(',')
             log_uri[0] = parse_and_redact_uri(
                 log_uri[0],
@@ -566,20 +566,32 @@ class XbmcPlugin(AbstractPlugin):
             action = uri
             result = False
 
-        elif context.is_plugin_path(uri, PATHS.PLAY):
+        elif context.is_plugin_path(uri):
             parts, params, log_uri, _, _ = parse_and_redact_uri(uri)
-            if params.get(ACTION, [None])[0] == 'list':
+            path = parts.path.rstrip('/')
+
+            if path != PATHS.PLAY:
                 log_action = 'Redirect queued'
                 action = context.create_uri(
-                    (PATHS.ROUTE, parts.path.rstrip('/')),
+                    (PATHS.ROUTE, path or PATHS.HOME),
                     params,
                     run=True,
                 )
                 result = False
+
+            elif params.get(ACTION, [None])[0] == 'list':
+                log_action = 'Redirect for listing queued'
+                action = context.create_uri(
+                    (PATHS.ROUTE, path),
+                    params,
+                    run=True,
+                )
+                result = False
+
             else:
                 log_action = 'Redirect for playback queued'
                 action = context.create_uri(
-                    (parts.path.rstrip('/'),),
+                    path,
                     params,
                     play=(xbmc.PLAYLIST_MUSIC
                           if (context.get_ui().get_property(PLAY_FORCE_AUDIO)
@@ -587,16 +599,6 @@ class XbmcPlugin(AbstractPlugin):
                           xbmc.PLAYLIST_VIDEO),
                 )
                 result = True
-
-        elif context.is_plugin_path(uri):
-            log_action = 'Redirect queued'
-            parts, params, log_uri, _, _ = parse_and_redact_uri(uri)
-            action = context.create_uri(
-                (PATHS.ROUTE, parts.path.rstrip('/') or PATHS.HOME),
-                params,
-                run=True,
-            )
-            result = False
 
         else:
             action = None
