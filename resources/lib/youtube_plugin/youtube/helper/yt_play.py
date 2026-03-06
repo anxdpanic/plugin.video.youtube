@@ -542,7 +542,7 @@ def process(provider, context, **_kwargs):
             # Action(Play) does not work in non-video windows
             if ((force_play_params or params.get(CONTEXT_MENU))
                     and not params.get(PLAY_STRM)
-                    and context.is_plugin_folder()):
+                    and context.is_plugin_folder(name=True)):
                 return UriItem('command://Action(Play)')
 
             return UriItem('command://{0}'.format(

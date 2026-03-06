@@ -32,6 +32,7 @@ from ...constants import (
     CHANNEL_ID,
     CONTENT,
     FOLDER_NAME,
+    FOLDER_URI,
     PLAYLIST_ID,
     PLAY_FORCE_AUDIO,
     SERVICE_IPC,
@@ -1083,11 +1084,19 @@ class XbmcContext(AbstractContext):
             )
         return value
 
-    def is_plugin_folder(self, folder_name=None):
-        if folder_name is None:
-            folder_name = XbmcContextUI.get_container_info(FOLDER_NAME,
-                                                           container_id=None)
-        return folder_name == self._plugin_name
+    def is_plugin_folder(self, folder_path='', name=False):
+        if name:
+            return XbmcContextUI.get_container_info(
+                FOLDER_NAME,
+                container_id=None,
+            ) == self._plugin_name
+        return self.is_plugin_path(
+            XbmcContextUI.get_container_info(
+                FOLDER_URI,
+                container_id=None,
+            ),
+            folder_path,
+        )
 
     def refresh_requested(self, force=False, on=False, off=False, params=None):
         if params is None:
