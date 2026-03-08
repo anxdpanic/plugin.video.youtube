@@ -458,11 +458,11 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                         timestamp = ' (~%.2fs)' % (
                                 float(duration)
                                 *
-                                next(map(int, byte_range[6:].split('-')))
+                                int(byte_range[6:].split('-')[0])
                                 /
                                 int(clen)
                         )
-                    except (IndexError, StopIteration, ValueError):
+                    except ValueError:
                         timestamp = ''
             else:
                 timestamp = ''
