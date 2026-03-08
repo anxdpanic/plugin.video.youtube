@@ -1,3 +1,22 @@
+## v7.4.2+beta.1
+### Fixed
+- Skip unplayable live manifests #1377
+- Handle inconsistent error codes and names used in Python 2 #1412
+- Simplify byte range to timestamp conversion for compatibility with Python 2 #1412
+- Fix unnecessarily reloading listing when adding items to Bookmarks
+
+### Changed
+- Rework addon debug log settings (Addon > Settings > Advanced > Debug > Enable debug logging) #1385
+  - Allowable values:
+    - Disabled (addon logging output disabled)
+    - Auto (default, addon logging output enabled if Kodi debug logging enabled)
+    - Always enabled (addon logging output enabled)
+    - Verbose (additional addon logging output enabled)
+- Various other improvement to addon logging
+
+### New
+- Update Setup Wizard to account for user possibly using mismatched watch history settings
+
 ## v7.4.1.1
 ### Fixed
 - Address possible race condition resulting in KeyError exception when calling pop() on an empty set
