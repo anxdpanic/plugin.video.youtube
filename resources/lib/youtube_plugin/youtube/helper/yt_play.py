@@ -182,7 +182,7 @@ def _play_stream(provider, context):
     ui.set_property(PLAYER_DATA,
                     value=playback_data,
                     process=json.dumps,
-                    log_process=redact_params)
+                    log_redact=True)
     ui.set_property(TRAKT_PAUSE_FLAG, raw=True)
     context.send_notification(PLAYBACK_INIT, playback_data)
     return media_item
@@ -542,7 +542,7 @@ def process(provider, context, **_kwargs):
             # Action(Play) does not work in non-video windows
             if ((force_play_params or params.get(CONTEXT_MENU))
                     and not params.get(PLAY_STRM)
-                    and context.is_plugin_folder()):
+                    and context.is_plugin_folder(name=True)):
                 return UriItem('command://Action(Play)')
 
             return UriItem('command://{0}'.format(

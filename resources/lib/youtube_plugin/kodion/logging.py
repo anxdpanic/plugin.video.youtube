@@ -20,7 +20,7 @@ from traceback import extract_stack, format_list
 
 from .compatibility import StringIO, string_type, to_str, xbmc
 from .constants import ADDON_ID
-from .utils.convert_format import to_unicode
+from .utils.convert_format import to_unicode, urls_in_text
 from .utils.redact import (
     parse_and_redact_uri,
     redact_auth_header,
@@ -74,24 +74,32 @@ class RecordFormatter(logging.Formatter):
 
     def format(self, record):
         record.message = to_unicode(record.getMessage())
+
         if self.usesTime():
             record.asctime = self.formatTime(record, self.datefmt)
+
         s = self.formatMessage(record)
+
+        if record.stack_info:
+            if not record.stack_text:
+                stack_text = self.formatStack(record.stack_info)
+                if getattr(record, '__redact_stack__', False):
+                    stack_text = urls_in_text(stack_text, parse_and_redact_uri)
+                record.stack_text = stack_text
+            if s[-1:] != '\n':
+                s += '\n\n'
+            s += record.stack_text
+
         if record.exc_info:
             if not record.exc_text:
-                record.exc_text = self.formatException(record.exc_info)
-        if record.exc_text:
-            if record.stack_info:
-                if s[-1:] != '\n':
-                    s += '\n\n'
-                s += self.formatStack(record.stack_info)
+                exc_text = self.formatException(record.exc_info)
+                if getattr(record, '__redact_exc__', False):
+                    exc_text = urls_in_text(exc_text, parse_and_redact_uri)
+                record.exc_text = exc_text
             if s[-1:] != '\n':
                 s += '\n\n'
             s += record.exc_text
-        elif record.stack_info:
-            if s[-1:] != '\n':
-                s += '\n\n'
-            s += self.formatStack(record.stack_info)
+
         return s
 
 
@@ -308,8 +316,7 @@ class Handler(logging.Handler):
 
 class LogRecord(logging.LogRecord):
     def __init__(self, name, level, pathname, lineno, msg, args, exc_info,
-                 func=None, **kwargs):
-        stack_info = kwargs.pop('sinfo', None)
+                 func=None, sinfo=None, extra=None, **kwargs):
         super(LogRecord, self).__init__(name,
                                         level,
                                         pathname,
@@ -319,7 +326,21 @@ class LogRecord(logging.LogRecord):
                                         exc_info,
                                         func=func,
                                         **kwargs)
-        self.stack_info = stack_info
+        self.message = None
+        self.asctime = None
+        self.stack_info = sinfo
+        self.stack_text = None
+        if extra is not None:
+            attrs = self.__dict__
+            duplicate_attrs = set(extra).intersection(attrs.keys())
+            if duplicate_attrs:
+                raise KeyError(
+                    "Attempt to overwrite LogRecord attributes: ('%s',)" % (
+                        "', '".join(duplicate_attrs)
+                    )
+                )
+            else:
+                attrs.update(extra)
 
     if not current_system_version.compatible(19):
         def getMessage(self):
@@ -423,21 +444,18 @@ class KodiLogger(logging.Logger):
 
     def makeRecord(self, name, level, fn, lno, msg, args, exc_info,
                    func=None, extra=None, sinfo=None):
-        rv = LogRecord(name,
-                       level,
-                       fn,
-                       lno,
-                       msg,
-                       args,
-                       exc_info,
-                       func=func,
-                       sinfo=sinfo)
-        if extra is not None:
-            for key in extra:
-                if (key in ["message", "asctime"]) or (key in rv.__dict__):
-                    raise KeyError("Attempt to overwrite %r in LogRecord" % key)
-                rv.__dict__[key] = extra[key]
-        return rv
+        return LogRecord(
+            name,
+            level,
+            fn,
+            lno,
+            msg,
+            args,
+            exc_info,
+            func=func,
+            sinfo=sinfo,
+            extra=extra,
+        )
 
     def exception(self, msg, *args, **kwargs):
         if self.isEnabledFor(ERROR):

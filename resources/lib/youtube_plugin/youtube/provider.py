@@ -2071,8 +2071,8 @@ class Provider(AbstractProvider):
             return (
                 True,
                 {
-                    provider.FORCE_REFRESH: context.get_path().startswith(
-                        PATHS.BOOKMARKS
+                    provider.FORCE_REFRESH: context.is_plugin_folder(
+                        PATHS.BOOKMARKS,
                     ),
                 },
             )
