@@ -13,14 +13,7 @@ import os
 import re
 import socket
 from collections import deque
-from errno import (
-    ECONNABORTED,
-    ECONNREFUSED,
-    ECONNRESET,
-    EPIPE,
-    EPROTOTYPE,
-    ESHUTDOWN,
-)
+from errno import errorcode
 from functools import partial
 from io import open
 from json import dumps as json_dumps, loads as json_loads
@@ -128,12 +121,17 @@ class RequestHandler(BaseHTTPRequestHandler, object):
     }
 
     SWALLOWED_ERRORS = {
-        ECONNABORTED,
-        ECONNREFUSED,
-        ECONNRESET,
-        EPIPE,
-        EPROTOTYPE,
-        ESHUTDOWN,
+        'ECONNABORTED',
+        'ECONNREFUSED',
+        'ECONNRESET',
+        'EPIPE',
+        'EPROTOTYPE',
+        'ESHUTDOWN',
+        'WSAECONNABORTED',
+        'WSAECONNREFUSED',
+        'WSAECONNRESET',
+        'WSAEPROTOTYPE',
+        'WSAESHUTDOWN',
     }
 
     def __init__(self, request, client_address, server):
@@ -176,11 +174,23 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         try:
             super(RequestHandler, self).handle_one_request()
             return
-        except (HTTPError, OSError) as exc:
+        except Exception as exc:
             self.close_connection = True
             self.log.exception('Request failed')
-            if (isinstance(exc, HTTPError)
-                    or getattr(exc, 'errno', None) in self.SWALLOWED_ERRORS):
+            if isinstance(exc, HTTPError):
+                return
+            error = getattr(exc, 'errno', None)
+            if error and errorcode.get(error) in self.SWALLOWED_ERRORS:
+                return
+            raise exc
+
+    def finish(self):
+        try:
+            super(RequestHandler, self).finish()
+        except Exception as exc:
+            self.log.exception('File object failed to close cleanly')
+            error = getattr(exc, 'errno', None)
+            if error and errorcode.get(error) in self.SWALLOWED_ERRORS:
                 return
             raise exc
 
