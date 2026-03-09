@@ -713,7 +713,12 @@ class AbstractContext(object):
     def tear_down(self):
         pass
 
-    def ipc_exec(self, target, timeout=None, payload=None, raise_exc=False):
+    def ipc_exec(self,
+                 target,
+                 timeout=None,
+                 payload=None,
+                 raise_exc=False,
+                 stacklevel=2):
         raise NotImplementedError()
 
     def is_plugin_folder(self, folder_name=None):

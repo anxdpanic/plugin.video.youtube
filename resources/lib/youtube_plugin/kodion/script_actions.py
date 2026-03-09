@@ -481,12 +481,15 @@ def run(argv):
         log_level = context.get_settings().log_level()
         if log_level:
             log.debugging = True
+            # Verbose
             if log_level & 2:
                 log.stack_info = True
                 log.verbose_logging = True
+            # Enabled or Auto on
             else:
                 log.stack_info = False
                 log.verbose_logging = False
+        # Disabled or Auto off
         else:
             log.debugging = False
             log.stack_info = False

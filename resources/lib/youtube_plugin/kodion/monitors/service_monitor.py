@@ -213,7 +213,7 @@ class ServiceMonitor(xbmc.Monitor):
                                 self._context.get_ui().set_property(
                                     '-'.join((FILE_READ, filepath)),
                                     file.read(),
-                                    log_value='<redacted>',
+                                    log_redact='REDACTED',
                                 )
                                 response = True
                         except (IOError, OSError):
@@ -222,7 +222,7 @@ class ServiceMonitor(xbmc.Monitor):
                         with write_access:
                             content = self._context.get_ui().pop_property(
                                 '-'.join((FILE_WRITE, filepath)),
-                                log_value='<redacted>',
+                                log_redact='REDACTED',
                             )
                             response = None
                             if content:
@@ -338,12 +338,15 @@ class ServiceMonitor(xbmc.Monitor):
         log_level = settings.log_level()
         if log_level:
             self.log.debugging = True
+            # Verbose
             if log_level & 2:
                 self.log.stack_info = True
                 self.log.verbose_logging = True
+            # Enabled or Auto on
             else:
                 self.log.stack_info = False
                 self.log.verbose_logging = False
+        # Disabled or Auto off
         else:
             self.log.debugging = False
             self.log.stack_info = False

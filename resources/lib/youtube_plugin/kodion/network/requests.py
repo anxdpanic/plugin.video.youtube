@@ -328,17 +328,19 @@ class BaseRequestsClass(object):
                 cookies=cookies,
                 hooks=hooks,
             ))
+        elif prepared_request:
+            method = prepared_request.method
+            url = prepared_request.url
+            headers = prepared_request.headers
 
         if stream:
             cache = False
         if cache is not False:
             if prepared_request:
-                method = prepared_request.method
                 if cache is True or method in self.METHODS_TO_CACHE:
-                    headers = prepared_request.headers
                     request_id = generate_hash(
                         method,
-                        prepared_request.url,
+                        url,
                         headers,
                         prepared_request.body,
                     )
@@ -461,6 +463,7 @@ class BaseRequestsClass(object):
                                response_reason=response_reason,
                                response_text=response_text,
                                stacklevel=stacklevel,
+                               extra={'__redact_exc__': True},
                                **kwargs)
 
             if raise_exc:

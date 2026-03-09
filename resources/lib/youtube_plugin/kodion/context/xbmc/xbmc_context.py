@@ -32,6 +32,7 @@ from ...constants import (
     CHANNEL_ID,
     CONTENT,
     FOLDER_NAME,
+    FOLDER_URI,
     PLAYLIST_ID,
     PLAY_FORCE_AUDIO,
     SERVICE_IPC,
@@ -1026,13 +1027,18 @@ class XbmcContext(AbstractContext):
             except AttributeError:
                 pass
 
-    def ipc_exec(self, target, timeout=None, payload=None, raise_exc=False):
+    def ipc_exec(self,
+                 target,
+                 timeout=None,
+                 payload=None,
+                 raise_exc=False,
+                 stacklevel=2):
         if not XbmcContextUI.get_property(SERVICE_RUNNING_FLAG, as_bool=True):
             msg = 'Service IPC - Monitor has not started'
             XbmcContextUI.set_property(SERVICE_RUNNING_FLAG, BUSY_FLAG)
             if raise_exc:
                 raise RuntimeError(msg)
-            self.log.warning_trace(msg)
+            self.log.warning_trace(msg, stacklevel=stacklevel)
             return None
 
         data = {'target': target, 'response_required': bool(timeout)}
@@ -1048,32 +1054,50 @@ class XbmcContext(AbstractContext):
         response = IPCMonitor(target, timeout)
         if response.received:
             value = response.value
-            if value:
-                self.log.debug(('Service IPC - Responded',
-                                'Procedure: {target!r}',
-                                'Latency:   {latency:.2f}ms'),
-                               target=target,
-                               latency=response.latency)
-            elif value is False:
-                self.log.error_trace(('Service IPC - Failed',
-                                      'Procedure: {target!r}',
-                                      'Latency:   {latency:.2f}ms'),
-                                     target=target,
-                                     latency=response.latency)
+            if value is False:
+                log_level = logging.ERROR
+                log_value = 'FAILED'
+                stack_info = True
+            else:
+                log_level = logging.DEBUG
+                log_value = value
+                stack_info = False
+            self.log.log(
+                level=log_level,
+                msg='Service IPC <{target}({payload})>:'
+                    ' {value} (in {time_ms:.2f}ms)',
+                target=target,
+                payload=payload,
+                value=log_value,
+                time_ms=response.latency,
+                stack_info=stack_info,
+                stacklevel=stacklevel,
+            )
         else:
             value = None
-            self.log.error_trace(('Service IPC - Timed out',
-                                  'Procedure: {target!r}',
-                                  'Timeout:   {timeout:.2f}s'),
-                                 target=target,
-                                 timeout=timeout)
+            self.log.error_trace(
+                'Service IPC <{target}({payload})>:'
+                ' TIMED OUT (in {time_s:.2f}s)',
+                target=target,
+                payload=payload,
+                time_s=timeout,
+                stacklevel=stacklevel,
+            )
         return value
 
-    def is_plugin_folder(self, folder_name=None):
-        if folder_name is None:
-            folder_name = XbmcContextUI.get_container_info(FOLDER_NAME,
-                                                           container_id=None)
-        return folder_name == self._plugin_name
+    def is_plugin_folder(self, folder_path='', name=False):
+        if name:
+            return XbmcContextUI.get_container_info(
+                FOLDER_NAME,
+                container_id=None,
+            ) == self._plugin_name
+        return self.is_plugin_path(
+            XbmcContextUI.get_container_info(
+                FOLDER_URI,
+                container_id=None,
+            ),
+            folder_path,
+        )
 
     def refresh_requested(self, force=False, on=False, off=False, params=None):
         if params is None:

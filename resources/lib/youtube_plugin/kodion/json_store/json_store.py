@@ -106,7 +106,7 @@ class JSONStore(object):
                 self._context.get_ui().set_property(
                     '-'.join((FILE_WRITE, filepath)),
                     to_unicode(_data),
-                    log_value='<redacted>',
+                    log_redact='REDACTED',
                 )
                 response = self._context.ipc_exec(
                     FILE_WRITE,
@@ -158,7 +158,7 @@ class JSONStore(object):
                 ) is not False:
                     data = self._context.get_ui().get_property(
                         '-'.join((FILE_READ, filepath)),
-                        log_value='<redacted>',
+                        log_redact='REDACTED',
                     )
                 else:
                     raise IOError

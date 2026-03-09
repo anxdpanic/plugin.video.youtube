@@ -825,8 +825,12 @@ class AbstractSettings(object):
     def log_level(self, value=None):
         if value is not None:
             return self.set_int(SETTINGS.LOG_LEVEL, value)
-        return (self.get_int(SETTINGS.LOG_LEVEL, 0)
-                or get_kodi_setting_bool('debug.showloginfo'))
+        log_level = self.get_int(SETTINGS.LOG_LEVEL, 0)
+        if not log_level:
+            return get_kodi_setting_bool('debug.showloginfo')
+        if log_level & 4:
+            log_level = 0
+        return log_level
 
     def exec_limit(self, value=None):
         if value is not None:
