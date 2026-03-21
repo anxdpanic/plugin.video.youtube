@@ -1091,18 +1091,17 @@ class XbmcContext(AbstractContext):
             )
         return value
 
-    def is_plugin_folder(self, folder_path='', name=False):
+    def is_plugin_folder(self, folder_path='', name=False, partial=True):
         if name:
             return XbmcContextUI.get_container_info(
                 FOLDER_NAME,
-                container_id=None,
             ) == self._plugin_name
         return self.is_plugin_path(
-            XbmcContextUI.get_container_info(
+            uri=XbmcContextUI.get_container_info(
                 FOLDER_URI,
-                container_id=None,
             ),
-            folder_path,
+            uri_path=folder_path,
+            partial=partial,
         )
 
     def refresh_requested(self, force=False, on=False, off=False, params=None):
