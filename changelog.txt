@@ -1,3 +1,7 @@
+## v7.4.2+beta.2
+### Fixed
+- Update parsing of plugin urls for path params and ID lists #1418
+
 ## v7.4.2+beta.1
 ### Fixed
 - Skip unplayable live manifests #1377
