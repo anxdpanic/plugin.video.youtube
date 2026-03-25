@@ -38,6 +38,7 @@ from ..constants import (
     LICENSE_TOKEN,
     LICENSE_URL,
     PATHS,
+    SYNC_API_KEYS,
     TEMP_PATH,
 )
 from ..utils.convert_format import fix_subtitle_stream
@@ -359,6 +360,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                 enabled = localize('api.personal.disabled')
 
             if updated:
+                context.send_notification(SYNC_API_KEYS)
                 # Successfully updated
                 updated = localize('api.config.updated', ', '.join(updated))
             else:
