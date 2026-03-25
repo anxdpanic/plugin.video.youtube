@@ -232,7 +232,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         parts, params, log_uri, log_params, log_path = parse_and_redact_uri(uri)
         path = {
             'uri': uri,
-            'path': parts.path,
+            'path': parts.path.rstrip('/'),
             'query': parts.query,
             'params': params,
             'log_uri': log_uri,
