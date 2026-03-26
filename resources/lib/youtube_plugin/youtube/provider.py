@@ -222,7 +222,7 @@ class Provider(AbstractProvider):
             _,
         ) = access_manager.get_access_tokens(dev_id)
 
-        if client:
+        if client and not client.context_changed(context):
             if api_last_origin != origin:
                 access_manager.set_last_origin(origin)
                 self.log.info(('API key origin changed - Resetting client',
