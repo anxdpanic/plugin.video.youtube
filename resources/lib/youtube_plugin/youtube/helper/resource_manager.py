@@ -61,15 +61,18 @@ class ResourceManager(object):
     def get_channels(self, ids, suppress_errors=False, defer_cache=False):
         context = self._context
         client = self._client
-        data_cache = context.get_data_cache()
+
         function_cache = context.get_function_cache()
 
         refresh = context.refresh_requested()
-        forced_cache = not function_cache.run(
-            client.internet_available,
-            function_cache.ONE_MINUTE * 5,
-            _refresh=refresh,
-        )
+        if not client.v3_api_available():
+            forced_cache = True
+        else:
+            forced_cache = not function_cache.run(
+                client.internet_available,
+                function_cache.ONE_MINUTE * 5,
+                _refresh=refresh,
+            )
         refresh = not forced_cache and refresh
 
         updated = []
@@ -97,6 +100,7 @@ class ResourceManager(object):
         if refresh or not ids:
             result = {}
         else:
+            data_cache = context.get_data_cache()
             result = data_cache.get_items(
                 ids,
                 None if forced_cache else data_cache.ONE_DAY,
@@ -168,14 +172,17 @@ class ResourceManager(object):
                          defer_cache=False):
         context = self._context
         client = self._client
-        function_cache = context.get_function_cache()
 
         refresh = context.refresh_requested()
-        forced_cache = not function_cache.run(
-            client.internet_available,
-            function_cache.ONE_MINUTE * 5,
-            _refresh=refresh,
-        )
+        if not client.v3_api_available():
+            forced_cache = True
+        else:
+            function_cache = context.get_function_cache()
+            forced_cache = not function_cache.run(
+                client.internet_available,
+                function_cache.ONE_MINUTE * 5,
+                _refresh=refresh,
+            )
         refresh = not forced_cache and refresh
 
         if not refresh and channel_data:
@@ -289,14 +296,17 @@ class ResourceManager(object):
 
         context = self._context
         client = self._client
-        function_cache = context.get_function_cache()
 
         refresh = context.refresh_requested()
-        forced_cache = not function_cache.run(
-            client.internet_available,
-            function_cache.ONE_MINUTE * 5,
-            _refresh=refresh,
-        )
+        if not client.v3_api_available():
+            forced_cache = True
+        else:
+            function_cache = context.get_function_cache()
+            forced_cache = not function_cache.run(
+                client.internet_available,
+                function_cache.ONE_MINUTE * 5,
+                _refresh=refresh,
+            )
         refresh = not forced_cache and refresh
 
         if refresh or not ids:
@@ -379,18 +389,19 @@ class ResourceManager(object):
 
         context = self._context
         client = self._client
-        function_cache = context.get_function_cache()
 
         refresh = context.refresh_requested()
-        forced_cache = (
-                not function_cache.run(
-                    client.internet_available,
-                    function_cache.ONE_MINUTE * 5,
-                    _refresh=refresh,
-                )
-                or (context.get_param(CHANNEL_ID) == 'mine'
-                    and not client.logged_in)
-        )
+        if not client.v3_api_available():
+            forced_cache = True
+        elif not client.logged_in and context.get_param(CHANNEL_ID) == 'mine':
+            forced_cache = True
+        else:
+            function_cache = context.get_function_cache()
+            forced_cache = not function_cache.run(
+                client.internet_available,
+                function_cache.ONE_MINUTE * 5,
+                _refresh=refresh,
+            )
         refresh = not forced_cache and refresh
 
         if batch_id:
@@ -564,14 +575,17 @@ class ResourceManager(object):
 
         context = self._context
         client = self._client
-        function_cache = context.get_function_cache()
 
         refresh = context.refresh_requested()
-        forced_cache = not function_cache.run(
-            client.internet_available,
-            function_cache.ONE_MINUTE * 5,
-            _refresh=refresh,
-        )
+        if not client.v3_api_available():
+            forced_cache = True
+        else:
+            function_cache = context.get_function_cache()
+            forced_cache = not function_cache.run(
+                client.internet_available,
+                function_cache.ONE_MINUTE * 5,
+                _refresh=refresh,
+            )
         refresh = not forced_cache and refresh
 
         if refresh or not ids:
