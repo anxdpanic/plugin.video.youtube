@@ -366,30 +366,32 @@ class AbstractProvider(object):
         if window_cache:
             ui.set_property(REROUTE_PATH, path)
 
-        action = ''.join((
-            'ReplaceWindow' if window_replace else 'ActivateWindow',
-            '(Videos,',
-            uri,
-            ',return)' if window_return else ')',
-        ))
-
         timeout = 30
         while ui.busy_dialog_active():
             timeout -= 1
             if timeout < 0:
                 self.log.warning('Multiple busy dialogs active'
                                  ' - Rerouting workaround')
-                return UriItem('command://{0}'.format(action))
+                defer = True
+                break
             context.sleep(0.1)
         else:
-            context.execute(
-                action,
-                # wait=True,
-                # wait_for=(REROUTE_PATH if window_cache else None),
-                # wait_for_set=False,
-                # block_ui=True,
-            )
-            return True
+            defer = False
+
+        action = context.create_uri(
+            uri,
+            window={
+                'name': 'Videos',
+                'replace': window_replace,
+                'return': window_return,
+            },
+            command=defer,
+        )
+
+        if defer:
+            return UriItem(action)
+        context.execute(action)
+        return True
 
     @staticmethod
     def on_bookmarks(provider, context, re_match):

@@ -261,7 +261,7 @@ class XbmcContextUI(AbstractContextUI):
             except (TypeError, ValueError):
                 return
 
-        xbmc.executebuiltin('SetFocus({0},{1},absolute)'.format(
+        xbmc.executebuiltin('SetFocus("{0}","{1}",absolute)'.format(
             container_id,
             position + offset,
         ))

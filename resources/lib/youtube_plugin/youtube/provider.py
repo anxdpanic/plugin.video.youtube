@@ -711,7 +711,7 @@ class Provider(AbstractProvider):
                 and identifier.lower() == 'property'
                 and li_channel_id
                 and li_channel_id.lower().startswith(('mine', 'uc'))):
-            context.execute('ActivateWindow(Videos, {channel}, return)'.format(
+            context.execute('ActivateWindow(Videos,"{channel}",return)'.format(
                 channel=create_uri(
                     (PATHS.CHANNEL, li_channel_id,),
                 )
