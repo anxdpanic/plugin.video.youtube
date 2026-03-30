@@ -391,9 +391,8 @@ class ResourceManager(object):
         client = self._client
 
         refresh = context.refresh_requested()
-        if not client.v3_api_available():
-            forced_cache = True
-        elif not client.logged_in and context.get_param(CHANNEL_ID) == 'mine':
+        v3_api_available = client.v3_api_available()
+        if not client.logged_in and context.get_param(CHANNEL_ID) == 'mine':
             forced_cache = True
         else:
             function_cache = context.get_function_cache()
@@ -478,7 +477,18 @@ class ResourceManager(object):
                 batch_id = (playlist_id, page_token)
                 if batch_id in result:
                     break
-                batch = client.get_playlist_items(*batch_id, **kwargs)
+                batch = (
+                    client.get_playlist_items(*batch_id, **kwargs)
+                    if v3_api_available else
+                    client.get_browse_items(
+                        browse_id='VL' + playlist_id,
+                        playlist_id=playlist_id,
+                        page_token=page_token,
+                        response_type='playlistItems',
+                        client='tv',
+                        json_path=client.JSON_PATHS['tv_playlist'],
+                    )
+                )
                 if not batch:
                     break
                 new_batch_ids.append(batch_id)
