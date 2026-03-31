@@ -34,12 +34,14 @@ from ...constants import (
     FOLDER_NAME,
     FOLDER_URI,
     PLAYLIST_ID,
+    PLAYLIST_IDS,
     PLAY_FORCE_AUDIO,
     SERVICE_IPC,
     SERVICE_RUNNING_FLAG,
     SORT,
     URI,
     VIDEO_ID,
+    VIDEO_IDS,
 )
 from ...json_store import APIKeyStore, AccessManager
 from ...player import XbmcPlaylistPlayer
@@ -477,29 +479,34 @@ class XbmcContext(AbstractContext):
             self._plugin_handle = -1
             return
 
+        self._param_string = ''
+        self._params = {}
+
         # first the path of the uri
-        self.set_path(
+        path = self.set_path(
             urlsplit(uri).path,
             force=True,
             parser=XbmcContextUI.get_infolabel,
             update_uri=False,
         )
+        params = self.parse_path(path)
 
         # after that try to get the params
         if num_args > 2:
-            params = to_unicode(sys.argv[2][1:])
-            self._param_string = params
-            self._params = {}
-            if params:
-                self.parse_params(
-                    dict(parse_qsl(params, keep_blank_values=True)),
-                    parser=XbmcContextUI.get_infolabel,
-                )
+            _params = to_unicode(sys.argv[2][1:])
+            if _params:
+                self._param_string = _params
+                params.update(dict(parse_qsl(_params, keep_blank_values=True)))
 
         # then Kodi resume status
         if num_args > 3 and sys.argv[3].lower() == 'resume:true':
-            self._params['resume'] = True
+            params['resume'] = True
 
+        if params:
+            self.parse_params(
+                params,
+                parser=XbmcContextUI.get_infolabel,
+            )
         self.update_uri()
 
     def get_region(self):
@@ -1121,35 +1128,24 @@ class XbmcContext(AbstractContext):
     def parse_item_ids(self,
                        uri='',
                        from_listitem=True,
-                       _ids={'video': VIDEO_ID,
-                             'channel': CHANNEL_ID,
-                             'playlist': PLAYLIST_ID}):
-        item_ids = {}
+                       _ids=(VIDEO_ID,
+                             VIDEO_IDS,
+                             CHANNEL_ID,
+                             # CHANNEL_IDS,  # not currently supported
+                             PLAYLIST_ID,
+                             PLAYLIST_IDS)):
         if not uri and from_listitem:
             uri = XbmcContextUI.get_listitem_info(URI)
         if not uri or not self.is_plugin_path(uri):
-            return item_ids
+            return {}
+
         uri = urlsplit(uri)
-
-        path = uri.path.rstrip('/')
-        while path:
-            id_type, _, next_part = path.partition('/')
-            if not next_part:
-                break
-
-            if id_type in _ids:
-                id_value = next_part.partition('/')[0]
-                if id_value:
-                    item_ids[_ids[id_type]] = id_value
-
-            path = next_part
-
-        params = dict(parse_qsl(uri.query))
-        for name in _ids.values():
-            id_value = params.get(name)
-            if not id_value and from_listitem:
-                id_value = XbmcContextUI.get_listitem_property(name)
-            if id_value:
-                item_ids[name] = id_value
+        item_ids = self.parse_path(uri.path)
+        _params = dict(parse_qsl(uri.query))
+        _prop = XbmcContextUI.get_listitem_property if from_listitem else False
+        for name in _ids:
+            value = _params.get(name) or _prop and _prop(name)
+            if value:
+                item_ids[name] = value
 
         return item_ids

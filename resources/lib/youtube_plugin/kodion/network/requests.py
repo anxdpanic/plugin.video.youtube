@@ -218,6 +218,9 @@ class BaseRequestsClass(object):
     def reinit(self, **kwargs):
         self.__init__(**kwargs)
 
+    def context_changed(self, context):
+        return self._context != context
+
     def __enter__(self):
         return self
 

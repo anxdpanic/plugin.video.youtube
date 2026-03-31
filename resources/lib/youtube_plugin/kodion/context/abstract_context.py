@@ -188,6 +188,11 @@ class AbstractContext(object):
     ))
     _NON_EMPTY_STRING_PARAMS = set()
 
+    _PATH_PARAMS = {
+        'channel': CHANNEL_ID,
+        'playlist': PLAYLIST_ID,
+    }
+
     def __init__(self, path='/', params=None, plugin_id=''):
         self._access_manager = None
         self._uuid = None
@@ -209,7 +214,7 @@ class AbstractContext(object):
         self._version = 'UNKNOWN'
 
         self._param_string = ''
-        self._params = params or {}
+        self._params = {}
         if params:
             self.parse_params(params)
 
@@ -515,9 +520,8 @@ class AbstractContext(object):
             parts = kwargs.get('parts')
             path = unquote(path[0])
             if parts is None:
-                path = path.split('/')
                 path, parts = self.create_path(
-                    *path,
+                    *path.split('/'),
                     parts=True,
                     parser=kwargs.get('parser')
                 )
@@ -528,6 +532,8 @@ class AbstractContext(object):
         self._path_parts = parts
         if kwargs.get('update_uri', True):
             self.update_uri()
+
+        return path
 
     def get_original_params(self):
         return self._param_string
@@ -541,19 +547,42 @@ class AbstractContext(object):
     def pop_param(self, name, default=None):
         return self._params.pop(name, default)
 
-    def parse_uri(self, uri, parse_params=True, update=False):
+    @classmethod
+    def parse_path(cls, path):
+        params = {}
+        path_params = cls._PATH_PARAMS
+        path = path.rstrip('/')
+        while path:
+            param, _, next_part = path.partition('/')
+            if not next_part:
+                break
+
+            if param in path_params:
+                value = next_part.partition('/')[0]
+                if value:
+                    params[path_params[param]] = value
+
+            path = next_part
+
+        return params
+
+    def parse_uri(self, uri, parse_params=True, parse_path=True, update=False):
         uri = urlsplit(uri)
         path = uri.path
-        if parse_params:
-            params = self.parse_params(
-                dict(parse_qsl(uri.query, keep_blank_values=True)),
-                update=False,
-            )
-            if update:
-                self._params = params
-                self.set_path(path)
-        else:
-            params = uri.query
+        if not parse_params:
+            return path, uri.query
+
+        params = dict(parse_qsl(uri.query, keep_blank_values=True))
+
+        if parse_path:
+            params.update(self.parse_path(path))
+
+        params = self.parse_params(params, update=False)
+
+        if update:
+            self._params = params
+            self.set_path(path)
+
         return path, params
 
     def parse_params(self, params, update=True, parser=None):
