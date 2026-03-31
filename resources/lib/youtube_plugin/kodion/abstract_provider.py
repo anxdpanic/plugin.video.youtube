@@ -312,7 +312,12 @@ class AbstractProvider(object):
                 self.log.debug('Rerouting - Fallback route not required')
                 return False, {self.FALLBACK: False}
 
-        refresh = context.refresh_requested(params=params)
+        new_context = context.clone(
+            new_path=path,
+            new_params=params,
+        )
+
+        refresh = new_context.refresh_requested()
         if (refresh or (
                 params == current_params
                 and path.rstrip('/') == current_path.rstrip('/')
@@ -320,16 +325,15 @@ class AbstractProvider(object):
             if refresh and refresh < 0:
                 del params['refresh']
             else:
-                params['refresh'] = context.refresh_requested(
+                params['refresh'] = new_context.refresh_requested(
                     force=True,
                     on=True,
-                    params=params,
                 )
         else:
             params['refresh'] = 0
 
         result = None
-        uri = context.create_uri(path, params)
+        uri = new_context.get_uri()
         if window_cache:
             function_cache = context.get_function_cache()
             with ui.on_busy():
@@ -337,9 +341,9 @@ class AbstractProvider(object):
                     self.navigate,
                     _refresh=True,
                     _scope=function_cache.SCOPE_NONE,
-                    context=context.clone(path, params),
+                    context=new_context,
                 )
-            if not result:
+            if not result and not isinstance(result, (tuple, list)):
                 self.log.debug(('No results', 'URI: %s'), uri)
                 return False
 

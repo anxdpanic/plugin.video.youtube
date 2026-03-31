@@ -291,7 +291,8 @@ class PlayerMonitorThread(object):
                         command='remove',
                         category='video',
                         playlist_id=watch_later_id,
-                        video_id=playlist_item_id,
+                        video_id=video_id,
+                        playlist_item_id=playlist_item_id,
                         video_name='',
                         confirmed=True,
                     )
