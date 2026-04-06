@@ -1,3 +1,25 @@
+## v7.4.2
+### Fixed
+- Ensure updated context is used in client instance when rerouting to existing provider handler methods #1418
+- Fix required ID potentially not being passed to YouTubeDataClient.(add|remove)_video_from_playlist() #1418
+- Skip unplayable live manifests #1377
+- Handle inconsistent error codes and names used in Python 2 #1412
+- Simplify byte range to timestamp conversion for compatibility with Python 2 #1412
+- Fix unnecessarily reloading listing when adding items to Bookmarks
+
+### Changed
+- Update parsing of plugin urls for path params and ID lists #1418
+- Rework addon debug log settings (Addon > Settings > Advanced > Debug > Enable debug logging) #1385
+  - Allowable values:
+    - Disabled (addon logging output disabled)
+    - Auto (default, addon logging output enabled if Kodi debug logging enabled)
+    - Always enabled (addon logging output enabled)
+    - Verbose (additional addon logging output enabled)
+- Various other improvement to addon logging
+
+### New
+- Update Setup Wizard to account for user possibly using mismatched watch history settings
+
 ## v7.4.2+beta.2
 ### Fixed
 - Ensure updated context is used in client instance when rerouting to existing provider handler methods #1418
