@@ -180,6 +180,8 @@ class ServiceMonitor(xbmc.Monitor):
             elif target == SERVER_WAKEUP:
                 if self.httpd_required():
                     response = self.start_httpd()
+                elif data.get('force'):
+                    response = self.restart_httpd()
                 else:
                     response = bool(self.httpd)
                 if self.httpd_sleep_allowed:
@@ -468,7 +470,7 @@ class ServiceMonitor(xbmc.Monitor):
                        ip=self._httpd_address,
                        port=self._httpd_port)
         self.shutdown_httpd(terminate=True)
-        self.start_httpd()
+        return self.start_httpd()
 
     def ping_httpd(self):
         return self.httpd and httpd_status(self._context)
@@ -481,7 +483,7 @@ class ServiceMonitor(xbmc.Monitor):
             self._use_httpd = required
 
         elif self._httpd_error:
-            required = False
+            required = None
 
         elif on_idle:
             settings = self._context.get_settings()
