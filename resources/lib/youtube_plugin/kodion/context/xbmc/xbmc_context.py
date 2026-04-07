@@ -318,6 +318,7 @@ class XbmcContext(AbstractContext):
         'sign.out': 30112,
         'sign.multi.text': 30547,
         'sign.multi.title': 30546,
+        'sign.multi.failed': 30548,
         'start': 335,
         'stats.commentCount': 30732,
         # 'stats.favoriteCount': 1036,

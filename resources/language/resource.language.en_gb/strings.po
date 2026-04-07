@@ -498,7 +498,7 @@ msgid "You may be prompted to sign in and enable access to multiple applications
 msgstr ""
 
 msgctxt "#30548"
-msgid ""
+msgid "Authorisation process failed. Check the log for more information about this message.[CR][CR]Refer to the wiki for detailed setup instructions: [B]https://ytaddon.page.link/keys[/B]"
 msgstr ""
 
 msgctxt "#30549"
