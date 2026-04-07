@@ -17,6 +17,7 @@ from .constants import (
     DATA_PATH,
     DEFAULT_LANGUAGES,
     DEFAULT_REGIONS,
+    PATHS,
     RELOAD_ACCESS_MANAGER,
     SERVER_WAKEUP,
     TEMP_PATH,
@@ -115,8 +116,9 @@ def _config_actions(context, action, *_args):
 
     elif action == 'show_client_ip':
         context.ipc_exec(SERVER_WAKEUP, timeout=5, payload={'force': True})
-        if httpd_status(context):
-            client_ip = get_client_ip_address(context)
+        url = httpd_status(context, path=PATHS.IP)
+        if url:
+            client_ip = get_client_ip_address(context, url)
             if client_ip:
                 ui.on_ok(context.get_name(),
                          context.localize('client.ip.is.x', client_ip))

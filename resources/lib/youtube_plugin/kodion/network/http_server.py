@@ -1049,7 +1049,7 @@ def get_http_server(address, port, context):
         return None
 
 
-def httpd_status(context, address=None):
+def httpd_status(context, address=None, path=None, query=None):
     netloc = get_connect_address(context, as_netloc=True, address=address)
     url = urlunsplit((
         'http',
@@ -1066,6 +1066,14 @@ def httpd_status(context, address=None):
         with response:
             result = response.status_code
             if result == 204:
+                if path:
+                    return urlunsplit((
+                        'http',
+                        netloc,
+                        path,
+                        query or '',
+                        '',
+                    ))
                 return True
 
     logging.debug(('Ping',
@@ -1076,14 +1084,15 @@ def httpd_status(context, address=None):
     return False
 
 
-def get_client_ip_address(context):
-    url = urlunsplit((
-        'http',
-        get_connect_address(context, as_netloc=True),
-        PATHS.IP,
-        '',
-        '',
-    ))
+def get_client_ip_address(context, url=None):
+    if url is None:
+        url = urlunsplit((
+            'http',
+            get_connect_address(context, as_netloc=True),
+            PATHS.IP,
+            '',
+            '',
+        ))
     if not RequestHandler.requests:
         RequestHandler.requests = BaseRequestsClass(context=context)
     response = RequestHandler.requests.request(url, cache=False)
