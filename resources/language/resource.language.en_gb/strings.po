@@ -826,7 +826,7 @@ msgid "IP whitelist (comma delimited)"
 msgstr ""
 
 msgctxt "#30630"
-msgid ""
+msgid "Check API configuration page address"
 msgstr ""
 
 msgctxt "#30631"

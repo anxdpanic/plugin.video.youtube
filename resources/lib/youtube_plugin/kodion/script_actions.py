@@ -127,6 +127,15 @@ def _config_actions(context, action, *_args):
         else:
             ui.show_notification(context.localize('httpd.not.running'))
 
+    elif action == 'show_api_config_page_address':
+        context.ipc_exec(SERVER_WAKEUP, timeout=5, payload={'force': True})
+        url = httpd_status(context, path=PATHS.API)
+        if url:
+            ui.on_ok(context.localize('api.config'),
+                     context.localize('go.to.x', ui.bold(url)))
+        else:
+            ui.show_notification(context.localize('httpd.not.running'))
+
     elif action == 'geo_location':
         locator = Locator(context)
         locator.locate_requester()
