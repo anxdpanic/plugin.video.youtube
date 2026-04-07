@@ -145,7 +145,6 @@ class Provider(AbstractProvider):
         settings = context.get_settings()
 
         user = access_manager.get_current_user()
-        api_last_origin = access_manager.get_last_origin()
 
         client = self._client
         if not client or not client.initialised:
@@ -222,16 +221,8 @@ class Provider(AbstractProvider):
             _,
         ) = access_manager.get_access_tokens(dev_id)
 
-        if client and not client.context_changed(context):
-            if api_last_origin != origin:
-                access_manager.set_last_origin(origin)
-                self.log.info(('API key origin changed - Resetting client',
-                               'Previous: {old!r}',
-                               'Current:  {new!r}'),
-                              old=api_last_origin,
-                              new=origin)
-                client.initialised = False
-        else:
+        api_last_origin = access_manager.get_last_origin()
+        if not client:
             client = YouTubePlayerClient(
                 context=context,
                 language=settings.get_language(),
@@ -242,6 +233,17 @@ class Provider(AbstractProvider):
             self._client = client
             if api_last_origin != origin:
                 access_manager.set_last_origin(origin)
+        elif api_last_origin != origin:
+            access_manager.set_last_origin(origin)
+            self.log.info(('Resetting client - API key origin changed',
+                           'Previous: {old!r}',
+                           'Current:  {new!r}'),
+                          old=api_last_origin,
+                          new=origin)
+            client.initialised = False
+        elif client.context_changed(context):
+            self.log.debug('Resetting client - Current context changed')
+            client.initialised = False
 
         if not client.initialised:
             self.reset_client(
