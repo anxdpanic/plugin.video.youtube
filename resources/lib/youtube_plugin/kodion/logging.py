@@ -18,9 +18,9 @@ from string import Formatter
 from sys import exc_info as sys_exc_info
 from traceback import extract_stack, format_list
 
-from .compatibility import StringIO, string_type, to_str, xbmc
+from .compatibility import StringIO, string_type, to_str, to_unicode, xbmc
 from .constants import ADDON_ID
-from .utils.convert_format import to_unicode, urls_in_text
+from .utils.convert_format import urls_in_text
 from .utils.redact import (
     parse_and_redact_uri,
     redact_auth_header,

@@ -201,6 +201,10 @@ def _play_playlist(provider, context):
         playlist_id = params.get(PLAYLIST_ID)
         if playlist_id:
             playlist_ids = [playlist_id]
+        else:
+            channel_id = params.get(CHANNEL_ID)
+            if channel_id and channel_id.startswith('UC'):
+                playlist_ids = [channel_id.replace('UC', 'UU', 1)]
 
     video_ids = params.get(VIDEO_IDS)
     if not playlist_ids and not video_ids:
@@ -283,6 +287,9 @@ def _play_channel_live(provider, context):
     })
     if not json_data:
         return False
+
+    if not json_data.get('items'):
+        return _play_playlist(provider, context)
 
     channel_streams = v3.response_to_items(provider,
                                            context,

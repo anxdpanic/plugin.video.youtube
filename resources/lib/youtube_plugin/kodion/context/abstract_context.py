@@ -377,6 +377,11 @@ class AbstractContext(object):
                    play=None,
                    window=None,
                    command=False,
+                   _window=(('name', ''),
+                            ('refresh', ''),
+                            ('replace', ''),
+                            ('return', ''),
+                            ('update', '')),
                    **kwargs):
         if isinstance(path, (list, tuple)):
             uri = self.create_path(*path, is_uri=True)
@@ -412,66 +417,69 @@ class AbstractContext(object):
 
         command = 'command://' if command else ''
 
-        if window:
-            if not isinstance(window, dict):
-                window = {}
-            if window.setdefault('refresh', False):
-                method = 'Container.Refresh('
-                if not window.setdefault('replace', False):
+        if run == 'addon':
+            method = 'RunAddon'
+        elif run == 'script':
+            method = 'RunScript'
+        elif run:
+            method = 'RunPlugin'
+        elif play is not None:
+            method = 'PlayMedia'
+            kwargs['playlist_type_hint'] = play
+        elif isinstance(window, dict):
+            window = dict(_window, **window)
+            if window['refresh']:
+                method = 'Container.Refresh'
+                if not window['replace']:
                     uri = ''
-                history_replace = False
-                window_return = False
-            elif window.setdefault('update', False):
-                method = 'Container.Update('
-                history_replace = window.setdefault('replace', False)
-                window_return = False
+                window['name'] = ''
+                window['return'] = ''
+                window['replace'] = ''
+            elif window['update']:
+                method = 'Container.Update'
+                window['name'] = ''
+                window['return'] = ''
+                window['replace'] = ',replace' if window['replace'] else ''
             else:
-                history_replace = False
-                window_name = window.setdefault('name', 'Videos')
-                if window.setdefault('replace', False):
-                    method = 'ReplaceWindow(%s,' % window_name
-                    window_return = window.setdefault('return', False)
+                window['name'] = '"%s",' % (window['name'] or 'Videos')
+                if window['replace']:
+                    method = 'ReplaceWindow'
+                    window['return'] = ''
                 else:
-                    method = 'ActivateWindow(%s,' % window_name
-                    window_return = window.setdefault('return', True)
-            return ''.join((
-                command,
-                method,
-                uri,
-                ',return' if window_return else '',
-                ',replace' if history_replace else '',
-                ')'
-            ))
+                    method = 'ActivateWindow'
+                    window['return'] = ',return' if window['return'] else ''
+                window['replace'] = ''
+
+            return ('{command}{method}('
+                    '{window[name]}'
+                    '{uri}'
+                    '{window[return]}'
+                    '{window[replace]}'
+                    ')').format(
+                command=command,
+                method=method,
+                uri=('"%s"' % uri) if uri else '',
+                window=window,
+            )
+        else:
+            return uri
 
         kwargs = ',' + ','.join([
-            '%s=%s' % (kwarg, value)
+            '"%s=%s"' % (kwarg, value)
             if value is not None else
-            kwarg
+            "%s" % kwarg
             for kwarg, value in kwargs.items()
         ]) if kwargs else ''
 
-        if run:
-            return ''.join((
-                command,
-                'RunAddon('
-                if run == 'addon' else
-                'RunScript('
-                if run == 'script' else
-                'RunPlugin(',
-                uri,
-                kwargs,
-                ')'
-            ))
-        if play is not None:
-            return ''.join((
-                command,
-                'PlayMedia(',
-                uri,
-                kwargs,
-                ',playlist_type_hint=', str(play),
-                ')',
-            ))
-        return uri
+        return ('{command}{method}('
+                '"{uri}"'
+                '{kwargs}'
+                ')').format(
+            command=command,
+            method=method,
+            uri=uri,
+            kwargs=kwargs,
+        )
 
     def get_parent_uri(self, **kwargs):
         return self.create_uri(self._path_parts[:-1], **kwargs)

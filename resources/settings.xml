@@ -330,11 +330,24 @@
                     <control type="toggle"/>
                 </setting>
             </group>
-            <group id="2" label="30633">
+            <group id="2" label="30634">
                 <setting id="youtube.api.config.page" type="boolean" label="30632" help="">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
+                </setting>
+                <setting id="youtube.api.config.page.address" type="action" label="30630" help="30633">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition setting="youtube.api.config.page" operator="is">true</condition>
+                        </dependency>
+                    </dependencies>
+                    <data>RunScript($ID,config/show_api_config_page_address)</data>
+                    <control format="action" type="button"/>
                 </setting>
             </group>
         </category>

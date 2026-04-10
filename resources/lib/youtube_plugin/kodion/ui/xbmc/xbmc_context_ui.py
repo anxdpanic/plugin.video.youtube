@@ -40,7 +40,6 @@ from ...constants import (
     UPDATING,
     URI,
 )
-from ...utils.convert_format import to_unicode
 
 
 class XbmcContextUI(AbstractContextUI):
@@ -90,13 +89,9 @@ class XbmcContextUI(AbstractContextUI):
     def on_keyboard_input(title, default='', hidden=False):
         # Starting with Gotham (13.X > ...)
         dialog = xbmcgui.Dialog()
-        result = dialog.input(title,
-                              to_unicode(default),
-                              type=xbmcgui.INPUT_ALPHANUM)
+        result = dialog.input(title, default, type=xbmcgui.INPUT_ALPHANUM)
         if result:
-            text = to_unicode(result)
-            return True, text
-
+            return True, result
         return False, ''
 
     @staticmethod
@@ -105,7 +100,6 @@ class XbmcContextUI(AbstractContextUI):
         result = dialog.input(title, str(default), type=xbmcgui.INPUT_NUMERIC)
         if result:
             return True, int(result)
-
         return False, None
 
     @staticmethod
@@ -121,19 +115,19 @@ class XbmcContextUI(AbstractContextUI):
     def on_remove_content(self, name):
         return self.on_yes_no_input(
             self._context.localize('content.remove'),
-            self._context.localize('content.remove.check.x', to_unicode(name)),
+            self._context.localize('content.remove.check.x', name),
         )
 
     def on_delete_content(self, name):
         return self.on_yes_no_input(
             self._context.localize('content.delete'),
-            self._context.localize('content.delete.check.x', to_unicode(name)),
+            self._context.localize('content.delete.check.x', name),
         )
 
     def on_clear_content(self, name):
         return self.on_yes_no_input(
             self._context.localize('content.clear'),
-            self._context.localize('content.clear.check.x', to_unicode(name)),
+            self._context.localize('content.clear.check.x', name),
         )
 
     @staticmethod
@@ -269,7 +263,7 @@ class XbmcContextUI(AbstractContextUI):
             except (TypeError, ValueError):
                 return
 
-        xbmc.executebuiltin('SetFocus({0},{1},absolute)'.format(
+        xbmc.executebuiltin('SetFocus("{0}","{1}",absolute)'.format(
             container_id,
             position + offset,
         ))

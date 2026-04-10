@@ -35,6 +35,7 @@ from ...constants import (
     REROUTE_PATH,
     SORT_DIR,
     SORT_METHOD,
+    SYNC_API_KEYS,
     SYNC_LISTITEM,
     TRAKT_PAUSE_FLAG,
     VIDEO_ID,
@@ -196,6 +197,9 @@ class XbmcPlugin(AbstractPlugin):
 
         if ui.get_property(PLUGIN_SLEEPING):
             context.ipc_exec(PLUGIN_WAKEUP)
+
+        if ui.pop_property(SYNC_API_KEYS):
+            context.get_api_store().sync(update_store=True)
 
         if ui.pop_property(RELOAD_ACCESS_MANAGER):
             context.reload_access_manager()

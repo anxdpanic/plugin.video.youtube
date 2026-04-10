@@ -12,11 +12,10 @@ from __future__ import absolute_import, division, unicode_literals
 
 import os
 
-from ...kodion.compatibility import urlencode, xbmcvfs
+from ...kodion.compatibility import to_unicode, urlencode, xbmcvfs
 from ...kodion.constants import ADDON_ID, DATA_PATH, WAIT_END_FLAG
 from ...kodion.network import get_listen_addresses, httpd_status
 from ...kodion.sql_store import PlaybackHistory, SearchHistory
-from ...kodion.utils.convert_format import to_unicode
 from ...kodion.utils.datetime import since_epoch, strptime
 
 

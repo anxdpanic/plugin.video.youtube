@@ -115,6 +115,7 @@ PLAYBACK_STOPPED = 'playback_stopped'
 REFRESH_CONTAINER = 'refresh_container'
 RELOAD_ACCESS_MANAGER = 'reload_access_manager'
 SERVICE_IPC = 'service_ipc'
+SYNC_API_KEYS = 'sync_api_keys'
 SYNC_LISTITEM = 'sync_listitem'
 
 # Sleep/wakeup states
@@ -284,6 +285,7 @@ __all__ = (
     'REFRESH_CONTAINER',
     'RELOAD_ACCESS_MANAGER',
     'SERVICE_IPC',
+    'SYNC_API_KEYS',
     'SYNC_LISTITEM',
 
     # Sleep/wakeup states
