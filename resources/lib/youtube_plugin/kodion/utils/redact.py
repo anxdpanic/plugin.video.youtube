@@ -181,7 +181,9 @@ def parse_and_redact_uri(uri, redact_only=False):
         params = parse_qs(parts.query, keep_blank_values=True)
         headers = params.get('__headers', [None])[0]
         if headers:
-            params['__headers'] = [urlsafe_b64decode(headers).decode('utf-8')]
+            params['__headers'] = [
+                urlsafe_b64decode(headers.encode('utf-8')).decode('utf-8')
+            ]
         log_params = redact_params(params)
         log_query = urlencode(log_params, doseq=True)
     else:

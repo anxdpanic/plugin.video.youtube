@@ -38,7 +38,6 @@ from .items import (
     SearchHistoryItem,
     UriItem,
 )
-from .utils.convert_format import to_unicode
 
 
 class AbstractProvider(object):
@@ -414,7 +413,7 @@ class AbstractProvider(object):
         search_history = context.get_search_history()
 
         if not command or command == 'query':
-            query = to_unicode(params.get('q', ''))
+            query = params.get('q', '')
             if query:
                 result, options = provider.on_search_run(context, query=query)
                 if not options:
@@ -430,7 +429,7 @@ class AbstractProvider(object):
             context.set_path(PATHS.SEARCH, command)
 
         if command == 'remove':
-            query = to_unicode(params.get('q', ''))
+            query = params.get('q', '')
             if not ui.on_yes_no_input(
                     localize('content.remove'),
                     localize('content.remove.check.x', query),
@@ -444,7 +443,7 @@ class AbstractProvider(object):
             return True, {provider.FORCE_REFRESH: True}
 
         if command == 'rename':
-            query = to_unicode(params.get('q', ''))
+            query = params.get('q', '')
             result, new_query = ui.on_keyboard_input(
                 localize('search.rename'), query
             )

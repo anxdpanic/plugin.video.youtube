@@ -64,7 +64,6 @@ from ..kodion.items import (
 from ..kodion.utils.convert_format import (
     channel_filter_split,
     strip_html_from_text,
-    to_unicode,
 )
 from ..kodion.utils.datetime import now, since_epoch
 
@@ -992,7 +991,7 @@ class Provider(AbstractProvider):
     def on_search_run(self, context, query=None):
         params = context.get_params()
         if query is None:
-            query = to_unicode(params.get('q', ''))
+            query = params.get('q', '')
 
         # Search by url to access unlisted videos
         if query.startswith(('https://', 'http://')):
@@ -1336,7 +1335,6 @@ class Provider(AbstractProvider):
 
         if command == 'remove':
             video_name = params.get('item_name') or video_id
-            video_name = to_unicode(video_name)
             if not ui.on_yes_no_input(
                     localize('content.remove'),
                     localize('content.remove.check.x', video_name),
@@ -2082,7 +2080,6 @@ class Provider(AbstractProvider):
 
         if command == 'remove':
             bookmark_name = params.get('item_name') or localize('bookmark')
-            bookmark_name = to_unicode(bookmark_name)
             if not ui.on_yes_no_input(
                     localize('content.remove'),
                     localize('content.remove.check.x', bookmark_name),
@@ -2182,7 +2179,6 @@ class Provider(AbstractProvider):
 
         if command == 'remove':
             video_name = params.get('item_name') or localize('untitled')
-            video_name = to_unicode(video_name)
             if not ui.on_yes_no_input(
                     localize('content.remove'),
                     localize('content.remove.check.x', video_name),

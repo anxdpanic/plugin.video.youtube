@@ -47,7 +47,6 @@ from ...json_store import APIKeyStore, AccessManager
 from ...player import XbmcPlaylistPlayer
 from ...settings import XbmcPluginSettings
 from ...ui import XbmcContextUI
-from ...utils.convert_format import to_unicode
 from ...utils.file_system import make_dirs
 from ...utils.methods import (
     get_kodi_setting_bool,
@@ -470,7 +469,7 @@ class XbmcContext(AbstractContext):
     def init(self):
         num_args = len(sys.argv)
         if num_args:
-            uri = to_unicode(sys.argv[0])
+            uri = sys.argv[0]
             if uri.startswith('plugin://'):
                 self._plugin_handle = int(sys.argv[1])
             else:
@@ -494,7 +493,7 @@ class XbmcContext(AbstractContext):
 
         # after that try to get the params
         if num_args > 2:
-            _params = to_unicode(sys.argv[2][1:])
+            _params = sys.argv[2][1:]
             if _params:
                 self._param_string = _params
                 params.update(dict(parse_qsl(_params, keep_blank_values=True)))
@@ -727,7 +726,7 @@ class XbmcContext(AbstractContext):
             else:
                 self.log.warning(msg, text_id=text_id)
             return default_text
-        result = to_unicode(result)
+        result = result
 
         if _args:
             if localize_args:
