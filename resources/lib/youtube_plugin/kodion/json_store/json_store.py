@@ -15,8 +15,8 @@ import errno
 from io import open
 
 from .. import logging
+from ..compatibility import to_unicode
 from ..constants import DATA_PATH, FILE_READ, FILE_WRITE
-from ..utils.convert_format import to_unicode
 from ..utils.file_system import make_dirs
 from ..utils.methods import merge_dicts
 

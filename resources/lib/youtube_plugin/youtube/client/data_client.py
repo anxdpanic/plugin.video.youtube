@@ -2976,6 +2976,13 @@ class YouTubeDataClient(YouTubeLoginClient):
         v3_response['_item_filter'] = item_filter
         return v3_response
 
+    @classmethod
+    def v3_api_available(cls):
+        user_config = cls._configs.get('user')
+        if user_config:
+            return bool(user_config.get('key'))
+        return False
+
     def _auth_required(self, params):
         if params:
             if params.get('mine') or params.get('forMine'):
@@ -3105,15 +3112,30 @@ class YouTubeDataClient(YouTubeLoginClient):
                     do_auth=None,
                     cache=None,
                     **kwargs):
+        context = self._context
+
+        if client == 'v3' and not self.v3_api_available():
+            abort = True
+            abort_msg = 'Request skipped: API key not provided'
+            abort_prompt = 'key.requirement'
+        else:
+            abort = False
+            abort_msg = None
+            abort_prompt = None
+
         if not client_data:
             client_data = {}
-        client_data.setdefault('method', method)
+
         if path:
             client_data['_endpoint'] = path.strip('/')
+
         if url:
             client_data['url'] = url
+
         if headers:
             client_data['headers'] = headers
+
+        client_data.setdefault('method', method)
         if method in {'POST', 'PUT'}:
             if post_data:
                 client_data['json'] = post_data
@@ -3124,16 +3146,18 @@ class YouTubeDataClient(YouTubeLoginClient):
             if do_auth is None and method == 'DELETE':
                 do_auth = True
             clear_data = True
+
         if params:
             client_data['params'] = params
 
         if do_auth is None:
             do_auth = self._auth_required(params)
         if do_auth:
-            abort = not self.logged_in
+            if not self.logged_in:
+                abort = True
+                abort_msg = 'Request skipped: Authorisation required'
+                abort_prompt = 'sign.multi.title'
             client_data.setdefault('_auth_required', do_auth)
-        else:
-            abort = False
 
         client_data['_access_tokens'] = access_tokens = {}
         client_data['_api_keys'] = api_keys = {}
@@ -3161,17 +3185,18 @@ class YouTubeDataClient(YouTubeLoginClient):
             params = client.get('params')
             if params and 'key' in params:
                 key = params['key']
-                if key:
-                    abort = False
-                elif not client['_has_auth']:
+                if not key and not client['_has_auth']:
                     abort = True
+                    abort_msg = 'Request skipped: API key not provided'
+                    abort_prompt = 'key.requirement'
         else:
             client_data.setdefault('_name', client)
             client = client_data
             params = client.get('params')
             abort = True
+            abort_msg = 'Request skipped: Invalid or disabled client'
+            abort_prompt = None
 
-        context = self._context
         self.log.debug(('{request_name} API request',
                         'method:    {method!r}',
                         'path:      {path!u}',
@@ -3185,18 +3210,18 @@ class YouTubeDataClient(YouTubeLoginClient):
                        data=client.get('json'),
                        headers=client.get('headers'),
                        stacklevel=2)
+
         if abort:
-            if kwargs.get('notify', True):
-                context.get_ui().on_ok(
-                    context.get_name(),
-                    context.localize('key.requirement'),
-                )
-            self.log.warning('Aborted', stacklevel=2)
+            if abort_prompt and kwargs.get('notify', True):
+                context.get_ui().on_ok(context.get_name(), abort_prompt)
+            self.log.warning(abort_msg, stacklevel=2)
             return {}
+
         if cache is None and 'no_content' in kwargs:
             cache = False
-        elif cache is not False and self._context.refresh_requested():
+        elif cache is not False and context.refresh_requested():
             cache = 'refresh'
+
         return self.request(response_hook=self._request_response_hook,
                             event_hook_kwargs=kwargs,
                             error_hook=self._request_error_hook,

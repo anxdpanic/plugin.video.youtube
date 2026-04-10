@@ -1,3 +1,21 @@
+## v7.4.3+beta.1
+### Fixed
+- Updates to resolve inconsistent Python2 string encoding/decoding
+- Ensure parameters to Kodi builtin functions are parsed as string literals
+- Allow trailing slashes in url of html pages served by internal http server
+
+### Changed
+- Open confirmation dialog, with a link for further information, when sign in process fails
+- Update API config page html
+- Improve handling of API key settings changes
+- Detect and notify when API requests cannot be completed
+- Use consistent language for signing in/out
+
+### New
+- Add button in API settings to view address of API config page
+- Fallback to playing channel uploads if no live stream is available
+- Add fallback method to load playlists when v3 API request cannot be made
+
 ## v7.4.2
 ### Fixed
 - Ensure updated context is used in client instance when rerouting to existing provider handler methods #1418

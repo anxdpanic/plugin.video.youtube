@@ -64,7 +64,6 @@ from ..kodion.items import (
 from ..kodion.utils.convert_format import (
     channel_filter_split,
     strip_html_from_text,
-    to_unicode,
 )
 from ..kodion.utils.datetime import now, since_epoch
 
@@ -145,7 +144,6 @@ class Provider(AbstractProvider):
         settings = context.get_settings()
 
         user = access_manager.get_current_user()
-        api_last_origin = access_manager.get_last_origin()
 
         client = self._client
         if not client or not client.initialised:
@@ -222,16 +220,8 @@ class Provider(AbstractProvider):
             _,
         ) = access_manager.get_access_tokens(dev_id)
 
-        if client and not client.context_changed(context):
-            if api_last_origin != origin:
-                access_manager.set_last_origin(origin)
-                self.log.info(('API key origin changed - Resetting client',
-                               'Previous: {old!r}',
-                               'Current:  {new!r}'),
-                              old=api_last_origin,
-                              new=origin)
-                client.initialised = False
-        else:
+        api_last_origin = access_manager.get_last_origin()
+        if not client:
             client = YouTubePlayerClient(
                 context=context,
                 language=settings.get_language(),
@@ -242,6 +232,17 @@ class Provider(AbstractProvider):
             self._client = client
             if api_last_origin != origin:
                 access_manager.set_last_origin(origin)
+        elif api_last_origin != origin:
+            access_manager.set_last_origin(origin)
+            self.log.info(('Resetting client - API key origin changed',
+                           'Previous: {old!r}',
+                           'Current:  {new!r}'),
+                          old=api_last_origin,
+                          new=origin)
+            client.initialised = False
+        elif client.context_changed(context):
+            self.log.debug('Resetting client - Current context changed')
+            client.initialised = False
 
         if not client.initialised:
             self.reset_client(
@@ -259,7 +260,8 @@ class Provider(AbstractProvider):
         ) = access_manager.get_refresh_tokens(dev_id)
 
         if not num_access_tokens and not num_refresh_tokens:
-            access_manager.update_access_token(dev_id, access_token='')
+            if any(access_tokens):
+                access_manager.update_access_token(dev_id, access_token='')
             return client
         if num_access_tokens == num_refresh_tokens and client.logged_in:
             return client
@@ -710,7 +712,7 @@ class Provider(AbstractProvider):
                 and identifier.lower() == 'property'
                 and li_channel_id
                 and li_channel_id.lower().startswith(('mine', 'uc'))):
-            context.execute('ActivateWindow(Videos, {channel}, return)'.format(
+            context.execute('ActivateWindow(Videos,"{channel}",return)'.format(
                 channel=create_uri(
                     (PATHS.CHANNEL, li_channel_id,),
                 )
@@ -989,7 +991,7 @@ class Provider(AbstractProvider):
     def on_search_run(self, context, query=None):
         params = context.get_params()
         if query is None:
-            query = to_unicode(params.get('q', ''))
+            query = params.get('q', '')
 
         # Search by url to access unlisted videos
         if query.startswith(('https://', 'http://')):
@@ -1333,7 +1335,6 @@ class Provider(AbstractProvider):
 
         if command == 'remove':
             video_name = params.get('item_name') or video_id
-            video_name = to_unicode(video_name)
             if not ui.on_yes_no_input(
                     localize('content.remove'),
                     localize('content.remove.check.x', video_name),
@@ -2079,7 +2080,6 @@ class Provider(AbstractProvider):
 
         if command == 'remove':
             bookmark_name = params.get('item_name') or localize('bookmark')
-            bookmark_name = to_unicode(bookmark_name)
             if not ui.on_yes_no_input(
                     localize('content.remove'),
                     localize('content.remove.check.x', bookmark_name),
@@ -2179,7 +2179,6 @@ class Provider(AbstractProvider):
 
         if command == 'remove':
             video_name = params.get('item_name') or localize('untitled')
-            video_name = to_unicode(video_name)
             if not ui.on_yes_no_input(
                     localize('content.remove'),
                     localize('content.remove.check.x', video_name),

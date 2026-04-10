@@ -28,6 +28,7 @@ from ..compatibility import (
     BaseHTTPRequestHandler,
     TCPServer,
     ThreadingMixIn,
+    parse_qs,
     urlencode,
     urlsplit,
     urlunsplit,
@@ -38,6 +39,7 @@ from ..constants import (
     LICENSE_TOKEN,
     LICENSE_URL,
     PATHS,
+    SYNC_API_KEYS,
     TEMP_PATH,
 )
 from ..utils.convert_format import fix_subtitle_stream
@@ -231,7 +233,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         parts, params, log_uri, log_params, log_path = parse_and_redact_uri(uri)
         path = {
             'uri': uri,
-            'path': parts.path,
+            'path': parts.path.rstrip('/'),
             'query': parts.query,
             'params': params,
             'log_uri': log_uri,
@@ -265,10 +267,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             return
 
         context = self._context
-        localize = context.localize
-
         settings = context.get_settings()
-        api_config_enabled = settings.api_config_page()
 
         empty = [None]
 
@@ -306,66 +305,8 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                             .format(uri=path['log_uri'], file_path=file_path))
                 self.send_error(404, response)
 
-        elif api_config_enabled and path['path'] == PATHS.API:
+        elif path['path'] == PATHS.API and settings.api_config_page():
             html = self.api_config_page()
-            html = html.encode('utf-8')
-
-            self.send_response(200)
-            self.send_header('Content-Type', 'text/html; charset=utf-8')
-            self.send_header('Content-Length', str(len(html)))
-            self.end_headers()
-
-            for chunk in self._get_chunks(html):
-                self.wfile.write(chunk)
-
-        elif api_config_enabled and path['path'].startswith(PATHS.API_SUBMIT):
-            xbmc.executebuiltin('Dialog.Close(addonsettings,true)')
-
-            query = path['query']
-            params = path['params']
-            updated = []
-
-            api_key = params.get('api_key', empty)[0]
-            api_id = params.get('api_id', empty)[0]
-            api_secret = params.get('api_secret', empty)[0]
-            # Bookmark this page
-            if api_key and api_id and api_secret:
-                footer = localize('api.config.bookmark')
-            else:
-                footer = ''
-
-            if re.search(r'api_key=(?:&|$)', query):
-                api_key = ''
-            if re.search(r'api_id=(?:&|$)', query):
-                api_id = ''
-            if re.search(r'api_secret=(?:&|$)', query):
-                api_secret = ''
-
-            if api_key is not None and api_key != settings.api_key():
-                settings.api_key(new_key=api_key)
-                updated.append(localize('api.key'))
-
-            if api_id is not None and api_id != settings.api_id():
-                settings.api_id(new_id=api_id)
-                updated.append(localize('api.id'))
-
-            if api_secret is not None and api_secret != settings.api_secret():
-                settings.api_secret(new_secret=api_secret)
-                updated.append(localize('api.secret'))
-
-            if api_key and api_id and api_secret:
-                enabled = localize('api.personal.enabled')
-            else:
-                enabled = localize('api.personal.disabled')
-
-            if updated:
-                # Successfully updated
-                updated = localize('api.config.updated', ', '.join(updated))
-            else:
-                # No changes, not updated
-                updated = localize('api.config.not_updated')
-
-            html = self.api_submit_page(updated, enabled, footer)
             html = html.encode('utf-8')
 
             self.send_response(200)
@@ -692,7 +633,70 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             self.send_error(403)
             return
 
-        if path['path'].startswith(PATHS.DRM):
+        context = self._context
+        settings = context.get_settings()
+        localize = context.localize
+
+        empty = [None]
+
+        if path['path'] == PATHS.API_SUBMIT and settings.api_config_page():
+            xbmc.executebuiltin('Dialog.Close(addonsettings,true)')
+
+            length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(length)
+
+            query = post_data.decode('utf-8', 'ignore')
+            params = parse_qs(query, keep_blank_values=True)
+            updated = []
+
+            api_key = params.get('api_key', empty)[0]
+            api_id = params.get('api_id', empty)[0]
+            api_secret = params.get('api_secret', empty)[0]
+
+            if re.search(r'api_key=(?:&|$)', query):
+                api_key = ''
+            if re.search(r'api_id=(?:&|$)', query):
+                api_id = ''
+            if re.search(r'api_secret=(?:&|$)', query):
+                api_secret = ''
+
+            if api_key is not None and api_key != settings.api_key():
+                settings.api_key(new_key=api_key)
+                updated.append(localize('api.key'))
+
+            if api_id is not None and api_id != settings.api_id():
+                settings.api_id(new_id=api_id)
+                updated.append(localize('api.id'))
+
+            if api_secret is not None and api_secret != settings.api_secret():
+                settings.api_secret(new_secret=api_secret)
+                updated.append(localize('api.secret'))
+
+            if api_key and api_id and api_secret:
+                enabled = localize('api.personal.enabled')
+            else:
+                enabled = localize('api.personal.disabled')
+
+            if updated:
+                context.send_notification(SYNC_API_KEYS)
+                # Successfully updated
+                updated = localize('api.config.updated', ', '.join(updated))
+            else:
+                # No changes, not updated
+                updated = localize('api.config.not_updated')
+
+            html = self.api_submit_page(updated, enabled)
+            html = html.encode('utf-8')
+
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html; charset=utf-8')
+            self.send_header('Content-Length', str(len(html)))
+            self.end_headers()
+
+            for chunk in self._get_chunks(html):
+                self.wfile.write(chunk)
+
+        elif path['path'].startswith(PATHS.DRM):
             ui = self._context.get_ui()
 
             lic_url = ui.get_property(LICENSE_URL)
@@ -814,12 +818,14 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             api_key_value=api_key,
             api_secret_value=api_secret,
             submit=localize('api.config.save'),
+            action_url=PATHS.API_SUBMIT,
             header=localize('api.config'),
+            footer=localize('api.config.bookmark'),
         )
         return html
 
     @classmethod
-    def api_submit_page(cls, updated_keys, enabled, footer):
+    def api_submit_page(cls, updated_keys, enabled):
         localize = cls._context.localize
         html = Pages.api_submit.get('html')
         css = Pages.api_submit.get('css')
@@ -828,7 +834,6 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             title=localize('api.config'),
             updated=updated_keys,
             enabled=enabled,
-            footer=footer,
             header=localize('api.config'),
         )
         return html
@@ -842,31 +847,34 @@ class Pages(object):
               <head>
                 <link rel="icon" href="data:;base64,=">
                 <meta charset="utf-8">
-                <title>{{title}}</title>
-                <style>{{css}}</style>
+                <title>{title}</title>
+                <style>{css}</style>
               </head>
               <body>
                 <div class="center">
-                  <h5>{{header}}</h5>
-                  <form action="{action_url}" class="config_form">
+                  <h5>{header}</h5>
+                  <form action="{action_url}" method="post" class="config_form" autocomplete="off">
                     <label for="api_key">
-                      <span>{{api_key_head}}:</span>
-                      <input type="text" name="api_key" value="{{api_key_value}}" size="50"/>
+                      <span>{api_key_head}:</span>
+                      <input type="text" name="api_key" value="{api_key_value}" size="50"/>
                     </label>
                     <label for="api_id">
-                      <span>{{api_id_head}}:</span>
-                      <input type="text" name="api_id" value="{{api_id_value}}" size="50"/>
+                      <span>{api_id_head}:</span>
+                      <input type="text" name="api_id" value="{api_id_value}" size="50"/>
                     </label>
                     <label for="api_secret">
-                      <span>{{api_secret_head}}:</span>
-                      <input type="text" name="api_secret" value="{{api_secret_value}}" size="50"/>
+                      <span>{api_secret_head}:</span>
+                      <input type="text" name="api_secret" value="{api_secret_value}" size="50"/>
                     </label>
-                    <input type="submit" value="{{submit}}">
+                    <input type="submit" value="{submit}">
                   </form>
+                  <p class="text_center">
+                    <small>{footer}</small>
+                  </p>
                 </div>
               </body>
             </html>
-        '''.format(action_url=PATHS.API_SUBMIT)),
+        '''),
         'css': ''.join('\t\t\t'.expandtabs(2) + line for line in dedent('''
             body {
               background: #141718;
@@ -878,7 +886,6 @@ class Pages(object):
             }
             .config_form {
               width: 575px;
-              height: 145px;
               font-size: 16px;
               background: #1a2123;
               padding: 30px 30px 15px 30px;
@@ -906,7 +913,7 @@ class Pages(object):
               color: #fff;
             }
             .config_form label {
-              display:block;
+              display: inline-block;
               margin-bottom: 10px;
             }
             .config_form label > span {
@@ -927,17 +934,37 @@ class Pages(object):
             }
             .config_form input[type=submit],
             .config_form input[type=button] {
+              display: block;
               width: 150px;
               background: #141718;
               border: 1px solid #147a96;
               padding: 8px 0px 8px 10px;
               border-radius: 5px;
               color: #fff;
-              margin-top: 10px
+              margin: 10px auto;
             }
             .config_form input[type=submit]:hover,
             .config_form input[type=button]:hover {
               background: #0f84a5;
+            }
+            .text_center {
+              margin: 2em auto auto;
+              width: 600px;
+              padding: 10px;
+              text-align: center;
+            }
+            p {
+              font-family: Arial, Helvetica, sans-serif;
+              font-size: 16px;
+              color: #fff;
+              float: left;
+              width: 575px;
+              margin: 0.5em auto;
+            }
+            small {
+              font-family: Arial, Helvetica, sans-serif;
+              font-size: 12px;
+              color: #fff;
             }
         ''').splitlines(True)) + '\t\t'.expandtabs(2)
     }
@@ -958,9 +985,6 @@ class Pages(object):
                   <div class="content">
                     <p>{updated}</p>
                     <p>{enabled}</p>
-                    <p class="text_center">
-                      <small>{footer}</small>
-                    </p>
                   </div>
                 </div>
               </body>
@@ -975,15 +999,8 @@ class Pages(object):
               width: 600px;
               padding: 10px;
             }
-            .text_center {
-              margin: 2em auto auto;
-              width: 600px;
-              padding: 10px;
-              text-align: center;
-            }
             .content {
               width: 575px;
-              height: 145px;
               background: #1a2123;
               padding: 30px 30px 15px 30px;
               border: 5px solid #1a2123;
@@ -1007,11 +1024,6 @@ class Pages(object):
               float: left;
               width: 575px;
               margin: 0.5em auto;
-            }
-            small {
-              font-family: Arial, Helvetica, sans-serif;
-              font-size: 12px;
-              color: #fff;
             }
         ''').splitlines(True)) + '\t\t'.expandtabs(2)
     }
@@ -1037,7 +1049,7 @@ def get_http_server(address, port, context):
         return None
 
 
-def httpd_status(context, address=None):
+def httpd_status(context, address=None, path=None, query=None):
     netloc = get_connect_address(context, as_netloc=True, address=address)
     url = urlunsplit((
         'http',
@@ -1054,6 +1066,14 @@ def httpd_status(context, address=None):
         with response:
             result = response.status_code
             if result == 204:
+                if path:
+                    return urlunsplit((
+                        'http',
+                        netloc,
+                        path,
+                        query or '',
+                        '',
+                    ))
                 return True
 
     logging.debug(('Ping',
@@ -1064,14 +1084,15 @@ def httpd_status(context, address=None):
     return False
 
 
-def get_client_ip_address(context):
-    url = urlunsplit((
-        'http',
-        get_connect_address(context, as_netloc=True),
-        PATHS.IP,
-        '',
-        '',
-    ))
+def get_client_ip_address(context, url=None):
+    if url is None:
+        url = urlunsplit((
+            'http',
+            get_connect_address(context, as_netloc=True),
+            PATHS.IP,
+            '',
+            '',
+        ))
     if not RequestHandler.requests:
         RequestHandler.requests = BaseRequestsClass(context=context)
     response = RequestHandler.requests.request(url, cache=False)

@@ -14,7 +14,15 @@ from datetime import timedelta
 from math import floor, log
 from re import DOTALL, compile as re_compile
 
-from ..compatibility import byte_string_type
+
+__all__ = (
+    'channel_filter_split',
+    'custom_filter_split',
+    'fix_subtitle_stream',
+    'friendly_number',
+    'strip_html_from_text',
+    'urls_in_text',
+)
 
 
 __RE_URL = re_compile(r'(https?://\S+)')
@@ -24,15 +32,6 @@ def urls_in_text(text, process=None, count=0):
     if process:
         return __RE_URL.sub(process, text, count=count)
     return __RE_URL.findall(text)
-
-
-def to_unicode(text):
-    if isinstance(text, byte_string_type):
-        try:
-            return text.decode('utf-8', 'ignore')
-        except UnicodeError:
-            pass
-    return text
 
 
 def strip_html_from_text(text, tag_re=re_compile('<[^<]+?>')):

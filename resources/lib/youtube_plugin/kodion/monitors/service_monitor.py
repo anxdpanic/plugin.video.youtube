@@ -37,6 +37,7 @@ from ..constants import (
     RESUMABLE,
     SERVER_WAKEUP,
     SERVICE_IPC,
+    SYNC_API_KEYS,
     SYNC_LISTITEM,
     VIDEO_ID,
 )
@@ -54,6 +55,7 @@ class ServiceMonitor(xbmc.Monitor):
     def __init__(self, context):
         self._context = context
 
+        self._api_values = ('', '', '')
         self._httpd_address = None
         self._httpd_port = None
         self._whitelist = None
@@ -178,6 +180,8 @@ class ServiceMonitor(xbmc.Monitor):
             elif target == SERVER_WAKEUP:
                 if self.httpd_required():
                     response = self.start_httpd()
+                elif data.get('force'):
+                    response = self.restart_httpd()
                 else:
                     response = bool(self.httpd)
                 if self.httpd_sleep_allowed:
@@ -260,6 +264,9 @@ class ServiceMonitor(xbmc.Monitor):
             self._context.reload_access_manager()
             self.refresh_container()
 
+        elif event == SYNC_API_KEYS:
+            self.onSettingsChanged(force=True)
+
         elif event == PLAYBACK_STOPPED:
             if data:
                 data = json.loads(data)
@@ -315,6 +322,7 @@ class ServiceMonitor(xbmc.Monitor):
 
     def onSettingsChanged(self, force=False):
         context = self._context
+        ui = context.get_ui()
 
         if force:
             self._settings_collect = False
@@ -352,7 +360,17 @@ class ServiceMonitor(xbmc.Monitor):
             self.log.stack_info = False
             self.log.verbose_logging = False
 
-        context.get_ui().set_property(CHECK_SETTINGS)
+        api_values = (
+            settings.api_key(),
+            settings.api_id(),
+            settings.api_secret(),
+        )
+        if api_values != self._api_values:
+            context.get_api_store().sync(update_store=True)
+            self._api_values = api_values
+            ui.set_property(SYNC_API_KEYS)
+
+        ui.set_property(CHECK_SETTINGS)
         self.refresh_container()
 
         httpd_started = bool(self.httpd)
@@ -452,7 +470,7 @@ class ServiceMonitor(xbmc.Monitor):
                        ip=self._httpd_address,
                        port=self._httpd_port)
         self.shutdown_httpd(terminate=True)
-        self.start_httpd()
+        return self.start_httpd()
 
     def ping_httpd(self):
         return self.httpd and httpd_status(self._context)
@@ -465,7 +483,7 @@ class ServiceMonitor(xbmc.Monitor):
             self._use_httpd = required
 
         elif self._httpd_error:
-            required = False
+            required = None
 
         elif on_idle:
             settings = self._context.get_settings()
