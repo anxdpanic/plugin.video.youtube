@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2026-02-23 15:13+0000\n"
 "Last-Translator: Alfonso Cachero <alfonso.cachero@gmail.com>\n"
@@ -484,16 +484,16 @@ msgid "No videos found."
 msgstr "No se ha encontrado ningún vídeo."
 
 msgctxt "#30546"
-msgid "Please complete all login prompts"
-msgstr "Por favor, complete todas las peticiones de inicio de sesión"
+msgid "Please sign in and complete all access authorisation prompts"
+msgstr ""
 
 msgctxt "#30547"
-msgid "You may be prompted to login and enable access to multiple applications so that this addon can function properly."
-msgstr "Se pedirá inicio de sesión y habilitar acceso a múltiples aplicaciones para que este addon funcione correctamente."
+msgid "You may be prompted to sign in and enable access to multiple applications so that this addon can function properly."
+msgstr ""
 
 msgctxt "#30548"
-msgid ""
-msgstr " "
+msgid "Authorisation process failed. Check the log for more information about this message.[CR][CR]Refer to the wiki for detailed setup instructions: [B]https://ytaddon.page.link/keys[/B]"
+msgstr ""
 
 msgctxt "#30549"
 msgid "No streams found"
@@ -820,8 +820,8 @@ msgid "IP whitelist (comma delimited)"
 msgstr "Lista blanca IP (utilice comas como separador)"
 
 msgctxt "#30630"
-msgid ""
-msgstr " "
+msgid "Check API configuration page address"
+msgstr ""
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
@@ -1160,8 +1160,8 @@ msgid "Prefer automatically translated dubbed audio over original audio"
 msgstr "Preferir automáticamente audio doblado traducido en lugar del original"
 
 msgctxt "#30715"
-msgid "Use YouTube internal list for Watch History?[CR][CR]Requires signing-in via the addon and activating history tracking on YouTube."
-msgstr "¿Usar lista interna de YouTube Historial de Visualizaciones?[CR][CR]Requiere iniciar sesión en el addon y activar el seguimiento de historial en YouTube."
+msgid "Use YouTube internal list for Watch History?[CR][CR]Requires signing in via the addon and activating history tracking on YouTube."
+msgstr ""
 
 msgctxt "#30716"
 msgid "Liked video"
@@ -1172,8 +1172,8 @@ msgid "Disliked video"
 msgstr "No me gusto el vídeo"
 
 msgctxt "#30718"
-msgid "Use YouTube internal list for Watch Later?[CR][CR]Requires signing-in via the addon."
-msgstr "¿Usar lista interna de YouTube 'Ver más tarde'?[CR][CR]Requiere iniciar sesión en el addon."
+msgid "Use YouTube internal list for Watch Later?[CR][CR]Requires signing in via the addon."
+msgstr ""
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
@@ -1598,6 +1598,30 @@ msgstr "Desactiva el filtrado para hacer auto-like a todos los vídeos. Activa e
 msgctxt "#30824"
 msgid "Filter by channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel'"
 msgstr "Filtrar por nombres de canal separados por coma. P.ej: 'El mejor canal,El segundo mejor canal'"
+
+#~ msgctxt "#30546"
+#~ msgid "Please complete all login prompts"
+#~ msgstr "Por favor, complete todas las peticiones de inicio de sesión"
+
+#~ msgctxt "#30547"
+#~ msgid "You may be prompted to login and enable access to multiple applications so that this addon can function properly."
+#~ msgstr "Se pedirá inicio de sesión y habilitar acceso a múltiples aplicaciones para que este addon funcione correctamente."
+
+#~ msgctxt "#30548"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30630"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30715"
+#~ msgid "Use YouTube internal list for Watch History?[CR][CR]Requires signing-in via the addon and activating history tracking on YouTube."
+#~ msgstr "¿Usar lista interna de YouTube Historial de Visualizaciones?[CR][CR]Requiere iniciar sesión en el addon y activar el seguimiento de historial en YouTube."
+
+#~ msgctxt "#30718"
+#~ msgid "Use YouTube internal list for Watch Later?[CR][CR]Requires signing-in via the addon."
+#~ msgstr "¿Usar lista interna de YouTube 'Ver más tarde'?[CR][CR]Requiere iniciar sesión en el addon."
 
 #~ msgctxt "#30511"
 #~ msgid "Queue video"

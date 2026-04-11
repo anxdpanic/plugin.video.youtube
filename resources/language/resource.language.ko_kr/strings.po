@@ -484,15 +484,15 @@ msgid "No videos found."
 msgstr "동영상을 찾을 수 없습니다."
 
 msgctxt "#30546"
-msgid "Please complete all login prompts"
-msgstr "모든 로그인을 완료해 주세요"
+msgid "Please sign in and complete all access authorisation prompts"
+msgstr ""
 
 msgctxt "#30547"
-msgid "You may be prompted to login and enable access to multiple applications so that this addon can function properly."
+msgid "You may be prompted to sign in and enable access to multiple applications so that this addon can function properly."
 msgstr ""
 
 msgctxt "#30548"
-msgid ""
+msgid "Authorisation process failed. Check the log for more information about this message.[CR][CR]Refer to the wiki for detailed setup instructions: [B]https://ytaddon.page.link/keys[/B]"
 msgstr ""
 
 msgctxt "#30549"
@@ -820,7 +820,7 @@ msgid "IP whitelist (comma delimited)"
 msgstr "IP 화이트리스트 (쉼표로 나눔)"
 
 msgctxt "#30630"
-msgid ""
+msgid "Check API configuration page address"
 msgstr ""
 
 msgctxt "#30631"
@@ -1160,8 +1160,8 @@ msgid "Prefer automatically translated dubbed audio over original audio"
 msgstr "원본 오디오보다 자동 번역된 더빙을 선호합니다"
 
 msgctxt "#30715"
-msgid "Use YouTube internal list for Watch History?[CR][CR]Requires signing-in via the addon and activating history tracking on YouTube."
-msgstr "시청 기록에 유튜브내부 목록을 사용할까요?[CR][CR]애드온을 통해 로그인하고 유튜브에서 기록 추적을 사용해야 합니다."
+msgid "Use YouTube internal list for Watch History?[CR][CR]Requires signing in via the addon and activating history tracking on YouTube."
+msgstr ""
 
 msgctxt "#30716"
 msgid "Liked video"
@@ -1172,8 +1172,8 @@ msgid "Disliked video"
 msgstr "싫어하는 동영상"
 
 msgctxt "#30718"
-msgid "Use YouTube internal list for Watch Later?[CR][CR]Requires signing-in via the addon."
-msgstr "나중에 시청할 유튜브에 내부 목록을 사용할까요?[CR][CR]애드온을 통해 로그인해야 합니다."
+msgid "Use YouTube internal list for Watch Later?[CR][CR]Requires signing in via the addon."
+msgstr ""
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
@@ -1598,6 +1598,18 @@ msgstr ""
 msgctxt "#30824"
 msgid "Filter by channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel'"
 msgstr ""
+
+#~ msgctxt "#30546"
+#~ msgid "Please complete all login prompts"
+#~ msgstr "모든 로그인을 완료해 주세요"
+
+#~ msgctxt "#30715"
+#~ msgid "Use YouTube internal list for Watch History?[CR][CR]Requires signing-in via the addon and activating history tracking on YouTube."
+#~ msgstr "시청 기록에 유튜브내부 목록을 사용할까요?[CR][CR]애드온을 통해 로그인하고 유튜브에서 기록 추적을 사용해야 합니다."
+
+#~ msgctxt "#30718"
+#~ msgid "Use YouTube internal list for Watch Later?[CR][CR]Requires signing-in via the addon."
+#~ msgstr "나중에 시청할 유튜브에 내부 목록을 사용할까요?[CR][CR]애드온을 통해 로그인해야 합니다."
 
 #~ msgctxt "#30511"
 #~ msgid "Queue video"

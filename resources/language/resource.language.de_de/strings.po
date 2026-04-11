@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2026-02-23 15:13+0000\n"
 "Last-Translator: Kai Sommerfeld <ksooo@users.noreply.kodi.weblate.cloud>\n"
@@ -484,15 +484,15 @@ msgid "No videos found."
 msgstr "Keine Videos gefunden."
 
 msgctxt "#30546"
-msgid "Please complete all login prompts"
-msgstr "Bitte alle Anmeldeaufforderungen abschliessen"
+msgid "Please sign in and complete all access authorisation prompts"
+msgstr ""
 
 msgctxt "#30547"
-msgid "You may be prompted to login and enable access to multiple applications so that this addon can function properly."
-msgstr "Es kann Aufforderungen zum Anmelden und Aktivieren des Zugriffs auf mehrere Applikationen geben, damit dieses Add-on funktioniert."
+msgid "You may be prompted to sign in and enable access to multiple applications so that this addon can function properly."
+msgstr ""
 
 msgctxt "#30548"
-msgid ""
+msgid "Authorisation process failed. Check the log for more information about this message.[CR][CR]Refer to the wiki for detailed setup instructions: [B]https://ytaddon.page.link/keys[/B]"
 msgstr ""
 
 msgctxt "#30549"
@@ -820,7 +820,7 @@ msgid "IP whitelist (comma delimited)"
 msgstr "IP-Whitelist (durch Komma getrennt)"
 
 msgctxt "#30630"
-msgid ""
+msgid "Check API configuration page address"
 msgstr ""
 
 msgctxt "#30631"
@@ -1160,8 +1160,8 @@ msgid "Prefer automatically translated dubbed audio over original audio"
 msgstr "Automatisch übersetzten Ton gegenüber Originalton bevorzugen"
 
 msgctxt "#30715"
-msgid "Use YouTube internal list for Watch History?[CR][CR]Requires signing-in via the addon and activating history tracking on YouTube."
-msgstr "YouTube-interne Liste für Gesehen-Historie verwenden?[CR][CR]Anmelden via Addon und Aktivieren von Historienverfolgung in YouTube sind dafür nötig."
+msgid "Use YouTube internal list for Watch History?[CR][CR]Requires signing in via the addon and activating history tracking on YouTube."
+msgstr ""
 
 msgctxt "#30716"
 msgid "Liked video"
@@ -1172,8 +1172,8 @@ msgid "Disliked video"
 msgstr "Negativ bewertete Videos"
 
 msgctxt "#30718"
-msgid "Use YouTube internal list for Watch Later?[CR][CR]Requires signing-in via the addon."
-msgstr "YouTube-interne Liste für „Später ansehen“ verwenden?[CR][CR]Anmelden via Addon ist dafür nötig."
+msgid "Use YouTube internal list for Watch Later?[CR][CR]Requires signing in via the addon."
+msgstr ""
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
@@ -1598,6 +1598,22 @@ msgstr "Filtern deaktivieren für auto-like aller Videos . Filtern aktivieren f�
 msgctxt "#30824"
 msgid "Filter by channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel'"
 msgstr "Nach Kanalnamen filtern, getrennt durc Komme, z. B. ‚Bester Kanal,Zweitbester Kanal‘"
+
+#~ msgctxt "#30546"
+#~ msgid "Please complete all login prompts"
+#~ msgstr "Bitte alle Anmeldeaufforderungen abschliessen"
+
+#~ msgctxt "#30547"
+#~ msgid "You may be prompted to login and enable access to multiple applications so that this addon can function properly."
+#~ msgstr "Es kann Aufforderungen zum Anmelden und Aktivieren des Zugriffs auf mehrere Applikationen geben, damit dieses Add-on funktioniert."
+
+#~ msgctxt "#30715"
+#~ msgid "Use YouTube internal list for Watch History?[CR][CR]Requires signing-in via the addon and activating history tracking on YouTube."
+#~ msgstr "YouTube-interne Liste für Gesehen-Historie verwenden?[CR][CR]Anmelden via Addon und Aktivieren von Historienverfolgung in YouTube sind dafür nötig."
+
+#~ msgctxt "#30718"
+#~ msgid "Use YouTube internal list for Watch Later?[CR][CR]Requires signing-in via the addon."
+#~ msgstr "YouTube-interne Liste für „Später ansehen“ verwenden?[CR][CR]Anmelden via Addon ist dafür nötig."
 
 #~ msgctxt "#30511"
 #~ msgid "Queue video"
