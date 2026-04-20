@@ -499,8 +499,8 @@ def _process_my_subscriptions(provider,
         feed_type = 'videos'
 
     with context.get_ui().create_progress_dialog(
-            heading=context.localize('my_subscriptions.loading'),
-            message=context.localize('subscriptions'),
+            heading=context.localize('my_subscriptions'),
+            message=context.localize('loading'),
             background=True,
     ) as progress_dialog:
         json_data = client.get_my_subscriptions(
