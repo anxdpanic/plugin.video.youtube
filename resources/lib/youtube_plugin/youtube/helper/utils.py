@@ -823,6 +823,7 @@ def update_video_items(provider, context, video_id_dict,
                 start_at = streaming_details['actualStartTime']
                 media_item.upcoming = False
                 if 'actualEndTime' in streaming_details:
+                    media_item.live = True
                     media_item.completed = True
             else:
                 start_at = streaming_details.get('scheduledStartTime')
