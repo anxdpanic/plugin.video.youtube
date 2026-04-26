@@ -1,3 +1,11 @@
+## v7.4.3+beta.2
+### Fixed
+- Improve handling of retries upon server error #1438
+- Improve identification of post-live streams #1420
+
+### Changed
+- Rename Subscriptions to Subscribed Channels #1435
+
 ## v7.4.3+beta.1
 ### Fixed
 - Updates to resolve inconsistent Python2 string encoding/decoding
