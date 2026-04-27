@@ -62,6 +62,7 @@ class SSLHTTPAdapter(HTTPAdapter):
             _SSL_CONTEXT.load_verify_locations(capath=_CA_PATH)
         else:
             _SSL_CONTEXT.load_verify_locations(cafile=_CA_PATH)
+    MAX_TOTAL_RETRIES = 3
 
     def init_poolmanager(self, *args, **kwargs):
         kwargs['ssl_context'] = self._SSL_CONTEXT
@@ -82,6 +83,25 @@ class SSLHTTPAdapter(HTTPAdapter):
             conn.cert_reqs = str('CERT_NONE')
         conn.ca_certs = None
         conn.ca_cert_dir = None
+
+    def send(self, *args, **kwargs):
+        retry = self.max_retries
+        if kwargs.pop('_allow_redirects', True):
+            retry.total = self.MAX_TOTAL_RETRIES
+            retry.connect = None
+            retry.read = None
+            retry.redirect = None
+            retry.status = None
+            retry.other = None
+        else:
+            total = retry.total
+            retry.total = None
+            retry.connect = total
+            retry.read = total
+            retry.redirect = 0
+            retry.status = 1
+            retry.other = 0
+        return super(SSLHTTPAdapter, self).send(*args, **kwargs)
 
 
 class CustomSession(Session):
@@ -148,13 +168,20 @@ class CustomSession(Session):
             pool_maxsize=20,
             pool_block=True,
             max_retries=Retry(
-                total=3,
-                backoff_factor=0.1,
-                status_forcelist={500, 502, 503, 504},
+                total=SSLHTTPAdapter.MAX_TOTAL_RETRIES,
                 allowed_methods=None,
+                status_forcelist={500, 502, 503, 504},
+                backoff_factor=0.1,
+                raise_on_redirect=False,
+                raise_on_status=False,
+                respect_retry_after_header=True,
             )
         ))
         self.mount('http://', HTTPAdapter())
+
+    def send(self, *args, **kwargs):
+        kwargs['_allow_redirects'] = kwargs.get('allow_redirects', True)
+        return super(CustomSession, self).send(*args, **kwargs)
 
 
 class BaseRequestsClass(object):

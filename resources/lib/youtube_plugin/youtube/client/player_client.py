@@ -1939,16 +1939,13 @@ class YouTubePlayerClient(YouTubeDataClient):
             '_partial': True,
         }
         is_live = (
-                video_details.get('isLiveContent')
-                or video_details.get('hasLiveStreamingData')
+                video_details.get('isLive')
+                or microformat.get('liveBroadcastDetails', {}).get('isLiveNow')
+                or False
         )
-        if is_live:
-            is_live = video_details.get('isLive', False)
-            live_dvr = video_details.get('isLiveDvrEnabled', False)
-            thumb_suffix = '_live' if is_live else ''
-        else:
-            live_dvr = False
-            thumb_suffix = ''
+        post_live = video_details.get('isPostLiveDvr', False)
+        was_live = not is_live and video_details.get('isLiveContent', False)
+        thumb_suffix = '_live' if is_live else ''
 
         meta_info = {
             'id': video_id,
@@ -1961,6 +1958,9 @@ class YouTubePlayerClient(YouTubeDataClient):
                 'crawlable': video_details.get('isCrawlable', False),
                 'family_safe': microformat.get('isFamilySafe', False),
                 'live': is_live,
+                'post_live': post_live,
+                'was_live': was_live,
+                'upcoming': video_details.get('isUpcoming', False),
             },
             'channel': {
                 'id': video_details.get('channelId', ''),
@@ -2004,16 +2004,7 @@ class YouTubePlayerClient(YouTubeDataClient):
                 'watchtime_url': '',
             }
 
-        if is_live or live_dvr or ask_for_quality or not use_mpd:
-            self._process_hls(
-                stream_list=stream_list,
-                responses=responses,
-                is_live=is_live,
-                meta_info=meta_info,
-                playback_stats=playback_stats,
-            )
-
-        if not is_live or live_dvr:
+        if not is_live or was_live:
             subtitles = Subtitles(context, video_id, use_mpd=use_mpd)
             default_lang, subs_data = self._process_captions(
                 subtitles=subtitles,
@@ -2038,12 +2029,6 @@ class YouTubePlayerClient(YouTubeDataClient):
 
         # extract adaptive streams and create MPEG-DASH manifest
         if use_mpd and not audio_only:
-            self._process_mpd(
-                stream_list=stream_list,
-                responses=responses,
-                meta_info=meta_info,
-                playback_stats=playback_stats,
-            )
             video_data, audio_data = self._process_adaptive_streams(
                 responses=responses,
                 default_lang_code=(default_lang['default']
@@ -2090,12 +2075,27 @@ class YouTubePlayerClient(YouTubeDataClient):
 
                 stream_list['9999'] = yt_format
 
+        if is_live or post_live or ask_for_quality or not stream_list:
+            self._process_hls(
+                stream_list=stream_list,
+                responses=responses,
+                is_live=is_live or post_live,
+                meta_info=meta_info,
+                playback_stats=playback_stats,
+            )
+            self._process_mpd(
+                stream_list=stream_list,
+                responses=responses,
+                meta_info=meta_info,
+                playback_stats=playback_stats,
+            )
+
         # extract non-adaptive streams
-        if audio_only or ask_for_quality or not use_mpd:
+        if audio_only or ask_for_quality or not stream_list:
             self._process_progressive_streams(
                 stream_list=stream_list,
                 responses=responses,
-                is_live=is_live,
+                is_live=is_live or post_live,
                 use_adaptive=use_mpd,
                 meta_info=meta_info,
                 playback_stats=playback_stats,
