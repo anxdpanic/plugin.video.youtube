@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2026-04-16 11:48+0000\n"
 "Last-Translator: Pavlo Marianov <acid@jack.kyiv.ua>\n"
@@ -316,8 +316,8 @@ msgid "Channel fanart"
 msgstr "Фанкарт каналу"
 
 msgctxt "#30504"
-msgid "Subscriptions"
-msgstr "Підписки"
+msgid "Subscribed Channels"
+msgstr ""
 
 msgctxt "#30505"
 msgid "Unsubscribe"
@@ -1598,6 +1598,10 @@ msgstr "Якщо фільтрацію вимкнуто, усі відео буд
 msgctxt "#30824"
 msgid "Filter by channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel'"
 msgstr "Фільтрувати за назвами каналів, розділеними комами, наприклад. «Найкращий канал, 2-й найкращий канал»"
+
+#~ msgctxt "#30504"
+#~ msgid "Subscriptions"
+#~ msgstr "Підписки"
 
 #~ msgctxt "#30546"
 #~ msgid "Please complete all login prompts"
