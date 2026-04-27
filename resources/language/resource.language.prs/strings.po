@@ -315,7 +315,7 @@ msgid "Channel fanart"
 msgstr ""
 
 msgctxt "#30504"
-msgid "Subscriptions"
+msgid "Subscribed Channels"
 msgstr ""
 
 msgctxt "#30505"

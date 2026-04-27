@@ -316,8 +316,8 @@ msgid "Channel fanart"
 msgstr ""
 
 msgctxt "#30504"
-msgid "Subscriptions"
-msgstr "Pretplate"
+msgid "Subscribed Channels"
+msgstr ""
 
 msgctxt "#30505"
 msgid "Unsubscribe"
@@ -1598,6 +1598,10 @@ msgstr ""
 msgctxt "#30824"
 msgid "Filter by channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel'"
 msgstr ""
+
+#~ msgctxt "#30504"
+#~ msgid "Subscriptions"
+#~ msgstr "Pretplate"
 
 #~ msgctxt "#30511"
 #~ msgid "Queue video"
