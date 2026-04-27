@@ -14,7 +14,7 @@ from atexit import register as atexit_register
 from collections import OrderedDict
 from os.path import exists, isdir
 
-from requests.adapters import HTTPAdapter, Retry
+from requests.adapters import HTTPAdapter as _HTTPAdapter, Retry
 from requests.exceptions import InvalidJSONError, RequestException, URLRequired
 from requests.hooks import default_hooks
 from requests.models import DEFAULT_REDIRECT_LIMIT, Request
@@ -36,6 +36,31 @@ __all__ = (
     'BaseRequestsClass',
     'InvalidJSONError'
 )
+
+
+class HTTPAdapter(_HTTPAdapter):
+    MAX_TOTAL_RETRIES = 3
+
+    def send(self, *args, **kwargs):
+        retry = self.max_retries
+        num_retries = self.MAX_TOTAL_RETRIES
+        if kwargs.pop('_allow_redirects', True):
+            if retry.total is None:
+                retry.total = num_retries
+                retry.connect = None
+                retry.read = None
+                retry.redirect = None
+                retry.status = None
+                retry.other = None
+        else:
+            if retry.total:
+                retry.total = None
+                retry.connect = num_retries
+                retry.read = num_retries
+                retry.redirect = 0
+                retry.status = 0
+                retry.other = 0
+        return super(HTTPAdapter, self).send(*args, **kwargs)
 
 
 class SSLHTTPAdapter(HTTPAdapter):
@@ -62,7 +87,6 @@ class SSLHTTPAdapter(HTTPAdapter):
             _SSL_CONTEXT.load_verify_locations(capath=_CA_PATH)
         else:
             _SSL_CONTEXT.load_verify_locations(cafile=_CA_PATH)
-    MAX_TOTAL_RETRIES = 3
 
     def init_poolmanager(self, *args, **kwargs):
         kwargs['ssl_context'] = self._SSL_CONTEXT
@@ -83,25 +107,6 @@ class SSLHTTPAdapter(HTTPAdapter):
             conn.cert_reqs = str('CERT_NONE')
         conn.ca_certs = None
         conn.ca_cert_dir = None
-
-    def send(self, *args, **kwargs):
-        retry = self.max_retries
-        if kwargs.pop('_allow_redirects', True):
-            retry.total = self.MAX_TOTAL_RETRIES
-            retry.connect = None
-            retry.read = None
-            retry.redirect = None
-            retry.status = None
-            retry.other = None
-        else:
-            total = retry.total
-            retry.total = None
-            retry.connect = total
-            retry.read = total
-            retry.redirect = 0
-            retry.status = 1
-            retry.other = 0
-        return super(SSLHTTPAdapter, self).send(*args, **kwargs)
 
 
 class CustomSession(Session):
