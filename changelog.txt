@@ -1,3 +1,7 @@
+## v7.4.3+beta.3
+### Fixed
+- Fix regressions with accessing http urls
+
 ## v7.4.3+beta.2
 ### Fixed
 - Improve handling of retries upon server error #1438
