@@ -28,10 +28,14 @@ __all__ = (
 __RE_URL = re_compile(r'(https?://\S+)')
 
 
-def urls_in_text(text, process=None, count=0):
+def urls_in_text(text, process=None, count=0, url_marker=None):
+    if url_marker:
+        url_re = re_compile(r'(https?://\S+|(?=%s)\S+)' % url_marker)
+    else:
+        url_re = __RE_URL
     if process:
-        return __RE_URL.sub(process, text, count=count)
-    return __RE_URL.findall(text)
+        return url_re.sub(process, text, count=count)
+    return url_re.findall(text)
 
 
 def strip_html_from_text(text, tag_re=re_compile('<[^<]+?>')):

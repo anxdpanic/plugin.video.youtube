@@ -554,7 +554,7 @@ def channel_subscribe_to(context,
                          channel_id=CHANNEL_ID_INFOLABEL,
                          channel_name=ARTIST_INFOLABEL):
     return (
-        context.localize('subscribe_to.x', context.get_ui().bold(channel_name))
+        context.localize('subscribe.to.x', context.get_ui().bold(channel_name))
         if channel_name else
         context.localize('subscribe'),
         context_menu_uri(

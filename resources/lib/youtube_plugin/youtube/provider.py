@@ -1686,7 +1686,7 @@ class Provider(AbstractProvider):
         # subscriptions
         if logged_in and settings_bool(settings.SHOW_SUBSCRIPTIONS, True):
             subscriptions_item = DirectoryItem(
-                localize('subscriptions'),
+                localize('subscribed_channels'),
                 create_uri((PATHS.SUBSCRIPTIONS, 'list')),
                 image='{media}/channels.png',
             )
