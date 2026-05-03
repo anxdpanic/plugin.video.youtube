@@ -580,13 +580,15 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                     if content:
                         wfile.write(content)
                     else:
-                        wfile.write(
-                            response.raw.read(
-                                amt=None,
+                        while 1:
+                            content = response.raw.read(
+                                amt=1048576,
                                 decode_content=False,
                                 cache_content=False,
                             )
-                        )
+                            if not content:
+                                break
+                            wfile.write(content)
                 break
 
         else:
