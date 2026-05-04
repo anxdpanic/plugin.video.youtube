@@ -107,7 +107,7 @@ msgstr "144p"
 
 msgctxt "#30020"
 msgid "Enable Stereoscopic 3D video"
-msgstr ""
+msgstr "Activer la vidéo 3D stéréoscopique"
 
 msgctxt "#30021"
 msgid "Show fanart"
@@ -151,7 +151,7 @@ msgstr "Configurer %s ?"
 
 msgctxt "#30031"
 msgid "Requests cache size (MB)"
-msgstr ""
+msgstr "Taille de la mémoire cache (Mo)"
 
 msgctxt "#30032"
 msgid "View: TV Shows"
@@ -209,7 +209,7 @@ msgstr ""
 
 msgctxt "#30106"
 msgid "Next page: %d"
-msgstr ""
+msgstr "Page suivante: %d"
 
 msgctxt "#30107"
 msgid "Watch Later"
@@ -217,11 +217,11 @@ msgstr "Regarder plus tard"
 
 msgctxt "#30108"
 msgid "Enter the name of the bookmark"
-msgstr ""
+msgstr "Saisir le nom du signet"
 
 msgctxt "#30109"
 msgid "Enter a valid YouTube or plugin URL for the bookmark"
-msgstr ""
+msgstr "Entrez une URL YouTube ou une URL valide pour le signet"
 
 msgctxt "#30110"
 msgid "New Search"
@@ -237,7 +237,7 @@ msgstr "Déconnexion"
 
 msgctxt "#30113"
 msgid "Related to \"%s\""
-msgstr ""
+msgstr "Lié à \"% s\""
 
 msgctxt "#30114"
 msgid "Confirm delete"
@@ -257,7 +257,7 @@ msgstr "Supprimer \"%s\" ?"
 
 msgctxt "#30118"
 msgid "Links from \"%s\""
-msgstr ""
+msgstr "Liens depuis \"% s\""
 
 msgctxt "#30119"
 msgid "Please wait..."
@@ -301,11 +301,11 @@ msgstr ""
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
 msgid "%s failed"
-msgstr ""
+msgstr "%s échec"
 
 msgctxt "#30501"
 msgid "Edit %s"
-msgstr ""
+msgstr "Éditer %s"
 
 msgctxt "#30502"
 msgid "Go to %s"
@@ -313,11 +313,11 @@ msgstr "Aller à %s"
 
 msgctxt "#30503"
 msgid "Channel fanart"
-msgstr ""
+msgstr "Fanart de la chaîne"
 
 msgctxt "#30504"
 msgid "Subscribed Channels"
-msgstr ""
+msgstr "Chaînes souscrites"
 
 msgctxt "#30505"
 msgid "Unsubscribe"
@@ -361,7 +361,7 @@ msgstr "Vidéos similaires"
 
 msgctxt "#30515"
 msgid "Auto-remove from Watch Later"
-msgstr ""
+msgstr "Suppression automatique de la liste de contrôle"
 
 msgctxt "#30516"
 msgid "Folders"
@@ -373,7 +373,7 @@ msgstr "Souscrire à %s"
 
 msgctxt "#30518"
 msgid "Feeds"
-msgstr ""
+msgstr "Souscriptions"
 
 msgctxt "#30519"
 msgid "and enter the following code:"
@@ -1357,203 +1357,203 @@ msgstr "Multi-audio"
 
 msgctxt "#30764"
 msgid "Requests connect timeout"
-msgstr ""
+msgstr "Délai d'attente de connexion des requêtes dépassé"
 
 msgctxt "#30765"
 msgid "Requests read timeout"
-msgstr ""
+msgstr "Délai d'attente pour la lecture des requêtes"
 
 msgctxt "#30766"
 msgid "Premieres"
-msgstr ""
+msgstr "Premières diffusions"
 
 msgctxt "#30767"
 msgid "Views"
-msgstr ""
+msgstr "Vues"
 
 msgctxt "#30768"
 msgid "Disable high framerate video at maximum video quality"
-msgstr ""
+msgstr "Désactivez la vidéo à haut taux d'images à la qualité vidéo maximale"
 
 msgctxt "#30769"
 msgid "Clear Watch Later list"
-msgstr ""
+msgstr "Nettoyé la liste visionnage plus tard"
 
 msgctxt "#30770"
 msgid "Are you sure you want to clear your Watch Later list?"
-msgstr ""
+msgstr "Êtes-vous sûr de vouloir effacer votre liste de visionnage plus tard?"
 
 msgctxt "#30771"
 msgid "Disable fractional framerate hinting"
-msgstr ""
+msgstr "Désactivez l'indice fractionnaire de fréquence d'images"
 
 msgctxt "#30772"
 msgid "Disable all framerate hinting"
-msgstr ""
+msgstr "Désactivez tous les indices de fréquence d'images"
 
 msgctxt "#30773"
 msgid "Show video details in video lists"
-msgstr ""
+msgstr "Afficher les détails vidéo dans des listes vidéo"
 
 msgctxt "#30774"
 msgid "All available"
-msgstr ""
+msgstr "Tous disponibles"
 
 msgctxt "#30775"
 msgid "%s (translation)"
-msgstr ""
+msgstr "%s (traduction)"
 
 msgctxt "#30776"
 msgid "Ask + Automatic + Quality selection"
-msgstr ""
+msgstr "Demander + Automatique + Sélection de qualité"
 
 msgctxt "#30777"
 msgid "Views for %s (%s)"
-msgstr ""
+msgstr "Vues pour %s (%s)"
 
 msgctxt "#30778"
 msgid "Import old playback history?"
-msgstr ""
+msgstr "Importer l'ancien historique de lecture?"
 
 msgctxt "#30779"
 msgid "Import old search history?"
-msgstr ""
+msgstr "Importer un ancien historique de recherche?"
 
 msgctxt "#30780"
 msgid "Clear local watch later list"
-msgstr ""
+msgstr "Nettoyez la liste locale de surveillance ultérieure"
 
 msgctxt "#30781"
 msgid "Delete watch later database"
-msgstr ""
+msgstr "Supprimer la base de données de la regarder plus tard"
 
 msgctxt "#30782"
 msgid "local watch later list"
-msgstr ""
+msgstr "Liste locale de surveillance ultérieure"
 
 msgctxt "#30783"
 msgid "settings to recommended values"
-msgstr ""
+msgstr "Réglages aux valeurs recommandées"
 
 msgctxt "#30784"
 msgid "listings to show minimal details"
-msgstr ""
+msgstr "Annonces pour montrer des détails minimes"
 
 msgctxt "#30785"
 msgid "performance settings"
-msgstr ""
+msgstr "Réglages de performance"
 
 msgctxt "#30786"
 msgid "Choose device capabilities"
-msgstr ""
+msgstr "Choisissez les capacités de l'appareil"
 
 msgctxt "#30787"
 msgid "720p, H.264 only | Limited or older devices"
-msgstr ""
+msgstr "720p, H.264 seulement | Appareils limités ou anciens"
 
 msgctxt "#30788"
 msgid "1080p/30 fps | Raspberry Pi 3, or similar"
-msgstr ""
+msgstr "1080p/30 fps | Raspberry Pi 3, ou un équivalent"
 
 msgctxt "#30789"
 msgid "4K/30 fps or 1080p/60 fps, HDR if compatible | Raspberry Pi 5, or similar"
-msgstr ""
+msgstr "4K/30 fps ou 1080p/60 fps, HDR si compatible | Raspberry Pi 5, ou similaire"
 
 msgctxt "#30790"
 msgid "4K/60 fps, HDR if compatible | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1, or similar"
-msgstr ""
+msgstr "4K/60 fps, HDR si compatible | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1, ou un équivalent"
 
 msgctxt "#30791"
 msgid "4K/60 fps, HDR, using AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V, or similar"
-msgstr ""
+msgstr "4K/60 fps, HDR, utilisation de l'AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V ou similaire"
 
 msgctxt "#30792"
 msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities"
-msgstr ""
+msgstr "8K/60 fps, HDR, utilisant AV1 | Appareil ou PC moderne avec toutes les capacités"
 
 msgctxt "#30793"
 msgid "Views count display colour"
-msgstr ""
+msgstr "Couleur d'affichage pour le nombre de vues"
 
 msgctxt "#30794"
 msgid "Subscriber/Likes count display colour"
-msgstr ""
+msgstr "Couleur d'affichage pour les abonnés / j'aime"
 
 msgctxt "#30795"
 msgid "Videos/Comments count display colour"
-msgstr ""
+msgstr "Couleur d'affichage pour les vidéos / commentaires"
 
 msgctxt "#30796"
 msgid "1080p/60 fps | Raspberry Pi 4, or similar"
-msgstr ""
+msgstr "1080p/60 fps | Raspberry Pi 4, ou similaire"
 
 msgctxt "#30797"
 msgid "1080p/30 fps or 720p/30 fps, H.264 only | Raspberry Pi 1/2, or similar"
-msgstr ""
+msgstr "1080p/30 fps ou 720p/30 fps, H.264 seulement | Raspberry Pi 1/2, ou similaire"
 
 msgctxt "#30798"
 msgid "Clear bookmarks list"
-msgstr ""
+msgstr "Nettoyer la liste de signets"
 
 msgctxt "#30799"
 msgid "Delete bookmarks database"
-msgstr ""
+msgstr "Supprimer la base de données des signets"
 
 msgctxt "#30800"
 msgid "bookmarks list"
-msgstr ""
+msgstr "Liste de signets"
 
 msgctxt "#30801"
 msgid "Clear Bookmarks list"
-msgstr ""
+msgstr "Nettoyer la liste de signets"
 
 msgctxt "#30802"
 msgid "Are you sure you want to clear your Bookmarks list?"
-msgstr ""
+msgstr "Êtes-vous sûr de vouloir effacer votre liste de signets?"
 
 msgctxt "#30803"
 msgid "Bookmark %s"
-msgstr ""
+msgstr "Signet %s"
 
 msgctxt "#30804"
 msgid "Use YouTube website urls with external player"
-msgstr ""
+msgstr "Utilisez les URL des sites YouTube avec un lecteur externe"
 
 msgctxt "#30805"
 msgid "Use MPEG-DASH with external player"
-msgstr ""
+msgstr "Utilisez MPEG-DASH avec lecteur externe"
 
 msgctxt "#30806"
 msgid "Jump to page..."
-msgstr ""
+msgstr "Aller à la page..."
 
 msgctxt "#30807"
 msgid "Use channel name as"
-msgstr ""
+msgstr "Masquer les éléments des annonces"
 
 msgctxt "#30808"
 msgid "Hide items from listings"
-msgstr ""
+msgstr "Masquer les éléments des annonces"
 
 msgctxt "#30809"
 msgid "All upcoming videos"
-msgstr ""
+msgstr "Toutes les vidéos à venir"
 
 msgctxt "#30810"
 msgid "All previously streamed (completed) videos"
-msgstr ""
+msgstr "Toutes les vidéos précédemment diffusées (terminées)"
 
 msgctxt "#30811"
 msgid "Filter Live folders"
-msgstr ""
+msgstr "Filtrer les dossiers Live"
 
 msgctxt "#30812"
 msgid "Clear subscription feed history"
-msgstr ""
+msgstr "Effacez l'historique du fil d'abonnement"
 
 msgctxt "#30813"
 msgid "Delete subscription feed history database"
-msgstr ""
+msgstr "Supprimer la base de données de l'historique du fil d'abonnement"
 
 msgctxt "#30814"
 msgid "feed history"
@@ -1561,43 +1561,43 @@ msgstr ""
 
 msgctxt "#30815"
 msgid "Go back..."
-msgstr ""
+msgstr "Retourne en arrière..."
 
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
-msgstr ""
+msgstr "La liste est vide. [CR][CR]Refresh à partir du menu contextuel ou réessayez plus tard."
 
 msgctxt "#30817"
 msgid "Refresh settings.xml"
-msgstr ""
+msgstr "Mettre à jour settings.xml"
 
 msgctxt "#30818"
 msgid "Are you sure you want to refresh settings.xml?"
-msgstr ""
+msgstr "Vous êtes sûr de vouloir rafraîchir les paramètres.xml ?"
 
 msgctxt "#30819"
 msgid "Play from start"
-msgstr ""
+msgstr "Jouer depuis le début"
 
 msgctxt "#30820"
 msgid "Podcast"
-msgstr ""
+msgstr "Podcast"
 
 msgctxt "#30821"
 msgid "Auto-like watched videos"
-msgstr ""
+msgstr "Marqué comme aimé les vidéos vues"
 
 msgctxt "#30822"
 msgid "Channel filtering"
-msgstr ""
+msgstr "Filtrage des chaînes"
 
 msgctxt "#30823"
 msgid "Disable filtering to auto-like all videos. Enable filtering to auto-like videos only from specific channels. Enable blacklist to auto-like all videos except from specific channels."
-msgstr ""
+msgstr "Désactivez le filtrage pour que toutes les vidéos soient automatiquement appréciées. Activer le filtrage des vidéos auto-similaires uniquement à partir de canaux spécifiques. Activer la liste noire pour aimer automatiquement toutes les vidéos sauf celles de chaînes spécifiques."
 
 msgctxt "#30824"
 msgid "Filter by channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel'"
-msgstr ""
+msgstr "Filtrer par les noms des canaux séparés par une virgule, par exemple. 'La meilleure chaîne, la deuxième meilleure chaîne'"
 
 #~ msgctxt "#30504"
 #~ msgid "Subscriptions"
