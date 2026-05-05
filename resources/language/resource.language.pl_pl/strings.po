@@ -316,8 +316,8 @@ msgid "Channel fanart"
 msgstr "Fototapeta kanału"
 
 msgctxt "#30504"
-msgid "Subscriptions"
-msgstr "Subskrypcje"
+msgid "Subscribed Channels"
+msgstr ""
 
 msgctxt "#30505"
 msgid "Unsubscribe"
@@ -1598,6 +1598,10 @@ msgstr "Wyłącz filtrowanie, aby automatycznie polubić wszystkie filmy. Włąc
 msgctxt "#30824"
 msgid "Filter by channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel'"
 msgstr "Filtruj według nazw kanałów oddzielonych przecinkiem, np. „Najlepszy kanał,Drugi najlepszy kanał”"
+
+#~ msgctxt "#30504"
+#~ msgid "Subscriptions"
+#~ msgstr "Subskrypcje"
 
 #~ msgctxt "#30546"
 #~ msgid "Please complete all login prompts"

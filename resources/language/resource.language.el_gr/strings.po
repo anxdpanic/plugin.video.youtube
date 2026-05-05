@@ -316,8 +316,8 @@ msgid "Channel fanart"
 msgstr "Εικόνα fanart καναλιού"
 
 msgctxt "#30504"
-msgid "Subscriptions"
-msgstr "Συνδρομές"
+msgid "Subscribed Channels"
+msgstr ""
 
 msgctxt "#30505"
 msgid "Unsubscribe"
@@ -1598,6 +1598,10 @@ msgstr ""
 msgctxt "#30824"
 msgid "Filter by channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel'"
 msgstr ""
+
+#~ msgctxt "#30504"
+#~ msgid "Subscriptions"
+#~ msgstr "Συνδρομές"
 
 #~ msgctxt "#30546"
 #~ msgid "Please complete all login prompts"
