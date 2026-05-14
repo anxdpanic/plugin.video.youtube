@@ -38,6 +38,7 @@ from ...constants import (
     REFRESH_CONTAINER,
     UPDATING,
     URI,
+    VALUE_TO_STR,
 )
 
 
@@ -527,7 +528,11 @@ class XbmcContextUI(AbstractContextUI):
                      stacklevel=2,
                      process=None,
                      log_redact=False,
-                     raw=False):
+                     raw=False,
+                     as_bool=False):
+        if as_bool:
+            value = VALUE_TO_STR.get(value, value)
+
         if log_redact is True:
             log_msg = 'Set property {property_id!r}: {value!p}'
             log_value = value

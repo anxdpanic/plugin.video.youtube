@@ -436,7 +436,7 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
     settings = context.get_settings()
     ui = context.get_ui()
 
-    is_external = ui.get_property(PLAY_USING)
+    is_external = ui.get_property(PLAY_USING, as_bool=True)
     is_strm = params.get(PLAY_STRM)
     mime_type = None
 
@@ -500,7 +500,8 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
                 props['inputstream.adaptive.manifest_config'] = dumps({
                     'timeshift_bufferlimit': 4 * 60 * 60,
                 })
-            if ui.pop_property(PLAY_TIMESHIFT) and 'timeshift' in capabilities:
+            if (ui.pop_property(PLAY_TIMESHIFT, as_bool=True)
+                    and 'timeshift' in capabilities):
                 props['inputstream.adaptive.play_timeshift_buffer'] = True
 
         if not settings.verify_ssl() and 'config_prop' in capabilities:

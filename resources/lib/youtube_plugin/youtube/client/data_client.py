@@ -2582,6 +2582,8 @@ class YouTubeDataClient(YouTubeLoginClient):
                     feed_items = feed_items[:min(1000, feed_limits['num'])]
                 elif cached_items:
                     feed_items = cached_items
+                else:
+                    refresh_feed = True
 
                 if refresh_feed:
                     new_cache[item_id] = {

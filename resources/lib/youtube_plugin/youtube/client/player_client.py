@@ -1644,7 +1644,7 @@ class YouTubePlayerClient(YouTubeDataClient):
         context = self._context
         settings = context.get_settings()
         age_gate_enabled = settings.age_gate()
-        use_remote_history = settings.use_remote_history()
+        use_remote_history = not incognito and settings.use_remote_history()
 
         _client_name = None
         _client = None

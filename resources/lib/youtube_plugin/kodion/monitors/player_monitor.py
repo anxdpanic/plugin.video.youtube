@@ -425,14 +425,14 @@ class PlayerMonitor(xbmc.Player):
         if not self._ui.busy_dialog_active():
             self._ui.clear_property(BUSY_FLAG)
 
-        if self._ui.get_property(PLAY_USING):
+        if self._ui.get_property(PLAY_USING, as_bool=True):
             self._context.execute('Action(SwitchPlayer)')
             self._context.execute('Action(Stop)')
             return
 
     def onAVStarted(self):
         ui = self._ui
-        if ui.get_property(PLAY_USING):
+        if ui.get_property(PLAY_USING, as_bool=True):
             return
 
         if not ui.busy_dialog_active():
