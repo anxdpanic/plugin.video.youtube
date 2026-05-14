@@ -1,3 +1,10 @@
+## v7.4.4+beta.1
+### Fixed
+- Limit retrying feeds that cannot be accessed #1425
+
+### New
+- Add option to play YouTube error notification video upon playback failure #1428
+
 ## v7.4.3
 ### Fixed
 - Limit chunk size when reading stream proxy response #1444
