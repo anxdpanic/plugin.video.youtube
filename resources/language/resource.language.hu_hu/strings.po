@@ -1112,7 +1112,7 @@ msgid "Play with subtitles"
 msgstr "Lejátszás felirattal"
 
 msgctxt "#30703"
-msgid ""
+msgid "Use YouTube error notification video upon playback failure"
 msgstr ""
 
 msgctxt "#30704"

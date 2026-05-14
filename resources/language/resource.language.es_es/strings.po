@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2026-05-02 02:16+0000\n"
 "Last-Translator: Alfonso Cachero <alfonso.cachero@gmail.com>\n"
@@ -1112,8 +1112,8 @@ msgid "Play with subtitles"
 msgstr "Reproducir con subtítulos"
 
 msgctxt "#30703"
-msgid ""
-msgstr " "
+msgid "Use YouTube error notification video upon playback failure"
+msgstr ""
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
@@ -1598,6 +1598,10 @@ msgstr "Desactiva el filtrado para hacer auto-like a todos los vídeos. Activa e
 msgctxt "#30824"
 msgid "Filter by channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel'"
 msgstr "Filtrar por nombres de canal separados por coma. P.ej: 'El mejor canal,El segundo mejor canal'"
+
+#~ msgctxt "#30703"
+#~ msgid ""
+#~ msgstr " "
 
 #~ msgctxt "#30504"
 #~ msgid "Subscriptions"

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2026-05-02 02:16+0000\n"
 "Last-Translator: Kai Sommerfeld <ksooo@users.noreply.kodi.weblate.cloud>\n"
@@ -1112,7 +1112,7 @@ msgid "Play with subtitles"
 msgstr "Mit Unteriteln wiedergeben"
 
 msgctxt "#30703"
-msgid ""
+msgid "Use YouTube error notification video upon playback failure"
 msgstr ""
 
 msgctxt "#30704"
