@@ -35,6 +35,7 @@ from ...kodion.constants import (
     PLAYLIST_POSITION,
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
+    PLAY_PROMPT_SUBTITLES,
     PLAY_STRM,
     PLAY_USING,
     SCREENSAVER,
@@ -100,6 +101,19 @@ def _play_stream(provider, context):
         except YouTubeException as exc:
             logging.exception('Error')
             ui.show_notification(message=exc.get_message())
+            if settings.default_player_fallback():
+                return False, {
+                    provider.FALLBACK: context.create_uri(
+                        PATHS.PLAY,
+                        {
+                            VIDEO_ID: 'M5t4UHllkUM',
+                            INCOGNITO: True,
+                            PLAY_FORCE_AUDIO: False,
+                            PLAY_PROMPT_QUALITY: False,
+                            PLAY_PROMPT_SUBTITLES: False,
+                        }
+                    ),
+                }
             return False
 
         if not streams:

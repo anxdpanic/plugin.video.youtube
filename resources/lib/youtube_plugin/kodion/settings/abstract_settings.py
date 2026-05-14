@@ -140,6 +140,13 @@ class AbstractSettings(object):
             return False
         return self.get_bool(SETTINGS.DEFAULT_PLAYER_WEB_URLS, False)
 
+    def default_player_fallback(self, value=None):
+        if value is not None:
+            return self.set_bool(SETTINGS.DEFAULT_PLAYER_FALLBACK_VIDEO, value)
+        if self.default_player_web_urls():
+            return False
+        return self.get_bool(SETTINGS.DEFAULT_PLAYER_FALLBACK_VIDEO, False)
+
     def alternative_player_web_urls(self, value=None):
         if value is not None:
             return self.set_bool(SETTINGS.ALTERNATIVE_PLAYER_WEB_URLS, value)
