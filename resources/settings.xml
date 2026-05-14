@@ -689,6 +689,16 @@
                     </dependencies>
                     <control type="toggle"/>
                 </setting>
+                <setting id="kodion.default_player.fallback_video" type="boolean" label="30703" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition setting="kodion.default_player.web_urls" operator="is">false</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="toggle"/>
+                </setting>
             </group>
             <group id="inputstream_adaptive" label="30617">
                 <setting id="kodion.video.quality.isa" type="boolean" label="30007" help="">

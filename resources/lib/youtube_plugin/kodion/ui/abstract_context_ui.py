@@ -138,7 +138,8 @@ class AbstractContextUI(object):
                      stacklevel=2,
                      process=None,
                      log_redact=False,
-                     raw=False):
+                     raw=False,
+                     as_bool=False):
         raise NotImplementedError()
 
     @classmethod

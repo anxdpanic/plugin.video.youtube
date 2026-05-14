@@ -1118,7 +1118,7 @@ msgid "Play with subtitles"
 msgstr ""
 
 msgctxt "#30703"
-msgid ""
+msgid "Use YouTube error notification video upon playback failure"
 msgstr ""
 
 msgctxt "#30704"
