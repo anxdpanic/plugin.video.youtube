@@ -65,7 +65,7 @@ def _play_stream(provider, context):
     screensaver = params.get(SCREENSAVER, False)
 
     audio_only = False
-    is_external = ui.get_property(PLAY_USING)
+    is_external = ui.get_property(PLAY_USING, as_bool=True)
     if ((is_external and settings.alternative_player_web_urls())
             or settings.default_player_web_urls()):
         stream = {
@@ -73,12 +73,18 @@ def _play_stream(provider, context):
         }
         yt_item = None
     else:
-        ask_for_quality = settings.ask_for_video_quality()
-        if ui.pop_property(PLAY_PROMPT_QUALITY) and not screensaver:
-            ask_for_quality = True
-        audio_only = not ask_for_quality and settings.audio_only()
-        if ui.pop_property(PLAY_FORCE_AUDIO):
-            audio_only = True
+        ask_for_quality = ui.pop_property(PLAY_PROMPT_QUALITY, as_bool=True)
+        if screensaver:
+            ask_for_quality = False
+        elif ask_for_quality is None:
+            ask_for_quality = settings.ask_for_video_quality()
+
+        audio_only = ui.pop_property(PLAY_FORCE_AUDIO, as_bool=True)
+        if screensaver:
+            audio_only = False
+        elif audio_only is None:
+            audio_only = not ask_for_quality and settings.audio_only()
+
         use_mpd = ((not is_external or settings.alternative_player_mpd())
                    and settings.use_mpd_videos()
                    and context.ipc_exec(SERVER_WAKEUP, timeout=5))
@@ -540,8 +546,7 @@ def process(provider, context, **_kwargs):
 
     if video_id and not playlist_id and not video_ids:
         for param in force_play_params:
-            del params[param]
-            ui.set_property(param)
+            ui.set_property(param, params.pop(param, None), as_bool=True)
 
         if context.get_handle() == -1:
             # This is required to trigger Kodi resume prompt, along with using
@@ -552,13 +557,18 @@ def process(provider, context, **_kwargs):
                     and context.is_plugin_folder(name=True)):
                 return UriItem('command://Action(Play)')
 
+            audio_only = ui.get_property(
+                PLAY_FORCE_AUDIO,
+                as_bool=True,
+            )
+            if audio_only is None:
+                audio_only = context.settings().audio_only()
             return UriItem('command://{0}'.format(
                 context.create_uri(
                     (PATHS.PLAY,),
                     params,
                     play=(xbmc.PLAYLIST_MUSIC
-                          if (ui.get_property(PLAY_FORCE_AUDIO)
-                              or context.get_settings().audio_only()) else
+                          if audio_only else
                           xbmc.PLAYLIST_VIDEO),
                 )
             ))

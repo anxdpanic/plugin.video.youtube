@@ -591,12 +591,17 @@ class XbmcPlugin(AbstractPlugin):
 
             else:
                 log_action = 'Redirect for playback queued'
+                audio_only = context.get_ui().get_property(
+                    PLAY_FORCE_AUDIO,
+                    as_bool=True,
+                )
+                if audio_only is None:
+                    audio_only = context.settings().audio_only()
                 action = context.create_uri(
                     path,
                     params,
                     play=(xbmc.PLAYLIST_MUSIC
-                          if (context.get_ui().get_property(PLAY_FORCE_AUDIO)
-                              or context.get_settings().audio_only()) else
+                          if audio_only else
                           xbmc.PLAYLIST_VIDEO),
                 )
                 result = True
