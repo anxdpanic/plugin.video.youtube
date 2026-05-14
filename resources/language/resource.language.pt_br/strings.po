@@ -1114,7 +1114,7 @@ msgid "Play with subtitles"
 msgstr "Reproduzir com legendas"
 
 msgctxt "#30703"
-msgid ""
+msgid "Use YouTube error notification video upon playback failure"
 msgstr ""
 
 msgctxt "#30704"
