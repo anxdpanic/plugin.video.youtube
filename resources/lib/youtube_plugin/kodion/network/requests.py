@@ -308,7 +308,7 @@ class BaseRequestsClass(object):
             return None, None
         with response:
             response.raise_for_status()
-            result = response and response.text
+            result = response.text
         if not result:
             self._raise_exception(
                 kwargs.get('exception', RequestException),
@@ -445,10 +445,13 @@ class BaseRequestsClass(object):
 
         except self._default_exc as exc:
             exc_response = exc.response or response
-            if exc_response:
-                response_text = exc_response.text
-                response_status = exc_response.status_code
-                response_reason = exc_response.reason
+            if exc_response is not None:
+                response_text = (
+                        getattr(exc_response, 'text', None)
+                        or repr(exc_response)
+                )
+                response_status = getattr(exc_response, 'status_code', 'Error')
+                response_reason = getattr(exc_response, 'reason', 'No response')
             else:
                 response_text = None
                 response_status = 'Error'
@@ -479,8 +482,11 @@ class BaseRequestsClass(object):
                     kwargs.update(_detail)
                 if _response is not None:
                     response = _response
-                    if response and not response_text:
-                        response_text = repr(_response)
+                    response_text = (
+                            getattr(response, 'text', None)
+                            or repr(response)
+                            or response_text
+                    )
                 if _exc is not None:
                     raise_exc = _exc
 
