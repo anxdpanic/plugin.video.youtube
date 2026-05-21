@@ -91,11 +91,11 @@ class FunctionCache(Storage):
         cache_id = self._create_id_from_func(partial_func)
         return self._get(cache_id)
 
-    def run(self, func, seconds=None, *args, **kwargs):
+    def run(self, func, seconds=-1, *args, **kwargs):
         """
         Returns the cached data of the given function.
         :param function func: function to call and cache if not already cached
-        :param int|None seconds: max allowable age of cached result
+        :param int seconds: max allowable age of cached result
         :param tuple args: positional arguments passed to the function
         :param dict kwargs: keyword arguments passed to the function
         :keyword _scope: (int) cache result if matching:
@@ -125,14 +125,25 @@ class FunctionCache(Storage):
             return partial_func()
 
         cache_id = self._create_id_from_func(partial_func, scope)
-        data = retry_value if refresh else self._get(cache_id, seconds=seconds)
-        if data == retry_value:
-            _data = data
-            data = partial_func()
+        old_data = self._get(cache_id, as_dict=True)
+        if old_data:
+            age = old_data['age']
+            old_data = old_data['value']
+            if age > seconds >= 0 or old_data == retry_value:
+                refresh = True
         else:
-            _data = None
-        if callable(process):
-            data = process(data, _data)
+            old_data = None
+            refresh = True
+
+        if refresh:
+            data = partial_func()
+            if callable(process):
+                data = process(data, old_data)
+        elif callable(process):
+            data = process(None, old_data)
+        else:
+            data = old_data
+
         if data != ignore_value:
             self._set(cache_id, data)
         elif oneshot:
