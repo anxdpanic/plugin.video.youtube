@@ -89,9 +89,9 @@ class RecordFormatter(logging.Formatter):
                         process=parse_and_redact_uri,
                         url_marker='url: ',
                     )
-                record.stack_text = stack_text
+                record.stack_text = '\n' + stack_text
             if s[-1:] != '\n':
-                s += '\n\n'
+                s += '\n'
             s += record.stack_text
 
         if record.exc_info:
@@ -103,9 +103,9 @@ class RecordFormatter(logging.Formatter):
                         process=parse_and_redact_uri,
                         url_marker='url: ',
                     )
-                record.exc_text = exc_text
+                record.exc_text = '\n' + exc_text
             if s[-1:] != '\n':
-                s += '\n\n'
+                s += '\n'
             s += record.exc_text
 
         return s
