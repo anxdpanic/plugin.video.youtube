@@ -119,8 +119,13 @@ def _do_login(provider, context, client=None, **kwargs):
                 ui.bold(user_code),
             ))
 
+            system = client._configs.get(token_type, {}).get('system', '')
+            heading = localize('sign.in')
+            if system:
+                heading = '{0} ({1})'.format(heading, system)
+
             with ui.create_progress_dialog(
-                    heading=localize('sign.in'),
+                    heading=heading,
                     message=message,
                     background=False
             ) as progress_dialog:
