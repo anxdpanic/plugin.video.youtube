@@ -1657,7 +1657,10 @@ class YouTubeDataClient(YouTubeLoginClient):
 
         if after:
             if isinstance(after, string_type) and after.startswith('{'):
-                after = json.loads(after)
+                try:
+                    after = json.loads(after)
+                except ValueError:
+                    after = None
             params['publishedAfter'] = (
                 yt_datetime_offset(**after)
                 if isinstance(after, dict) else
@@ -2222,7 +2225,10 @@ class YouTubeDataClient(YouTubeLoginClient):
         published = params.get('publishedBefore')
         if published:
             if isinstance(published, string_type) and published.startswith('{'):
-                published = json.loads(published)
+                try:
+                    published = json.loads(published)
+                except ValueError:
+                    published = None
             search_params['publishedBefore'] = (
                 yt_datetime_offset(**published)
                 if isinstance(published, dict) else
@@ -2232,7 +2238,10 @@ class YouTubeDataClient(YouTubeLoginClient):
         published = params.get('publishedAfter')
         if published:
             if isinstance(published, string_type) and published.startswith('{'):
-                published = json.loads(published)
+                try:
+                    published = json.loads(published)
+                except ValueError:
+                    published = None
             search_params['publishedAfter'] = (
                 yt_datetime_offset(**published)
                 if isinstance(published, dict) else

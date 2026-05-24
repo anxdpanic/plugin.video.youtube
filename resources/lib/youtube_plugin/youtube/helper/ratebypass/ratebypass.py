@@ -158,7 +158,8 @@ def throttling_prepend(d, e):
         d.append(el)
 
     end_len = len(d)
-    assert start_len == end_len
+    if start_len != end_len:
+        raise ValueError('Throttling transform corrupted list length')
 
 
 def throttling_swap(d, e):
