@@ -1,5 +1,13 @@
+## v7.4.4+beta.2
+### Fixed
+- Fix using unimplemented change to localisation identifier when showing API config page address
+
+### Changed
+- More aggressively utilise cached data for My Subscriptions feed failures #1425
+
 ## v7.4.4+beta.1
 ### Fixed
+- Fix play uri parameters/properties not being able to be forced off
 - Limit retrying feeds that cannot be accessed #1425
 
 ### New

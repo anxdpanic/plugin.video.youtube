@@ -132,7 +132,7 @@ def _config_actions(context, action, *_args):
         url = httpd_status(context, path=PATHS.API)
         if url:
             ui.on_ok(context.localize('api.config'),
-                     context.localize('go.to.x', ui.bold(url)))
+                     context.localize('go_to.x', ui.bold(url)))
         else:
             ui.show_notification(context.localize('httpd.not.running'))
 
