@@ -23,6 +23,24 @@ from ..compatibility import (
 from ..constants.const_settings import API_ID, API_KEY, API_SECRET, LOCATION
 
 
+def redact_value(value, start=None, end=None, replace=None):
+    if not value:
+        return ''
+    if replace:
+        value = value.replace(*replace)
+    value_len = len(value)
+    min_len = 0
+    if start is None:
+        min_len = min(10, value_len // 4)
+        start = min_len
+    if end is None:
+        end = min_len or min(10, value_len // 4)
+    min_len = 3 + start + end
+    if value_len >= min_len:
+        return '...'.join((value[:start], value[-end:]))
+    return '...'
+
+
 def redact_ip(url,
               _re=re_compile(r'([?&/]|%3F|%26|%2F)ip([=/]|%3D|%2F)[^?&/%]+')):
     return _re.sub(r'\g<1>ip\g<2>REDACTED', url)
@@ -111,19 +129,19 @@ def redact_params(params,
 
         if param in _partially_redacted_secret_params:
             log_value = [
-                '...'.join((val[:3], val[-3:]))
-                if len(val) > 9 else
-                '...'
+                redact_value(val, start=3, end=3)
                 for val in value
             ]
         elif param in _partially_redacted_id_params:
-            log_value = []
-            for val in value:
-                val = val.replace('.apps.googleusercontent.com', '')
-                if len(val) > 11:
-                    log_value.append('...'.join((val[:3], val[-5:])))
-                else:
-                    log_value.append('...')
+            log_value = [
+                redact_value(
+                    val,
+                    start=3,
+                    end=5,
+                    replace=('.apps.googleusercontent.com', ''),
+                )
+                for val in value
+            ]
         elif param in _fully_redacted_params:
             log_value = [
                 'REDACTED'
