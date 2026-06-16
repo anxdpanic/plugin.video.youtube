@@ -897,7 +897,7 @@ class YouTubePlayerClient(YouTubeDataClient):
                 'video_id:      {video_id!r}',
                 'Client:        {client_name!r}',
                 'Auth:          {has_auth!r}',
-                'Valid visitor: {has_visitor_data}',
+                'Visitor:       {visitor_data!v}',
             )
             return None, info, None, data, exception
 
@@ -907,7 +907,7 @@ class YouTubePlayerClient(YouTubeDataClient):
             'video_id:      {video_id!r}',
             'Client:        {client_name!r}',
             'Auth:          {has_auth!r}',
-            'Valid visitor: {has_visitor_data}',
+            'Visitor:       {visitor_data!v}',
         )
         details = json_data['error']
         details = {
@@ -1020,6 +1020,7 @@ class YouTubePlayerClient(YouTubeDataClient):
             error_hook=self._player_error_hook,
             client_name=client_name,
             has_auth=False,
+            visitor_data=client.get('_visitor_data'),
             cache=False,
         )
         if not result:
@@ -1095,7 +1096,7 @@ class YouTubePlayerClient(YouTubeDataClient):
             video_id=self.video_id,
             client_name=client_name,
             has_auth=client.get('_has_auth'),
-            has_visitor_data=bool(client.get('_visitor_data')),
+            visitor_data=client.get('_visitor_data'),
             cache=False,
         )
         if not result:
@@ -1212,7 +1213,7 @@ class YouTubePlayerClient(YouTubeDataClient):
                 video_id=self.video_id,
                 client_name=client_name,
                 has_auth=client.get('_has_auth'),
-                has_visitor_data=bool(client.get('_visitor_data')),
+                visitor_data=client.get('_visitor_data'),
                 cache=False,
             )
             if not result:
@@ -1563,7 +1564,7 @@ class YouTubePlayerClient(YouTubeDataClient):
                 video_id=video_id,
                 client_name=client_name,
                 has_auth=client.get('_has_auth'),
-                has_visitor_data=bool(client.get('_visitor_data')),
+                visitor_data=client.get('_visitor_data'),
                 cache=False,
                 **client
             )
@@ -1659,7 +1660,6 @@ class YouTubePlayerClient(YouTubeDataClient):
 
         auth_client = None
         visitor_data = self._visitor_data[visitor_data_key]
-        has_visitor_data = bool(visitor_data)
         video_details = {}
         microformat = {}
         responses = {}
@@ -1737,7 +1737,7 @@ class YouTubePlayerClient(YouTubeDataClient):
                         video_id=video_id,
                         client_name=_client_name,
                         has_auth=_has_auth,
-                        has_visitor_data=has_visitor_data,
+                        visitor_data=visitor_data,
                         cache=False,
                         pass_data=True,
                         raise_exc=False,
@@ -1770,7 +1770,6 @@ class YouTubePlayerClient(YouTubeDataClient):
                         if visitor_data:
                             client_data['_visitor_data'] = visitor_data
                             self._visitor_data[visitor_data_key] = visitor_data
-                            has_visitor_data = True
 
                     _video_details = _result.get('videoDetails', {})
                     _microformat = (_result
@@ -1807,13 +1806,13 @@ class YouTubePlayerClient(YouTubeDataClient):
                                           'video_id:      {video_id!r}',
                                           'Client:        {client!r}',
                                           'Auth:          {has_auth!r}',
-                                          'Valid visitor: {has_visitor_data}'),
+                                          'Visitor:       {visitor_data!v}'),
                                          status=_status,
                                          reason=_reason or 'UNKNOWN',
                                          video_id=video_id,
                                          client=_client_name,
                                          has_auth=_has_auth,
-                                         has_visitor_data=has_visitor_data)
+                                         visitor_data=visitor_data)
 
                         fail_reason = _reason.lower()
 
@@ -1864,11 +1863,11 @@ class YouTubePlayerClient(YouTubeDataClient):
                                 'video_id:      {video_id!r}',
                                 'Client:        {client!r}',
                                 'Auth:          {has_auth!r}',
-                                'Valid visitor: {has_visitor_data}'),
+                                'Visitor:       {visitor_data!v}'),
                                video_id=video_id,
                                client=_client_name,
                                has_auth=_has_auth,
-                               has_visitor_data=has_visitor_data)
+                               visitor_data=visitor_data)
 
                 video_details = merge_dicts(
                     _video_details,
