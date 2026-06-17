@@ -1642,10 +1642,15 @@ class YouTubePlayerClient(YouTubeDataClient):
         else:
             self._use_mpd = use_mpd
 
+        logged_in = self.logged_in
         context = self._context
         settings = context.get_settings()
         age_gate_enabled = settings.age_gate()
-        use_remote_history = not incognito and settings.use_remote_history()
+        use_remote_history = (
+                not incognito
+                and logged_in
+                and settings.use_remote_history()
+        )
 
         _client_name = None
         _client = None
@@ -1669,7 +1674,6 @@ class YouTubePlayerClient(YouTubeDataClient):
         fail = self.FAILURE_REASONS
         abort = False
 
-        logged_in = self.logged_in
         client_data = {
             'json': {
                 'videoId': video_id,
@@ -1689,7 +1693,6 @@ class YouTubePlayerClient(YouTubeDataClient):
             '_visitor_data': visitor_data,
         }
         if use_remote_history:
-            client_data['_auth_type'] = 'user'
             client_data['_auth_requested'] = True
 
         for name, clients in self._client_groups:
@@ -1700,7 +1703,7 @@ class YouTubePlayerClient(YouTubeDataClient):
             if name == 'ask' and use_mpd and not ask_for_quality:
                 continue
             if name.startswith('auth_enabled|initial_request'):
-                if visitor_data and not logged_in:
+                if not use_remote_history and video_details and visitor_data:
                     continue
                 allow_skip = False
                 client_data['_auth_requested'] = True
