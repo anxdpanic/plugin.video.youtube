@@ -20,6 +20,7 @@ from .constants import (
     CONTAINER_ID,
     CONTAINER_POSITION,
     CURRENT_ITEM,
+    FOLDER_URI,
     MARK_AS_LABEL,
     PLAYLIST_ID,
     PLAYLIST_ITEM_ID,
@@ -101,6 +102,7 @@ def run():
         return watched_label
 
     container_id = None
+    container_path = None
     container_position = None
     item_has_id = None
     plugin_item_details = {
@@ -194,9 +196,16 @@ def run():
                     wait_interval = wait_interval_ms / 1000
 
             if check_item:
-                if container_id != container['id']:
-                    container_id = container['id']
+                _id = container['id']
+                if container_id != _id:
+                    container_id = _id
                     set_property(CONTAINER_ID, container_id)
+                    container_position = None
+
+                _path = container[FOLDER_URI]
+                if container_path != _path:
+                    container_path = _path
+                    container_position = None
 
                 _position = get_container_info(CURRENT_ITEM, container_id)
                 if _position and _position != container_position:

@@ -5,17 +5,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2025-10-11 06:29+0000\n"
-"Last-Translator: Dmitry Petrov <dimakrm361@gmail.com>\n"
+"PO-Revision-Date: 2026-06-09 11:16+0000\n"
+"Last-Translator: Andrei Stepanov <adem4ik@gmail.com>\n"
 "Language-Team: Russian <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/ru_ru/>\n"
 "Language: ru_ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.13.3\n"
+"X-Generator: Weblate 2026.6.1\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -175,11 +175,11 @@ msgstr "Поддержка альтернативного проигрывате
 
 msgctxt "#30037"
 msgid "Custom Watch Later playlist id"
-msgstr "ID плейлиста для отложенного просмотра"
+msgstr "Идентификатор плейлиста для отложенного просмотра"
 
 msgctxt "#30038"
 msgid "Custom History playlist id"
-msgstr "ID плейлиста для истории"
+msgstr "Идентификатор плейлиста для истории"
 
 # Kodion Common
 # empty strings from id 30039 to 30099
@@ -257,7 +257,7 @@ msgstr "Удалить \"%s\"?"
 
 msgctxt "#30118"
 msgid "Links from \"%s\""
-msgstr ""
+msgstr "Ссылки из «%s»"
 
 msgctxt "#30119"
 msgid "Please wait..."
@@ -301,11 +301,11 @@ msgstr ""
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
 msgid "%s failed"
-msgstr ""
+msgstr "%s не удалось"
 
 msgctxt "#30501"
 msgid "Edit %s"
-msgstr ""
+msgstr "Править %s"
 
 msgctxt "#30502"
 msgid "Go to %s"
@@ -313,11 +313,11 @@ msgstr "Перейти к %s"
 
 msgctxt "#30503"
 msgid "Channel fanart"
-msgstr ""
+msgstr "Фан-арт канала"
 
 msgctxt "#30504"
 msgid "Subscribed Channels"
-msgstr ""
+msgstr "Подписанные каналы"
 
 msgctxt "#30505"
 msgid "Unsubscribe"
@@ -353,7 +353,7 @@ msgstr "Просмотр каналов"
 
 msgctxt "#30513"
 msgid "Trending"
-msgstr ""
+msgstr "Набирает популярность"
 
 msgctxt "#30514"
 msgid "Related Videos"
@@ -361,7 +361,7 @@ msgstr "Похожее видео"
 
 msgctxt "#30515"
 msgid "Auto-remove from Watch Later"
-msgstr ""
+msgstr "Автоматически удалять из «Посмотреть позже»"
 
 msgctxt "#30516"
 msgid "Folders"
@@ -373,7 +373,7 @@ msgstr "Подписаться %s"
 
 msgctxt "#30518"
 msgid "Feeds"
-msgstr ""
+msgstr "Ленты"
 
 msgctxt "#30519"
 msgid "and enter the following code:"
@@ -425,11 +425,11 @@ msgstr "Мне не понравилось"
 
 msgctxt "#30531"
 msgid "Bookmarked Channels"
-msgstr ""
+msgstr "Закреплённые каналы"
 
 msgctxt "#30532"
 msgid "Bookmarked Playlists"
-msgstr ""
+msgstr "Закреплённые плейлисты"
 
 msgctxt "#30533"
 msgid "Reverse"
@@ -485,15 +485,15 @@ msgstr "Видео не найдено."
 
 msgctxt "#30546"
 msgid "Please sign in and complete all access authorisation prompts"
-msgstr ""
+msgstr "Пожалуйста, войдите и завершите все запросы на авторизацию доступа"
 
 msgctxt "#30547"
 msgid "You may be prompted to sign in and enable access to multiple applications so that this addon can function properly."
-msgstr ""
+msgstr "Возможно, вам будет предложено войти и разрешить доступ к нескольким приложениям, чтобы это дополнение могло работать верно."
 
 msgctxt "#30548"
 msgid "Authorisation process failed. Check the log for more information about this message.[CR][CR]Refer to the wiki for detailed setup instructions: [B]https://ytaddon.page.link/keys[/B]"
-msgstr ""
+msgstr "Процесс авторизации не удался. Проверьте журнал для получения подробностей об этом сообщении.[CR][CR]Обратитесь к вики для получения подробных инструкций по настройке: [B]https://ytaddon.page.link/keys[/B]"
 
 msgctxt "#30549"
 msgid "No streams found"
@@ -557,7 +557,7 @@ msgstr "Время выполнения плагина"
 
 msgctxt "#30564"
 msgid "For testing only - forcibly terminate plugin execution after set time limit. Set to 0 seconds (default) to disable."
-msgstr "Для целей тестирования - принудительно остановить выполнение плагина через заданное время. Установите на 0 секунд (по-умолчанию) для выключения."
+msgstr "Для целей тестирования — принудительно остановить выполнение плагина через заданное время. Установите на 0 секунд (по умолчанию) для отключения."
 
 msgctxt "#30565"
 msgid ""
@@ -593,11 +593,11 @@ msgstr "Отвязать от истории"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove \"%s\" as your History list?"
-msgstr ""
+msgstr "Уверены, что хотите удалить «%s» из списка истории?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with \"%s\"?"
-msgstr ""
+msgstr "Уверены, что хотите заменить текущий список истории на «%s»?"
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -629,11 +629,11 @@ msgstr "Вы действительно хотите сбросить диспе
 
 msgctxt "#30582"
 msgid "Auto-play suggested videos"
-msgstr ""
+msgstr "Автоматически воспроизводить предлагаемые видео"
 
 msgctxt "#30583"
 msgid "Filters can be channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel', and/or custom video filters in the form '{ATTR}{OP}{VALUE}' eg. '{duration}{>=}{180}{artists_string}{=}{\"The Best Channel\"},{duration}{<}{180}'"
-msgstr ""
+msgstr "Фильтры могут быть именами каналов, разделёнными запятыми, например, «Лучший канал,Второй лучший канал», и/или пользовательскими фильтрами видео в форме '{АТТР}{ОП}{ЗНАЧЕНИЕ}', например, '{duration}{>=}{180}{artists_string}{=}{\"Лучший канал\"},{duration}{<}{180}'"
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
@@ -641,7 +641,7 @@ msgstr "Мои подписки (с фильтром)"
 
 msgctxt "#30585"
 msgid "Enable Blacklist to exclude channel names in Filters from My Subscriptions, disable to include channel names"
-msgstr ""
+msgstr "Включите чёрный список, чтобы исключить имена каналов из фильтров в разделе «Мои подписки», отключите, чтобы включить имена каналов"
 
 msgctxt "#30586"
 msgid "Blacklist"
@@ -705,7 +705,7 @@ msgstr "Крупный (16:9)"
 
 msgctxt "#30601"
 msgid "%s with Original/%s fallback"
-msgstr ""
+msgstr "%s с оригинальным/%s запасным вариантом"
 
 msgctxt "#30602"
 msgid "No auto-generated"
@@ -781,11 +781,11 @@ msgstr "Включить для снижения потребления ресу
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
-msgstr "Порт %s уже используется. Ошибка запуска HTTP сервера."
+msgstr "Порт %s уже используется. Ошибка запуска HTTP-сервера."
 
 msgctxt "#30621"
 msgid "Verbose"
-msgstr ""
+msgstr "Подробный"
 
 msgctxt "#30622"
 msgid "Purchases"
@@ -821,7 +821,7 @@ msgstr "Белый список IP (разделен запятыми)"
 
 msgctxt "#30630"
 msgid "Check API configuration page address"
-msgstr ""
+msgstr "Проверить адрес страницы конфигурации API"
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
@@ -913,7 +913,7 @@ msgstr "Радиус местонахождения (км)"
 
 msgctxt "#30653"
 msgid "My Location using IP geolocation lookup"
-msgstr ""
+msgstr "Моё местоположение согласно IP геолокации"
 
 msgctxt "#30654"
 msgid "My Location"
@@ -1112,12 +1112,12 @@ msgid "Play with subtitles"
 msgstr "Воспроизвести с субтитрами"
 
 msgctxt "#30703"
-msgid ""
-msgstr ""
+msgid "Use YouTube error notification video upon playback failure"
+msgstr "Использовать видео с уведомлением об ошибке YouTube при сбое воспроизведения"
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
-msgstr "Использовать ссылки YouTube с проигрывателем по-умолчанию"
+msgstr "Использовать ссылки YouTube с проигрывателем по умолчанию"
 
 msgctxt "#30705"
 msgid "Download subtitles"
@@ -1161,7 +1161,7 @@ msgstr "Предпочитать автоматически переведенн
 
 msgctxt "#30715"
 msgid "Use YouTube internal list for Watch History?[CR][CR]Requires signing in via the addon and activating history tracking on YouTube."
-msgstr ""
+msgstr "Использовать внутренний список YouTube для истории просмотров?[CR][CR]Требуется вход через дополнение и активация отслеживания истории на YouTube."
 
 msgctxt "#30716"
 msgid "Liked video"
@@ -1173,7 +1173,7 @@ msgstr "Оценка \"Не нравится\" поставлена"
 
 msgctxt "#30718"
 msgid "Use YouTube internal list for Watch Later?[CR][CR]Requires signing in via the addon."
-msgstr ""
+msgstr "Использовать внутренний список YouTube для списка «Посмотреть позже»?[CR][CR]Требуется вход через дополнение."
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
@@ -1221,7 +1221,7 @@ msgstr "Предпочитать потоки в низком разрешени
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
-msgstr "Воспроизвести (Выбрать качество)"
+msgstr "Воспроизвести (запрос выбора качества)"
 
 msgctxt "#30731"
 msgid "The YouTube add-on now requires that you use your own API keys.[CR]For more information see the wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Sorry for the inconvenience."
@@ -1285,11 +1285,11 @@ msgstr "Дубляж"
 
 msgctxt "#30746"
 msgid "Descriptive"
-msgstr ""
+msgstr "Описательное"
 
 msgctxt "#30747"
 msgid "Alternate"
-msgstr ""
+msgstr "Альтернативное"
 
 msgctxt "#30748"
 msgid "Stream features"
@@ -1437,7 +1437,7 @@ msgstr "настройки к рекомендованным значениям"
 
 msgctxt "#30784"
 msgid "listings to show minimal details"
-msgstr ""
+msgstr "списки с минимумом подробностей"
 
 msgctxt "#30785"
 msgid "performance settings"
@@ -1513,7 +1513,7 @@ msgstr "Вы уверены что хотите очистить список в
 
 msgctxt "#30803"
 msgid "Bookmark %s"
-msgstr "Добавить в закладки"
+msgstr "Закладка %s"
 
 msgctxt "#30804"
 msgid "Use YouTube website urls with external player"
@@ -1585,19 +1585,19 @@ msgstr "Подкаст"
 
 msgctxt "#30821"
 msgid "Auto-like watched videos"
-msgstr ""
+msgstr "Автоматически ставить лайк просмотренным видео"
 
 msgctxt "#30822"
 msgid "Channel filtering"
-msgstr ""
+msgstr "Фильтрация каналов"
 
 msgctxt "#30823"
 msgid "Disable filtering to auto-like all videos. Enable filtering to auto-like videos only from specific channels. Enable blacklist to auto-like all videos except from specific channels."
-msgstr ""
+msgstr "Отключите фильтрацию, чтобы автоматически ставить лайк всем видео. Включите фильтрацию, чтобы автоматически ставить лайк видео только с определённых каналов. Включите чёрный список, чтобы автоматически ставить лайк всем видео, кроме видео с определённых каналов."
 
 msgctxt "#30824"
 msgid "Filter by channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel'"
-msgstr ""
+msgstr "Фильтровать по именам каналов, разделённым запятыми, например, «Лучший канал,Второй лучший канал»"
 
 #~ msgctxt "#30504"
 #~ msgid "Subscriptions"

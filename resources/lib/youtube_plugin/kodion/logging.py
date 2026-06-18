@@ -25,6 +25,7 @@ from .utils.redact import (
     parse_and_redact_uri,
     redact_auth_header,
     redact_params,
+    redact_value,
 )
 from .utils.system_version import current_system_version
 
@@ -189,6 +190,11 @@ class PrettyPrintFormatter(Formatter):
         # redact params
         if conversion == 'p':
             return self._pretty_printer.pformat(redact_params(value))
+        
+        # redact value
+        if conversion == 'v':
+            return self._pretty_printer.pformat(redact_value(value))
+
         if conversion in {'d', 'e', 't', 'u', 'w'}:
             _sort_dicts = sort_dicts = getattr(self._pretty_printer,
                                                '_sort_dicts',

@@ -195,8 +195,7 @@ class XbmcPlugin(AbstractPlugin):
                 self.post_run(context, ui, *post_run_actions)
             return succeeded
 
-        if ui.get_property(PLUGIN_SLEEPING):
-            context.ipc_exec(PLUGIN_WAKEUP)
+        context.ipc_exec(PLUGIN_WAKEUP)
 
         if ui.pop_property(SYNC_API_KEYS):
             context.get_api_store().sync(update_store=True)
