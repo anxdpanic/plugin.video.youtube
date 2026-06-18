@@ -1,3 +1,7 @@
+## v7.4.4+beta.4
+### Fixed
+- Fix not including FolderPath in current container details #1467
+
 ## v7.4.4+beta.3
 ### Fixed
 - Fix current plugin item window properties sometimes not updating correctly
