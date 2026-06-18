@@ -26,6 +26,7 @@ from ...constants import (
     CONTAINER_POSITION,
     CURRENT_CONTAINER_INFO,
     CURRENT_ITEM,
+    FOLDER_URI,
     HAS_FILES,
     HAS_FOLDERS,
     HAS_PARENT,
@@ -325,6 +326,11 @@ class XbmcContextUI(AbstractContextUI):
         return {
             'is_plugin': is_plugin,
             'id': container_id,
+            FOLDER_URI: self.get_container_info(
+                FOLDER_URI,
+                _container_id,
+                stacklevel=stacklevel,
+            ),
             'is_active': is_active,
             'is_loaded': is_loaded,
         }
