@@ -1,3 +1,12 @@
+## v7.4.4+beta.3
+### Fixed
+- Fix current plugin item window properties sometimes not updating correctly
+- Fix not updating remote history upon consecutive playback events for certain video types
+
+### Changed
+- Improve responsiveness of service loop upon plugin invocation
+- Log redacted visitorData details #1425
+
 ## v7.4.4+beta.2
 ### Fixed
 - Fix using unimplemented change to localisation identifier when showing API config page address
