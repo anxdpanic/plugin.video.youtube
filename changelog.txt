@@ -1,3 +1,20 @@
+## v7.4.4
+### Fixed
+- Fix not including FolderPath in current container details #1467
+- Fix current plugin item window properties sometimes not updating correctly
+- Fix not updating remote history upon consecutive playback events for certain video types
+- Fix using unimplemented change to localisation identifier when showing API config page address
+- Fix play uri parameters/properties not being able to be forced off
+- Limit retrying feeds that cannot be accessed #1425
+
+### Changed
+- Improve responsiveness of service loop upon plugin invocation
+- Log redacted visitorData details #1425
+- More aggressively utilise cached data for My Subscriptions feed failures #1425
+
+### New
+- Add option to play YouTube error notification video upon playback failure #1428
+
 ## v7.4.4+beta.4
 ### Fixed
 - Fix not including FolderPath in current container details #1467
