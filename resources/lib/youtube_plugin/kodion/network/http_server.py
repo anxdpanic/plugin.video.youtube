@@ -52,7 +52,7 @@ class HTTPServer(ThreadingMixIn, TCPServer):
     socket_type = socket.SOCK_STREAM
     request_queue_size = 5
     allow_reuse_address = True
-    allow_reuse_port = True
+    allow_reuse_port = False
 
     daemon_threads = False
     block_on_close = True
@@ -75,6 +75,8 @@ class HTTPServer(ThreadingMixIn, TCPServer):
                 handler.finish()
 
     def server_close(self):
+        self.socket.close()
+
         request_handler = self.RequestHandlerClass
         request_handler._close_all = True
         request_handler.timeout = 0
