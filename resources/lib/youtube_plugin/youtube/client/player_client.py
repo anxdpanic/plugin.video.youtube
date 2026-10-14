@@ -2295,18 +2295,21 @@ class YouTubePlayerClient(YouTubeDataClient):
 
                     mime_group = (
                         mime_type,
+                        is_drc,
                         language_code,
                         role_id,
                     )
 
-                    label = '{0} ({1} kbps)'.format(
+                    label = '{0} ({1} kbps){2}'.format(
                         localize('stream.{0}'.format(role_type)),
                         bitrate // 1000,
+                        ' DRC' if is_drc else '',
                     )
                     if channels > 2 or 'auto' not in stream_select:
                         quality_group = (
                             container,
                             codec,
+                            is_drc,
                             language_code,
                             role_id,
                         )
@@ -2599,6 +2602,7 @@ class YouTubePlayerClient(YouTubeDataClient):
                 group[-1] != preferred_audio['role_id'],
                 main_stream['langName'],
                 - main_stream['roleOrder'],
+                main_stream['drc'],
             )
             return key + _stream_sort(main_stream)
 
@@ -2668,6 +2672,7 @@ class YouTubePlayerClient(YouTubeDataClient):
                 skip_group
                 and new_stream['langCode'] == previous_stream['langCode']
                 and new_stream['role'] == previous_stream['role']
+                and new_stream['drc'] == previous_stream['drc']
             )
             return skip_group
 
