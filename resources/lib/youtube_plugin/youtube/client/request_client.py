@@ -93,6 +93,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'package_id': 'com.google.android.apps.youtube.vr.oculus',
             },
             '_auth_type': 'vr',
+            '_use_adaptive': False,
             '_use_subtitles': False,
             'json': {
                 'context': {
