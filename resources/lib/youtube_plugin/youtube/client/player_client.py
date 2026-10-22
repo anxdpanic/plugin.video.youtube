@@ -2293,8 +2293,13 @@ class YouTubePlayerClient(YouTubeDataClient):
                     if is_drc:
                         itag += '.drc'
 
+                    # streams with different codecs or channel layouts are
+                    # kept apart, otherwise ISA may switch between e.g. AC-3
+                    # and AAC during playback, reopening the audio output
                     mime_group = (
                         mime_type,
+                        codec,
+                        channels,
                         language_code,
                         role_id,
                     )
