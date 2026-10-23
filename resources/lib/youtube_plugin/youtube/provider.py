@@ -282,44 +282,61 @@ class Provider(AbstractProvider):
             if num_refresh_tokens and num_access_tokens != num_refresh_tokens:
                 access_tokens = [None, None, None, None]
                 token_expiry = 0
-                try:
-                    for token_type, value in enumerate(refresh_tokens):
-                        if not value:
-                            continue
+                invalid_grant = False
+                login_error = False
+                # Refresh each token separately so that a single revoked
+                # refresh token does not invalidate all the other tokens
+                for token_type, value in enumerate(refresh_tokens):
+                    if not value:
+                        continue
 
+                    try:
                         json_data = client.refresh_token(token_type, value)
-                        if not json_data:
-                            continue
+                    except (InvalidGrant, LoginException) as exc:
+                        self.handle_exception(context, exc)
+                        # reset refresh token if InvalidGrant otherwise leave
+                        # as-is to retry later
+                        if isinstance(exc, InvalidGrant):
+                            refresh_tokens[token_type] = ''
+                            invalid_grant = True
+                        else:
+                            login_error = True
+                        continue
+                    if not json_data:
+                        continue
 
-                        token = json_data.get('access_token')
-                        expiry = int(json_data.get('expires_in', 3600))
-                        if token and expiry > 0:
-                            access_tokens[token_type] = token
-                            if not token_expiry or expiry < token_expiry:
-                                token_expiry = expiry
+                    token = json_data.get('access_token')
+                    expiry = int(json_data.get('expires_in', 3600))
+                    if token and expiry > 0:
+                        access_tokens[token_type] = token
+                        if not token_expiry or expiry < token_expiry:
+                            token_expiry = expiry
 
-                    if any(access_tokens) and token_expiry:
-                        access_manager.update_access_token(
-                            dev_id,
-                            access_token=access_tokens,
-                            expiry=token_expiry,
-                        )
-                    else:
-                        raise InvalidGrant('Failed to refresh access token(s)')
-
-                except (InvalidGrant, LoginException) as exc:
-                    self.handle_exception(context, exc)
+                if any(access_tokens) and token_expiry:
+                    access_manager.update_access_token(
+                        dev_id,
+                        access_token=access_tokens,
+                        expiry=token_expiry,
+                        refresh_token=(refresh_tokens
+                                       if invalid_grant else
+                                       None),
+                    )
+                else:
+                    if not invalid_grant and not login_error:
+                        self.handle_exception(context, InvalidGrant(
+                            'Failed to refresh access token(s)'
+                        ))
+                        invalid_grant = True
+                        refresh_tokens = ''
                     # reset access token
-                    # reset refresh token if InvalidGrant otherwise leave as-is
-                    # to retry later
-                    if isinstance(exc, InvalidGrant):
-                        refresh_token = ''
-                    else:
-                        refresh_token = None
+                    # reset refresh token(s) if InvalidGrant otherwise leave
+                    # as-is to retry later
                     access_manager.update_access_token(
                         dev_id,
                         access_token='',
-                        refresh_token=refresh_token,
+                        refresh_token=(refresh_tokens
+                                       if invalid_grant else
+                                       None),
                     )
             client.set_access_token(access_tokens)
         return client

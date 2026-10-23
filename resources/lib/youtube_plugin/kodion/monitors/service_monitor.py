@@ -419,10 +419,27 @@ class ServiceMonitor(xbmc.Monitor):
         self.httpd_address_sync()
         self.httpd = get_http_server(address=self._httpd_address,
                                      port=self._httpd_port,
-                                     context=context)
+                                     context=context,
+                                     port_fallback=True)
         if not self.httpd:
             self._httpd_error = True
             return False
+
+        port = self.httpd.socket.getsockname()[1]
+        if port != self._httpd_port:
+            # the configured port was unavailable, keep the port that was used
+            # instead, so that playback and the settings page use it as well
+            self.log.warning('HTTPServer: Port {old_port} unavailable,'
+                             ' using {port}',
+                             old_port=self._httpd_port,
+                             port=port)
+            self._httpd_port = port
+            self.httpd_address_sync()
+            context.get_settings().httpd_port(port)
+            context.get_ui().show_notification(
+                context.localize('httpd.port.changed', port),
+                audible=False,
+            )
 
         self.httpd_thread = Thread(target=self.httpd.serve_forever)
         self.httpd_thread.daemon = True

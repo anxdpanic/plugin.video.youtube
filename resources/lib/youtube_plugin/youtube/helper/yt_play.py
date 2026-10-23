@@ -471,6 +471,7 @@ def process_items_for_playlist(context,
 
     # add videos to playlist
     num_items = 0
+    added_items = []
     # convert from days to seconds
     recent_limit = recent_days * 24 * 60 * 60 if recent_days else None
     for idx, item in enumerate(items):
@@ -483,6 +484,7 @@ def process_items_for_playlist(context,
         ) > recent_limit):
             continue
         playlist_player.add(item)
+        added_items.append(item)
         num_items += 1
         if position is None and item.video_id == play_from:
             position = num_items
@@ -493,8 +495,9 @@ def process_items_for_playlist(context,
     if isinstance(play_from, int):
         if num_items >= play_from > 0:
             position = play_from
-        elif play_from < 0:
-            position = num_items + play_from
+        elif -num_items <= play_from < 0:
+            # positions are 1-based, so -1 refers to the last item
+            position = num_items + play_from + 1
         else:
             position = 1
     elif not position:
@@ -514,7 +517,7 @@ def process_items_for_playlist(context,
             context.sleep(0.1)
         else:
             playlist_player.play_playlist_item(position)
-    return items[position - 1]
+    return added_items[position - 1]
 
 
 def process(provider, context, **_kwargs):

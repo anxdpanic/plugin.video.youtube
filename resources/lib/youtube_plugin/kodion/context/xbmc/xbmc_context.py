@@ -204,6 +204,7 @@ class XbmcContext(AbstractContext):
         'httpd.not.running': 30699,
         'httpd.connect.wait': 13028,
         'httpd.connect.failed': 1001,
+        'httpd.port.changed': 30825,
         'inputstreamhelper.is_installed': 30625,
         'internet.connection.required': 21451,
         'isa.enable.check': 30579,

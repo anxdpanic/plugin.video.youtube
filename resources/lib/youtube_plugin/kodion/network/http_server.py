@@ -1031,7 +1031,21 @@ class Pages(object):
     }
 
 
-def get_http_server(address, port, context):
+# errno/winerror values of a port that is in use (EADDRINUSE, WSAEADDRINUSE)
+# or that may not be used (EACCES, WSAEACCES), e.g. because Windows reserved
+# it for Hyper-V, WSL or Docker
+PORT_UNAVAILABLE_ERRORS = frozenset((98, 48, 100, 10048, 13, 10013))
+# tried in this order if the configured port is unavailable, ports below the
+# dynamic range of Windows are less likely to be reserved; 0 lets the OS pick
+FALLBACK_PORTS = (48152, 40152, 30152, 0)
+
+
+def _is_port_unavailable(exc):
+    return (getattr(exc, 'winerror', None) in PORT_UNAVAILABLE_ERRORS
+            or getattr(exc, 'errno', None) in PORT_UNAVAILABLE_ERRORS)
+
+
+def get_http_server(address, port, context, port_fallback=False):
     RequestHandler._context = context
     RequestHandler._close_all = False
     RequestHandler.timeout = None
@@ -1039,16 +1053,27 @@ def get_http_server(address, port, context):
         HTTPServer.address_family = socket.AF_INET6
     else:
         HTTPServer.address_family = socket.AF_INET
-    try:
-        server = HTTPServer((address, port), RequestHandler)
-        return server
-    except socket.error as exc:
-        logging.exception(('Failed to start',
-                           'Address:  {address}:{port}'),
-                          address=address,
-                          port=port)
-        context.get_ui().show_notification(str(exc), audible=False)
-        return None
+
+    ports = [port]
+    if port_fallback:
+        ports.extend(fallback for fallback in FALLBACK_PORTS
+                     if fallback != port)
+    error = None
+    for try_port in ports:
+        try:
+            server = HTTPServer((address, try_port), RequestHandler)
+            return server
+        except socket.error as exc:
+            if error is None:
+                error = exc
+            logging.exception(('Failed to start',
+                               'Address:  {address}:{port}'),
+                              address=address,
+                              port=try_port)
+            if not _is_port_unavailable(exc):
+                break
+    context.get_ui().show_notification(str(error), audible=False)
+    return None
 
 
 def httpd_status(context, address=None, path=None, query=None):

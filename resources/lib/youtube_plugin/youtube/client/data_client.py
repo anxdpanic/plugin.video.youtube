@@ -3228,7 +3228,8 @@ class YouTubeDataClient(YouTubeLoginClient):
 
         if abort:
             if abort_prompt and kwargs.get('notify', True):
-                context.get_ui().on_ok(context.get_name(), abort_prompt)
+                context.get_ui().on_ok(context.get_name(),
+                                       context.localize(abort_prompt))
             self.log.warning(abort_msg, stacklevel=2)
             return {}
 

@@ -89,21 +89,19 @@ class PlayerMonitorThread(object):
         waited = 0
         wait_interval = 0.5
         while not player.isPlaying():
-            if context.abort_requested():
-                break
-            if waited >= timeout_period:
+            if context.abort_requested() or waited >= timeout_period:
                 self.end()
                 return
 
             log.debug('Waiting for playback to start')
             monitor.waitForAbort(wait_interval)
             waited += wait_interval
-        else:
-            context.send_notification(PLAYBACK_STARTED, {
-                VIDEO_ID: video_id,
-                CHANNEL_ID: self.channel_id,
-                'status': self.video_status,
-            })
+
+        context.send_notification(PLAYBACK_STARTED, {
+            VIDEO_ID: video_id,
+            CHANNEL_ID: self.channel_id,
+            'status': self.video_status,
+        })
 
         client = provider.get_client(context)
         logged_in = client.logged_in
@@ -161,6 +159,10 @@ class PlayerMonitorThread(object):
                     playlist_player.play_playlist_item('next')
                 else:
                     player.stop()
+                # stop monitoring to avoid repeatedly skipping to the next
+                # item while Kodi is still switching playlist items
+                self.stop()
+                break
 
             if waited >= report_period:
                 waited = 0

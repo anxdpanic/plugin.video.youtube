@@ -395,6 +395,7 @@ class Storage(object):
                         'PRAGMA writable_schema = 1;',
                         self._sql['drop_old_table'],
                         'PRAGMA writable_schema = 0;',
+                        self._sql['create_table'],
                     ))
                 break
 
@@ -525,7 +526,7 @@ class Storage(object):
                         status=status,
                         attempt=attempt,
                         query=query,
-                        values=values,
+                        values=_values,
                     )
                 if abort:
                     break
@@ -715,8 +716,8 @@ class Storage(object):
 
         memory_store = self._memory_store
         if memory_store and key in memory_store:
+            item = memory_store[key]
             if defer:
-                item = memory_store[key]
                 memory_store[key] = (
                     item_id,
                     timestamp,
@@ -725,14 +726,20 @@ class Storage(object):
                 self._close_actions = True
                 return None
             del memory_store[key]
+            # item may not have been written to the db yet, so an UPDATE
+            # could silently drop it. Use REPLACE to persist it instead.
+            query = self._sql['set']
+            values = self._encode(item_id, item[2], timestamp)
+        else:
+            query = self._sql['refresh']
+            values = (timestamp, key)
 
-        values = (timestamp, key)
         with self as (db, cursor):
             self._execute(
                 cursor,
                 (
                     'BEGIN IMMEDIATE;',
-                    (self._sql['refresh'], values, False),
+                    (query, values, False),
                     'COMMIT;',
                 ),
             )
@@ -754,14 +761,20 @@ class Storage(object):
                 self._close_actions = True
                 return None
             del memory_store[key]
+            # item may not have been written to the db yet, so an UPDATE
+            # could silently drop it. Use REPLACE to persist it instead.
+            query = self._sql['set']
+            values = self._encode(item_id, item, timestamp)
+        else:
+            query = self._sql['update']
+            values = self._encode(item_id, item, timestamp, for_update=True)
 
-        values = self._encode(item_id, item, timestamp, for_update=True)
         with self as (db, cursor):
             self._execute(
                 cursor,
                 (
                     'BEGIN IMMEDIATE;',
-                    (self._sql['update'], values, False),
+                    (query, values, False),
                     'COMMIT;',
                 ),
             )
@@ -973,18 +986,15 @@ class Storage(object):
         return True
 
     def _remove_many(self, item_ids):
+        item_ids = tuple(item_ids) if item_ids else ()
         memory_store = self._memory_store
         if memory_store:
-            _item_ids = []
             for item_id in item_ids:
-                key = to_str(item_id)
-                if key in memory_store:
-                    del memory_store[key]
-                else:
-                    _item_ids.append(item_id)
-            item_ids = _item_ids
+                memory_store.pop(to_str(item_id), None)
 
         num_ids = len(item_ids)
+        if not num_ids:
+            return True
         query = self._sql['remove_by_key'].format('?,' * (num_ids - 1) + '?')
         with self as (db, cursor):
             self._execute(
