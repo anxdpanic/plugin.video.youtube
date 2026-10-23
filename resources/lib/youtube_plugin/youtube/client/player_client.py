@@ -2128,6 +2128,7 @@ class YouTubePlayerClient(YouTubeDataClient):
         isa_capabilities = context.inputstream_adaptive_capabilities()
         stream_features = settings.stream_features()
         allow_3d = '3d' in stream_features
+        allow_auto_drc = 'auto_drc' in stream_features
         allow_hdr = 'hdr' in stream_features
         allow_hfr = 'hfr' in stream_features
         disable_hfr_max = 'no_hfr_max' in stream_features
@@ -2292,21 +2293,25 @@ class YouTubePlayerClient(YouTubeDataClient):
                     is_drc = stream.get('isDrc', False)
                     if is_drc:
                         itag += '.drc'
+                    separate_drc = is_drc and not allow_auto_drc
 
                     mime_group = (
                         mime_type,
+                        separate_drc,
                         language_code,
                         role_id,
                     )
 
-                    label = '{0} ({1} kbps)'.format(
+                    label = '{0} ({1} kbps){2}'.format(
                         localize('stream.{0}'.format(role_type)),
                         bitrate // 1000,
+                        ' DRC' if separate_drc else '',
                     )
                     if channels > 2 or 'auto' not in stream_select:
                         quality_group = (
                             container,
                             codec,
+                            separate_drc,
                             language_code,
                             role_id,
                         )
@@ -2599,6 +2604,7 @@ class YouTubePlayerClient(YouTubeDataClient):
                 group[-1] != preferred_audio['role_id'],
                 main_stream['langName'],
                 - main_stream['roleOrder'],
+                group[-3],
             )
             return key + _stream_sort(main_stream)
 
@@ -2668,6 +2674,7 @@ class YouTubePlayerClient(YouTubeDataClient):
                 skip_group
                 and new_stream['langCode'] == previous_stream['langCode']
                 and new_stream['role'] == previous_stream['role']
+                and new_group[-3] == previous_group[-3]
             )
             return skip_group
 

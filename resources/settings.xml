@@ -139,6 +139,7 @@
                         - no fractional framerate hinting
                         - no framerate hinting
                         - spatial audio
+                        - automatic DRC audio
                         - alternate sorting of unselected codecs
                         - ttml subtitles
                     -->
@@ -165,6 +166,7 @@
                             <option label="30755">ec-3</option>
                             <option label="30756">dts</option>
                             <option label="30738">spa</option>
+                            <option label="30825">auto_drc</option>
                             <option label="30709">vtt</option>
                             <option label="30710">ttml</option>
                             <option label="30757">filter</option>
