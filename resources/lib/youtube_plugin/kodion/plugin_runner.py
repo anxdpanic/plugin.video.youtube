@@ -24,6 +24,7 @@ from .constants import (
 from .context import XbmcContext
 from .debug import Profiler
 from .plugin import XbmcPlugin
+from .sql_store.storage import Storage
 from ..youtube import Provider
 
 
@@ -148,6 +149,7 @@ def run(context=_context,
             cache_to_disc=False,
         )
     finally:
+        Storage.close_pending()
         if log_level:
             profiler.print_stats()
         gc.collect()

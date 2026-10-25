@@ -85,6 +85,7 @@ class Storage(object):
     _base = None
     _table_name = 'storage_v2'
     _table_updated = False
+    _pending_close = set()
 
     _sql = {
         'clear': (
@@ -324,6 +325,7 @@ class Storage(object):
             close_timer = Timer(5, self._close)
             close_timer.start()
             self._close_timer = close_timer
+            Storage._pending_close.add(self)
 
     def _open(self):
         table_queries = []
@@ -412,6 +414,7 @@ class Storage(object):
         close_timer = self._close_timer
         if close_timer:
             close_timer.cancel()
+        Storage._pending_close.discard(self)
 
         if self._lock.accessing() or self._lock.waiting():
             return False
@@ -468,6 +471,17 @@ class Storage(object):
         self._close_actions = False
         self._close_timer = None
         return True
+
+    @staticmethod
+    def close_pending():
+        for storage in tuple(Storage._pending_close):
+            lock = storage._lock
+            if lock.accessing() or lock.waiting():
+                continue
+            close_timer = storage._close_timer
+            storage._close()
+            if close_timer:
+                close_timer.join()
 
     def _execute(self, cursor, queries, values=(), many=False, script=False):
         result = []
