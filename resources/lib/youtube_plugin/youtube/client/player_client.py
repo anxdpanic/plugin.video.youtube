@@ -2030,7 +2030,7 @@ class YouTubePlayerClient(YouTubeDataClient):
             }
 
         # extract adaptive streams and create MPEG-DASH manifest
-        if use_mpd and not audio_only:
+        if use_mpd:
             video_data, audio_data = self._process_adaptive_streams(
                 responses=responses,
                 default_lang_code=(default_lang['default']
@@ -2618,9 +2618,7 @@ class YouTubePlayerClient(YouTubeDataClient):
                                video_data,
                                audio_data,
                                subs_data):
-        # Following line can be uncommented if needed to use mpd for audio only
-        # if (not video_data and not self._audio_only) or not audio_data:
-        if not video_data or not audio_data:
+        if (not video_data and not self._audio_only) or not audio_data:
             return None, None
 
         if not self.BASE_PATH:
