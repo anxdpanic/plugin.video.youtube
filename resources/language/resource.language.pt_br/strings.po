@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2025-02-08 17:27+0000\n"
+"PO-Revision-Date: 2026-11-11 18:25+0000\n"
 "Last-Translator: Havok Dan <havokdan@yahoo.com.br>\n"
 "Language-Team: Portuguese (Brazil) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/pt_br/>\n"
 "Language: pt_br\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.9.2\n"
+"X-Generator: Weblate 2026.11.1\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -1139,11 +1139,11 @@ msgstr "Reproduzir áudio somente"
 
 msgctxt "#30709"
 msgid "WebVTT subtitles"
-msgstr ""
+msgstr "Legendas WebVTT"
 
 msgctxt "#30710"
 msgid "TTML subtitles"
-msgstr ""
+msgstr "Legendas TTML"
 
 msgctxt "#30711"
 msgid ""
@@ -1155,11 +1155,11 @@ msgstr "Avaliar vídeos na lista de reprodução"
 
 msgctxt "#30713"
 msgid "Prefer dubbed audio over original audio"
-msgstr ""
+msgstr "Prefira áudio dublado ao invés do áudio original"
 
 msgctxt "#30714"
 msgid "Prefer automatically translated dubbed audio over original audio"
-msgstr ""
+msgstr "Prefira áudio dublado traduzido automaticamente em vez do áudio original"
 
 msgctxt "#30715"
 msgid "Use YouTube internal list for Watch History?[CR][CR]Requires signing in via the addon and activating history tracking on YouTube."
@@ -1271,10 +1271,9 @@ msgctxt "#30741"
 msgid "Multi-stream HLS"
 msgstr "Multi-stream HLS"
 
-#, fuzzy
 msgctxt "#30742"
 msgid "Adaptive HLS"
-msgstr "Adaptive HLS"
+msgstr "HLS Adaptativo"
 
 #, fuzzy
 msgctxt "#30743"
@@ -1484,11 +1483,11 @@ msgstr "Cor de exibição do número de visualizações"
 
 msgctxt "#30794"
 msgid "Subscriber/Likes count display colour"
-msgstr ""
+msgstr "Cor de exibição da contagem de assinantes/curtidas"
 
 msgctxt "#30795"
 msgid "Videos/Comments count display colour"
-msgstr ""
+msgstr "Cor de exibição da contagem de vídeos/comentários"
 
 msgctxt "#30796"
 msgid "1080p/60 fps | Raspberry Pi 4, or similar"
@@ -1528,7 +1527,7 @@ msgstr "Use URLs de sites do YouTube com player externo"
 
 msgctxt "#30805"
 msgid "Use MPEG-DASH with external player"
-msgstr ""
+msgstr "Use MPEG-DASH com player externo"
 
 msgctxt "#30806"
 msgid "Jump to page..."
@@ -1540,7 +1539,7 @@ msgstr "Use o nome do canal como"
 
 msgctxt "#30808"
 msgid "Hide items from listings"
-msgstr ""
+msgstr "Ocultar itens das listas"
 
 msgctxt "#30809"
 msgid "All upcoming videos"
@@ -1552,59 +1551,59 @@ msgstr "Todos os vídeos transmitidos anteriormente (concluídos)"
 
 msgctxt "#30811"
 msgid "Filter Live folders"
-msgstr ""
+msgstr "Filtrar pastas ao vivo"
 
 msgctxt "#30812"
 msgid "Clear subscription feed history"
-msgstr ""
+msgstr "Limpar histórico do feed de assinaturas"
 
 msgctxt "#30813"
 msgid "Delete subscription feed history database"
-msgstr ""
+msgstr "Excluir histórico do banco de dados do feed de assinatura"
 
 msgctxt "#30814"
 msgid "feed history"
-msgstr ""
+msgstr "histórico do feed"
 
 msgctxt "#30815"
 msgid "Go back..."
-msgstr ""
+msgstr "Voltar..."
 
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
-msgstr ""
+msgstr "A lista está vazia.[CR][CR]Atualize pelo menu de contexto ou tente novamente mais tarde."
 
 msgctxt "#30817"
 msgid "Refresh settings.xml"
-msgstr ""
+msgstr "Atualizar settings.xml"
 
 msgctxt "#30818"
 msgid "Are you sure you want to refresh settings.xml?"
-msgstr ""
+msgstr "Tem certeza de que deseja atualizar o settings.xml?"
 
 msgctxt "#30819"
 msgid "Play from start"
-msgstr ""
+msgstr "Reproduzir desde o início"
 
 msgctxt "#30820"
 msgid "Podcast"
-msgstr ""
+msgstr "Podcast"
 
 msgctxt "#30821"
 msgid "Auto-like watched videos"
-msgstr ""
+msgstr "Curtir automaticamente vídeos assistidos"
 
 msgctxt "#30822"
 msgid "Channel filtering"
-msgstr ""
+msgstr "Filtragem de canal"
 
 msgctxt "#30823"
 msgid "Disable filtering to auto-like all videos. Enable filtering to auto-like videos only from specific channels. Enable blacklist to auto-like all videos except from specific channels."
-msgstr ""
+msgstr "Desative o filtro para curtir automaticamente todos os vídeos. Ative o filtro para curtir automaticamente apenas vídeos de canais específicos. Ative a lista negra para curtir automaticamente todos os vídeos, exceto de canais específicos."
 
 msgctxt "#30824"
 msgid "Filter by channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel'"
-msgstr ""
+msgstr "Filtrar por nomes de canais separados por vírgula, por exemplo, 'O Melhor Canal,O 2º Melhor Canal'"
 
 #~ msgctxt "#30504"
 #~ msgid "Subscriptions"
