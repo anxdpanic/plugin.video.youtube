@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2026-06-09 11:16+0000\n"
+"PO-Revision-Date: 2026-09-23 21:16+0000\n"
 "Last-Translator: Andrei Stepanov <adem4ik@gmail.com>\n"
 "Language-Team: Russian <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/ru_ru/>\n"
 "Language: ru_ru\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 2026.6.1\n"
+"X-Generator: Weblate 2026.9.1\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -38,15 +38,15 @@ msgstr "Плагин не поддерживается Google"
 # Kodion Settings
 msgctxt "#30000"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30001"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30002"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30003"
 msgid "YouTube"
@@ -197,11 +197,11 @@ msgstr "Поиск"
 
 msgctxt "#30103"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30104"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30105"
 msgid "filtered"
@@ -291,11 +291,11 @@ msgstr "Секретный код клиента (API Secret)"
 
 msgctxt "#30204"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30205"
 msgid ""
-msgstr ""
+msgstr " "
 
 # YouTube
 # empty strings from id 30206 to 30499
@@ -345,7 +345,7 @@ msgstr "Мои подписки"
 
 msgctxt "#30511"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30512"
 msgid "Browse Channels"
@@ -437,7 +437,7 @@ msgstr "в обратном порядке"
 
 msgctxt "#30534"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
@@ -461,7 +461,7 @@ msgstr "Воспроизвести недавно добавленное"
 
 msgctxt "#30540"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30541"
 msgid "Show channel name and video details in description"
@@ -473,7 +473,7 @@ msgstr "потоки rtmpe не поддерживаются"
 
 msgctxt "#30543"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30544"
 msgid "More Links from the description"
@@ -501,7 +501,7 @@ msgstr "Трансляции не найдены"
 
 msgctxt "#30550"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30551"
 msgid "Recommendations"
@@ -541,11 +541,11 @@ msgstr "Удалить settings.xml"
 
 msgctxt "#30560"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30561"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30562"
 msgid "View all"
@@ -561,11 +561,11 @@ msgstr "Для целей тестирования — принудительн�
 
 msgctxt "#30565"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30566"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
@@ -873,7 +873,7 @@ msgstr "Удалить access_manager.json"
 
 msgctxt "#30643"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30644"
 msgid "Select listen IP"
@@ -997,7 +997,7 @@ msgstr "история просмотра"
 
 msgctxt "#30674"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30675"
 msgid "Use local playback history (watched, resume tracking)"
@@ -1145,7 +1145,7 @@ msgstr "TTML субтитры"
 
 msgctxt "#30711"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"

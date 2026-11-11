@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2026-07-07 20:16+0000\n"
+"PO-Revision-Date: 2026-07-14 21:19+0000\n"
 "Last-Translator: Michal Várady <miko.vaji@gmail.com>\n"
 "Language-Team: Czech <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/cs_cz/>\n"
 "Language: cs_cz\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Weblate 2026.7\n"
+"X-Generator: Weblate 2026.7.1\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -119,7 +119,7 @@ msgstr "Položek na stránku"
 
 msgctxt "#30023"
 msgid "Search history size"
-msgstr "Velikost historie vyhledávání"
+msgstr "Velikost historie hledání"
 
 msgctxt "#30024"
 msgid "Cache size (MB)"
@@ -557,7 +557,7 @@ msgstr "Časový limit běhu doplňku"
 
 msgctxt "#30564"
 msgid "For testing only - forcibly terminate plugin execution after set time limit. Set to 0 seconds (default) to disable."
-msgstr "Pouze pro testování - násilně ukončí běh doplňku po nastaveném časovém limitu. Nastavením na 0 sekund (výchozí) tuto funkci zakážete."
+msgstr "Pouze pro testování - násilně ukončí běh doplňku po nastaveném časovém limitu. Nastavením na 0 sekund (výchozí) tuto funkci vypnete."
 
 msgctxt "#30565"
 msgid ""
@@ -569,15 +569,15 @@ msgstr ""
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
-msgstr "Nastavit jako Přehrát později"
+msgstr "Nastavit jako seznam Přehrát později"
 
 msgctxt "#30568"
 msgid "Remove as Watch Later"
-msgstr "Odebrat jako Přehrát později"
+msgstr "Přestat používat jako seznam Přehrát později"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
-msgstr "Opravdu chcete odebrat „%s“ jako svůj seznam Přehrát později?"
+msgstr "Opravdu chcete přestat používat „%s“ jako svůj seznam Přehrát později?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
@@ -585,15 +585,15 @@ msgstr "Opravdu chcete nahradit svůj aktuální seznam Přehrát později sezna
 
 msgctxt "#30571"
 msgid "Set as History"
-msgstr "Nastavit jako historii"
+msgstr "Nastavit jako seznam historie"
 
 msgctxt "#30572"
 msgid "Remove as History"
-msgstr "Odebrat jako historii"
+msgstr "Přestat používat jako seznam historie"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove \"%s\" as your History list?"
-msgstr "Opravdu chcete odebrat „%s“ jako svůj seznam historie?"
+msgstr "Opravdu chcete přestat používat „%s“ jako svůj seznam historie?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with \"%s\"?"
@@ -601,11 +601,11 @@ msgstr "Opravdu chcete nahradit svůj aktuální seznam historie seznamem „%s�
 
 msgctxt "#30575"
 msgid "Succeeded"
-msgstr "Úspěšné"
+msgstr "Úspěšně dokončeno"
 
 msgctxt "#30576"
 msgid "Failed"
-msgstr "Neúspěšné"
+msgstr "Akce se nezdařila"
 
 msgctxt "#30577"
 msgid "Smallest (4:3)"
@@ -617,7 +617,7 @@ msgstr "Vynutit ověření certifikátu SSL"
 
 msgctxt "#30579"
 msgid "InputStream.Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream.Adaptive now?"
-msgstr "InputStream.Adaptive je aktivován v nastavení YouTube, ale doplněk je zakázán. Chcete nyní povolit InputStream.Adaptive?"
+msgstr "InputStream.Adaptive je povolen v nastavení YouTube, ale samotný doplněk je zakázán. Chcete ho nyní povolit?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
@@ -681,11 +681,11 @@ msgstr "Bezpečné vyhledávání"
 
 msgctxt "#30595"
 msgid "Moderate"
-msgstr "Přibližné"
+msgstr "Střední"
 
 msgctxt "#30596"
 msgid "Strict"
-msgstr "Přesné"
+msgstr "Přísné"
 
 msgctxt "#30597"
 msgid "Hide \"Members only\" folder"
@@ -1233,7 +1233,7 @@ msgstr "Komentáře"
 
 msgctxt "#30733"
 msgid "Likes"
-msgstr "Líbí se"
+msgstr "označení „To se mi líbí“"
 
 msgctxt "#30734"
 msgid "Replies"
