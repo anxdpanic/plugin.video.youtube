@@ -24,7 +24,7 @@ def url_for(route, **params):
     return BASE_URL + route + ('?' + urllib.parse.urlencode(params) if params else '')
 
 
-class Plugin(object):
+class Plugin:
     def __init__(self, argv):
         parsed = urllib.parse.urlparse(argv[0])
         self.route = parsed.path.strip('/')

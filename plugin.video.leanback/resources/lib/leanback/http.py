@@ -45,7 +45,7 @@ def request(url, data=None, headers=None, method=None, timeout=20):
             except OSError:
                 pass
         kodi.log('HTTP %s for %s' % (exc.code, url.split('?')[0]))
-        raise HTTPError(exc.code, body, url)
+        raise HTTPError(exc.code, body, url) from exc
 
 
 def request_json(url, data=None, headers=None, method=None, timeout=20):

@@ -68,9 +68,9 @@ def _ensure_dir(path):
 def load_json(name, default=None):
     path = os.path.join(PROFILE, name)
     try:
-        with open(path, 'r', encoding='utf-8') as handle:
+        with open(path, encoding='utf-8') as handle:
             return json.load(handle)
-    except (IOError, OSError, ValueError):
+    except (OSError, ValueError):
         return {} if default is None else default
 
 
@@ -83,7 +83,7 @@ def save_json(name, data):
     os.replace(tmp, path)
 
 
-class Cache(object):
+class Cache:
     """Small file cache so a page fetched for a shelf list can be reused when a shelf is opened."""
 
     @staticmethod
@@ -96,9 +96,9 @@ class Cache(object):
         try:
             if time.time() - os.path.getmtime(path) > ttl:
                 return None
-            with open(path, 'r', encoding='utf-8') as handle:
+            with open(path, encoding='utf-8') as handle:
                 return json.load(handle)
-        except (IOError, OSError, ValueError):
+        except (OSError, ValueError):
             return None
 
     @classmethod

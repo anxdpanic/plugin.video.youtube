@@ -62,7 +62,7 @@ class InnerTubeError(Exception):
     pass
 
 
-class InnerTube(object):
+class InnerTube:
     def __init__(self):
         self.hl, self.gl = kodi.language()
         self._state = kodi.load_json('state.json', {})
@@ -120,7 +120,7 @@ class InnerTube(object):
                 auth.access_token(force_refresh=True)
                 return self._post(endpoint, body, client, use_auth, visitor, retry=False)
             message = exc.json().get('error', {}).get('message') or str(exc)
-            raise InnerTubeError(message)
+            raise InnerTubeError(message) from exc
 
     # ------------------------------------------------------------- browsing
     def guide(self):

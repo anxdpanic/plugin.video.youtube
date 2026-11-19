@@ -472,7 +472,7 @@ def parse_guide(resp):
     """Sidebar entries: [{'id', 'title', 'target', 'thumb', 'channel'}]."""
     entries = []
     for section in resp.get('items', []):
-        for key, value in section.items():
+        for value in section.values():
             for item in value.get('items', []) or []:
                 guide = item.get('guideEntryRenderer')
                 if not guide:

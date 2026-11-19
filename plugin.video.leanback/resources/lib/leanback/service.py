@@ -57,9 +57,9 @@ class _Handler(BaseHTTPRequestHandler):
 def _subtitle(video_id, index):
     """Fetch one caption track from YouTube; retry a rate limit once, else return an empty track."""
     try:
-        with open(os.path.join(kodi.TEMP_DIR, '%s.subs.json' % video_id), 'r', encoding='utf-8') as handle:
+        with open(os.path.join(kodi.TEMP_DIR, '%s.subs.json' % video_id), encoding='utf-8') as handle:
             info = json.load(handle)
-    except (IOError, OSError, ValueError):
+    except (OSError, ValueError):
         info = {}
     urls = info.get('urls', [])
     if index >= len(urls):

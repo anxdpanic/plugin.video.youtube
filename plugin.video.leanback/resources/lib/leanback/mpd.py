@@ -6,6 +6,8 @@ from xml.sax.saxutils import escape, quoteattr
 
 SUPPORTED_VIDEO = ('avc1', 'vp9', 'vp09', 'av01')
 SUPPORTED_AUDIO = ('mp4a', 'opus', 'ec-3', 'ac-3')
+TRANSFER_SCHEME = 'urn:mpeg:mpegB:cicp:TransferCharacteristics'
+CHANNEL_SCHEME = 'urn:mpeg:dash:23003:3:audio_channel_configuration:2011'
 HDR_TRANSFER = ('COLOR_TRANSFER_CHARACTERISTICS_SMPTEST2084', 'COLOR_TRANSFER_CHARACTERISTICS_ARIB_STD_B67')
 
 
@@ -120,12 +122,14 @@ def build(player_resp, max_height=0, codec='any', allow_hdr=True, audio_pref='or
     for fmt in videos:
         mime, codecs = _mime_codec(fmt)
         groups.setdefault((mime, codec_family(codecs), is_hdr(fmt)), []).append(fmt)
-    for (mime, family, hdr), group in sorted(groups.items(), key=lambda kv: -max(f.get('height', 0) for f in kv[1])):
+    for (mime, _family, hdr), group in sorted(groups.items(), key=lambda kv: -max(f.get('height', 0) for f in kv[1])):
         out.append('    <AdaptationSet id="%d" contentType="video" mimeType="%s" subsegmentAlignment="true" '
                    'startWithSAP="1" scanType="progressive">' % (set_id, mime))
         if hdr:
-            out.append('      <SupplementalProperty schemeIdUri="urn:mpeg:mpegB:cicp:TransferCharacteristics" '
-                       'value="%s"/>' % ('16' if 'SMPTEST2084' in group[0]['colorInfo']['transferCharacteristics'] else '18'))
+            # CICP transfer characteristics: 16 = PQ (HDR10), 18 = HLG
+            pq = 'SMPTEST2084' in group[0]['colorInfo']['transferCharacteristics']
+            out.append('      <SupplementalProperty schemeIdUri="%s" value="%s"/>'
+                       % (TRANSFER_SCHEME, '16' if pq else '18'))
         for fmt in sorted(group, key=lambda f: (f.get('height', 0), f.get('bitrate', 0))):
             out.extend(_representation(fmt, _mime_codec(fmt)[1]))
         out.append('    </AdaptationSet>')
@@ -156,8 +160,7 @@ def build(player_resp, max_height=0, codec='any', allow_hdr=True, audio_pref='or
                    % ('main' if is_main(key) else 'alternate'))
         for fmt in sorted(group, key=lambda f: f.get('bitrate', 0)):
             channels = fmt.get('audioChannels', 2)
-            extra = ('        <AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" '
-                     'value="%d"/>' % channels)
+            extra = '        <AudioChannelConfiguration schemeIdUri="%s" value="%d"/>' % (CHANNEL_SCHEME, channels)
             out.extend(_representation(fmt, _mime_codec(fmt)[1], extra))
         out.append('    </AdaptationSet>')
         set_id += 1

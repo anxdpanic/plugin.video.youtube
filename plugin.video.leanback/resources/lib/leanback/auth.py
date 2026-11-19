@@ -140,7 +140,7 @@ def access_token(force_refresh=False):
             data['accounts'].pop(key, None)
             data['active'] = None
             kodi.save_json(STORE, data)
-            raise AuthError('invalid_grant')
+            raise AuthError('invalid_grant') from exc
         raise
     account['access_token'] = resp['access_token']
     account['expires_at'] = time.time() + int(resp.get('expires_in', 3600)) - 120
