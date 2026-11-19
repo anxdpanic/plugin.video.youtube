@@ -240,3 +240,19 @@ def test_empty_page_shows_youtubes_own_message(monkeypatch):
     monkeypatch.setattr(router.Plugin, 'fetch', lambda self, desc, use_cache=True: resp)
     run('browse', '?id=FEmy_videos').dispatch()
     assert 'Videos you upload to YouTube will appear here' in str(xbmcgui.NOTIFICATIONS)
+
+
+def test_channel_rows_pointing_back_at_the_channel_open_the_row(monkeypatch):
+    """The TV client ignores a channel's web tab params and returns the channel page again."""
+    def shelf(title, endpoint):
+        return {'title': title, 'items': [video(title[:11].ljust(11, 'x'))], 'continuation': 'C', 'shorts': False,
+                'endpoint': endpoint}
+    page = {'header': None, 'tabs': [], 'continuation': None, 'shelves': [
+        shelf('Videos', {'type': 'browse', 'browse_id': 'UCchan', 'params': 'EgZ2aWRlb3M='}),
+        shelf('A playlist', {'type': 'browse', 'browse_id': 'VLPLx', 'params': None})]}
+    monkeypatch.setattr(router.Plugin, 'fetch', lambda self, desc, use_cache=True: {})
+    monkeypatch.setattr(parser, 'parse_page', lambda resp: page)
+    run('browse', '?id=UCchan').dispatch()
+    urls = [u for u, _, _ in xbmcplugin.ITEMS]
+    assert urls[0].startswith(router.url_for('shelf'))
+    assert urls[1] == router.url_for('browse', id='VLPLx', title='A playlist')

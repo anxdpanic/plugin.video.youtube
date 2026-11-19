@@ -452,7 +452,10 @@ class Plugin:
         # playlist every item belongs to (Watch later -> VLWL); otherwise open the shelf itself.
         endpoint = shelf.get('endpoint') or {}
         playlists = {i['target'].get('playlist_id') for i in shelf['items'] if i['kind'] == 'video'}
-        if endpoint.get('type') == 'browse' and endpoint.get('browse_id'):
+        # A channel's Videos / Popular videos / Playlists rows point back at the channel with a web tab's
+        # params, which the TV client ignores: it returns the channel page again. The row pages by itself.
+        same_page = endpoint.get('browse_id') == desc.get('id') and not desc.get('ctoken')
+        if endpoint.get('type') == 'browse' and endpoint.get('browse_id') and not same_page:
             url = url_for('browse', id=endpoint['browse_id'], params=endpoint.get('params'), title=title)
         elif endpoint.get('type') == 'search' and endpoint.get('query'):
             url = url_for('search', q=endpoint['query'], params=endpoint.get('params'))
