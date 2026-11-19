@@ -14,7 +14,9 @@ ADDON_VERSION = ADDON.getAddonInfo('version')
 PROFILE = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
 ADDON_PATH = xbmcvfs.translatePath(ADDON.getAddonInfo('path'))
 CACHE_DIR = os.path.join(PROFILE, 'cache')
-TEMP_DIR = os.path.join(PROFILE, 'temp')
+# Files the local HTTP service serves (manifests, subtitle lists) live in Kodi's temp folder.
+TEMP_DIR = os.path.join(xbmcvfs.translatePath('special://temp/'), ADDON_ID)
+LEGACY_TEMP_DIR = os.path.join(PROFILE, 'temp')
 
 
 def log(msg, level=xbmc.LOGDEBUG):

@@ -1,7 +1,9 @@
 """Background service: a localhost HTTP server that hands generated DASH manifests to
 InputStream Adaptive (ISA only downloads manifests over HTTP, not from local paths)."""
+import json
 import os
 import re
+import shutil
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -52,7 +54,11 @@ class _Handler(BaseHTTPRequestHandler):
 
 def _subtitle(video_id, index):
     """Fetch one caption track from YouTube; retry a rate limit once, else return an empty track."""
-    info = kodi.load_json(os.path.join('temp', '%s.subs.json' % video_id), {})
+    try:
+        with open(os.path.join(kodi.TEMP_DIR, '%s.subs.json' % video_id), 'r', encoding='utf-8') as handle:
+            info = json.load(handle)
+    except (IOError, OSError, ValueError):
+        info = {}
     urls = info.get('urls', [])
     if index >= len(urls):
         return EMPTY_VTT
@@ -106,6 +112,8 @@ def run():
     thread.start()
     kodi.log('manifest server on 127.0.0.1:%d' % port, xbmc.LOGINFO)
     monitor = xbmc.Monitor()
+    # Older versions kept these files in the add-on profile; remove that folder.
+    shutil.rmtree(kodi.LEGACY_TEMP_DIR, ignore_errors=True)
     _cleanup()
     while not monitor.waitForAbort(1800):
         _cleanup()
