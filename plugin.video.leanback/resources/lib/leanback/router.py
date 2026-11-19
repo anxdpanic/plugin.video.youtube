@@ -242,19 +242,30 @@ class Plugin:
     def browse(self):
         browse_id = self.params.get('id')
         if is_mix(browse_id[2:]):
-            items = self._mix_items(browse_id[2:])
+            items, token = self._mix_items(browse_id[2:], self.params.get('ctoken'))
             self._render_items(items, browse_id=browse_id)
+            if token:
+                li = xbmcgui.ListItem(kodi.string(30102), offscreen=True)
+                li.setArt({'icon': 'DefaultFolder.png'})
+                li.setProperty('SpecialSort', 'bottom')
+                self._add(url_for('browse', id=browse_id, ctoken=token, title=self.params.get('title')), li, True)
             self._finish_listing(items)
             return
         desc = {'ep': 'browse', 'id': browse_id, 'params': self.params.get('params')}
         self.render(desc, browse_id=browse_id)
 
-    def _mix_items(self, playlist_id):
+    def _mix_items(self, playlist_id, token=None):
         """A Mix (RD...) is generated per viewer and has no playlist page: browse VLRD... is rejected.
-        The TV app lists it in the watch-next panel instead, so take the items that belong to it."""
-        page = parser.parse_page(self.fetch({'ep': 'next', 'list': playlist_id}))
-        return [i for s in page['shelves'] for i in s['items']
-                if i['kind'] == 'video' and i['target'].get('playlist_id') == playlist_id]
+        The TV app lists it in the watch-next panel instead, so take the items that belong to it.
+        Returns (items, continuation token for the next batch or None)."""
+        desc = {'ep': 'next', 'ctoken': token} if token else {'ep': 'next', 'list': playlist_id}
+        page = parser.parse_page(self.fetch(desc))
+        for shelf in page['shelves']:
+            items = [i for i in shelf['items']
+                     if i['kind'] == 'video' and i['target'].get('playlist_id') == playlist_id]
+            if items:
+                return items, shelf['continuation']
+        return [], None
 
     def page(self):
         """A continuation page: ?ep=browse|search|next&ctoken=..."""
@@ -590,7 +601,7 @@ class Plugin:
     def play_playlist(self):
         playlist_id = self.params['list']
         if is_mix(playlist_id):
-            items = self._mix_items(playlist_id)
+            items = self._mix_items(playlist_id)[0]
         else:
             page = parser.parse_page(self.fetch({'ep': 'browse', 'id': 'VL' + playlist_id}))
             items = [i for s in page['shelves'] for i in s['items'] if i['kind'] == 'video']

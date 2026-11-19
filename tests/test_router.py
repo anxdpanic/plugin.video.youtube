@@ -88,10 +88,17 @@ def test_mix_lists_watch_next_panel_instead_of_browsing(monkeypatch):
         return {}
 
     monkeypatch.setattr(router.Plugin, 'fetch', fetch)
-    monkeypatch.setattr(parser, 'parse_page', lambda resp: {'shelves': [{'items': [in_mix, video('b')]}]})
+    monkeypatch.setattr(parser, 'parse_page', lambda resp: {'shelves': [
+        {'items': [video('related')], 'continuation': 'RELATED'},
+        {'items': [in_mix, video('b')], 'continuation': 'MORE'}]})
     run('browse', '?id=VL' + mix).dispatch()
     assert fetched == [{'ep': 'next', 'list': mix}]
-    assert [url.rsplit('=', 1)[-1] for url, _, _ in xbmcplugin.ITEMS] == ['a']
+    urls = [url for url, _, _ in xbmcplugin.ITEMS]
+    assert urls[0].endswith('v=a') and len(urls) == 2
+    assert 'ctoken=MORE' in urls[1] and 'id=VL' + mix in urls[1]
+    # The next batch comes from the radio continuation.
+    run('browse', '?id=VL%s&ctoken=MORE' % mix).dispatch()
+    assert fetched[-1] == {'ep': 'next', 'ctoken': 'MORE'}
 
 
 def test_failed_requests_show_friendly_messages(monkeypatch):

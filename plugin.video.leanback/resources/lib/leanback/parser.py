@@ -341,7 +341,8 @@ def parse_item(node):
 # ------------------------------------------------------------------- shelves
 def _continuation(container):
     for entry in container.get('continuations', []) or []:
-        for key in ('nextContinuationData', 'reloadContinuationData'):
+        # nextRadioContinuationData pages through a Mix; reload only re-fetches the same items.
+        for key in ('nextContinuationData', 'nextRadioContinuationData', 'reloadContinuationData'):
             if key in entry:
                 return entry[key].get('continuation')
     return None
