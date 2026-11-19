@@ -59,7 +59,11 @@ VISITOR_TTL = 86400 * 3
 
 
 class InnerTubeError(Exception):
-    pass
+    """status is the HTTP status (0 when YouTube couldn't be reached, None when not an HTTP failure)."""
+
+    def __init__(self, message, status=None):
+        Exception.__init__(self, message)
+        self.status = status
 
 
 class InnerTube:
@@ -120,7 +124,7 @@ class InnerTube:
                 auth.access_token(force_refresh=True)
                 return self._post(endpoint, body, client, use_auth, visitor, retry=False)
             message = exc.json().get('error', {}).get('message') or str(exc)
-            raise InnerTubeError(message) from exc
+            raise InnerTubeError(message, exc.status) from exc
 
     # ------------------------------------------------------------- browsing
     def guide(self):

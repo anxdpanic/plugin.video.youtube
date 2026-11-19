@@ -9,7 +9,7 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 
-from . import auth, kodi, mpd, parser
+from . import auth, http, kodi, mpd, parser
 from .innertube import InnerTube, InnerTubeError
 
 BASE_URL = 'plugin://%s/' % kodi.ADDON_ID
@@ -17,6 +17,30 @@ PAGE_TTL = 600
 GUIDE_TTL = 3600
 NO_WATCHED_FILTER = ('FEhistory', 'FElibrary', 'FEmy_youtube', 'FEplaylist_aggregation')
 ISA = 'inputstream.adaptive'
+
+
+ERRORS = {  # string id -> English fallback (Kodi only loads new strings after a restart)
+    30135: 'YouTube is busy right now, try again in a moment',
+    30136: "YouTube couldn't open this page",
+    30137: "YouTube isn't responding, try again later",
+    30138: "Can't reach YouTube, check the network connection",
+}
+
+
+def error_message(exc):
+    """A short, TV-friendly message for a failed request; the raw error goes to the log."""
+    status = getattr(exc, 'status', None)
+    if status == 0:
+        string_id = 30138
+    elif status in (403, 429):
+        string_id = 30135
+    elif status in (400, 404):
+        string_id = 30136
+    elif status and status >= 500:
+        string_id = 30137
+    else:
+        return kodi.string(30129) % exc
+    return kodi.string(string_id) or ERRORS[string_id]
 
 
 def is_mix(playlist_id):
@@ -75,9 +99,9 @@ class Plugin:
             handler = self.root
         try:
             handler()
-        except InnerTubeError as exc:
+        except (InnerTubeError, http.HTTPError) as exc:
             kodi.log('InnerTube error on %s: %s' % (self.route, exc))
-            self._notify(kodi.string(30129) % exc, error=True)
+            self._notify(error_message(exc), error=True)
             self._end(False)
         except auth.AuthError:
             self._notify(kodi.string(30132), error=True)
@@ -494,8 +518,11 @@ class Plugin:
         video_id = self.params['v']
         try:
             resp, client = self.api.player(video_id)
-        except InnerTubeError as exc:
-            self._notify('%s: %s' % (kodi.string(30120), exc), error=True)
+        except (InnerTubeError, http.HTTPError) as exc:
+            kodi.log('no streams for %s: %s' % (video_id, exc))
+            # YouTube's own playability reasons ("Video unavailable") read fine; HTTP failures don't.
+            message = error_message(exc) if exc.status is not None else '%s: %s' % (kodi.string(30120), exc)
+            self._notify(message, error=True)
             xbmcplugin.setResolvedUrl(self.handle, False, xbmcgui.ListItem(offscreen=True))
             return
         data = resp.get('streamingData', {})

@@ -3,6 +3,7 @@
 """Minimal HTTP client on urllib (no third-party modules on stock Kodi)."""
 import gzip
 import json
+import socket
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -46,6 +47,10 @@ def request(url, data=None, headers=None, method=None, timeout=20):
                 pass
         kodi.log('HTTP %s for %s' % (exc.code, url.split('?')[0]))
         raise HTTPError(exc.code, body, url) from exc
+    except (urllib.error.URLError, socket.timeout, ConnectionError) as exc:
+        # No HTTP response at all (DNS, refused, timed out): status 0 so callers can tell.
+        kodi.log('network error for %s: %s' % (url.split('?')[0], exc))
+        raise HTTPError(0, b'', url) from exc
 
 
 def request_json(url, data=None, headers=None, method=None, timeout=20):

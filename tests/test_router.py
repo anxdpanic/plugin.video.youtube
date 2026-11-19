@@ -92,3 +92,20 @@ def test_mix_lists_watch_next_panel_instead_of_browsing(monkeypatch):
     run('browse', '?id=VL' + mix).dispatch()
     assert fetched == [{'ep': 'next', 'list': mix}]
     assert [url.rsplit('=', 1)[-1] for url, _, _ in xbmcplugin.ITEMS] == ['a']
+
+
+def test_failed_requests_show_friendly_messages(monkeypatch):
+    import xbmcgui
+
+    from resources.lib.leanback.innertube import InnerTubeError
+
+    def fail(status):
+        def browse(self):
+            raise InnerTubeError('Request contains an invalid argument.', status)
+        return browse
+
+    for status, string_id in ((400, 30136), (403, 30135), (0, 30138), (503, 30137)):
+        monkeypatch.setattr(router.Plugin, 'browse', fail(status))
+        del xbmcgui.NOTIFICATIONS[:]
+        run('browse', '?id=VLx').dispatch()
+        assert 'str%d' % string_id in str(xbmcgui.NOTIFICATIONS)

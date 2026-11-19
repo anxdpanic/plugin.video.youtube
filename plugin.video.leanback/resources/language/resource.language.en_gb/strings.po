@@ -319,3 +319,19 @@ msgstr ""
 msgctxt "#30134"
 msgid "Channels"
 msgstr ""
+
+msgctxt "#30135"
+msgid "YouTube is busy right now, try again in a moment"
+msgstr ""
+
+msgctxt "#30136"
+msgid "YouTube couldn't open this page"
+msgstr ""
+
+msgctxt "#30137"
+msgid "YouTube isn't responding, try again later"
+msgstr ""
+
+msgctxt "#30138"
+msgid "Can't reach YouTube, check the network connection"
+msgstr ""
