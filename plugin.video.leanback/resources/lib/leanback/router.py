@@ -708,6 +708,7 @@ class Plugin:
         else:
             li = xbmcgui.ListItem(found[choice]['title'], offscreen=True)
             li.setProperty('IsPlayable', 'true')
+            li.setProperty('StartOffset', '%.3f' % start)
             player.play(url_for('play', v=video_id, t='%.3f' % start), li)
 
     def details(self):
