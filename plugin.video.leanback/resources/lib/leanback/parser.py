@@ -396,6 +396,15 @@ def parse_page(resp):
                 shelf = _shelf('', raw, _continuation(entry['itemSectionRenderer']))
                 if shelf['items']:
                     page['shelves'].append(shelf)
+            elif 'clusterShelfRenderer' in entry:
+                # Search rows such as "Recently uploaded" or "Shows", each headed by a button.
+                for cluster in entry['clusterShelfRenderer'].get('clusters', []):
+                    renderer = cluster.get('clusterRenderer', {})
+                    button = renderer.get('headerRenderer', {}).get('buttonViewModel', {})
+                    shelf = _shelf(text(button.get('title')).strip(), renderer.get('items', []), None,
+                                   endpoint=endpoint_target(button.get('onTap')))
+                    if shelf['items']:
+                        page['shelves'].append(shelf)
             elif 'gridRenderer' in entry:
                 grid = entry['gridRenderer']
                 page['shelves'].append(_shelf(text(grid.get('header', {}).get('gridHeaderRenderer', {}).get('title')),

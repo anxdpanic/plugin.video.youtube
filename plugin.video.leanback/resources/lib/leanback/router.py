@@ -383,6 +383,8 @@ class Plugin:
         playlists = {i['target'].get('playlist_id') for i in shelf['items'] if i['kind'] == 'video'}
         if endpoint.get('type') == 'browse' and endpoint.get('browse_id'):
             url = url_for('browse', id=endpoint['browse_id'], params=endpoint.get('params'), title=title)
+        elif endpoint.get('type') == 'search' and endpoint.get('query'):
+            url = url_for('search', q=endpoint['query'], params=endpoint.get('params'))
         elif len(playlists) == 1 and None not in playlists and not is_mix(next(iter(playlists))):
             url = url_for('browse', id='VL' + next(iter(playlists)), title=title)
         else:
@@ -508,7 +510,8 @@ class Plugin:
     def search(self):
         query = self.params.get('q')
         if query:
-            self._remember_search(query)
+            if not self.params.get('params'):  # refinements like "Recently uploaded" aren't the user's searches
+                self._remember_search(query)
             self.render({'ep': 'search', 'q': query, 'params': self.params.get('params')})
             return
         li = xbmcgui.ListItem('[B]%s[/B]' % kodi.string(30101), offscreen=True)

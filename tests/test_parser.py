@@ -241,3 +241,15 @@ def test_chapters_from_macro_markers():
     assert parser.chapters(resp) == [{'title': 'Intro', 'start': 5.0, 'thumb': 'https://i.ytimg.com/c.jpg'}]
     assert parser.chapters({}) == []
     assert parser.chapters(None) == []
+
+
+def test_search_cluster_rows_become_shelves():
+    button = {'buttonViewModel': {'title': 'Recently uploaded', 'onTap': {'innertubeCommand': {
+        'searchEndpoint': {'query': 'cats videos', 'params': 'eAE%3D'}}}}}
+    resp = {'contents': {'sectionListRenderer': {'contents': [{'clusterShelfRenderer': {'clusters': [
+        {'clusterRenderer': {'headerRenderer': button, 'items': [tile('aaaaaaaaaaa', lines=[line('x')])]}},
+        {'clusterRenderer': {'headerRenderer': button, 'items': []}},
+    ]}}]}}}
+    shelves = parser.parse_page(resp)['shelves']
+    assert [(s['title'], len(s['items'])) for s in shelves] == [('Recently uploaded', 1)]
+    assert shelves[0]['endpoint'] == {'type': 'search', 'query': 'cats videos', 'params': 'eAE='}
