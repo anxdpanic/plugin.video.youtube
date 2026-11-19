@@ -580,7 +580,9 @@ class Plugin:
             return
         li = xbmcgui.ListItem('[B]%s[/B]' % kodi.string(30101), offscreen=True)
         li.setArt({'icon': 'DefaultAddonsSearch.png'})
-        self._add(url_for('search/new'), li, True)
+        # Not a folder: Kodi runs it as a script, so the Container.Update to the results isn't
+        # undone by Kodi going back from a failed folder.
+        self._add(url_for('search/new'), li, False)
         for past in self._state().get('search_history', []):
             li = xbmcgui.ListItem(past, offscreen=True)
             li.setArt({'icon': 'DefaultAddonsSearch.png'})

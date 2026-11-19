@@ -212,3 +212,10 @@ def test_search_continuation_keeps_to_the_results_row(monkeypatch):
     run('page', '?ep=search&ctoken=T2&n=2').dispatch()
     assert [u for u, _, _ in xbmcplugin.ITEMS] == [router.url_for('play', v='a'), router.url_for('play', v='b'),
                                                     router.url_for('page', ep='search', ctoken='T4', n=3)]
+
+
+def test_new_search_runs_as_a_script_not_a_folder():
+    """As a folder, Kodi undid the Container.Update to the results by going back from the failed folder."""
+    run('search').dispatch()
+    new_search = [entry for entry in xbmcplugin.ITEMS if entry[0] == router.url_for('search/new')]
+    assert new_search and new_search[0][2] is False
