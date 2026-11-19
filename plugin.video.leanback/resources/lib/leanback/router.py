@@ -9,7 +9,7 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 
-from . import art, auth, history, http, kodi, mpd, parser
+from . import art, auth, descriptions, history, http, kodi, mpd, parser
 from .innertube import InnerTube, InnerTubeError
 
 BASE_URL = 'plugin://%s/' % kodi.ADDON_ID
@@ -69,6 +69,7 @@ class Plugin:
         self.api = InnerTube()
         self.banners = art.Banners()
         self.fanart = ''  # a channel page's banner, for everything listed on it
+        self.descriptions = descriptions.Descriptions()
 
     # ================================================================ dispatch
     def dispatch(self):
@@ -515,6 +516,38 @@ class Plugin:
     def _channel_fanart(self, channel_id):
         return self.fanart or self.banners.get(channel_id)
 
+    @staticmethod
+    def _video_plot(item, known, threshold):
+        """The info panel's text: what the list knows about the video, then its description."""
+        facts = [item['channel'], item.get('subscribers')]
+        if item['views']:
+            facts.append('{:,} {}'.format(item['views'], 'watching' if item['live'] else 'views'))
+        facts.append(item['published'] or (known or {}).get('p'))
+        if item['duration']:
+            facts.append(format_time(item['duration']))
+        status = []
+        if item['live']:
+            status.append(kodi.string(30127) or 'Live')
+        elif item.get('upcoming'):
+            status.append(item['upcoming'])
+        status.extend(item['badges'])
+        if item['watched_pct'] >= threshold:
+            status.append(kodi.string(30142) or 'Watched')
+        elif item['watched_pct'] > 0:
+            label = kodi.string(30141)
+            status.append(label % item['watched_pct'] if '%d' in label else 'Watched %d%%' % item['watched_pct'])
+        lines = [' • '.join(x for x in facts if x), ' • '.join(status)]
+        if known and known.get('d'):
+            lines.append('\n' + known['d'])
+        else:
+            # Lines from the tile that say more than the facts above (e.g. "Scheduled for ...").
+            said = ' '.join(lines)
+            for line in item['plot_lines']:
+                parts = [p for p in line.split(' • ') if p and p not in said and not parser.is_count(p)]
+                if parts:
+                    lines.append(' • '.join(parts))
+        return '\n'.join(line for line in lines if line)
+
     def _add_video(self, item, threshold):
         target = item['target']
         video_id = target.get('video_id') or item.get('id')
@@ -531,8 +564,11 @@ class Plugin:
         tag = li.getVideoInfoTag()
         tag.setMediaType('video')
         tag.setTitle(title)
-        tag.setPlot('\n'.join(item['plot_lines']))
+        known = self.descriptions.get(video_id)
+        tag.setPlot(self._video_plot(item, known, threshold))
         tag.setPlotOutline(' • '.join(x for x in (item['channel'], item['published']) if x))
+        if known and known.get('p'):
+            tag.setPremiered(known['p'])
         if item['channel']:
             tag.setStudios([item['channel']])
             tag.setDirectors([item['channel']])
@@ -749,6 +785,8 @@ class Plugin:
         xbmc.Player().play(playlist)
 
     def _apply_details(self, li, info):
+        # Played or opened in Info: keep the description for the video's plot in listings.
+        self.descriptions.remember(info['video_id'], info['plot'], info.get('date'))
         tag = li.getVideoInfoTag()
         tag.setMediaType('video')
         tag.setTitle(info['title'])

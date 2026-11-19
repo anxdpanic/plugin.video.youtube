@@ -359,3 +359,11 @@ msgstr ""
 msgctxt "#30140"
 msgid "This video has no chapters"
 msgstr ""
+
+msgctxt "#30141"
+msgid "Watched %d%%"
+msgstr ""
+
+msgctxt "#30142"
+msgid "Watched"
+msgstr ""

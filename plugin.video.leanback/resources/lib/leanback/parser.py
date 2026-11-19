@@ -250,6 +250,11 @@ _AGO = re.compile(r'(ago|vor |il y a|hace|streamed|premiered|\d{4})', re.I)
 _SUBS = re.compile(r'subscriber', re.I)
 
 
+def is_count(part):
+    """A tile's view count, age or subscriber count ("556K views", "3 days ago")."""
+    return bool(_VIEWS.search(part) or _AGO.search(part) or _SUBS.search(part))
+
+
 def _apply_lines(item, lines):
     """Spread the metadata lines of a tile/lockup over channel, views, date and plot."""
     item['plot_lines'] = [' • '.join(parts) for parts in lines]
