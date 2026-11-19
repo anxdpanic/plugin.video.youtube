@@ -228,3 +228,16 @@ def test_upcoming_tile():
         {'thumbnailOverlayTimeStatusRenderer': {'text': {'simpleText': 'PREMIERE'}, 'style': 'UPCOMING'}}]))
     assert item['upcoming'] == 'PREMIERE'
     assert item['published'] == 'Premieres 11/20/26'
+
+
+def test_chapters_from_macro_markers():
+    marker = {'title': {'simpleText': 'Intro'}, 'startMillis': '5000',
+              'thumbnailDetails': {'thumbnails': [{'url': 'https://i.ytimg.com/c.jpg', 'width': 320}]}}
+    resp = {'frameworkUpdates': {'entityBatchUpdate': {'mutations': [
+        {'payload': {'macroMarkersListEntity': {'markersList': {'markerType': 'MARKER_TYPE_HEATMAP'}}}},
+        {'payload': {'macroMarkersListEntity': {'markersList': {'markerType': 'MARKER_TYPE_CHAPTERS',
+                                                                'markers': [marker]}}}},
+    ]}}}
+    assert parser.chapters(resp) == [{'title': 'Intro', 'start': 5.0, 'thumb': 'https://i.ytimg.com/c.jpg'}]
+    assert parser.chapters({}) == []
+    assert parser.chapters(None) == []

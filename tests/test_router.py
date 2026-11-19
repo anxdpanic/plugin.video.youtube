@@ -116,3 +116,35 @@ def test_failed_requests_show_friendly_messages(monkeypatch):
         del xbmcgui.NOTIFICATIONS[:]
         run('browse', '?id=VLx').dispatch()
         assert 'str%d' % string_id in str(xbmcgui.NOTIFICATIONS)
+
+
+def test_format_time():
+    assert router.format_time(65) == '1:05'
+    assert router.format_time(3725.5) == '1:02:05'
+
+
+def test_chapters_seek_when_playing_and_start_there_otherwise(monkeypatch):
+    import xbmc
+    import xbmcgui
+
+    found = [{'title': 'A', 'start': 0.0, 'thumb': ''}, {'title': 'B', 'start': 90.0, 'thumb': ''}]
+    monkeypatch.setattr(router.Plugin, 'fetch', lambda self, desc, use_cache=True: {})
+    monkeypatch.setattr(parser, 'chapters', lambda resp: found)
+    picks = []
+
+    def select(self, heading, items, preselect=-1, **kwargs):
+        picks.append(preselect)
+        return 1
+    monkeypatch.setattr(xbmcgui.Dialog, 'select', select)
+
+    monkeypatch.setattr(xbmc.Player, 'PLAYING', 'http://127.0.0.1:1/mpd/abcdefghijk.mpd')
+    monkeypatch.setattr(xbmc.Player, 'TIME', 120.0)
+    monkeypatch.setattr(xbmc.Player, 'SEEKS', [])
+    run('chapters', '?v=abcdefghijk').dispatch()
+    assert picks == [1] and xbmc.Player.SEEKS == [90.0]
+
+    monkeypatch.setattr(xbmc.Player, 'PLAYING', '')
+    monkeypatch.setattr(xbmc.Player, 'PLAYED', [])
+    run('chapters', '?v=abcdefghijk').dispatch()
+    expected = router.url_for('play', v='abcdefghijk', t='90.000')
+    assert expected in xbmc.Player.PLAYED

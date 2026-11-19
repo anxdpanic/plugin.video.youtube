@@ -39,5 +39,22 @@ class PlayList:
 
 
 class Player:
-    def play(self, item=None):
-        pass
+    PLAYING = ''  # file the stub reports as playing
+    TIME = 0.0
+    SEEKS = []
+    PLAYED = []
+
+    def play(self, item=None, listitem=None):
+        Player.PLAYED.append(item)
+
+    def isPlayingVideo(self):  # noqa: N802
+        return bool(Player.PLAYING)
+
+    def getPlayingFile(self):  # noqa: N802
+        return Player.PLAYING
+
+    def getTime(self):  # noqa: N802
+        return Player.TIME
+
+    def seekTime(self, seconds):  # noqa: N802
+        Player.SEEKS.append(seconds)

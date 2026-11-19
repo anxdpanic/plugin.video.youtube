@@ -335,3 +335,11 @@ msgstr ""
 msgctxt "#30138"
 msgid "Can't reach YouTube, check the network connection"
 msgstr ""
+
+msgctxt "#30139"
+msgid "Chapters"
+msgstr ""
+
+msgctxt "#30140"
+msgid "This video has no chapters"
+msgstr ""

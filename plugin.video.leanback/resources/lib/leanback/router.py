@@ -43,6 +43,12 @@ def error_message(exc):
     return kodi.string(string_id) or ERRORS[string_id]
 
 
+def format_time(seconds):
+    seconds = int(seconds)
+    hours, rest = divmod(seconds, 3600)
+    return '%d:%02d:%02d' % (hours, rest // 60, rest % 60) if hours else '%d:%02d' % (rest // 60, rest % 60)
+
+
 def is_mix(playlist_id):
     """YouTube Mixes (RD...) are generated on the fly and can't be browsed as a playlist page."""
     return (playlist_id or '').startswith('RD')
@@ -77,6 +83,7 @@ class Plugin:
             'play_playlist': self.play_playlist,
             'shorts': self.shorts,
             'details': self.details,
+            'chapters': self.chapters,
             'pin': self.pin,
             'unpin': self.unpin,
             'accounts': self.accounts_menu,
@@ -93,7 +100,8 @@ class Plugin:
         # When Kodi loses its navigation history (e.g. after playback) it builds a ".." path by
         # dropping the query string, e.g. plugin://.../browse/. Show the main menu instead of failing.
         required = {'browse': 'id', 'shelf': 'src', 'page': 'ctoken', 'related': 'v', 'play': 'v',
-                    'play_playlist': 'list', 'pin': 'id', 'unpin': 'id'}
+                    'play_playlist': 'list', 'pin': 'id', 'unpin': 'id',
+                    'chapters': 'v'}
         if self.route in required and not self.params.get(required[self.route]):
             kodi.log('route %s without %s, showing main menu' % (self.route, required[self.route]))
             handler = self.root
@@ -455,6 +463,8 @@ class Plugin:
                 'browse', id=item['channel_id'], title=item['channel'])))
         menu.append((kodi.string(30104), 'Container.Update(%s)' % url_for('related', v=video_id)))
         menu.append((kodi.string(30105), 'RunPlugin(%s)' % url_for('details', v=video_id)))
+        if not item['live'] and not item['short']:
+            menu.append((kodi.string(30139) or 'Chapters', 'RunPlugin(%s)' % url_for('chapters', v=video_id)))
         li.addContextMenuItems(menu)
         self._add(url_for('play', v=video_id), li, False)
 
@@ -596,6 +606,8 @@ class Plugin:
             li.setProperty(ISA + '.play_timeshift_buffer', 'true')
         info = parser.video_details(resp)
         self._apply_details(li, info)
+        if self.params.get('t'):  # start at a chapter
+            li.setProperty('StartOffset', self.params['t'])
         xbmcplugin.setResolvedUrl(self.handle, True, li)
 
     def play_playlist(self):
@@ -662,6 +674,34 @@ class Plugin:
             tag.setGenres([info['genre']])
         thumb = 'https://i.ytimg.com/vi/%s/maxresdefault.jpg' % info['video_id'] if info['video_id'] else info['thumb']
         li.setArt({'thumb': info['thumb'] or thumb, 'fanart': thumb, 'icon': info['thumb'] or thumb})
+
+    def chapters(self):
+        """Pick a chapter: seek to it when this video is playing, otherwise start the video there."""
+        video_id = self.params['v']
+        found = parser.chapters(self.fetch({'ep': 'next', 'v': video_id}))
+        if not found:
+            self._notify(kodi.string(30140) or 'This video has no chapters')
+            return
+        items = []
+        for chapter in found:
+            li = xbmcgui.ListItem(chapter['title'], format_time(chapter['start']), offscreen=True)
+            li.setArt({'thumb': chapter['thumb'], 'icon': chapter['thumb']})
+            items.append(li)
+        player = xbmc.Player()
+        playing = player.isPlayingVideo() and video_id in player.getPlayingFile()
+        current = player.getTime() if playing else -1
+        preselect = max([i for i, c in enumerate(found) if c['start'] <= current] or [0])
+        choice = xbmcgui.Dialog().select(kodi.string(30139) or 'Chapters', items, preselect=preselect,
+                                         useDetails=True)
+        if choice < 0:
+            return
+        start = found[choice]['start']
+        if playing:
+            player.seekTime(start)
+        else:
+            li = xbmcgui.ListItem(found[choice]['title'], offscreen=True)
+            li.setProperty('IsPlayable', 'true')
+            player.play(url_for('play', v=video_id, t='%.3f' % start), li)
 
     def details(self):
         if self.params.get('header'):

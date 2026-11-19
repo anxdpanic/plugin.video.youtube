@@ -504,6 +504,19 @@ def parse_guide(resp):
     return entries
 
 
+def chapters(next_resp):
+    """Chapters from a next response: [{'title', 'start' (seconds), 'thumb'}], empty when there are none."""
+    for mutation in (next_resp or {}).get('frameworkUpdates', {}).get('entityBatchUpdate', {}).get('mutations', []):
+        markers = mutation.get('payload', {}).get('macroMarkersListEntity', {}).get('markersList', {})
+        if markers.get('markerType') != 'MARKER_TYPE_CHAPTERS':
+            continue
+        return [{'title': text(marker.get('title')),
+                 'start': int(marker.get('startMillis') or 0) / 1000.0,
+                 'thumb': best_thumb(marker.get('thumbnailDetails', {}).get('thumbnails'))}
+                for marker in markers.get('markers', [])]
+    return []
+
+
 def video_details(player_resp, next_resp=None):
     """Full information for a single video from the player (and optionally next) response."""
     details = player_resp.get('videoDetails', {}) if player_resp else {}
