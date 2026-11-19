@@ -409,7 +409,12 @@ class Plugin:
         if not video_id:
             return
         title = item['title']
-        label = '[COLOR red]%s[/COLOR] %s' % (kodi.string(30127), title) if item['live'] else title
+        if item['live']:
+            label = '[COLOR red]%s[/COLOR] %s' % (kodi.string(30127), title)
+        elif item.get('upcoming'):
+            label = '[COLOR yellow]%s[/COLOR] %s' % (item['upcoming'], title)
+        else:
+            label = title
         li = xbmcgui.ListItem(label, offscreen=True)
         tag = li.getVideoInfoTag()
         tag.setMediaType('video')
@@ -521,7 +526,13 @@ class Plugin:
         except (InnerTubeError, http.HTTPError) as exc:
             kodi.log('no streams for %s: %s' % (video_id, exc))
             # YouTube's own playability reasons ("Video unavailable") read fine; HTTP failures don't.
-            message = error_message(exc) if exc.status is not None else '%s: %s' % (kodi.string(30120), exc)
+            # An upcoming stream's reason already says it all ("This live event will begin in 61 minutes.").
+            if exc.status is not None:
+                message = error_message(exc)
+            elif str(exc) in ('', 'unplayable'):
+                message = kodi.string(30120)
+            else:
+                message = str(exc)
             self._notify(message, error=True)
             xbmcplugin.setResolvedUrl(self.handle, False, xbmcgui.ListItem(offscreen=True))
             return

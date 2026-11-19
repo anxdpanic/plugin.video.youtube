@@ -199,3 +199,32 @@ def test_video_details_merges_player_and_next():
     assert info['published'] == '12y ago'
     assert info['subscribers'] == '1M subscribers'
     assert info['plot'] == 'a much longer description'
+
+
+def test_upcoming_lockup_shows_status_and_schedule():
+    lockup = {'lockupViewModel': {
+        'contentId': '7pWu0ScRFdw', 'contentType': 'LOCKUP_CONTENT_TYPE_VIDEO',
+        'contentImage': {'thumbnailViewModel': {'image': {'sources': []}, 'overlays': [
+            {'thumbnailBottomOverlayViewModel': {'badges': [{'thumbnailBadgeViewModel': {
+                'text': 'Upcoming', 'badgeStyle': 'THUMBNAIL_OVERLAY_BADGE_STYLE_DEFAULT'}}]}}]}},
+        'metadata': {'lockupMetadataViewModel': {
+            'title': {'content': 'Mission update'},
+            'metadata': {'contentMetadataViewModel': {'metadataRows': [
+                {'metadataParts': [{'text': {'content': 'FOX 10 Phoenix'}}]},
+                {'metadataParts': [{'text': {'content': 'Scheduled for 11/19/26, 9:00 AM'}}]},
+            ]}},
+        }},
+        'rendererContext': {'commandContext': {'onTap': {'innertubeCommand': {
+            'watchEndpoint': {'videoId': '7pWu0ScRFdw'}}}}},
+    }}
+    item = parser.parse_item(lockup)
+    assert item['upcoming'] == 'Upcoming' and not item['live'] and item['duration'] == 0
+    assert item['channel'] == 'FOX 10 Phoenix'
+    assert item['published'] == 'Scheduled for 11/19/26, 9:00 AM'
+
+
+def test_upcoming_tile():
+    item = parser.parse_item(tile(lines=[line('Channel'), line('Premieres 11/20/26')], overlays=[
+        {'thumbnailOverlayTimeStatusRenderer': {'text': {'simpleText': 'PREMIERE'}, 'style': 'UPCOMING'}}]))
+    assert item['upcoming'] == 'PREMIERE'
+    assert item['published'] == 'Premieres 11/20/26'

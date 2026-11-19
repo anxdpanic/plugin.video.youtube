@@ -102,7 +102,7 @@ def endpoint_target(command):
 def _item_base(kind, title, thumb='', target=None):
     return {'kind': kind, 'title': title, 'thumb': thumb, 'target': target or {},
             'plot_lines': [], 'duration': 0, 'channel': '', 'channel_id': '', 'views': 0,
-            'published': '', 'watched_pct': 0, 'short': False, 'live': False, 'badges': []}
+            'published': '', 'watched_pct': 0, 'short': False, 'live': False, 'upcoming': '', 'badges': []}
 
 
 def parse_tile(tile):
@@ -133,6 +133,8 @@ def parse_tile(tile):
                 item['live'] = True
             elif status.get('style') == 'SHORTS':
                 item['short'] = True
+            elif status.get('style') == 'UPCOMING':
+                item['upcoming'] = label  # "Upcoming" / "Premiere", already in the UI language
             else:
                 item['duration'] = parse_duration(label)
 
@@ -206,6 +208,8 @@ def parse_lockup(lockup):
                 item['duration'] = parse_duration(label)
             elif label and kind == 'playlist':
                 item['badges'].append(label)
+            elif label and kind == 'video' and not item['short']:
+                item['upcoming'] = label  # "Upcoming" / "Premiere", already in the UI language
         progress = overlay.get('thumbnailBottomOverlayViewModel', {}).get('progressBar', {}) \
             .get('thumbnailOverlayProgressBarViewModel', {})
         if progress.get('startPercent') is not None:
@@ -251,6 +255,8 @@ def _apply_lines(item, lines):
                 item['subscribers'] = part
             elif index == 0 and not item['channel'] and item['kind'] == 'video':
                 item['channel'] = part
+            elif item.get('upcoming') and index > 0 and not item['published']:
+                item['published'] = part  # "Scheduled for 11/19/26, 9:00 AM" / "Premieres ..."
 
 
 def parse_channel_header(header):
