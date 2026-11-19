@@ -79,6 +79,18 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="pages_per_listing" type="integer" label="30046" help="30047">
+                    <level>0</level>
+                    <default>2</default>
+                    <constraints>
+                        <minimum>1</minimum>
+                        <step>1</step>
+                        <maximum>5</maximum>
+                    </constraints>
+                    <control type="slider" format="integer">
+                        <popup>false</popup>
+                    </control>
+                </setting>
             </group>
             <group id="menu_filter">
                 <setting id="hide_shorts" type="boolean" label="30012">

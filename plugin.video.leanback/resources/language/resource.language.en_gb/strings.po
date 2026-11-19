@@ -187,6 +187,14 @@ msgctxt "#30045"
 msgid "When signed in, tell YouTube what you watch so it appears in your history and keeps your progress."
 msgstr ""
 
+msgctxt "#30046"
+msgid "Pages to load at once"
+msgstr ""
+
+msgctxt "#30047"
+msgid "How many of YouTube's pages each list loads before Next page. More pages make longer lists but take longer to open."
+msgstr ""
+
 # Runtime
 msgctxt "#30100"
 msgid "Search"

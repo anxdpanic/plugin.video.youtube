@@ -250,13 +250,14 @@ class Plugin:
     def browse(self):
         browse_id = self.params.get('id')
         if is_mix(browse_id[2:]):
-            items, token = self._mix_items(browse_id[2:], self.params.get('ctoken'))
+            playlist_id = browse_id[2:]
+            items, token = self._mix_items(playlist_id, self.params.get('ctoken'))
+            items, token = self._more_pages('next', items, token,
+                                            lambda page: self._mix_batch(page, playlist_id))
             self._render_items(items, browse_id=browse_id)
             if token:
-                li = xbmcgui.ListItem(kodi.string(30102), offscreen=True)
-                li.setArt({'icon': 'DefaultFolder.png'})
-                li.setProperty('SpecialSort', 'bottom')
-                self._add(url_for('browse', id=browse_id, ctoken=token, title=self.params.get('title')), li, True)
+                self._add_next_url(url_for('browse', id=browse_id, ctoken=token, title=self.params.get('title'),
+                                           n=self._page_number() + 1))
             self._finish_listing(items)
             return
         desc = {'ep': 'browse', 'id': browse_id, 'params': self.params.get('params')}
@@ -267,7 +268,10 @@ class Plugin:
         The TV app lists it in the watch-next panel instead, so take the items that belong to it.
         Returns (items, continuation token for the next batch or None)."""
         desc = {'ep': 'next', 'ctoken': token} if token else {'ep': 'next', 'list': playlist_id}
-        page = parser.parse_page(self.fetch(desc))
+        return self._mix_batch(parser.parse_page(self.fetch(desc)), playlist_id)
+
+    @staticmethod
+    def _mix_batch(page, playlist_id):
         for shelf in page['shelves']:
             items = [i for i in shelf['items']
                      if i['kind'] == 'video' and i['target'].get('playlist_id') == playlist_id]
@@ -285,6 +289,42 @@ class Plugin:
         paged = [s for s in shelves if s['continuation']]
         return paged[:1] if len(paged) == 1 else shelves[:1]
 
+    def _list_batch(self, page):
+        """A continuation page as one list: its items and the token that continues them."""
+        shelves = self._continued_rows(page)
+        paged = [s for s in shelves if s['continuation']]
+        token = paged[0]['continuation'] if len(paged) == 1 else page['continuation']
+        return [i for s in shelves for i in s['items']], token
+
+    def _pages_per_listing(self):
+        return min(max(kodi.setting_int('pages_per_listing') or 1, 1), 5)
+
+    def _page_number(self):
+        try:
+            return int(self.params.get('n') or 1)
+        except ValueError:
+            return 1
+
+    def _more_pages(self, ep, items, token, batch=None):
+        """Follow the continuation until the listing holds pages_per_listing pages, so each listing
+        is longer and needs fewer Next page clicks. Returns (items, token for the page after)."""
+        batch = batch or self._list_batch
+        seen = {i.get('id') for i in items if i.get('id')}
+        for _ in range(self._pages_per_listing() - 1):
+            if not token:
+                break
+            try:
+                more, next_token = batch(parser.parse_page(self.fetch({'ep': ep, 'ctoken': token})))
+            except (InnerTubeError, http.HTTPError) as exc:
+                kodi.log('stopped loading more pages: %s' % exc)  # keep what loaded, page on from here
+                break
+            # Pages can overlap where they meet.
+            fresh = [i for i in more if not i.get('id') or i['id'] not in seen]
+            seen.update(i['id'] for i in fresh if i.get('id'))
+            items = items + fresh
+            token = next_token if next_token != token else None
+        return items, token
+
     def page(self):
         """A continuation page: ?ep=browse|search|next&ctoken=..."""
         desc = {'ep': self.params['ep'], 'ctoken': self.params['ctoken']}
@@ -298,10 +338,11 @@ class Plugin:
         if index >= len(shelves):
             return self._end(False)
         shelf = shelves[index]
-        self._render_items(shelf['items'], browse_id=desc.get('id'))
-        if shelf['continuation']:
-            self._add_next(desc['ep'], shelf['continuation'], desc.get('id'))
-        self._finish_listing(shelf['items'])
+        items, token = self._more_pages(desc['ep'], shelf['items'], shelf['continuation'])
+        self._render_items(items, browse_id=desc.get('id'))
+        if token:
+            self._add_next(desc['ep'], token, desc.get('id'))
+        self._finish_listing(items)
 
     def related(self):
         desc = {'ep': 'next', 'v': self.params['v']}
@@ -350,18 +391,21 @@ class Plugin:
         untitled = sum(1 for s in shelves if not s['title'])
         flatten = not kodi.setting_bool('shelves_as_folders') or (shelves and untitled * 2 >= len(shelves))
         if len(shelves) == 1 or (shelves and flatten):
-            for shelf in shelves:
-                rendered.extend(self._render_items(shelf['items'], browse_id=browse_id))
-            # Search results flattened with their extra rows: the results shelf is the only one that pages.
+            # One list; with search's extra rows flattened in, the results shelf is the one that pages.
             paged = [s for s in shelves if s['continuation']]
-            if len(paged) == 1:
-                self._add_next(desc['ep'], paged[0]['continuation'], browse_id)
+            token = paged[0]['continuation'] if len(paged) == 1 else page['continuation']
+            items, token = self._more_pages(desc['ep'], [i for s in shelves for i in s['items']], token)
+            rendered.extend(self._render_items(items, browse_id=browse_id))
+            if token:
+                self._add_next(desc['ep'], token, browse_id)
+        elif page['continuation']:
+            # Rows as folders: the continuation brings more rows, not more items.
+            for index, shelf in enumerate(shelves):
+                self._add_shelf_folder(desc, index, shelf)
+            self._add_next(desc['ep'], page['continuation'], browse_id)
         else:
             for index, shelf in enumerate(shelves):
                 self._add_shelf_folder(desc, index, shelf)
-
-        if page['continuation']:
-            self._add_next(desc['ep'], page['continuation'], browse_id)
 
         if not tabs and not shelves and not page['header']:
             message = kodi.string(30125) if (browse_id or '').startswith('FE') and not self.api.signed_in() \
@@ -378,10 +422,15 @@ class Plugin:
         self._end()
 
     def _add_next(self, ep, token, browse_id=None):
-        li = xbmcgui.ListItem(kodi.string(30102), offscreen=True)
+        self._add_next_url(url_for('page', ep=ep, ctoken=token, bid=browse_id, n=self._page_number() + 1))
+
+    def _add_next_url(self, url):
+        """The Next page item, numbered so it's clear how far in the listing is."""
+        number = urllib.parse.parse_qs(urllib.parse.urlsplit(url).query).get('n', ['2'])[0]
+        li = xbmcgui.ListItem('%s (%s)' % (kodi.string(30102), number), offscreen=True)
         li.setArt({'icon': 'DefaultFolder.png'})
         li.setProperty('SpecialSort', 'bottom')
-        self._add(url_for('page', ep=ep, ctoken=token, bid=browse_id), li, True)
+        self._add(url, li, True)
 
     def _add_shelf_folder(self, desc, index, shelf):
         title = shelf['title'] or kodi.string(30133) or shelf['items'][0]['title']

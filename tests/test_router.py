@@ -161,7 +161,7 @@ def test_flattened_search_keeps_next_page_and_rows_open_as_searches(monkeypatch)
 
     xbmcaddon.SETTINGS['shelves_as_folders'] = False
     run('search', '?q=cats').dispatch()
-    assert router.url_for('page', ep='search', ctoken='MORE') in [u for u, _, _ in xbmcplugin.ITEMS]
+    assert router.url_for('page', ep='search', ctoken='MORE', n=2) in [u for u, _, _ in xbmcplugin.ITEMS]
 
     xbmcplugin.reset()
     xbmcaddon.SETTINGS['shelves_as_folders'] = True
@@ -170,15 +170,45 @@ def test_flattened_search_keeps_next_page_and_rows_open_as_searches(monkeypatch)
     assert run('')._state()['search_history'] == ['cats']
 
 
+def test_listing_loads_several_pages_and_numbers_next_page(monkeypatch):
+    def shelf(ids, token):
+        return {'title': '', 'items': [video(i) for i in ids], 'continuation': token, 'shorts': False,
+                'endpoint': None}
+    pages = {None: ['a', 'b'], 'T2': ['b', 'c'], 'T3': ['d'], 'T4': ['e']}
+    tokens = {None: 'T2', 'T2': 'T3', 'T3': 'T4', 'T4': None}
+    fetched = []
+
+    def fetch(self, desc, use_cache=True):
+        fetched.append(desc.get('ctoken'))
+        return desc.get('ctoken')
+    monkeypatch.setattr(router.Plugin, 'fetch', fetch)
+    monkeypatch.setattr(parser, 'parse_page', lambda token: {
+        'header': None, 'tabs': [], 'continuation': None, 'shelves': [shelf(pages[token], tokens[token])]})
+
+    xbmcaddon.SETTINGS['pages_per_listing'] = 3
+    run('browse', '?id=FEsubscriptions').dispatch()
+    urls = [u for u, _, _ in xbmcplugin.ITEMS]
+    assert fetched == [None, 'T2', 'T3']
+    assert urls[:-1] == [router.url_for('play', v=v) for v in 'abcd']  # the overlap ('b') shows once
+    assert urls[-1] == router.url_for('page', ep='browse', ctoken='T4', bid='FEsubscriptions', n=2)
+    assert xbmcplugin.ITEMS[-1][1].label == 'str30102 (2)'
+
+    xbmcplugin.reset()
+    run('page', '?ep=browse&ctoken=T4&bid=FEsubscriptions&n=2').dispatch()
+    assert [u for u, _, _ in xbmcplugin.ITEMS] == [router.url_for('play', v='e')]
+
+
 def test_search_continuation_keeps_to_the_results_row(monkeypatch):
     """Each page of search results repeats side rows such as Songs; only the results continue."""
     def shelf(title, ids, token):
         return {'title': title, 'items': [video(i) for i in ids], 'continuation': token, 'shorts': False,
                 'endpoint': None}
-    page = {'header': None, 'tabs': [], 'continuation': None,
-            'shelves': [shelf('Results', ['a'], 'T3'), shelf('Songs', ['s'], None)]}
-    monkeypatch.setattr(router.Plugin, 'fetch', lambda self, desc, use_cache=True: {})
-    monkeypatch.setattr(parser, 'parse_page', lambda resp: page)
-    run('page', '?ep=search&ctoken=T2').dispatch()
-    assert [u for u, _, _ in xbmcplugin.ITEMS] == [router.url_for('play', v='a'),
-                                                    router.url_for('page', ep='search', ctoken='T3')]
+    pages = {'T2': [shelf('Results', ['a'], 'T3'), shelf('Songs', ['s'], None)],
+             'T3': [shelf('Results', ['b'], 'T4'), shelf('Songs', ['s'], None)]}
+    monkeypatch.setattr(router.Plugin, 'fetch', lambda self, desc, use_cache=True: desc['ctoken'])
+    monkeypatch.setattr(parser, 'parse_page', lambda token: {
+        'header': None, 'tabs': [], 'continuation': None, 'shelves': pages[token]})
+    xbmcaddon.SETTINGS['pages_per_listing'] = 2
+    run('page', '?ep=search&ctoken=T2&n=2').dispatch()
+    assert [u for u, _, _ in xbmcplugin.ITEMS] == [router.url_for('play', v='a'), router.url_for('play', v='b'),
+                                                    router.url_for('page', ep='search', ctoken='T4', n=3)]
