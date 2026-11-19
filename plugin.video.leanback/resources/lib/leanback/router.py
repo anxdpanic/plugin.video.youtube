@@ -206,7 +206,8 @@ class Plugin:
         li.getVideoInfoTag().setPlot(kodi.string(30112) % (account.get('name') or '') if account
                                      else kodi.string(30123))
         li.setArt({'icon': 'DefaultUser.png', 'thumb': 'DefaultUser.png'})
-        self._add(url_for('accounts'), li, True)
+        # Only opens a dialog: as a folder its failed listing made Kodi leave the add-on (and re-run it on Back).
+        self._add(url_for('accounts'), li, False)
         xbmcplugin.setContent(self.handle, 'files')
         self._end()
 
@@ -235,7 +236,9 @@ class Plugin:
                     'pin', id=entry['id'], title=entry['title'], thumb=entry.get('thumb'))))
         menu.append((kodi.string(30011), 'RunPlugin(%s)' % url_for('menu/customise')))
         li.addContextMenuItems(menu)
-        self._add(url, li, True)
+        # Shorts starts playback rather than listing anything: as a folder its failed listing made Kodi
+        # leave the add-on, so run it as a script.
+        self._add(url, li, entry['id'] != 'shorts')
 
     def _maybe_whos_watching(self):
         if not kodi.setting_bool('whos_watching') or not auth.accounts():

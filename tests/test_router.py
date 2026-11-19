@@ -219,3 +219,13 @@ def test_new_search_runs_as_a_script_not_a_folder():
     run('search').dispatch()
     new_search = [entry for entry in xbmcplugin.ITEMS if entry[0] == router.url_for('search/new')]
     assert new_search and new_search[0][2] is False
+
+
+def test_shorts_menu_entry_runs_as_a_script(monkeypatch):
+    """Shorts starts playback; as a folder its failed listing made Kodi leave the add-on."""
+    monkeypatch.setattr(router.Plugin, 'guide', lambda self: guide_entries())
+    run('').dispatch()
+    folders = {url: folder for url, _, folder in xbmcplugin.ITEMS}
+    assert folders[router.url_for('shorts', params='CA8=')] is False
+    assert folders[router.url_for('accounts')] is False  # only opens a dialog
+    assert folders[router.url_for('browse', id='FEtopics', title='Home')] is True
