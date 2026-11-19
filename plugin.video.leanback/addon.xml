@@ -7,7 +7,7 @@
     <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>video</provides>
     </extension>
-    <extension point="xbmc.service" library="service.py" start="startup"/>
+    <extension point="xbmc.service" library="service.py"/>
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">Browse and watch YouTube with the TV layout</summary>
         <description lang="en_GB">Browse YouTube the way the TV app shows it: the TV sidebar, shelves, subscriptions, library and search, with full video information and DASH/HLS playback through InputStream Adaptive. Sign in with a TV code, customise the main menu, hide Shorts or watched videos, and set preferred quality, codec and subtitle languages.</description>
