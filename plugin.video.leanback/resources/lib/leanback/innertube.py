@@ -56,6 +56,8 @@ PLAYER_CLIENTS = [
 ]
 
 VISITOR_TTL = 86400 * 3
+RETRY_STATUSES = (0, 403, 429, 500, 502, 503, 504)
+RETRY_DELAY = 1.5  # seconds
 
 
 class InnerTubeError(Exception):
@@ -122,6 +124,18 @@ class InnerTube:
         except http.HTTPError as exc:
             if exc.status == 401 and token and retry:
                 auth.access_token(force_refresh=True)
+                return self._post(endpoint, body, client, use_auth, visitor, retry=False)
+            if exc.status in RETRY_STATUSES and retry:
+                # Google turns some requests away briefly (403/429, the odd 5xx or dropped connection);
+                # the same request usually succeeds a moment later. A 403 can also mean the visitor
+                # id went stale, so fetch a fresh one first.
+                kodi.log('HTTP %s on %s, retrying once' % (exc.status, endpoint))
+                time.sleep(RETRY_DELAY)
+                if exc.status == 403 and visitor:
+                    try:
+                        self.visitor_data(refresh=True)
+                    except InnerTubeError:
+                        pass
                 return self._post(endpoint, body, client, use_auth, visitor, retry=False)
             message = exc.json().get('error', {}).get('message') or str(exc)
             raise InnerTubeError(message, exc.status) from exc
