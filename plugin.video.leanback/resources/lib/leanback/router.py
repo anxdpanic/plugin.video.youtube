@@ -9,7 +9,7 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 
-from . import auth, history, http, kodi, mpd, parser
+from . import art, auth, history, http, kodi, mpd, parser
 from .innertube import InnerTube, InnerTubeError
 
 BASE_URL = 'plugin://%s/' % kodi.ADDON_ID
@@ -67,6 +67,8 @@ class Plugin:
         query = argv[2][1:] if len(argv) > 2 and argv[2].startswith('?') else (argv[2] if len(argv) > 2 else '')
         self.params = dict(urllib.parse.parse_qsl(query))
         self.api = InnerTube()
+        self.banners = art.Banners()
+        self.fanart = ''  # a channel page's banner, for everything listed on it
 
     # ================================================================ dispatch
     def dispatch(self):
@@ -114,6 +116,8 @@ class Plugin:
         except auth.AuthError:
             self._notify(kodi.string(30132), error=True)
             self._end(False)
+        # The listing is on screen by now; fetch the channel banners it lacked for next time.
+        self.banners.fetch_missing()
 
     # ================================================================ helpers
     def _end(self, succeeded=True, cache=False):
@@ -341,6 +345,7 @@ class Plugin:
         if index >= len(shelves):
             return self._end(False)
         shelf = shelves[index]
+        self._use_channel_fanart(desc.get('id'), page['header'])
         items, token = self._more_pages(desc['ep'], shelf['items'], shelf['continuation'])
         self._render_items(items, browse_id=desc.get('id'))
         if token:
@@ -364,6 +369,7 @@ class Plugin:
         resp = self.fetch(desc)
         page = parser.parse_page(resp)
         rendered = []
+        self._use_channel_fanart(browse_id, page['header'])
 
         if page['header']:
             self._add_header(page['header'])
@@ -444,7 +450,7 @@ class Plugin:
         li = xbmcgui.ListItem(title, offscreen=True)
         first = shelf['items'][0]
         art = first.get('thumb') or 'DefaultFolder.png'
-        li.setArt({'icon': 'DefaultFolder.png', 'thumb': art, 'fanart': art})
+        li.setArt({'icon': 'DefaultFolder.png', 'thumb': art, 'fanart': self.fanart or art})
         tag = li.getVideoInfoTag()
         tag.setTitle(title)
         tag.setPlot('\n'.join('• ' + i['title'] for i in shelf['items'][:12]))
@@ -498,6 +504,17 @@ class Plugin:
             shown.append(item)
         return shown
 
+    def _use_channel_fanart(self, browse_id, header):
+        """On a channel's pages, its banner is the fanart for everything listed."""
+        if not (browse_id or '').startswith('UC'):
+            return
+        if header and header['kind'] == 'channel':
+            self.banners.remember(browse_id, header.get('fanart'))
+        self.fanart = self.banners.get(browse_id)
+
+    def _channel_fanart(self, channel_id):
+        return self.fanart or self.banners.get(channel_id)
+
     def _add_video(self, item, threshold):
         target = item['target']
         video_id = target.get('video_id') or item.get('id')
@@ -529,8 +546,8 @@ class Plugin:
             tag.setTags(item['badges'])
         if item['views']:
             tag.setVotes(item['views'])
-        li.setArt({'thumb': item['thumb'], 'icon': item['thumb'], 'fanart': item['thumb'],
-                   'landscape': item['thumb']})
+        li.setArt({'thumb': item['thumb'], 'icon': item['thumb'],
+                   'fanart': self._channel_fanart(item['channel_id']) or item['thumb'], 'landscape': item['thumb']})
         li.setProperty('IsPlayable', 'true')
         li.setProperty('leanback.video_id', video_id)
         menu = []
@@ -567,9 +584,11 @@ class Plugin:
             lines.append(' • '.join(item['badges']))
         tag.setPlot('\n'.join(lines))
         thumb = item.get('thumb') or 'DefaultFolder.png'
-        li.setArt({'thumb': thumb, 'icon': thumb, 'fanart': item.get('thumb') or ''})
-        menu = []
         browse_id = target.get('browse_id') or ''
+        channel_id = browse_id if browse_id.startswith('UC') else item.get('channel_id')
+        li.setArt({'thumb': thumb, 'icon': thumb,
+                   'fanart': self._channel_fanart(channel_id) or item.get('thumb') or ''})
+        menu = []
         if kind == 'channel' or browse_id.startswith('UC'):
             menu.append((kodi.string(30106), 'RunPlugin(%s)' % url_for(
                 'pin', id=browse_id or item.get('id'), title=item['title'], thumb=item.get('thumb'))))
@@ -754,7 +773,8 @@ class Plugin:
         if info.get('genre'):
             tag.setGenres([info['genre']])
         thumb = 'https://i.ytimg.com/vi/%s/maxresdefault.jpg' % info['video_id'] if info['video_id'] else info['thumb']
-        li.setArt({'thumb': info['thumb'] or thumb, 'fanart': thumb, 'icon': info['thumb'] or thumb})
+        li.setArt({'thumb': info['thumb'] or thumb, 'icon': info['thumb'] or thumb,
+                   'fanart': self._channel_fanart(info.get('channel_id')) or thumb})
 
     def chapters(self):
         """Pick a chapter: seek to it when this video is playing, otherwise start the video there."""
