@@ -22,8 +22,13 @@ LEGACY_TEMP_DIR = os.path.join(PROFILE, 'temp')
 
 
 def log(msg):
-    """Log at debug level only, so nothing appears unless Kodi debug logging is on."""
+    """Log at debug level, so nothing appears unless Kodi debug logging is on."""
     xbmc.log('[%s] %s' % (ADDON_ID, msg), xbmc.LOGDEBUG)
+
+
+def log_error(msg):
+    """Log a real failure; the only messages written outside debug logging."""
+    xbmc.log('[%s] %s' % (ADDON_ID, msg), xbmc.LOGERROR)
 
 
 def string(string_id):

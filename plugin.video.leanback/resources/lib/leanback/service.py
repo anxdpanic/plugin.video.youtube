@@ -105,7 +105,7 @@ def run():
     window = xbmcgui.Window(10000)
     server = _start_server()
     if server is None:
-        kodi.log('could not start manifest server')
+        kodi.log_error('could not start manifest server')
         return
     port = server.server_address[1]
     window.setProperty(PORT_PROPERTY, str(port))
