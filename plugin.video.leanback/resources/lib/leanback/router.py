@@ -411,8 +411,12 @@ class Plugin:
                 self._add_shelf_folder(desc, index, shelf)
 
         if not tabs and not shelves and not page['header']:
-            message = kodi.string(30125) if (browse_id or '').startswith('FE') and not self.api.signed_in() \
-                else kodi.string(30124)
+            if page.get('message'):
+                message = page['message']
+            elif (browse_id or '').startswith('FE') and not self.api.signed_in():
+                message = kodi.string(30125)
+            else:
+                message = kodi.string(30124)
             self._notify(message)
         self._finish_listing(rendered or [{'kind': 'folder'}])
 

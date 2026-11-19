@@ -391,10 +391,11 @@ def parse_shelf(shelf):
 def parse_page(resp):
     """Normalise any browse/search/next response into:
 
-    {'header': item|None, 'tabs': [..], 'shelves': [..], 'continuation': token|None}
+    {'header': item|None, 'tabs': [..], 'shelves': [..], 'continuation': token|None, 'message': str}
+    'message' is what YouTube says about an empty page, if anything.
     Each shelf: {'title', 'items', 'continuation', 'shorts', 'endpoint'}.
     """
-    page = {'header': None, 'tabs': [], 'shelves': [], 'continuation': None}
+    page = {'header': None, 'tabs': [], 'shelves': [], 'continuation': None, 'message': ''}
 
     def handle_section_list(section_list):
         for entry in section_list.get('contents', []):
@@ -427,6 +428,10 @@ def parse_page(resp):
             page['header'] = parse_channel_header(header['channelHeaderRenderer'])
         elif 'channelHeaderRenderer' in surface:
             page['header'] = parse_channel_header(surface['channelHeaderRenderer'])
+        if 'genericPromoRenderer' in content:
+            # An empty page's own explanation ("Videos you upload to YouTube will appear here").
+            promo = content['genericPromoRenderer']
+            page['message'] = text(promo.get('bodyText')) or text(promo.get('title'))
         if 'sectionListRenderer' in content:
             handle_section_list(content['sectionListRenderer'])
         elif 'gridRenderer' in content:

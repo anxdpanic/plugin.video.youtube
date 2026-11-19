@@ -229,3 +229,14 @@ def test_shorts_menu_entry_runs_as_a_script(monkeypatch):
     assert folders[router.url_for('shorts', params='CA8=')] is False
     assert folders[router.url_for('accounts')] is False  # only opens a dialog
     assert folders[router.url_for('browse', id='FEtopics', title='Home')] is True
+
+
+def test_empty_page_shows_youtubes_own_message(monkeypatch):
+    import xbmcgui
+
+    promo = {'bodyText': {'runs': [{'text': 'Videos you upload to YouTube will appear here'}]}}
+    resp = {'contents': {'tvBrowseRenderer': {'content': {'tvSurfaceContentRenderer': {'content': {
+        'genericPromoRenderer': promo}}}}}}
+    monkeypatch.setattr(router.Plugin, 'fetch', lambda self, desc, use_cache=True: resp)
+    run('browse', '?id=FEmy_videos').dispatch()
+    assert 'Videos you upload to YouTube will appear here' in str(xbmcgui.NOTIFICATIONS)
