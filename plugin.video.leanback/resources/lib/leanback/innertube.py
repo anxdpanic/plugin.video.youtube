@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 anxdpanic
 """InnerTube API access.
 
 Browsing (guide, browse, search, next) uses the TVHTML5 client, the same client youtube.com/tv

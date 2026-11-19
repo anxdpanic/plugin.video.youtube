@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 anxdpanic
 """Background service: a localhost HTTP server that hands generated DASH manifests to
 InputStream Adaptive (ISA only downloads manifests over HTTP, not from local paths)."""
 import json

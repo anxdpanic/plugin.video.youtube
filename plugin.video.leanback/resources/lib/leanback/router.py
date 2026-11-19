@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 anxdpanic
 """Plugin entry: routes, directory listings, playback and the account/menu dialogs."""
 import json
 import time

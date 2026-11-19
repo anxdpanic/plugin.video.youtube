@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 anxdpanic
 """Minimal HTTP client on urllib (no third-party modules on stock Kodi)."""
 import gzip
 import json

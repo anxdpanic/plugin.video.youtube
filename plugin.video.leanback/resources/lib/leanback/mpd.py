@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 anxdpanic
 """Builds a static DASH manifest (SegmentBase / byte ranges) from InnerTube adaptiveFormats."""
 import re
 from xml.sax.saxutils import escape, quoteattr

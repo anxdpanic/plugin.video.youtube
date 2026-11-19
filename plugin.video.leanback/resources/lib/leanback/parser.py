@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 anxdpanic
 """Turns TVHTML5 InnerTube responses into plain items, shelves and tabs.
 
 Handles both item shapes the TV client sends: legacy `tileRenderer` and the newer

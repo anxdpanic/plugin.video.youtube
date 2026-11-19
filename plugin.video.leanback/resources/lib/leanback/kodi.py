@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 anxdpanic
 """Thin helpers around the Kodi API: settings, strings, paths, logging, JSON storage."""
 import hashlib
 import json
