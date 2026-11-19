@@ -146,7 +146,9 @@ class InnerTube:
         if continuation:
             body = {'continuation': continuation}
         else:
-            body = {'videoId': video_id, 'racyCheckOk': True, 'contentCheckOk': True}
+            body = {'racyCheckOk': True, 'contentCheckOk': True}
+            if video_id:
+                body['videoId'] = video_id
             if playlist_id:
                 body['playlistId'] = playlist_id
             if params:

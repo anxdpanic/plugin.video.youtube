@@ -74,3 +74,21 @@ def test_history_is_not_filtered_for_watched():
     xbmcaddon.SETTINGS.update(hide_watched=True, watched_threshold=80)
     shown = run('browse', '?id=FEhistory')._render_items([video('a', watched=100)], browse_id='FEhistory')
     assert [i['id'] for i in shown] == ['a']
+
+
+def test_mix_lists_watch_next_panel_instead_of_browsing(monkeypatch):
+    """browse VLRD... is rejected by YouTube, so a Mix is read from the next endpoint."""
+    mix = 'RDAjc1PXQvWBY'
+    in_mix = video('a')
+    in_mix['target']['playlist_id'] = mix
+    fetched = []
+
+    def fetch(self, desc, use_cache=True):
+        fetched.append(desc)
+        return {}
+
+    monkeypatch.setattr(router.Plugin, 'fetch', fetch)
+    monkeypatch.setattr(parser, 'parse_page', lambda resp: {'shelves': [{'items': [in_mix, video('b')]}]})
+    run('browse', '?id=VL' + mix).dispatch()
+    assert fetched == [{'ep': 'next', 'list': mix}]
+    assert [url.rsplit('=', 1)[-1] for url, _, _ in xbmcplugin.ITEMS] == ['a']

@@ -19,6 +19,11 @@ NO_WATCHED_FILTER = ('FEhistory', 'FElibrary', 'FEmy_youtube', 'FEplaylist_aggre
 ISA = 'inputstream.adaptive'
 
 
+def is_mix(playlist_id):
+    """YouTube Mixes (RD...) are generated on the fly and can't be browsed as a playlist page."""
+    return (playlist_id or '').startswith('RD')
+
+
 def url_for(route, **params):
     params = {k: v for k, v in params.items() if v not in (None, '')}
     return BASE_URL + route + ('?' + urllib.parse.urlencode(params) if params else '')
@@ -212,8 +217,20 @@ class Plugin:
     # ================================================================ listings
     def browse(self):
         browse_id = self.params.get('id')
+        if is_mix(browse_id[2:]):
+            items = self._mix_items(browse_id[2:])
+            self._render_items(items, browse_id=browse_id)
+            self._finish_listing(items)
+            return
         desc = {'ep': 'browse', 'id': browse_id, 'params': self.params.get('params')}
         self.render(desc, browse_id=browse_id)
+
+    def _mix_items(self, playlist_id):
+        """A Mix (RD...) is generated per viewer and has no playlist page: browse VLRD... is rejected.
+        The TV app lists it in the watch-next panel instead, so take the items that belong to it."""
+        page = parser.parse_page(self.fetch({'ep': 'next', 'list': playlist_id}))
+        return [i for s in page['shelves'] for i in s['items']
+                if i['kind'] == 'video' and i['target'].get('playlist_id') == playlist_id]
 
     def page(self):
         """A continuation page: ?ep=browse|search|next&ctoken=..."""
@@ -323,7 +340,7 @@ class Plugin:
         playlists = {i['target'].get('playlist_id') for i in shelf['items'] if i['kind'] == 'video'}
         if endpoint.get('type') == 'browse' and endpoint.get('browse_id'):
             url = url_for('browse', id=endpoint['browse_id'], params=endpoint.get('params'), title=title)
-        elif len(playlists) == 1 and None not in playlists and not next(iter(playlists)).startswith('RD'):
+        elif len(playlists) == 1 and None not in playlists and not is_mix(next(iter(playlists))):
             url = url_for('browse', id='VL' + next(iter(playlists)), title=title)
         else:
             url = url_for('shelf', src=json.dumps(desc, sort_keys=True), i=index)
@@ -534,8 +551,11 @@ class Plugin:
 
     def play_playlist(self):
         playlist_id = self.params['list']
-        page = parser.parse_page(self.fetch({'ep': 'browse', 'id': 'VL' + playlist_id}))
-        items = [i for s in page['shelves'] for i in s['items'] if i['kind'] == 'video']
+        if is_mix(playlist_id):
+            items = self._mix_items(playlist_id)
+        else:
+            page = parser.parse_page(self.fetch({'ep': 'browse', 'id': 'VL' + playlist_id}))
+            items = [i for s in page['shelves'] for i in s['items'] if i['kind'] == 'video']
         if not items:
             self._notify(kodi.string(30124))
             return
