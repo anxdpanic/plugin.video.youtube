@@ -8,6 +8,13 @@ import xbmcvfs
 
 
 @pytest.fixture(autouse=True)
+def no_request_pacing(monkeypatch):
+    """InnerTube requests are spaced out on a device; tests don't wait (test_innertube checks the pacing)."""
+    from resources.lib.leanback import innertube
+    monkeypatch.setattr(innertube, 'REQUEST_GAP', 0)
+
+
+@pytest.fixture(autouse=True)
 def no_banner_fetching(monkeypatch):
     """Listings fetch missing channel banners after they end; tests stay offline."""
     from resources.lib.leanback import art
