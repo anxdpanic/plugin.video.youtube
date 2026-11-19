@@ -119,6 +119,9 @@ def parse_tile(tile):
     }.get(content_type)
     if not kind:
         kind = 'video' if target and target['type'] == 'video' else 'folder'
+    elif kind == 'video' and target and target['type'] == 'browse':
+        # A show ("629 episodes") is a video tile of its latest episode that opens the show's playlist.
+        kind = 'playlist' if (target.get('browse_id') or '').startswith('VL') else 'folder'
     item = _item_base(kind, title, thumb, target)
     item['id'] = tile.get('contentId') or (target or {}).get('video_id') or (target or {}).get('browse_id')
     item['short'] = tile.get('tvhtml5ShelfRendererType') == TILE_SHORTS or bool(target and target.get('short'))
@@ -135,7 +138,7 @@ def parse_tile(tile):
                 item['short'] = True
             elif status.get('style') == 'UPCOMING':
                 item['upcoming'] = label  # "Upcoming" / "Premiere", already in the UI language
-            else:
+            elif kind == 'video':
                 item['duration'] = parse_duration(label)
 
     lines = []
@@ -192,6 +195,9 @@ def parse_lockup(lockup):
     }.get(content_type)
     if not kind:
         kind = 'video' if target and target['type'] == 'video' else 'folder'
+    elif kind == 'video' and target and target['type'] == 'browse':
+        # As with tiles: a video card that opens a page (a show) isn't a single video.
+        kind = 'playlist' if (target.get('browse_id') or '').startswith('VL') else 'folder'
     item = _item_base(kind, title, thumb, target)
     item['id'] = lockup.get('contentId')
     item['short'] = content_type == 'LOCKUP_CONTENT_TYPE_SHORT' or bool(target and target.get('short'))

@@ -253,3 +253,25 @@ def test_search_cluster_rows_become_shelves():
     shelves = parser.parse_page(resp)['shelves']
     assert [(s['title'], len(s['items'])) for s in shelves] == [('Recently uploaded', 1)]
     assert shelves[0]['endpoint'] == {'type': 'search', 'query': 'cats videos', 'params': 'eAE='}
+
+
+def test_show_tile_opens_its_playlist_not_one_episode():
+    """Home's Recommended shows: a video tile of the latest episode whose select opens the show."""
+    status = {'thumbnailOverlayTimeStatusRenderer': {'text': {'runs': [{'text': '629'}, {'text': ' episodes'}]},
+                                                     'style': 'DEFAULT'}}
+    node = tile('mAGzebdONa0', title='This Is', overlays=[status], lines=[line('This Is')])
+    node['tileRenderer']['onSelectCommand'] = {'browseEndpoint': {'browseId': 'VLPLshow', 'params': 'kgY'}}
+    item = parser.parse_item(node)
+    assert item['kind'] == 'playlist'
+    assert item['target'] == {'type': 'browse', 'browse_id': 'VLPLshow', 'params': 'kgY'}
+    assert item['duration'] == 0
+
+
+def test_show_lockup_opens_its_playlist_not_one_episode():
+    node = {'lockupViewModel': {
+        'contentType': 'LOCKUP_CONTENT_TYPE_VIDEO', 'contentId': 'mAGzebdONa0',
+        'metadata': {'lockupMetadataViewModel': {'title': {'content': 'This Is'}}},
+        'rendererContext': {'commandContext': {'onTap': {'innertubeCommand': {
+            'browseEndpoint': {'browseId': 'VLPLshow'}}}}}}}
+    item = parser.parse_item(node)
+    assert item['kind'] == 'playlist' and item['target']['browse_id'] == 'VLPLshow'
