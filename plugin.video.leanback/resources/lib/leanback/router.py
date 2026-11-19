@@ -614,9 +614,7 @@ class Plugin:
         if self.params.get('t'):  # start at a chapter
             li.setProperty('StartOffset', self.params['t'])
         if self.api.signed_in() and kodi.setting_bool('report_history'):
-            info = history.tracking_info(resp, video_id, client, path)
-            if info:
-                history.publish(info)
+            history.publish(video_id, path)
         xbmcplugin.setResolvedUrl(self.handle, True, li)
 
     def play_playlist(self):

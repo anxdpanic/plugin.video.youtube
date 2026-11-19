@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright (C) 2026 anxdpanic
 """Report playback to YouTube so watched videos land in the signed-in account's history and keep
-their progress. The player response carries the stats URLs; the service pings them while a video
-plays, with the account's token."""
+their progress. The streams come from anonymous player requests, whose stats URLs YouTube doesn't
+tie to the account, so the service asks the TV client's player for the account's own stats URLs
+and pings them while the video plays."""
 import json
 import random
 import string
@@ -13,14 +14,14 @@ import urllib.parse
 import xbmc
 import xbmcgui
 
-from . import auth, http, kodi
+from . import auth, http, innertube, kodi
 
 PROPERTY = 'leanback.tracking'
 INTERVAL = 30  # seconds between watch-time reports
 
 
-def tracking_info(player_resp, video_id, client, path):
-    """What the service needs to report a playback, or None when YouTube gave no stats URLs."""
+def tracking_info(player_resp, ua):
+    """The stats URLs to report a playback with, or None when YouTube gave none."""
     tracking = (player_resp or {}).get('playbackTracking', {})
     playback = tracking.get('videostatsPlaybackUrl', {}).get('baseUrl')
     watchtime = tracking.get('videostatsWatchtimeUrl', {}).get('baseUrl')
@@ -30,8 +31,7 @@ def tracking_info(player_resp, video_id, client, path):
         length = int(player_resp.get('videoDetails', {}).get('lengthSeconds') or 0)
     except ValueError:
         length = 0
-    return {'video_id': video_id, 'playback': playback, 'watchtime': watchtime, 'ua': client['ua'],
-            'path': path, 'length': length}
+    return {'playback': playback, 'watchtime': watchtime, 'ua': ua, 'length': length}
 
 
 def stats_url(base, params):
@@ -106,18 +106,25 @@ def _send(url, ua):
     thread.start()
 
 
-def publish(info):
-    """From the plugin: hand the next playback's stats URLs to the service."""
-    xbmcgui.Window(10000).setProperty(PROPERTY, json.dumps(info))
+def publish(video_id, path):
+    """From the plugin: tell the service which video it is about to play."""
+    xbmcgui.Window(10000).setProperty(PROPERTY, json.dumps({'video_id': video_id, 'path': path}))
+
+
+def _account_stats(video_id):
+    resp = innertube.InnerTube().player_tracking(video_id)
+    return tracking_info(resp, innertube.TV['ua'])
 
 
 class Tracker(xbmc.Player):
     """Lives in the service; watches Kodi's player for videos the plugin started."""
 
-    def __init__(self):
+    def __init__(self, stats=None):
         xbmc.Player.__init__(self)
         self.session = None
         self.paused = False
+        self.playing = None  # the claimed playback, so a late answer for an old one is dropped
+        self.stats = stats or _account_stats
 
     def _claim(self):
         window = xbmcgui.Window(10000)
@@ -143,12 +150,27 @@ class Tracker(xbmc.Player):
 
     def onAVStarted(self):  # noqa: N802 (Kodi API)
         self.finish()
-        info = self._claim()
-        if info:
-            kodi.log('reporting %s to history' % info['video_id'])
-            self.session = Session(info)
-            self.paused = False
-            self.session.start(self._time() or 0.0)
+        self.paused = False
+        claimed = self._claim()
+        self.playing = claimed
+        if claimed:
+            thread = threading.Thread(target=self._begin, args=(claimed, self._time() or 0.0),
+                                      name='leanback-history')
+            thread.daemon = True
+            thread.start()
+
+    def _begin(self, claimed, position):
+        try:
+            info = self.stats(claimed['video_id'])
+        except (innertube.InnerTubeError, http.HTTPError) as exc:
+            kodi.log('no history stats for %s: %s' % (claimed['video_id'], exc))
+            return
+        if not info or self.playing is not claimed:
+            return
+        kodi.log('reporting %s to history' % claimed['video_id'])
+        session = Session(info)
+        session.start(position)
+        self.session = session
 
     def onPlayBackSeek(self, time_ms, offset_ms):  # noqa: N802
         if self.session:
@@ -176,6 +198,7 @@ class Tracker(xbmc.Player):
             self.session.update(self._time())
 
     def finish(self):
+        self.playing = None
         if self.session:
             self.session.update(None, state='paused', final=True, force=True)
             self.session = None

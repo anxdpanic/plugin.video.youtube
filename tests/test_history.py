@@ -7,7 +7,6 @@ from resources.lib.leanback import history
 
 PLAYBACK = 'https://s.youtube.com/api/stats/playback?docid=abcdefghijk&ei=E'
 WATCHTIME = 'https://s.youtube.com/api/stats/watchtime?docid=abcdefghijk&ei=E'
-CLIENT = {'ua': 'UA'}
 
 
 def resp():
@@ -21,15 +20,14 @@ def query(url):
 
 
 def test_tracking_info_needs_both_urls():
-    info = history.tracking_info(resp(), 'abcdefghijk', CLIENT, 'http://p/x.mpd')
-    assert info == {'video_id': 'abcdefghijk', 'playback': PLAYBACK, 'watchtime': WATCHTIME, 'ua': 'UA',
-                    'path': 'http://p/x.mpd', 'length': 300}
-    assert history.tracking_info({'playbackTracking': {}}, 'abcdefghijk', CLIENT, '') is None
+    info = history.tracking_info(resp(), 'UA')
+    assert info == {'playback': PLAYBACK, 'watchtime': WATCHTIME, 'ua': 'UA', 'length': 300}
+    assert history.tracking_info({'playbackTracking': {}}, 'UA') is None
 
 
 def test_session_reports_playback_then_watchtime_segments(monkeypatch):
     sent = []
-    info = history.tracking_info(resp(), 'abcdefghijk', CLIENT, '')
+    info = history.tracking_info(resp(), 'UA')
     session = history.Session(info, send=lambda url, ua: sent.append(url))
     session.start(10.0)
     first = query(sent[0])
@@ -49,19 +47,27 @@ def test_session_reports_playback_then_watchtime_segments(monkeypatch):
     assert all(q['cpn'] == first['cpn'] for q in segments)
 
 
-def test_tracker_only_claims_the_video_the_plugin_resolved(monkeypatch):
-    sessions = []
-    monkeypatch.setattr(history.Session, 'start', lambda self, position: sessions.append(self.info['video_id']))
-    info = history.tracking_info(resp(), 'abcdefghijk', CLIENT, 'http://127.0.0.1:1/mpd/abcdefghijk.mpd')
+def test_tracker_only_reports_the_video_the_plugin_resolved(monkeypatch):
+    started = []
+    monkeypatch.setattr(history.Session, 'start', lambda self, position: started.append(position))
+    monkeypatch.setattr(history.threading, 'Thread', lambda target, args, name: type(
+        'T', (), {'daemon': False, 'start': lambda self: target(*args)})())
+    looked_up = []
+
+    def stats(video_id):
+        looked_up.append(video_id)
+        return history.tracking_info(resp(), 'UA')
+    path = 'http://127.0.0.1:1/mpd/abcdefghijk.mpd'
+    tracker = history.Tracker(stats=stats)
 
     monkeypatch.setattr(xbmc.Player, 'PLAYING', 'smb://nas/movie.mkv')
-    history.publish(info)
-    tracker = history.Tracker()
+    history.publish('abcdefghijk', path)
     tracker.onAVStarted()
-    assert tracker.session is None and sessions == []
+    assert tracker.session is None and looked_up == []
     assert xbmcgui.Window(10000).getProperty(history.PROPERTY) == ''
 
-    monkeypatch.setattr(xbmc.Player, 'PLAYING', info['path'])
-    history.publish(info)
+    monkeypatch.setattr(xbmc.Player, 'PLAYING', path)
+    monkeypatch.setattr(xbmc.Player, 'TIME', 12.0)
+    history.publish('abcdefghijk', path)
     tracker.onAVStarted()
-    assert sessions == ['abcdefghijk']
+    assert looked_up == ['abcdefghijk'] and started == [12.0] and tracker.session is not None

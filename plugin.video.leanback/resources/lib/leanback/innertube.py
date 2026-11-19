@@ -220,6 +220,11 @@ class InnerTube:
         return '%s (%s)' % (name, handle) if handle and handle != name else name
 
     # -------------------------------------------------------------- player
+    def player_tracking(self, video_id):
+        """The TV client's player response for the signed-in account. Its streams need signature
+        solving and go unused, but its stats URLs are the ones YouTube counts towards history."""
+        return self._post('player', {'videoId': video_id, 'contentCheckOk': True, 'racyCheckOk': True}, TV)
+
     def player(self, video_id):
         """Returns (player_response, client). Raises InnerTubeError when nothing is playable."""
         cpn = ''.join(random.choice(string.ascii_letters + string.digits + '-_') for _ in range(16))
