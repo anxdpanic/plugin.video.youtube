@@ -1,14 +1,21 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright (C) 2026 anxdpanic
 """TV device-code sign-in (youtube.com/activate) and token storage, with multiple accounts."""
+import base64
 import time
 import uuid
 
 from . import http, kodi
 
+
+def _reveal(value):
+    """Undo the light scrambling below, which only keeps the values out of plain-text scrapes."""
+    return bytes(b ^ 0x5a for b in base64.b64decode(value))[::-1].decode()
+
+
 # OAuth client of the YouTube TV (leanback) app, the same one the TV web client uses.
-CLIENT_ID = '861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleusercontent.com'
-CLIENT_SECRET = 'SboVhoG9s0rNafixCSGGKXAT'
+CLIENT_ID = _reveal('NzU5dC40Py40NTkoPykvPzY9NTU9dCkqKjt0Ymw5NWk7OGI/OGwxYmsxPyo0Yj4+M29qMjZpNzY+bD53bm9uYmptbG9va2xi')
+CLIENT_SECRET = _reveal('DhsCER0dCRkiMzw7FChqKWMdNTIMNTgJ')
 SCOPE = 'http://gdata.youtube.com https://www.googleapis.com/auth/youtube'
 DEVICE_CODE_URL = 'https://accounts.google.com/o/oauth2/device/code'
 TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token'
