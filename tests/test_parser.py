@@ -288,3 +288,22 @@ def test_shortcut_tile_title_comes_from_its_image_overlay():
     item = parser.parse_item(node)
     assert item['title'] == 'Watch later'
     assert item['target'] == {'type': 'browse', 'browse_id': 'FEmy_youtube', 'params': 'cAc='}
+
+
+def test_channels_in_two_sections_are_listed_once():
+    def tab(channel):
+        return {'tabRenderer': {'title': {'simpleText': channel}, 'endpoint': {'browseEndpoint': {
+            'browseId': 'FEsubscriptions', 'params': 'p-' + channel}}}}
+    resp = {'contents': {'tvBrowseRenderer': {'content': {'tvSecondaryNavRenderer': {'sections': [
+        {'tvSecondaryNavSectionRenderer': {'tabs': [tab('All'), tab('Grian')]}},
+        {'tvSecondaryNavSectionRenderer': {'tabs': [tab('Grian'), tab('Scott')]}},
+    ]}}}}}
+    assert [t['title'] for t in parser.parse_page(resp)['tabs']] == ['All', 'Grian', 'Scott']
+
+    def entry(browse_id):
+        return {'guideEntryRenderer': {'title': {'simpleText': browse_id}, 'thumbnail': {'thumbnails': [
+            {'url': 'https://yt3.ggpht.com/x', 'width': 88}]}, 'navigationEndpoint': {
+            'browseEndpoint': {'browseId': browse_id}}}}
+    guide = {'items': [{'guideSectionRenderer': {'items': [entry('UCa'), entry('UCb')]}},
+                       {'guideSubscriptionsSectionRenderer': {'items': [entry('UCb'), entry('UCc')]}}]}
+    assert [e['id'] for e in parser.parse_guide(guide)] == ['UCa', 'UCb', 'UCc']

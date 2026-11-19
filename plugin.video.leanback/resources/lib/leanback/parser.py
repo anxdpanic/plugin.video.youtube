@@ -5,6 +5,7 @@
 Handles both item shapes the TV client sends: legacy `tileRenderer` and the newer
 `lockupViewModel`, plus shelves, grids, secondary-nav tabs, playlists and continuations.
 """
+import json
 import re
 from urllib.parse import unquote
 
@@ -310,14 +311,39 @@ def _find_description(node):
     return best
 
 
+def _with_channel(item, node):
+    """Most video tiles name their channel only in the long-press menu (Go to channel)."""
+    if item and item['kind'] == 'video' and not item['channel_id']:
+        found = []
+
+        def walk(value):
+            if found:
+                return
+            if isinstance(value, dict):
+                browse_id = value.get('browseEndpoint', {}).get('browseId', '') \
+                    if isinstance(value.get('browseEndpoint'), dict) else ''
+                if browse_id.startswith('UC'):
+                    found.append(browse_id)
+                    return
+                for child in value.values():
+                    walk(child)
+            elif isinstance(value, list):
+                for child in value:
+                    walk(child)
+        walk(node)
+        if found:
+            item['channel_id'] = found[0]
+    return item
+
+
 def parse_item(node):
     """Any list entry -> item dict, or None for things we don't show."""
     if not isinstance(node, dict):
         return None
     if 'tileRenderer' in node:
-        return parse_tile(node['tileRenderer'])
+        return _with_channel(parse_tile(node['tileRenderer']), node)
     if 'lockupViewModel' in node:
-        return parse_lockup(node['lockupViewModel'])
+        return _with_channel(parse_lockup(node['lockupViewModel']), node)
     if 'pivotVideoRenderer' in node:
         pivot = node['pivotVideoRenderer']
         item = _item_base('video', text(pivot.get('title')),
@@ -462,6 +488,8 @@ def parse_page(resp):
     if 'tvSurfaceContentRenderer' in browse:
         handle_surface(browse['tvSurfaceContentRenderer'])
     if 'tvSecondaryNavRenderer' in browse:
+        # A channel can sit in more than one section (recently active and the full list); list it once.
+        seen_tabs = set()
         for section in browse['tvSecondaryNavRenderer'].get('sections', []):
             for tab in section.get('tvSecondaryNavSectionRenderer', {}).get('tabs', []):
                 tab_r = tab.get('tabRenderer')
@@ -470,6 +498,10 @@ def parse_page(resp):
                 thumb = best_thumb(tab_r.get('thumbnail', {}).get('thumbnails'))
                 entry = _item_base('tab', text(tab_r.get('title')), thumb, endpoint_target(tab_r.get('endpoint')))
                 entry['selected'] = tab_r.get('selected', False)
+                key = json.dumps(entry['target'], sort_keys=True) if entry['target'] else entry['title']
+                if key in seen_tabs:
+                    continue
+                seen_tabs.add(key)
                 page['tabs'].append(entry)
                 surface = tab_r.get('content', {}).get('tvSurfaceContentRenderer')
                 if surface and tab_r.get('selected'):
@@ -501,6 +533,7 @@ def parse_page(resp):
 def parse_guide(resp):
     """Sidebar entries: [{'id', 'title', 'target', 'thumb', 'channel'}]."""
     entries = []
+    seen = set()  # a channel can be listed in more than one guide section
     for section in resp.get('items', []):
         for value in section.values():
             for item in value.get('items', []) or []:
@@ -519,6 +552,9 @@ def parse_guide(resp):
                     entry_id = 'shorts'
                 else:
                     entry_id = title
+                if entry_id in seen:
+                    continue
+                seen.add(entry_id)
                 thumb = best_thumb(guide.get('thumbnail', {}).get('thumbnails'))
                 entries.append({'id': entry_id, 'title': title, 'target': target, 'thumb': thumb,
                                 'channel': bool(thumb) and target['type'] == 'browse'
