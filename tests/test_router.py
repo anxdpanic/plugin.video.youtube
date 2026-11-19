@@ -148,3 +148,23 @@ def test_chapters_seek_when_playing_and_start_there_otherwise(monkeypatch):
     run('chapters', '?v=abcdefghijk').dispatch()
     expected = router.url_for('play', v='abcdefghijk', t='90.000')
     assert expected in xbmc.Player.PLAYED
+
+
+def test_flattened_search_keeps_next_page_and_rows_open_as_searches(monkeypatch):
+    results = {'title': 'Search results for cats', 'items': [video('aaaaaaaaaaa')], 'continuation': 'MORE',
+               'shorts': False, 'endpoint': None}
+    recent = {'title': 'Recently uploaded', 'items': [video('bbbbbbbbbbb')], 'continuation': None,
+              'shorts': False, 'endpoint': {'type': 'search', 'query': 'cats videos', 'params': 'eAE='}}
+    page = {'header': None, 'tabs': [], 'shelves': [results, recent], 'continuation': None}
+    monkeypatch.setattr(router.Plugin, 'fetch', lambda self, desc, use_cache=True: {})
+    monkeypatch.setattr(parser, 'parse_page', lambda resp: page)
+
+    xbmcaddon.SETTINGS['shelves_as_folders'] = False
+    run('search', '?q=cats').dispatch()
+    assert router.url_for('page', ep='search', ctoken='MORE') in [u for u, _, _ in xbmcplugin.ITEMS]
+
+    xbmcplugin.reset()
+    xbmcaddon.SETTINGS['shelves_as_folders'] = True
+    run('search', '?q=cats').dispatch()
+    assert router.url_for('search', q='cats videos', params='eAE=') in [u for u, _, _ in xbmcplugin.ITEMS]
+    assert run('')._state()['search_history'] == ['cats']

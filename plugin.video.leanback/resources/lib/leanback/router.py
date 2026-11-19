@@ -339,8 +339,10 @@ class Plugin:
         if len(shelves) == 1 or (shelves and flatten):
             for shelf in shelves:
                 rendered.extend(self._render_items(shelf['items'], browse_id=browse_id))
-            if len(shelves) == 1 and shelves[0]['continuation']:
-                self._add_next(desc['ep'], shelves[0]['continuation'], browse_id)
+            # Search results flattened with their extra rows: the results shelf is the only one that pages.
+            paged = [s for s in shelves if s['continuation']]
+            if len(paged) == 1:
+                self._add_next(desc['ep'], paged[0]['continuation'], browse_id)
         else:
             for index, shelf in enumerate(shelves):
                 self._add_shelf_folder(desc, index, shelf)
