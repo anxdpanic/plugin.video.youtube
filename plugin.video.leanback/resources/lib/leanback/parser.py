@@ -127,7 +127,10 @@ def parse_tile(tile):
     item['short'] = tile.get('tvhtml5ShelfRendererType') == TILE_SHORTS or bool(target and target.get('short'))
 
     for overlay in header.get('thumbnailOverlays', []):
-        if 'thumbnailOverlayResumePlaybackRenderer' in overlay:
+        if 'tileMetadataRenderer' in overlay:
+            # Shortcut tiles (Library's History, Watch later...; Movies' Explore) print their name on the image.
+            item['title'] = item['title'] or text(overlay['tileMetadataRenderer'].get('title'))
+        elif 'thumbnailOverlayResumePlaybackRenderer' in overlay:
             item['watched_pct'] = overlay['thumbnailOverlayResumePlaybackRenderer'].get('percentDurationWatched', 0)
         elif 'thumbnailOverlayTimeStatusRenderer' in overlay:
             status = overlay['thumbnailOverlayTimeStatusRenderer']

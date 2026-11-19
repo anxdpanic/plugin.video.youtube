@@ -275,3 +275,16 @@ def test_show_lockup_opens_its_playlist_not_one_episode():
             'browseEndpoint': {'browseId': 'VLPLshow'}}}}}}}
     item = parser.parse_item(node)
     assert item['kind'] == 'playlist' and item['target']['browse_id'] == 'VLPLshow'
+
+
+def test_shortcut_tile_title_comes_from_its_image_overlay():
+    """Library's shortcut row (History, Watch later...) has no metadata block, only a title on the image."""
+    node = {'tileRenderer': {
+        'contentType': 'TILE_CONTENT_TYPE_CHANNEL',
+        'header': {'tileHeaderRenderer': {
+            'thumbnail': {'thumbnails': [{'url': 'https://lh3.googleusercontent.com/x', 'width': 640}]},
+            'thumbnailOverlays': [{'tileMetadataRenderer': {'title': {'simpleText': 'Watch later'}}}]}},
+        'onSelectCommand': {'browseEndpoint': {'browseId': 'FEmy_youtube', 'params': 'cAc%3D'}}}}
+    item = parser.parse_item(node)
+    assert item['title'] == 'Watch later'
+    assert item['target'] == {'type': 'browse', 'browse_id': 'FEmy_youtube', 'params': 'cAc='}
