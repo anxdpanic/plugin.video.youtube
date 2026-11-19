@@ -67,7 +67,8 @@ class Banners:
         found = {}
 
         def work():
-            api = InnerTube()
+            # Background: the request broker runs these after anything on screen.
+            api = InnerTube(priority=http.BACKGROUND)
             while todo:
                 try:
                     channel_id = todo.pop()
@@ -77,6 +78,8 @@ class Banners:
                     header = parser.parse_page(api.browse(channel_id))['header'] or {}
                 except (InnerTubeError, http.HTTPError) as exc:
                     kodi.log('no banner for %s: %s' % (channel_id, exc))
+                    if getattr(exc, 'blocked', False):
+                        del todo[:]  # YouTube is holding requests back: try the rest another time
                     continue
                 found[channel_id] = header.get('fanart') or ''
 

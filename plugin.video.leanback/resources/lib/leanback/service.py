@@ -1,7 +1,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright (C) 2026 anxdpanic
 """Background service: a localhost HTTP server that hands generated DASH manifests to
-InputStream Adaptive (ISA only downloads manifests over HTTP, not from local paths)."""
+InputStream Adaptive (ISA only downloads manifests over HTTP, not from local paths), and the home of
+the request broker every request to Google goes through (listings reach it via POST /fetch)."""
 import json
 import os
 import re
@@ -14,9 +15,9 @@ from socketserver import ThreadingMixIn
 import xbmc
 import xbmcgui
 
-from . import history, http, kodi
+from . import broker, history, http, kodi
 
-PORT_PROPERTY = 'leanback.port'
+PORT_PROPERTY = http.PORT_PROPERTY
 PREFERRED_PORTS = (50152, 50153, 50154, 0)
 MANIFEST = re.compile(r'^/mpd/([A-Za-z0-9_-]{11})\.mpd$')
 SUBTITLE = re.compile(r'^/sub/([A-Za-z0-9_-]{11})/(\d+)\.vtt$')
@@ -29,6 +30,22 @@ class _Server(ThreadingMixIn, HTTPServer):
 
 
 class _Handler(BaseHTTPRequestHandler):
+    broker = None
+
+    def do_POST(self):  # noqa: N802 (http.server API)
+        if self.path != '/fetch' or self.broker is None:
+            self.send_error(404)
+            return
+        raw = self.rfile.read(int(self.headers.get('Content-Length') or 0))
+        headers, body = http.serve_envelope(raw, self.broker)
+        self.send_response(200)
+        for key, value in headers.items():
+            self.send_header(key, value)
+        self.send_header('Content-Type', 'application/octet-stream')
+        self.send_header('Content-Length', str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
     def do_GET(self):  # noqa: N802 (http.server API)
         path = self.path.split('?')[0]
         sub = SUBTITLE.match(path)
@@ -103,6 +120,9 @@ def _cleanup(max_age=6 * 3600):
 
 def run():
     window = xbmcgui.Window(10000)
+    requests = broker.Broker(http.send)
+    http.install_broker(requests)
+    _Handler.broker = requests
     server = _start_server()
     if server is None:
         kodi.log_error('could not start manifest server')
@@ -128,3 +148,4 @@ def run():
     window.clearProperty(PORT_PROPERTY)
     server.shutdown()
     server.server_close()
+    requests.stop()

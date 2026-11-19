@@ -9,10 +9,7 @@ decipher stream URLs, so streams come from clients that return direct URLs.
 import json
 import random
 import string
-import threading
 import time
-
-import xbmcgui
 
 from . import auth, http, kodi
 
@@ -61,40 +58,22 @@ PLAYER_CLIENTS = [
 VISITOR_TTL = 86400 * 3
 RETRY_STATUSES = (0, 403, 429, 500, 502, 503, 504)
 RETRY_DELAY = 1.5  # seconds
-# Bursts of requests from one IP get Google's "automated queries" block page (a slow 403). Spacing them
-# out avoids most of it; tested 2026-11-19: back to back 4/16 blocked, 2 s apart ~1 in 6, 10 s apart 0/16.
-REQUEST_GAP = 1.0  # seconds between InnerTube requests, across all of the add-on's processes
-PACE_PROPERTY = 'leanback.next_request'
-_pace_lock = threading.Lock()  # threads of one process (e.g. banner fetching) take slots one at a time
-
-
-def _pace():
-    """Wait for this process's turn. Kodi runs each listing (and the service) as its own process, so the
-    next free slot is kept in a home-window property they all share."""
-    if REQUEST_GAP <= 0:
-        return
-    window = xbmcgui.Window(10000)
-    with _pace_lock:
-        now = time.time()
-        try:
-            slot = max(now, float(window.getProperty(PACE_PROPERTY) or 0))
-        except ValueError:
-            slot = now
-        window.setProperty(PACE_PROPERTY, repr(slot + REQUEST_GAP))
-    if slot > now:
-        time.sleep(slot - now)
 
 
 class InnerTubeError(Exception):
     """status is the HTTP status (0 when YouTube couldn't be reached, None when not an HTTP failure)."""
 
-    def __init__(self, message, status=None):
+    def __init__(self, message, status=None, blocked=False):
         Exception.__init__(self, message)
         self.status = status
+        self.blocked = blocked
 
 
 class InnerTube:
-    def __init__(self):
+    def __init__(self, priority=http.FOREGROUND):
+        """priority: http.BACKGROUND for work nobody is waiting on (banners, history), which the request
+        broker runs after what's on screen and drops while YouTube is holding requests back."""
+        self.priority = priority
         self.hl, self.gl = kodi.language()
         self._state = kodi.load_json('state.json', {})
 
@@ -143,11 +122,14 @@ class InnerTube:
         payload['context'] = {'client': context_client, 'user': {'lockedSafetyMode': False},
                               'request': {'useSsl': True}}
         url = API + endpoint + '?prettyPrint=false'
-        _pace()
         kodi.log('POST %s (%s%s)' % (endpoint, client['key'], ', auth' if token else ''))
         try:
-            return http.request_json(url, data=json.dumps(payload).encode('utf-8'), headers=headers)
+            return http.request_json(url, data=json.dumps(payload).encode('utf-8'), headers=headers,
+                                     priority=self.priority)
         except http.HTTPError as exc:
+            if exc.blocked:
+                # Google's automated-queries page: the broker already waited out a hold and tried again.
+                raise InnerTubeError('YouTube is holding requests back', exc.status, blocked=True) from exc
             if exc.status == 401 and token and retry:
                 auth.access_token(force_refresh=True)
                 return self._post(endpoint, body, client, use_auth, visitor, retry=False)

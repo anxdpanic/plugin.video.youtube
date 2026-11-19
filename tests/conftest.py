@@ -9,9 +9,12 @@ import xbmcvfs
 
 @pytest.fixture(autouse=True)
 def no_request_pacing(monkeypatch):
-    """InnerTube requests are spaced out on a device; tests don't wait (test_innertube checks the pacing)."""
-    from resources.lib.leanback import innertube
-    monkeypatch.setattr(innertube, 'REQUEST_GAP', 0)
+    """Requests are spaced out on a device; tests don't wait (test_broker and test_http check the pacing)."""
+    import xbmcgui
+
+    from resources.lib.leanback import broker
+    monkeypatch.setattr(broker, 'GAPS', {})
+    xbmcgui.Window(10000).clearProperty('leanback.port')  # no service: requests go straight to http.send
 
 
 @pytest.fixture(autouse=True)

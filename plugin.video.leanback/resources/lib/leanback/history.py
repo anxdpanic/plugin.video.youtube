@@ -98,7 +98,7 @@ def _send(url, ua):
             return
         headers = {'User-Agent': ua, 'Authorization': 'Bearer ' + token}
         try:
-            http.request(url, headers=headers, timeout=10)
+            http.request(url, headers=headers, timeout=10, priority=http.BACKGROUND)
         except http.HTTPError as exc:
             kodi.log('history report failed: %s' % exc)
     thread = threading.Thread(target=run, name='leanback-history')
@@ -112,7 +112,7 @@ def publish(video_id, path):
 
 
 def _account_stats(video_id):
-    resp = innertube.InnerTube().player_tracking(video_id)
+    resp = innertube.InnerTube(priority=http.BACKGROUND).player_tracking(video_id)
     return tracking_info(resp, innertube.TV['ua'])
 
 
