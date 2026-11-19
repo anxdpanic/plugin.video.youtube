@@ -1,0 +1,789 @@
+"""Plugin entry: routes, directory listings, playback and the account/menu dialogs."""
+import json
+import time
+import urllib.parse
+
+import xbmc
+import xbmcgui
+import xbmcplugin
+
+from . import auth, kodi, mpd, parser
+from .innertube import InnerTube, InnerTubeError
+
+BASE_URL = 'plugin://%s/' % kodi.ADDON_ID
+PAGE_TTL = 600
+GUIDE_TTL = 3600
+NO_WATCHED_FILTER = ('FEhistory', 'FElibrary', 'FEmy_youtube', 'FEplaylist_aggregation')
+ISA = 'inputstream.adaptive'
+
+
+def url_for(route, **params):
+    params = {k: v for k, v in params.items() if v not in (None, '')}
+    return BASE_URL + route + ('?' + urllib.parse.urlencode(params) if params else '')
+
+
+class Plugin(object):
+    def __init__(self, argv):
+        parsed = urllib.parse.urlparse(argv[0])
+        self.route = parsed.path.strip('/')
+        self.handle = int(argv[1]) if len(argv) > 1 and argv[1].lstrip('-').isdigit() else -1
+        query = argv[2][1:] if len(argv) > 2 and argv[2].startswith('?') else (argv[2] if len(argv) > 2 else '')
+        self.params = dict(urllib.parse.parse_qsl(query))
+        self.api = InnerTube()
+
+    # ================================================================ dispatch
+    def dispatch(self):
+        routes = {
+            '': self.root,
+            'browse': self.browse,
+            'shelf': self.shelf,
+            'page': self.page,
+            'search': self.search,
+            'search/new': self.search_new,
+            'search/remove': self.search_remove,
+            'related': self.related,
+            'play': self.play,
+            'play_playlist': self.play_playlist,
+            'shorts': self.shorts,
+            'details': self.details,
+            'pin': self.pin,
+            'unpin': self.unpin,
+            'accounts': self.accounts_menu,
+            'account/sign_in': self.sign_in,
+            'account/switch': self.switch_account,
+            'account/sign_out': self.sign_out,
+            'menu/customise': self.customise_menu,
+            'menu/reset': self.reset_menu,
+        }
+        handler = routes.get(self.route)
+        if handler is None:
+            kodi.log('unknown route %s' % self.route, xbmc.LOGWARNING)
+            return self._end(False)
+        # When Kodi loses its navigation history (e.g. after playback) it builds a ".." path by
+        # dropping the query string, e.g. plugin://.../browse/. Show the main menu instead of failing.
+        required = {'browse': 'id', 'shelf': 'src', 'page': 'ctoken', 'related': 'v', 'play': 'v',
+                    'play_playlist': 'list', 'pin': 'id', 'unpin': 'id'}
+        if self.route in required and not self.params.get(required[self.route]):
+            kodi.log('route %s without %s, showing main menu' % (self.route, required[self.route]))
+            handler = self.root
+        try:
+            handler()
+        except InnerTubeError as exc:
+            kodi.log('InnerTube error on %s: %s' % (self.route, exc), xbmc.LOGWARNING)
+            self._notify(kodi.string(30129) % exc, error=True)
+            self._end(False)
+        except auth.AuthError:
+            self._notify(kodi.string(30132), error=True)
+            self._end(False)
+
+    # ================================================================ helpers
+    def _end(self, succeeded=True, cache=False):
+        if self.handle >= 0:
+            xbmcplugin.endOfDirectory(self.handle, succeeded=succeeded, cacheToDisc=cache)
+
+    @staticmethod
+    def _notify(message, error=False):
+        xbmcgui.Dialog().notification(kodi.ADDON.getAddonInfo('name'), message,
+                                      xbmcgui.NOTIFICATION_ERROR if error else xbmcgui.NOTIFICATION_INFO, 4000)
+
+    def _add(self, url, li, folder):
+        xbmcplugin.addDirectoryItem(self.handle, url, li, isFolder=folder)
+
+    def _state(self):
+        return kodi.load_json('state.json', {})
+
+    def _save_state(self, state):
+        kodi.save_json('state.json', state)
+
+    def _account_key(self):
+        return auth.active_account()[0] or 'guest'
+
+    # --------------------------------------------------------- page fetching
+    def fetch(self, desc, use_cache=True):
+        """Fetch a page described by desc = {'ep': browse|search|next, ...}; cached briefly so opening
+        a shelf from a page re-uses the response."""
+        key = self._account_key() + ':' + json.dumps(desc, sort_keys=True)
+        if use_cache:
+            cached = kodi.Cache.get(key, PAGE_TTL)
+            if cached is not None:
+                return cached
+        ep = desc['ep']
+        token = desc.get('ctoken')
+        if ep == 'browse':
+            resp = self.api.browse(desc.get('id'), desc.get('params'), continuation=token)
+        elif ep == 'search':
+            resp = self.api.search(desc.get('q'), desc.get('params'), continuation=token)
+        elif ep == 'next':
+            resp = self.api.next(desc.get('v'), desc.get('list'), continuation=token)
+        else:
+            raise InnerTubeError('bad page %s' % ep)
+        kodi.Cache.set(key, resp)
+        return resp
+
+    def guide(self):
+        key = 'guide:' + self._account_key() + ':' + self.api.hl
+        entries = kodi.Cache.get(key, GUIDE_TTL)
+        if entries is None:
+            entries = parser.parse_guide(self.api.guide())
+            kodi.Cache.set(key, entries)
+        return entries
+
+    # ================================================================ root menu
+    def menu_entries(self, include_hidden=False):
+        """Sidebar entries after the user's customisation (order, hidden, pinned channels)."""
+        state = self._state().get('menu', {})
+        entries = [e for e in self.guide() if not e['channel']]
+        channels = [e for e in self.guide() if e['channel']]
+        for pin in state.get('pinned', []):
+            if not any(e['id'] == pin['id'] for e in entries):
+                entries.append({'id': pin['id'], 'title': pin['title'], 'thumb': pin.get('thumb', ''),
+                                'target': {'type': 'browse', 'browse_id': pin['id']}, 'channel': False,
+                                'pinned': True})
+        order = state.get('order', [])
+        if order:
+            rank = {entry_id: index for index, entry_id in enumerate(order)}
+            entries.sort(key=lambda e: rank.get(e['id'], len(rank)))
+        if not include_hidden:
+            hidden = set(state.get('hidden', []))
+            entries = [e for e in entries if e['id'] not in hidden]
+            if kodi.setting_bool('hide_shorts'):
+                entries = [e for e in entries if e['id'] != 'shorts']
+        return entries, channels
+
+    def root(self):
+        kodi.Cache.prune()
+        self._maybe_whos_watching()
+        entries, channels = self.menu_entries()
+        for entry in entries:
+            self._add_menu_entry(entry)
+        if kodi.setting_bool('show_channels'):
+            if kodi.setting_bool('sort_subscriptions'):
+                channels = sorted(channels, key=lambda e: e['title'].lower())
+            for entry in channels:
+                self._add_menu_entry(entry)
+        account_id, account = auth.active_account()
+        li = xbmcgui.ListItem(kodi.string(30108), offscreen=True)
+        li.setLabel2(account.get('name') or '' if account else kodi.string(30123))
+        li.getVideoInfoTag().setPlot(kodi.string(30112) % (account.get('name') or '') if account
+                                     else kodi.string(30123))
+        li.setArt({'icon': 'DefaultUser.png', 'thumb': 'DefaultUser.png'})
+        self._add(url_for('accounts'), li, True)
+        xbmcplugin.setContent(self.handle, 'files')
+        self._end()
+
+    def _add_menu_entry(self, entry):
+        target = entry['target']
+        if entry['id'] == 'search':
+            url = url_for('search')
+            icon = 'DefaultAddonsSearch.png'
+        elif entry['id'] == 'shorts':
+            url = url_for('shorts', params=target.get('params'))
+            icon = 'DefaultVideo.png'
+        elif target['type'] == 'browse':
+            url = url_for('browse', id=target['browse_id'], params=target.get('params'), title=entry['title'])
+            icon = 'DefaultFolder.png'
+        else:
+            return
+        li = xbmcgui.ListItem(entry['title'], offscreen=True)
+        thumb = entry.get('thumb') or icon
+        li.setArt({'icon': thumb, 'thumb': thumb})
+        menu = []
+        if target['type'] == 'browse' and (target.get('browse_id') or '').startswith('UC'):
+            if entry.get('pinned'):
+                menu.append((kodi.string(30107), 'RunPlugin(%s)' % url_for('unpin', id=entry['id'])))
+            else:
+                menu.append((kodi.string(30106), 'RunPlugin(%s)' % url_for(
+                    'pin', id=entry['id'], title=entry['title'], thumb=entry.get('thumb'))))
+        menu.append((kodi.string(30011), 'RunPlugin(%s)' % url_for('menu/customise')))
+        li.addContextMenuItems(menu)
+        self._add(url, li, True)
+
+    def _maybe_whos_watching(self):
+        if not kodi.setting_bool('whos_watching') or not auth.accounts():
+            return
+        window = xbmcgui.Window(10000)
+        if window.getProperty('leanback.whos_watching'):
+            return
+        window.setProperty('leanback.whos_watching', '1')
+        self._choose_account(kodi.string(30114), allow_add=False)
+
+    # ================================================================ listings
+    def browse(self):
+        browse_id = self.params.get('id')
+        desc = {'ep': 'browse', 'id': browse_id, 'params': self.params.get('params')}
+        self.render(desc, browse_id=browse_id)
+
+    def page(self):
+        """A continuation page: ?ep=browse|search|next&ctoken=..."""
+        desc = {'ep': self.params['ep'], 'ctoken': self.params['ctoken']}
+        self.render(desc, browse_id=self.params.get('bid'))
+
+    def shelf(self):
+        desc = json.loads(self.params['src'])
+        page = parser.parse_page(self.fetch(desc))
+        shelves = self._visible_shelves(page)
+        index = int(self.params.get('i', 0))
+        if index >= len(shelves):
+            return self._end(False)
+        shelf = shelves[index]
+        self._render_items(shelf['items'], browse_id=desc.get('id'))
+        if shelf['continuation']:
+            self._add_next(desc['ep'], shelf['continuation'], desc.get('id'))
+        self._finish_listing(shelf['items'])
+
+    def related(self):
+        desc = {'ep': 'next', 'v': self.params['v']}
+        page = parser.parse_page(self.fetch(desc))
+        items = [i for s in page['shelves'] for i in s['items']]
+        self._render_items(items)
+        self._finish_listing(items)
+
+    def _visible_shelves(self, page):
+        shelves = page['shelves']
+        if kodi.setting_bool('hide_shorts'):
+            shelves = [s for s in shelves if not s['shorts']]
+        return [s for s in shelves if s['items']]
+
+    def render(self, desc, browse_id=None):
+        resp = self.fetch(desc)
+        page = parser.parse_page(resp)
+        rendered = []
+
+        if page['header']:
+            self._add_header(page['header'])
+
+        tabs = page['tabs']
+        if tabs and self.params.get('tabs'):
+            # The secondary navigation on its own (e.g. every subscribed channel).
+            tabs = [t for t in tabs if not t.get('selected')]
+            if kodi.setting_bool('sort_subscriptions'):
+                tabs = sorted(tabs, key=lambda t: t['title'].lower())
+            for tab in tabs:
+                self._add_folder_item(tab)
+            return self._finish_listing([{'kind': 'folder'}])
+        if len(tabs) > 2 and not desc.get('params'):
+            # Like the TV app: show the selected tab ("All") and put the other tabs in one folder.
+            others = [t for t in tabs if not t.get('selected')]
+            label = kodi.string(30134) or 'Channels'
+            li = xbmcgui.ListItem('[B]%s[/B] (%d)' % (label, len(others)), offscreen=True)
+            li.setArt({'icon': 'DefaultArtist.png', 'thumb': 'DefaultArtist.png'})
+            li.getVideoInfoTag().setPlot(', '.join(t['title'] for t in others[:40]))
+            li.setProperty('SpecialSort', 'top')
+            self._add(url_for('browse', id=browse_id, params=desc.get('params'), tabs=1), li, True)
+        shelves = self._visible_shelves(page)
+        # Untitled rows (the Subscriptions feed, a channel's uploads) read better as one list.
+        untitled = sum(1 for s in shelves if not s['title'])
+        flatten = not kodi.setting_bool('shelves_as_folders') or (shelves and untitled * 2 >= len(shelves))
+        if len(shelves) == 1 or (shelves and flatten):
+            for shelf in shelves:
+                rendered.extend(self._render_items(shelf['items'], browse_id=browse_id))
+            if len(shelves) == 1 and shelves[0]['continuation']:
+                self._add_next(desc['ep'], shelves[0]['continuation'], browse_id)
+        else:
+            for index, shelf in enumerate(shelves):
+                self._add_shelf_folder(desc, index, shelf)
+
+        if page['continuation']:
+            self._add_next(desc['ep'], page['continuation'], browse_id)
+
+        if not tabs and not shelves and not page['header']:
+            message = kodi.string(30125) if (browse_id or '').startswith('FE') and not self.api.signed_in() \
+                else kodi.string(30124)
+            self._notify(message)
+        self._finish_listing(rendered or [{'kind': 'folder'}])
+
+    def _finish_listing(self, items):
+        videos = sum(1 for i in items if i.get('kind') == 'video')
+        xbmcplugin.setContent(self.handle, 'videos' if videos and videos >= len(items) / 2 else 'files')
+        xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_UNSORTED)
+        xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_LABEL)
+        xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_DURATION)
+        self._end()
+
+    def _add_next(self, ep, token, browse_id=None):
+        li = xbmcgui.ListItem(kodi.string(30102), offscreen=True)
+        li.setArt({'icon': 'DefaultFolder.png'})
+        li.setProperty('SpecialSort', 'bottom')
+        self._add(url_for('page', ep=ep, ctoken=token, bid=browse_id), li, True)
+
+    def _add_shelf_folder(self, desc, index, shelf):
+        title = shelf['title'] or kodi.string(30133) or shelf['items'][0]['title']
+        li = xbmcgui.ListItem(title, offscreen=True)
+        first = shelf['items'][0]
+        art = first.get('thumb') or 'DefaultFolder.png'
+        li.setArt({'icon': 'DefaultFolder.png', 'thumb': art, 'fanart': art})
+        tag = li.getVideoInfoTag()
+        tag.setTitle(title)
+        tag.setPlot('\n'.join('• ' + i['title'] for i in shelf['items'][:12]))
+        # Prefer the shelf's own full page (Library: History -> FEhistory, Liked videos -> VLLL), or the
+        # playlist every item belongs to (Watch later -> VLWL); otherwise open the shelf itself.
+        endpoint = shelf.get('endpoint') or {}
+        playlists = {i['target'].get('playlist_id') for i in shelf['items'] if i['kind'] == 'video'}
+        if endpoint.get('type') == 'browse' and endpoint.get('browse_id'):
+            url = url_for('browse', id=endpoint['browse_id'], params=endpoint.get('params'), title=title)
+        elif len(playlists) == 1 and None not in playlists and not next(iter(playlists)).startswith('RD'):
+            url = url_for('browse', id='VL' + next(iter(playlists)), title=title)
+        else:
+            url = url_for('shelf', src=json.dumps(desc, sort_keys=True), i=index)
+        self._add(url, li, True)
+
+    def _add_header(self, header):
+        li = xbmcgui.ListItem('[B]%s[/B]' % header['title'], offscreen=True)
+        tag = li.getVideoInfoTag()
+        tag.setTitle(header['title'])
+        tag.setPlot('\n\n'.join(line for line in header['plot_lines'] if line))
+        art = {'thumb': header.get('thumb'), 'icon': header.get('thumb'),
+               'fanart': header.get('fanart') or header.get('thumb')}
+        li.setArt({k: v for k, v in art.items() if v})
+        li.setProperty('SpecialSort', 'top')
+        li.setProperty('IsPlayable', 'false')
+        self._add(url_for('details', header=json.dumps({'title': header['title'], 'plot': tag.getPlot(),
+                                                        'thumb': header.get('thumb'),
+                                                        'fanart': header.get('fanart')})), li, False)
+
+    # ------------------------------------------------------------------ items
+    def _render_items(self, items, browse_id=None):
+        hide_shorts = kodi.setting_bool('hide_shorts')
+        hide_watched = kodi.setting_bool('hide_watched') and browse_id not in NO_WATCHED_FILTER \
+            and not (browse_id or '').startswith('VL')
+        threshold = kodi.setting_int('watched_threshold') or 80
+        shown = []
+        for item in items:
+            if hide_shorts and item['short']:
+                continue
+            if hide_watched and item['kind'] == 'video' and item['watched_pct'] >= threshold:
+                continue
+            if item['kind'] == 'video':
+                self._add_video(item, threshold)
+            else:
+                self._add_folder_item(item)
+            shown.append(item)
+        return shown
+
+    def _add_video(self, item, threshold):
+        target = item['target']
+        video_id = target.get('video_id') or item.get('id')
+        if not video_id:
+            return
+        title = item['title']
+        label = '[COLOR red]%s[/COLOR] %s' % (kodi.string(30127), title) if item['live'] else title
+        li = xbmcgui.ListItem(label, offscreen=True)
+        tag = li.getVideoInfoTag()
+        tag.setMediaType('video')
+        tag.setTitle(title)
+        tag.setPlot('\n'.join(item['plot_lines']))
+        tag.setPlotOutline(' • '.join(x for x in (item['channel'], item['published']) if x))
+        if item['channel']:
+            tag.setStudios([item['channel']])
+            tag.setDirectors([item['channel']])
+        if item['duration']:
+            tag.setDuration(item['duration'])
+            if 0 < item['watched_pct'] < threshold:
+                tag.setResumePoint(item['duration'] * item['watched_pct'] / 100.0, item['duration'])
+        if item['watched_pct'] >= threshold:
+            tag.setPlaycount(1)
+        if item['badges']:
+            tag.setTags(item['badges'])
+        if item['views']:
+            tag.setVotes(item['views'])
+        li.setArt({'thumb': item['thumb'], 'icon': item['thumb'], 'fanart': item['thumb'],
+                   'landscape': item['thumb']})
+        li.setProperty('IsPlayable', 'true')
+        li.setProperty('leanback.video_id', video_id)
+        menu = []
+        if item['channel_id']:
+            menu.append((kodi.string(30103), 'Container.Update(%s)' % url_for(
+                'browse', id=item['channel_id'], title=item['channel'])))
+        menu.append((kodi.string(30104), 'Container.Update(%s)' % url_for('related', v=video_id)))
+        menu.append((kodi.string(30105), 'RunPlugin(%s)' % url_for('details', v=video_id)))
+        li.addContextMenuItems(menu)
+        self._add(url_for('play', v=video_id), li, False)
+
+    def _add_folder_item(self, item):
+        target = item['target'] or {}
+        kind = item['kind']
+        if kind == 'playlist' or (target.get('type') == 'video' and target.get('playlist_id') and kind != 'video'):
+            playlist_id = target.get('playlist_id') or (target.get('browse_id') or '')[2:] or item.get('id')
+            browse_id = target.get('browse_id') if target.get('type') == 'browse' else 'VL' + playlist_id
+            url = url_for('browse', id=browse_id, title=item['title'])
+        elif target.get('type') == 'browse':
+            url = url_for('browse', id=target['browse_id'], params=target.get('params'), title=item['title'])
+        elif target.get('type') == 'search':
+            url = url_for('search', q=target['query'], params=target.get('params'))
+        elif target.get('type') == 'play_playlist':
+            url = url_for('browse', id='VL' + target['playlist_id'], title=item['title'])
+        else:
+            return
+        li = xbmcgui.ListItem(item['title'], offscreen=True)
+        tag = li.getVideoInfoTag()
+        tag.setTitle(item['title'])
+        lines = list(item['plot_lines'])
+        if item['badges']:
+            lines.append(' • '.join(item['badges']))
+        tag.setPlot('\n'.join(lines))
+        thumb = item.get('thumb') or 'DefaultFolder.png'
+        li.setArt({'thumb': thumb, 'icon': thumb, 'fanart': item.get('thumb') or ''})
+        menu = []
+        browse_id = target.get('browse_id') or ''
+        if kind == 'channel' or browse_id.startswith('UC'):
+            menu.append((kodi.string(30106), 'RunPlugin(%s)' % url_for(
+                'pin', id=browse_id or item.get('id'), title=item['title'], thumb=item.get('thumb'))))
+        if kind == 'playlist':
+            playlist_id = browse_id[2:] if browse_id.startswith('VL') else (target.get('playlist_id') or item.get('id'))
+            menu.append((kodi.string(30126), 'RunPlugin(%s)' % url_for('play_playlist', list=playlist_id)))
+        if menu:
+            li.addContextMenuItems(menu)
+        self._add(url, li, True)
+
+    # ================================================================ search
+    def search(self):
+        query = self.params.get('q')
+        if query:
+            self._remember_search(query)
+            self.render({'ep': 'search', 'q': query, 'params': self.params.get('params')})
+            return
+        li = xbmcgui.ListItem('[B]%s[/B]' % kodi.string(30101), offscreen=True)
+        li.setArt({'icon': 'DefaultAddonsSearch.png'})
+        self._add(url_for('search/new'), li, True)
+        for past in self._state().get('search_history', []):
+            li = xbmcgui.ListItem(past, offscreen=True)
+            li.setArt({'icon': 'DefaultAddonsSearch.png'})
+            li.addContextMenuItems([(kodi.string(30128), 'RunPlugin(%s)' % url_for('search/remove', q=past))])
+            self._add(url_for('search', q=past), li, True)
+        self._end()
+
+    def search_new(self):
+        query = xbmcgui.Dialog().input(kodi.string(30100))
+        self._end(False)
+        if query:
+            xbmc.executebuiltin('Container.Update(%s)' % url_for('search', q=query))
+
+    def search_remove(self):
+        state = self._state()
+        state['search_history'] = [q for q in state.get('search_history', []) if q != self.params.get('q')]
+        self._save_state(state)
+        xbmc.executebuiltin('Container.Refresh')
+
+    def _remember_search(self, query):
+        state = self._state()
+        history = [q for q in state.get('search_history', []) if q.lower() != query.lower()]
+        state['search_history'] = [query] + history[:19]
+        self._save_state(state)
+
+    # ================================================================ playback
+    def play(self):
+        video_id = self.params['v']
+        try:
+            resp, client = self.api.player(video_id)
+        except InnerTubeError as exc:
+            self._notify('%s: %s' % (kodi.string(30120), exc), error=True)
+            xbmcplugin.setResolvedUrl(self.handle, False, xbmcgui.ListItem(offscreen=True))
+            return
+        data = resp.get('streamingData', {})
+        details = resp.get('videoDetails', {})
+        headers = 'User-Agent=%s' % urllib.parse.quote(client['ua'])
+        hl = self.api.hl
+        live = bool(details.get('isLive')) or bool(
+            data.get('hlsManifestUrl') and not any(f.get('initRange') for f in data.get('adaptiveFormats', [])))
+
+        path = None
+        mime = None
+        if not live:
+            translate = [x.strip() for x in (kodi.setting('subs_translate').strip() or hl).split(',')]
+            translate += [x.strip() for x in kodi.setting('subs_more').split(',') if x.strip()]
+            subs = mpd.subtitle_tracks(resp, kodi.setting_bool('subs_asr'), translate)
+            port = xbmcgui.Window(10000).getProperty('leanback.port')
+            if subs and port:
+                # Subtitles go through the local server, which retries YouTube's rate limits (429 on
+                # translated tracks) and returns an empty track instead of an error.
+                with open(kodi.temp_file('%s.subs.json' % video_id), 'w', encoding='utf-8') as handle:
+                    json.dump({'ua': client['ua'], 'urls': [s['url'] for s in subs]}, handle)
+                for index, sub in enumerate(subs):
+                    sub['url'] = 'http://127.0.0.1:%s/sub/%s/%d.vtt' % (port, video_id, index)
+            manifest = mpd.build(resp, max_height=kodi.setting_int('max_quality'),
+                                 codec=kodi.setting('codec') or 'any', allow_hdr=kodi.setting_bool('allow_hdr'),
+                                 audio_pref=kodi.setting('audio_track') or 'original', ui_lang=hl, subtitles=subs)
+            if manifest and port:
+                with open(kodi.temp_file('%s.mpd' % video_id), 'w', encoding='utf-8') as handle:
+                    handle.write(manifest)
+                path = 'http://127.0.0.1:%s/mpd/%s.mpd' % (port, video_id)
+                mime = 'application/dash+xml'
+            elif manifest:
+                kodi.log('manifest server not running, falling back to HLS', xbmc.LOGWARNING)
+        if not path and data.get('hlsManifestUrl'):
+            path = data['hlsManifestUrl']
+            mime = 'application/vnd.apple.mpegurl'
+        if not path:
+            self._notify(kodi.string(30120), error=True)
+            xbmcplugin.setResolvedUrl(self.handle, False, xbmcgui.ListItem(offscreen=True))
+            return
+
+        li = xbmcgui.ListItem(path=path, offscreen=True)
+        li.setMimeType(mime)
+        li.setContentLookup(False)
+        li.setProperty('inputstream', ISA)
+        li.setProperty(ISA + '.manifest_headers', headers)
+        li.setProperty(ISA + '.stream_headers', headers)
+        if live:
+            li.setProperty(ISA + '.play_timeshift_buffer', 'true')
+        info = parser.video_details(resp)
+        self._apply_details(li, info)
+        xbmcplugin.setResolvedUrl(self.handle, True, li)
+
+    def play_playlist(self):
+        playlist_id = self.params['list']
+        page = parser.parse_page(self.fetch({'ep': 'browse', 'id': 'VL' + playlist_id}))
+        items = [i for s in page['shelves'] for i in s['items'] if i['kind'] == 'video']
+        if not items:
+            self._notify(kodi.string(30124))
+            return
+        self._end(False)
+        playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+        playlist.clear()
+        for item in items:
+            video_id = item['target'].get('video_id') or item.get('id')
+            li = xbmcgui.ListItem(item['title'], offscreen=True)
+            li.setArt({'thumb': item['thumb']})
+            li.getVideoInfoTag().setTitle(item['title'])
+            li.setProperty('IsPlayable', 'true')
+            playlist.add(url_for('play', v=video_id), li)
+        xbmc.Player().play(playlist)
+
+    def shorts(self):
+        """Like the TV app's Shorts button: start playing the Shorts feed as a playlist."""
+        self._end(False)
+        videos = self.api.shorts(self.params.get('params') or 'CA8=')
+        if not videos:
+            self._notify(kodi.string(30124))
+            return
+        playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+        playlist.clear()
+        for video_id, thumb in videos:
+            li = xbmcgui.ListItem(video_id, offscreen=True)
+            li.setArt({'thumb': thumb, 'icon': thumb})
+            li.setProperty('IsPlayable', 'true')
+            playlist.add(url_for('play', v=video_id), li)
+        xbmc.Player().play(playlist)
+
+    def _apply_details(self, li, info):
+        tag = li.getVideoInfoTag()
+        tag.setMediaType('video')
+        tag.setTitle(info['title'])
+        plot = info['plot']
+        facts = [x for x in (info['channel'], info.get('subscribers'), info.get('published') or info.get('date'),
+                             ('%s views' % '{:,}'.format(info['views'])) if info['views'] else '',
+                             ('%s likes' % info['likes']) if info.get('likes') else '') if x]
+        if facts:
+            plot = ' • '.join(facts) + ('\n\n' + plot if plot else '')
+        tag.setPlot(plot)
+        if info['channel']:
+            tag.setStudios([info['channel']])
+            tag.setDirectors([info['channel']])
+        if info['duration']:
+            tag.setDuration(info['duration'])
+        if info['tags']:
+            tag.setTags(info['tags'][:20])
+        if info['views']:
+            tag.setVotes(info['views'])
+        if info.get('date'):
+            tag.setPremiered(info['date'])
+        if info.get('genre'):
+            tag.setGenres([info['genre']])
+        thumb = 'https://i.ytimg.com/vi/%s/maxresdefault.jpg' % info['video_id'] if info['video_id'] else info['thumb']
+        li.setArt({'thumb': info['thumb'] or thumb, 'fanart': thumb, 'icon': info['thumb'] or thumb})
+
+    def details(self):
+        if self.params.get('header'):
+            header = json.loads(self.params['header'])
+            li = xbmcgui.ListItem(header['title'], offscreen=True)
+            tag = li.getVideoInfoTag()
+            tag.setTitle(header['title'])
+            tag.setPlot(header['plot'])
+            li.setArt({k: v for k, v in (('thumb', header.get('thumb')), ('fanart', header.get('fanart'))) if v})
+            xbmcgui.Dialog().info(li)
+            return
+        video_id = self.params['v']
+        xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+        try:
+            player_resp = None
+            try:
+                player_resp, _ = self.api.player(video_id)
+            except InnerTubeError:
+                pass
+            next_resp = self.api.next(video_id)
+        finally:
+            xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
+        info = parser.video_details(player_resp or {}, next_resp)
+        info['video_id'] = info['video_id'] or video_id
+        li = xbmcgui.ListItem(info['title'], offscreen=True)
+        self._apply_details(li, info)
+        li.setPath(url_for('play', v=video_id))
+        li.setProperty('IsPlayable', 'true')
+        xbmcgui.Dialog().info(li)
+
+    # ================================================================ menu customisation
+    def pin(self):
+        state = self._state()
+        menu = state.setdefault('menu', {})
+        pinned = [p for p in menu.get('pinned', []) if p['id'] != self.params['id']]
+        pinned.append({'id': self.params['id'], 'title': self.params.get('title', ''),
+                       'thumb': self.params.get('thumb', '')})
+        menu['pinned'] = pinned
+        self._save_state(state)
+        self._notify(kodi.string(30119))
+
+    def unpin(self):
+        state = self._state()
+        menu = state.setdefault('menu', {})
+        menu['pinned'] = [p for p in menu.get('pinned', []) if p['id'] != self.params['id']]
+        menu['order'] = [x for x in menu.get('order', []) if x != self.params['id']]
+        self._save_state(state)
+        xbmc.executebuiltin('Container.Refresh')
+
+    def customise_menu(self):
+        dialog = xbmcgui.Dialog()
+        changed = False
+        while True:
+            choice = dialog.select(kodi.string(30011), [kodi.string(30116), kodi.string(30117), kodi.string(30122)])
+            if choice == 0:
+                changed |= self._choose_hidden()
+            elif choice == 1:
+                changed |= self._reorder()
+            else:
+                break
+        if changed:
+            self._notify(kodi.string(30119))
+            xbmc.executebuiltin('Container.Refresh')
+
+    def _choose_hidden(self):
+        entries, _ = self.menu_entries(include_hidden=True)
+        state = self._state()
+        menu = state.setdefault('menu', {})
+        hidden = set(menu.get('hidden', []))
+        labels = [e['title'] for e in entries]
+        preselect = [i for i, e in enumerate(entries) if e['id'] not in hidden]
+        chosen = xbmcgui.Dialog().multiselect(kodi.string(30116), labels, preselect=preselect)
+        if chosen is None:
+            return False
+        menu['hidden'] = [e['id'] for i, e in enumerate(entries) if i not in chosen]
+        self._save_state(state)
+        return True
+
+    def _reorder(self):
+        changed = False
+        while True:
+            entries, _ = self.menu_entries(include_hidden=True)
+            labels = [e['title'] for e in entries]
+            index = xbmcgui.Dialog().select(kodi.string(30121), labels)
+            if index < 0:
+                return changed
+            target = xbmcgui.Dialog().select(kodi.string(30118) % labels[index],
+                                             ['%d. %s' % (i + 1, label) for i, label in enumerate(labels)],
+                                             preselect=index)
+            if target < 0 or target == index:
+                continue
+            order = [e['id'] for e in entries]
+            moved = order.pop(index)
+            order.insert(target, moved)
+            state = self._state()
+            state.setdefault('menu', {})['order'] = order
+            self._save_state(state)
+            changed = True
+
+    def reset_menu(self):
+        state = self._state()
+        state['menu'] = {'pinned': state.get('menu', {}).get('pinned', [])}
+        self._save_state(state)
+        self._notify(kodi.string(30119))
+
+    # ================================================================ accounts
+    def accounts_menu(self):
+        self._end(False)
+        self._choose_account(kodi.string(30108), allow_add=True)
+
+    def _choose_account(self, heading, allow_add):
+        accounts = auth.accounts()
+        active = auth.active_account()[0]
+        labels = [('* ' if key == active else '') + name for key, name in accounts]
+        labels.append(('* ' if active is None else '') + kodi.string(30115))
+        if allow_add:
+            labels.append(kodi.string(30109))
+            if accounts:
+                labels.append(kodi.string(30043))
+        choice = xbmcgui.Dialog().select(heading, labels)
+        if choice < 0:
+            return
+        if choice < len(accounts):
+            auth.set_active(accounts[choice][0])
+        elif choice == len(accounts):
+            auth.set_active(None)
+        elif choice == len(accounts) + 1:
+            self.sign_in()
+            return
+        else:
+            self.sign_out()
+            return
+        xbmc.executebuiltin('Container.Refresh')
+
+    def switch_account(self):
+        self._choose_account(kodi.string(30042), allow_add=True)
+
+    def sign_in(self):
+        try:
+            code = auth.request_device_code()
+        except Exception as exc:  # network or OAuth errors
+            self._notify(kodi.string(30113) % exc, error=True)
+            return
+        url = code.get('verification_url') or 'youtube.com/activate'
+        url = url.replace('https://', '').replace('http://', '').replace('www.', '')
+        interval = max(int(code.get('interval', 5)), 2)
+        deadline = time.time() + int(code.get('expires_in', 1800))
+        progress = xbmcgui.DialogProgress()
+        message = '%s\n[B][COLOR yellow]%s[/COLOR][/B]\n%s' % (kodi.string(30110) % url, code['user_code'],
+                                                              kodi.string(30111))
+        progress.create(kodi.string(30109), message)
+        token = None
+        monitor = xbmc.Monitor()
+        try:
+            while time.time() < deadline:
+                if progress.iscanceled() or monitor.abortRequested():
+                    return
+                remaining = (deadline - time.time()) / float(code.get('expires_in', 1800))
+                progress.update(int(remaining * 100), message)
+                if monitor.waitForAbort(interval):
+                    return
+                try:
+                    token = auth.poll_token(code['device_code'])
+                except auth.AuthError as exc:
+                    self._notify(kodi.string(30113) % exc, error=True)
+                    return
+                if token:
+                    break
+        finally:
+            progress.close()
+        if not token:
+            self._notify(kodi.string(30130), error=True)
+            return
+        account_id = auth.add_account(token)
+        name = InnerTube().account_name() or kodi.string(30131) % len(auth.accounts())
+        auth.rename_account(account_id, name)
+        self._notify(kodi.string(30112) % name)
+        xbmc.executebuiltin('Container.Refresh')
+
+    def sign_out(self):
+        accounts = auth.accounts()
+        if not accounts:
+            return
+        if len(accounts) == 1:
+            index = 0 if xbmcgui.Dialog().yesno(kodi.string(30043), accounts[0][1]) else -1
+        else:
+            index = xbmcgui.Dialog().select(kodi.string(30043), [name for _, name in accounts])
+        if index < 0:
+            return
+        auth.remove_account(accounts[index][0])
+        self._notify(kodi.string(30123))
+        xbmc.executebuiltin('Container.Refresh')
+
+
+def run(argv):
+    Plugin(argv).dispatch()
