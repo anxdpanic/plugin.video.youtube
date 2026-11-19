@@ -22,6 +22,14 @@ ruff check .
 pytest
 ```
 
+To build an installable zip for Kodi's **Install from zip file**:
+
+```sh
+python scripts/package.py
+```
+
+This writes `dist/plugin.video.leanback-<version>.zip`, with the version taken from `addon.xml`.
+
 ## License
 
 GPL-3.0-only. See [LICENSE](LICENSE).
