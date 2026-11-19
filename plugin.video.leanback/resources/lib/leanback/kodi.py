@@ -21,8 +21,9 @@ TEMP_DIR = os.path.join(xbmcvfs.translatePath('special://temp/'), ADDON_ID)
 LEGACY_TEMP_DIR = os.path.join(PROFILE, 'temp')
 
 
-def log(msg, level=xbmc.LOGDEBUG):
-    xbmc.log('[%s] %s' % (ADDON_ID, msg), level)
+def log(msg):
+    """Log at debug level only, so nothing appears unless Kodi debug logging is on."""
+    xbmc.log('[%s] %s' % (ADDON_ID, msg), xbmc.LOGDEBUG)
 
 
 def string(string_id):

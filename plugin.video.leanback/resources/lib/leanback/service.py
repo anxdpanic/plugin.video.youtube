@@ -105,14 +105,14 @@ def run():
     window = xbmcgui.Window(10000)
     server = _start_server()
     if server is None:
-        kodi.log('could not start manifest server', xbmc.LOGERROR)
+        kodi.log('could not start manifest server')
         return
     port = server.server_address[1]
     window.setProperty(PORT_PROPERTY, str(port))
     thread = threading.Thread(target=server.serve_forever, name='leanback-httpd')
     thread.daemon = True
     thread.start()
-    kodi.log('manifest server on 127.0.0.1:%d' % port, xbmc.LOGINFO)
+    kodi.log('manifest server on 127.0.0.1:%d' % port)
     monitor = xbmc.Monitor()
     # Older versions kept these files in the add-on profile; remove that folder.
     shutil.rmtree(kodi.LEGACY_TEMP_DIR, ignore_errors=True)

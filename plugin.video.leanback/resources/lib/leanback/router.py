@@ -59,7 +59,7 @@ class Plugin:
         }
         handler = routes.get(self.route)
         if handler is None:
-            kodi.log('unknown route %s' % self.route, xbmc.LOGWARNING)
+            kodi.log('unknown route %s' % self.route)
             return self._end(False)
         # When Kodi loses its navigation history (e.g. after playback) it builds a ".." path by
         # dropping the query string, e.g. plugin://.../browse/. Show the main menu instead of failing.
@@ -71,7 +71,7 @@ class Plugin:
         try:
             handler()
         except InnerTubeError as exc:
-            kodi.log('InnerTube error on %s: %s' % (self.route, exc), xbmc.LOGWARNING)
+            kodi.log('InnerTube error on %s: %s' % (self.route, exc))
             self._notify(kodi.string(30129) % exc, error=True)
             self._end(False)
         except auth.AuthError:
@@ -511,7 +511,7 @@ class Plugin:
                 path = 'http://127.0.0.1:%s/mpd/%s.mpd' % (port, video_id)
                 mime = 'application/dash+xml'
             elif manifest:
-                kodi.log('manifest server not running, falling back to HLS', xbmc.LOGWARNING)
+                kodi.log('manifest server not running, falling back to HLS')
         if not path and data.get('hlsManifestUrl'):
             path = data['hlsManifestUrl']
             mime = 'application/vnd.apple.mpegurl'
