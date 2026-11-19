@@ -41,6 +41,11 @@
                         <close>true</close>
                     </control>
                 </setting>
+                <setting id="report_history" type="boolean" label="30044" help="30045">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
             </group>
         </category>
         <category id="menu" label="30010">

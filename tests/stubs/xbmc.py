@@ -50,6 +50,9 @@ class Player:
     def isPlayingVideo(self):  # noqa: N802
         return bool(Player.PLAYING)
 
+    def isPlaying(self):  # noqa: N802
+        return bool(Player.PLAYING)
+
     def getPlayingFile(self):  # noqa: N802
         return Player.PLAYING
 

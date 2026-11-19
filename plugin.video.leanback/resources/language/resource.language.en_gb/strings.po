@@ -179,6 +179,14 @@ msgctxt "#30043"
 msgid "Sign out"
 msgstr ""
 
+msgctxt "#30044"
+msgid "Add watched videos to YouTube history"
+msgstr ""
+
+msgctxt "#30045"
+msgid "When signed in, tell YouTube what you watch so it appears in your history and keeps your progress."
+msgstr ""
+
 # Runtime
 msgctxt "#30100"
 msgid "Search"

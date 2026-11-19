@@ -9,7 +9,7 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 
-from . import auth, http, kodi, mpd, parser
+from . import auth, history, http, kodi, mpd, parser
 from .innertube import InnerTube, InnerTubeError
 
 BASE_URL = 'plugin://%s/' % kodi.ADDON_ID
@@ -613,6 +613,10 @@ class Plugin:
         self._apply_details(li, info)
         if self.params.get('t'):  # start at a chapter
             li.setProperty('StartOffset', self.params['t'])
+        if self.api.signed_in() and kodi.setting_bool('report_history'):
+            info = history.tracking_info(resp, video_id, client, path)
+            if info:
+                history.publish(info)
         xbmcplugin.setResolvedUrl(self.handle, True, li)
 
     def play_playlist(self):

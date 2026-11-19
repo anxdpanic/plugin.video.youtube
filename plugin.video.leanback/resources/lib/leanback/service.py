@@ -14,7 +14,7 @@ from socketserver import ThreadingMixIn
 import xbmc
 import xbmcgui
 
-from . import http, kodi
+from . import history, http, kodi
 
 PORT_PROPERTY = 'leanback.port'
 PREFERRED_PORTS = (50152, 50153, 50154, 0)
@@ -117,8 +117,14 @@ def run():
     # Older versions kept these files in the add-on profile; remove that folder.
     shutil.rmtree(kodi.LEGACY_TEMP_DIR, ignore_errors=True)
     _cleanup()
-    while not monitor.waitForAbort(1800):
-        _cleanup()
+    tracker = history.Tracker()
+    last_cleanup = time.time()
+    while not monitor.waitForAbort(5):
+        tracker.tick()
+        if time.time() - last_cleanup > 1800:
+            _cleanup()
+            last_cleanup = time.time()
+    tracker.finish()
     window.clearProperty(PORT_PROPERTY)
     server.shutdown()
     server.server_close()
