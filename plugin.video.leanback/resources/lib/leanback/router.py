@@ -15,6 +15,7 @@ from .innertube import InnerTube, InnerTubeError
 BASE_URL = 'plugin://%s/' % kodi.ADDON_ID
 PAGE_TTL = 600
 GUIDE_TTL = 3600
+ROW_PAGES = 3  # pages of rows per listing at least: one page holds only three or four rows
 NO_WATCHED_FILTER = ('FEhistory', 'FElibrary', 'FEmy_youtube', 'FEplaylist_aggregation')
 ISA = 'inputstream.adaptive'
 
@@ -333,6 +334,26 @@ class Plugin:
             token = next_token if next_token != token else None
         return items, token
 
+    def _more_rows(self, ep, token, titles):
+        """Add the rows of the next few pages as folders too. A page of rows (Home, the topic pages)
+        holds only three or four of them. Returns the token for the page after, or None."""
+        for _ in range(max(self._pages_per_listing(), ROW_PAGES) - 1):
+            if not token:
+                break
+            desc = {'ep': ep, 'ctoken': token}
+            try:
+                page = parser.parse_page(self.fetch(desc))
+            except (InnerTubeError, http.HTTPError) as exc:
+                kodi.log('stopped loading more rows: %s' % exc)  # keep what loaded, page on from here
+                break
+            for index, shelf in enumerate(self._visible_shelves(page)):
+                if shelf['title'] and shelf['title'] in titles:
+                    continue  # a row repeated where pages meet
+                titles.add(shelf['title'])
+                self._add_shelf_folder(desc, index, shelf)
+            token = page['continuation'] if page['continuation'] != token else None
+        return token
+
     def page(self):
         """A continuation page: ?ep=browse|search|next&ctoken=..."""
         desc = {'ep': self.params['ep'], 'ctoken': self.params['ctoken']}
@@ -412,7 +433,9 @@ class Plugin:
             # Rows as folders: the continuation brings more rows, not more items.
             for index, shelf in enumerate(shelves):
                 self._add_shelf_folder(desc, index, shelf)
-            self._add_next(desc['ep'], page['continuation'], browse_id)
+            token = self._more_rows(desc['ep'], page['continuation'], {s['title'] for s in shelves})
+            if token:
+                self._add_next(desc['ep'], token, browse_id)
         else:
             for index, shelf in enumerate(shelves):
                 self._add_shelf_folder(desc, index, shelf)

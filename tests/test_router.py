@@ -1,3 +1,5 @@
+import json
+
 import xbmcaddon
 import xbmcplugin
 
@@ -196,6 +198,32 @@ def test_listing_loads_several_pages_and_numbers_next_page(monkeypatch):
     xbmcplugin.reset()
     run('page', '?ep=browse&ctoken=T4&bid=FEsubscriptions&n=2').dispatch()
     assert [u for u, _, _ in xbmcplugin.ITEMS] == [router.url_for('play', v='e')]
+
+
+def test_rows_listing_loads_three_pages_of_rows(monkeypatch):
+    """Home shows rows as folders; one page holds only a few rows, so the next two come with it."""
+    def shelf(title):
+        return {'title': title, 'items': [video(title.lower())], 'continuation': None, 'shorts': False,
+                'endpoint': None}
+    pages = {None: ['Recommended', 'Music'], 'T2': ['Music', 'News'], 'T3': ['Gaming'], 'T4': ['Live']}
+    tokens = {None: 'T2', 'T2': 'T3', 'T3': 'T4', 'T4': None}
+    fetched = []
+
+    def fetch(self, desc, use_cache=True):
+        fetched.append(desc.get('ctoken'))
+        return desc.get('ctoken')
+    monkeypatch.setattr(router.Plugin, 'fetch', fetch)
+    monkeypatch.setattr(parser, 'parse_page', lambda token: {
+        'header': None, 'tabs': [], 'continuation': tokens[token], 'shelves': [shelf(t) for t in pages[token]]})
+
+    xbmcaddon.SETTINGS['pages_per_listing'] = 2
+    run('browse', '?id=FEtopics').dispatch()
+    assert fetched[:3] == [None, 'T2', 'T3']
+    labels = [li.label for _, li, _ in xbmcplugin.ITEMS]
+    assert labels == ['Recommended', 'Music', 'News', 'Gaming', 'str30102 (2)']  # 'Music' repeated once
+    gaming = xbmcplugin.ITEMS[3][0]
+    assert gaming == router.url_for('shelf', src=json.dumps({'ctoken': 'T3', 'ep': 'browse'}, sort_keys=True), i=0)
+    assert xbmcplugin.ITEMS[-1][0] == router.url_for('page', ep='browse', ctoken='T4', bid='FEtopics', n=2)
 
 
 def test_search_continuation_keeps_to_the_results_row(monkeypatch):
