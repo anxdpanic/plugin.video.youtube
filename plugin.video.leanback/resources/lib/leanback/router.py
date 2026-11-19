@@ -275,6 +275,16 @@ class Plugin:
                 return items, shelf['continuation']
         return [], None
 
+    @staticmethod
+    def _continued_rows(page):
+        """The rows a continuation page continues. A row's continuation (search results) comes back
+        with side rows such as Songs repeated on every page; keep to the row being paged."""
+        shelves = [s for s in page['shelves'] if s['items']]
+        if page['continuation'] or len(shelves) < 2:
+            return shelves
+        paged = [s for s in shelves if s['continuation']]
+        return paged[:1] if len(paged) == 1 else shelves[:1]
+
     def page(self):
         """A continuation page: ?ep=browse|search|next&ctoken=..."""
         desc = {'ep': self.params['ep'], 'ctoken': self.params['ctoken']}
@@ -333,6 +343,9 @@ class Plugin:
             li.setProperty('SpecialSort', 'top')
             self._add(url_for('browse', id=browse_id, params=desc.get('params'), tabs=1), li, True)
         shelves = self._visible_shelves(page)
+        if desc.get('ctoken'):
+            continued = self._continued_rows(page)
+            shelves = [s for s in shelves if s in continued]
         # Untitled rows (the Subscriptions feed, a channel's uploads) read better as one list.
         untitled = sum(1 for s in shelves if not s['title'])
         flatten = not kodi.setting_bool('shelves_as_folders') or (shelves and untitled * 2 >= len(shelves))

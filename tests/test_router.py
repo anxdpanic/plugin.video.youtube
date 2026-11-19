@@ -168,3 +168,17 @@ def test_flattened_search_keeps_next_page_and_rows_open_as_searches(monkeypatch)
     run('search', '?q=cats').dispatch()
     assert router.url_for('search', q='cats videos', params='eAE=') in [u for u, _, _ in xbmcplugin.ITEMS]
     assert run('')._state()['search_history'] == ['cats']
+
+
+def test_search_continuation_keeps_to_the_results_row(monkeypatch):
+    """Each page of search results repeats side rows such as Songs; only the results continue."""
+    def shelf(title, ids, token):
+        return {'title': title, 'items': [video(i) for i in ids], 'continuation': token, 'shorts': False,
+                'endpoint': None}
+    page = {'header': None, 'tabs': [], 'continuation': None,
+            'shelves': [shelf('Results', ['a'], 'T3'), shelf('Songs', ['s'], None)]}
+    monkeypatch.setattr(router.Plugin, 'fetch', lambda self, desc, use_cache=True: {})
+    monkeypatch.setattr(parser, 'parse_page', lambda resp: page)
+    run('page', '?ep=search&ctoken=T2').dispatch()
+    assert [u for u, _, _ in xbmcplugin.ITEMS] == [router.url_for('play', v='a'),
+                                                    router.url_for('page', ep='search', ctoken='T3')]
