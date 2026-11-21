@@ -6,7 +6,8 @@ from xml.sax.saxutils import escape, quoteattr
 
 from .parser import text
 
-SUPPORTED_VIDEO = ('avc1', 'vp9', 'vp09', 'av01')
+# Codec families (see codec_family) a manifest offers.
+SUPPORTED_VIDEO = ('avc1', 'vp9', 'av01')
 SUPPORTED_AUDIO = ('mp4a', 'opus', 'ec-3', 'ac-3')
 TRANSFER_SCHEME = 'urn:mpeg:mpegB:cicp:TransferCharacteristics'
 CHANNEL_SCHEME = 'urn:mpeg:dash:23003:3:audio_channel_configuration:2011'
@@ -31,19 +32,16 @@ def is_hdr(fmt):
     return fmt.get('colorInfo', {}).get('transferCharacteristics') in HDR_TRANSFER
 
 
+def _usable(fmt, media, families):
+    """A stream of this media type ('video'/'audio') in a supported codec that a manifest can address
+    by byte ranges: a direct URL, init and index ranges, and no DRM."""
+    mime, codecs = _mime_codec(fmt)
+    return bool(mime and mime.startswith(media + '/') and fmt.get('url') and 'initRange' in fmt
+                and 'indexRange' in fmt and not fmt.get('drmFamilies') and codec_family(codecs) in families)
+
+
 def select_video(formats, max_height=0, codec='any', allow_hdr=True):
-    videos = []
-    for fmt in formats:
-        mime, codecs = _mime_codec(fmt)
-        if not mime or not mime.startswith('video/') or not fmt.get('url'):
-            continue
-        if 'initRange' not in fmt or 'indexRange' not in fmt or fmt.get('drmFamilies'):
-            continue
-        if codec_family(codecs) not in ('avc1', 'vp9', 'av01'):
-            continue
-        if not allow_hdr and is_hdr(fmt):
-            continue
-        videos.append(fmt)
+    videos = [f for f in formats if _usable(f, 'video', SUPPORTED_VIDEO) and (allow_hdr or not is_hdr(f))]
     if max_height:
         capped = [f for f in videos if min(f.get('height', 0), f.get('width', 0)) <= max_height]
         videos = capped or sorted(videos, key=lambda f: f.get('height', 0))[:1]
@@ -55,17 +53,7 @@ def select_video(formats, max_height=0, codec='any', allow_hdr=True):
 
 
 def select_audio(formats):
-    audios = []
-    for fmt in formats:
-        mime, codecs = _mime_codec(fmt)
-        if not mime or not mime.startswith('audio/') or not fmt.get('url'):
-            continue
-        if 'initRange' not in fmt or 'indexRange' not in fmt or fmt.get('drmFamilies'):
-            continue
-        if codec_family(codecs) not in ('mp4a', 'opus', 'ec-3', 'ac-3'):
-            continue
-        audios.append(fmt)
-    return audios
+    return [f for f in formats if _usable(f, 'audio', SUPPORTED_AUDIO)]
 
 
 def _duration(formats, fallback):
