@@ -11,7 +11,7 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 
-from . import art, auth, describe, descriptions, history, http, kodi, maintenance, mpd, parser
+from . import art, auth, compat, describe, descriptions, history, http, kodi, maintenance, mpd, parser
 from .innertube import InnerTube, InnerTubeError
 
 BASE_URL = 'plugin://%s/' % kodi.ADDON_ID
@@ -84,6 +84,33 @@ def url_for(route, **params):
     return BASE_URL + route + ('?' + urllib.parse.urlencode(params) if params else '')
 
 
+ROUTES = {  # route -> Plugin method
+    '': 'root',
+    'browse': 'browse',
+    'shelf': 'shelf',
+    'page': 'page',
+    'search': 'search',
+    'search/new': 'search_new',
+    'search/remove': 'search_remove',
+    'related': 'related',
+    'play': 'play',
+    'play_playlist': 'play_playlist',
+    'shorts': 'shorts',
+    'details': 'details',
+    'chapters': 'chapters',
+    'pin': 'pin',
+    'unpin': 'unpin',
+    'accounts': 'accounts_menu',
+    'account/sign_in': 'sign_in',
+    'account/switch': 'switch_account',
+    'account/sign_out': 'sign_out',
+    'menu/customise': 'customise_menu',
+    'menu/reset': 'reset_menu',
+    'maintenance': 'maintenance',
+    'settings': 'open_settings',
+}
+
+
 class Plugin:
     def __init__(self, argv):
         parsed = urllib.parse.urlparse(argv[0])
@@ -91,6 +118,7 @@ class Plugin:
         self.handle = int(argv[1]) if len(argv) > 1 and argv[1].lstrip('-').isdigit() else -1
         query = argv[2][1:] if len(argv) > 2 and argv[2].startswith('?') else (argv[2] if len(argv) > 2 else '')
         self.params = dict(urllib.parse.parse_qsl(query))
+        self.route, self.params = compat.translate(self.route, self.params, ROUTES)
         self.api = InnerTube()
         self.banners = art.Banners()
         self.fanart = ''  # a channel page's banner, for everything listed on it
@@ -98,34 +126,11 @@ class Plugin:
 
     # ================================================================ dispatch
     def dispatch(self):
-        routes = {
-            '': self.root,
-            'browse': self.browse,
-            'shelf': self.shelf,
-            'page': self.page,
-            'search': self.search,
-            'search/new': self.search_new,
-            'search/remove': self.search_remove,
-            'related': self.related,
-            'play': self.play,
-            'play_playlist': self.play_playlist,
-            'shorts': self.shorts,
-            'details': self.details,
-            'chapters': self.chapters,
-            'pin': self.pin,
-            'unpin': self.unpin,
-            'accounts': self.accounts_menu,
-            'account/sign_in': self.sign_in,
-            'account/switch': self.switch_account,
-            'account/sign_out': self.sign_out,
-            'menu/customise': self.customise_menu,
-            'menu/reset': self.reset_menu,
-            'maintenance': self.maintenance,
-        }
-        handler = routes.get(self.route)
-        if handler is None:
+        name = ROUTES.get(self.route)
+        if name is None:
             kodi.log('unknown route %s' % self.route)
             return self._end(False)
+        handler = getattr(self, name)
         # When Kodi loses its navigation history (e.g. after playback) it builds a ".." path by
         # dropping the query string, e.g. plugin://.../browse/. Show the main menu instead of failing.
         required = {'browse': 'id', 'shelf': 'src', 'page': 'ctoken', 'related': 'v', 'play': 'v',
@@ -1040,6 +1045,10 @@ class Plugin:
         else:
             message = maintenance.text(30159)
         self._notify(message)
+
+    def open_settings(self):
+        self._end(False)
+        xbmc.executebuiltin('Addon.OpenSettings(%s)' % kodi.ADDON_ID)
 
     def reset_menu(self):
         state = self._state()
