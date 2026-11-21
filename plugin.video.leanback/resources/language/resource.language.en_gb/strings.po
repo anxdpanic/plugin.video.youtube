@@ -367,3 +367,19 @@ msgstr ""
 msgctxt "#30142"
 msgid "Watched"
 msgstr ""
+
+msgctxt "#30143"
+msgid "Advanced"
+msgstr ""
+
+msgctxt "#30144"
+msgid "Service port"
+msgstr ""
+
+msgctxt "#30145"
+msgid "Local port for Leanback's background service, which serves video manifests and subtitles to the player. Only this device can reach it. Change it if another add-on or program needs this port; 0 picks any free port."
+msgstr ""
+
+msgctxt "#30146"
+msgid "Port %d is in use, using %d"
+msgstr ""

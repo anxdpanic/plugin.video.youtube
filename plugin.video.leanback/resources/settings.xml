@@ -199,5 +199,20 @@
                 </setting>
             </group>
         </category>
+        <category id="advanced" label="30143">
+            <group id="advanced_service">
+                <setting id="service_port" type="integer" label="30144" help="30145">
+                    <level>3</level>
+                    <default>61152</default>
+                    <constraints>
+                        <minimum>0</minimum>
+                        <maximum>65535</maximum>
+                    </constraints>
+                    <control type="edit" format="integer">
+                        <heading>30144</heading>
+                    </control>
+                </setting>
+            </group>
+        </category>
     </section>
 </settings>

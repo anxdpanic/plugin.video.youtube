@@ -119,7 +119,7 @@ def test_listing_requests_reach_the_broker_through_the_service(net, monkeypatch)
     net.answers[url] = [(200, b'{"ok": true}')]
     pool = make(net)
     monkeypatch.setattr(service._Handler, 'broker', pool)
-    server = service._start_server()
+    server = service._start_server((0,))
     threading.Thread(target=server.serve_forever, daemon=True).start()
     xbmcgui.Window(10000).setProperty(http.PORT_PROPERTY, str(server.server_address[1]))
     try:
