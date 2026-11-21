@@ -4,12 +4,14 @@ SORT_METHOD_UNSORTED, SORT_METHOD_LABEL, SORT_METHOD_DURATION = 0, 1, 2
 ITEMS = []
 ENDED = []
 RESOLVED = []
+CONTENT = []
 
 
 def reset():
     del ITEMS[:]
     del ENDED[:]
     del RESOLVED[:]
+    del CONTENT[:]
 
 
 def addDirectoryItem(handle, url, listitem, isFolder=False, totalItems=0):  # noqa: N802,N803 (Kodi API)
@@ -26,7 +28,7 @@ def setResolvedUrl(handle, succeeded, listitem):  # noqa: N802
 
 
 def setContent(handle, content):  # noqa: N802
-    pass
+    CONTENT.append(content)
 
 
 def addSortMethod(handle, sortMethod, labelMask='', label2Mask=''):  # noqa: N802,N803

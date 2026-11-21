@@ -84,6 +84,17 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="listing_content" type="string" label="30163" help="30164">
+                    <level>0</level>
+                    <default>movies</default>
+                    <constraints>
+                        <options>
+                            <option label="30165">movies</option>
+                            <option label="30166">videos</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
                 <setting id="pages_per_listing" type="integer" label="30046" help="30047">
                     <level>0</level>
                     <default>2</default>

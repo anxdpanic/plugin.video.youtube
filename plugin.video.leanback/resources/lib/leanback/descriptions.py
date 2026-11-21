@@ -26,25 +26,34 @@ class Descriptions:
         """{'d': description, 'p': upload date, and the watch page's 's', 'l', 't' when known} or None."""
         return self._load().get(video_id)
 
-    def remember(self, video_id, description, published='', facts=None):
+    def remember(self, video_id, description, published='', facts=None, save=True):
         """facts: what the watch page adds to a video, as {'s': subscribers, 'l': likes, 't': age text},
         with 'w' set once the watch page was read."""
-        if not video_id or not description:
-            return
         facts = {k: v for k, v in (facts or {}).items() if v}
+        # A watch page without a description (Shorts often have none) is kept too, so it isn't read again.
+        if not video_id or not (description or facts.get('w')):
+            return
         entry = self.get(video_id)
-        unchanged = entry and entry['d'] == description and (entry.get('p') or not published)
+        unchanged = entry and entry.get('d') == description and (entry.get('p') or not published)
         if unchanged and all(entry.get(k) == v for k, v in facts.items()):
             return
         new = dict(entry or {}, d=description, p=published or (entry or {}).get('p', ''), ts=time.time())
         new.update(facts)
         self._load()[video_id] = new
-        self._save()
+        if save:
+            self._save()
 
-    def remember_details(self, info):
+    def remember_details(self, info, save=True):
         """Keep the description and watch-page facts from parser.video_details()."""
         self.remember(info.get('video_id'), info.get('plot'), info.get('date'),
-                      {'s': info.get('subscribers'), 'l': info.get('likes'), 't': info.get('published'), 'w': 1})
+                      {'s': info.get('subscribers'), 'l': info.get('likes'), 't': info.get('published'), 'w': 1},
+                      save=save)
+
+    def remember_all(self, infos):
+        """remember_details() for many videos, written to disk once."""
+        for info in infos:
+            self.remember_details(info, save=False)
+        self._save()
 
     def _save(self):
         # Another listing may have stored descriptions since this one loaded them.

@@ -29,8 +29,6 @@ def test_video_plot_lists_info_then_description():
     assert plots[0] == 'Chan • 2 days ago • 1,234,567 views\n4K • Watched 40%\n\nThe description.'
     # No description yet: the tile's own lines, minus what the info line already says.
     assert plots[1] == 'Chan • 2 days ago • 1,234,567 watching\nstr30127\nExtra line'
-    # Neither has been read from its watch page yet, so both go to the service.
-    assert plugin.undescribed == ['aaaaaaaaaaa', 'bbbbbbbbbbb']
 
 
 def test_video_plot_leads_like_full_details():
@@ -45,7 +43,6 @@ def test_video_plot_leads_like_full_details():
     [(_, li, _)] = xbmcplugin.ITEMS
     assert li.tag.values['plot'] == ('Chan • 1.2M subscribers • 3 years ago • 1,234,567 views • 456,789 likes'
                                      '\n\nWatch page text.')
-    assert plugin.undescribed == []  # already read: not fetched again
 
 
 def test_format_count():

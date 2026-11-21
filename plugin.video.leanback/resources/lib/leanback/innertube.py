@@ -14,6 +14,9 @@ import time
 from . import auth, http, kodi
 
 API = 'https://www.youtube.com/youtubei/v1/'
+# The same API as the mobile apps reach it. Tested 2026-11-21: 2 x 40 watch page requests at once, all
+# answered in about 3 s each, where www.youtube.com answers bursts with its automated-queries page.
+APPS_API = 'https://youtubei.googleapis.com/youtubei/v1/'
 
 TV = {
     'key': 'tv',
@@ -94,7 +97,7 @@ class InnerTube:
     def signed_in():
         return auth.active_account()[0] is not None
 
-    def _post(self, endpoint, body, client, use_auth=True, visitor=True, retry=True):
+    def _post(self, endpoint, body, client, use_auth=True, visitor=True, retry=True, api=API):
         context_client = dict(client['context'], hl=self.hl, gl=self.gl, userAgent=client['ua'])
         headers = {
             'Content-Type': 'application/json',
@@ -121,7 +124,7 @@ class InnerTube:
         payload = dict(body)
         payload['context'] = {'client': context_client, 'user': {'lockedSafetyMode': False},
                               'request': {'useSsl': True}}
-        url = API + endpoint + '?prettyPrint=false'
+        url = api + endpoint + '?prettyPrint=false'
         kodi.log('POST %s (%s%s)' % (endpoint, client['key'], ', auth' if token else ''))
         try:
             return http.request_json(url, data=json.dumps(payload).encode('utf-8'), headers=headers,
@@ -172,7 +175,7 @@ class InnerTube:
         """The watch page as the visionOS app gets it: unlike the TV client's, it carries the description,
         like count and subscribers, in a small response."""
         body = {'videoId': video_id, 'racyCheckOk': True, 'contentCheckOk': True}
-        return self._post('next', body, PLAYER_CLIENTS[0], use_auth=False)
+        return self._post('next', body, PLAYER_CLIENTS[0], use_auth=False, api=APPS_API)
 
     def next(self, video_id=None, playlist_id=None, params=None, continuation=None):
         if continuation:

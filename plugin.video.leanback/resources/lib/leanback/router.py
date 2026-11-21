@@ -77,8 +77,6 @@ class Plugin:
         self.banners = art.Banners()
         self.fanart = ''  # a channel page's banner, for everything listed on it
         self.descriptions = descriptions.Descriptions()
-        self.path = argv[0] + (argv[2] if len(argv) > 2 and argv[2].startswith('?') else '')
-        self.undescribed = []  # listed videos whose watch page hasn't been read yet
 
     # ================================================================ dispatch
     def dispatch(self):
@@ -127,10 +125,7 @@ class Plugin:
         except auth.AuthError:
             self._notify(kodi.string(30132), error=True)
             self._end(False)
-        # The listing is on screen by now: have the service fetch the descriptions it lacks, and fetch
-        # the channel banners it lacked for next time.
-        if self.undescribed and self.handle >= 0:
-            describe.request(self.path, self.undescribed)
+        # The listing is on screen by now; fetch the channel banners it lacked for next time.
         self.banners.fetch_missing()
 
     # ================================================================ helpers
@@ -464,7 +459,12 @@ class Plugin:
 
     def _finish_listing(self, items):
         videos = sum(1 for i in items if i.get('kind') == 'video')
-        xbmcplugin.setContent(self.handle, 'videos' if videos and videos >= len(items) / 2 else 'files')
+        if videos and videos >= len(items) / 2:
+            # Skins offer most of their views (walls, posters, info panels) for movies.
+            content = 'videos' if kodi.setting('listing_content') == 'videos' else 'movies'
+        else:
+            content = 'files'
+        xbmcplugin.setContent(self.handle, content)
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_UNSORTED)
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_LABEL)
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_DURATION)
@@ -527,6 +527,14 @@ class Plugin:
         hide_watched = kodi.setting_bool('hide_watched') and browse_id not in NO_WATCHED_FILTER \
             and not (browse_id or '').startswith('VL')
         threshold = kodi.setting_int('watched_threshold') or 80
+        if describe.enabled():
+            # Every listed video's description, fetched at once before anything is drawn.
+            missing = [item['target'].get('video_id') or item.get('id') for item in items
+                       if item['kind'] == 'video' and not item.get('upcoming')
+                       and not (hide_shorts and item['short'])]
+            missing = [v for v in missing if v and not (self.descriptions.get(v) or {}).get('w')]
+            if missing:
+                describe.fetch_all(missing, self.descriptions)
         shown = []
         for item in items:
             if hide_shorts and item['short']:
@@ -602,10 +610,10 @@ class Plugin:
         tag.setMediaType('video')
         tag.setTitle(title)
         known = self.descriptions.get(video_id)
-        if not (known and known.get('w')) and not item.get('upcoming'):
-            self.undescribed.append(video_id)
-        tag.setPlot(self._video_plot(item, known, threshold))
-        tag.setPlotOutline(' • '.join(x for x in (item['channel'], item['published']) if x))
+        plot = self._video_plot(item, known, threshold)
+        tag.setPlot(plot)
+        # Some views (Estuary's Poster, Shift, Fanart) show the outline instead of the plot when it is set.
+        tag.setPlotOutline(plot)
         if known and known.get('p'):
             tag.setPremiered(known['p'])
         if item['channel']:

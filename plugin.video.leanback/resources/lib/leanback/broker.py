@@ -22,7 +22,7 @@ import urllib.parse
 from . import kodi
 
 FOREGROUND, BACKGROUND = 0, 1
-WORKERS = 3
+WORKERS = 32  # paced hosts still get one request at a time; the rest (e.g. descriptions) run in parallel
 # Seconds between requests to a host. Tested 2026-11-19 against www.youtube.com: back to back 4/16
 # requests got the block page, 2 s apart about 1 in 6, 10 s apart none.
 GAPS = {'www.youtube.com': 1.0}

@@ -16,7 +16,7 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 
-from . import broker, describe, history, http, kodi
+from . import broker, history, http, kodi
 
 PORT_PROPERTY = http.PORT_PROPERTY
 # Default port, kept clear of other add-ons' servers (plugin.video.youtube binds 50152 by default and
@@ -38,19 +38,8 @@ class _Server(ThreadingMixIn, HTTPServer):
 
 class _Handler(BaseHTTPRequestHandler):
     broker = None
-    describer = None
 
     def do_POST(self):  # noqa: N802 (http.server API)
-        if self.path == '/describe' and self.describer is not None:
-            raw = self.rfile.read(int(self.headers.get('Content-Length') or 0))
-            try:
-                job = json.loads(raw.decode('utf-8'))
-                self.describer.submit(job['path'], [str(v) for v in job['ids']])
-            except (ValueError, KeyError, TypeError):
-                self.send_error(400)
-                return
-            self._reply(b'', 'text/plain')
-            return
         if self.path != '/fetch' or self.broker is None:
             self.send_error(404)
             return
@@ -233,9 +222,6 @@ def run():
         kodi.log_error('could not start manifest server')
         requests.stop()
         return
-    describer = describe.Describer()
-    describer.start()
-    _Handler.describer = describer
     monitor = _Monitor()
     # Older versions kept these files in the add-on profile; remove that folder.
     shutil.rmtree(kodi.LEGACY_TEMP_DIR, ignore_errors=True)
@@ -254,6 +240,5 @@ def run():
             _cleanup()
             last_cleanup = time.time()
     tracker.finish()
-    describer.stop()
     httpd.stop()
     requests.stop()
