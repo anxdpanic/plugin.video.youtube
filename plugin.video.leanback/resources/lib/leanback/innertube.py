@@ -61,6 +61,7 @@ PLAYER_CLIENTS = [
 ]
 
 VISITOR_TTL = 86400 * 3
+CPN_CHARS = string.ascii_letters + string.digits + '-_'
 RETRY_STATUSES = (0, 403, 429, 500, 502, 503, 504)
 RETRY_DELAY = 1.5  # seconds
 
@@ -252,7 +253,7 @@ class InnerTube:
 
     def player(self, video_id):
         """Returns (player_response, client). Raises InnerTubeError when nothing is playable."""
-        cpn = ''.join(random.choice(string.ascii_letters + string.digits + '-_') for _ in range(16))
+        cpn = new_cpn()
         reason = None
         for client in PLAYER_CLIENTS:
             body = {
@@ -283,6 +284,11 @@ class InnerTube:
             if status.get('status') == 'LOGIN_REQUIRED' and 'bot' in (reason or ''):
                 self.visitor_data(refresh=True)
         raise InnerTubeError(reason or 'unplayable')
+
+
+def new_cpn():
+    """A client playback nonce: the random id a player request and its stats reports share."""
+    return ''.join(random.choice(CPN_CHARS) for _ in range(16))
 
 
 def _thumb(endpoint):

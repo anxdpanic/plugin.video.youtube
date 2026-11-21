@@ -5,8 +5,6 @@ their progress. The streams come from anonymous player requests, whose stats URL
 tie to the account, so the service asks the TV client's player for the account's own stats URLs
 and pings them while the video plays."""
 import json
-import random
-import string
 import threading
 import time
 import urllib.parse
@@ -41,16 +39,12 @@ def stats_url(base, params):
     return urllib.parse.urlunsplit(parts._replace(query=urllib.parse.urlencode(query)))
 
 
-def _cpn():
-    return ''.join(random.choice(string.ascii_letters + string.digits + '-_') for _ in range(16))
-
-
 class Session:
     """One playback of one video: a playback ping at the start, watch-time segments after."""
 
     def __init__(self, info, send=None):
         self.info = info
-        self.cpn = _cpn()
+        self.cpn = innertube.new_cpn()
         self.started = time.time()
         self.last_report = self.started
         self.position = 0.0
