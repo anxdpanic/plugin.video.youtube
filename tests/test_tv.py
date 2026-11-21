@@ -141,3 +141,20 @@ def test_local_screen_rebuilds_on_refresh():
     screen.refresh()
     assert [i['title'] for i in screen.rows[0].items] == ['dogs', 'cats']
     assert not screen.can_grow()
+
+
+def test_short_clip_is_not_done_at_once():
+    assert model.watched_percent(1, 8) == 12
+    assert model.watched_percent(7.7, 8) == 100  # within 5% of the end
+
+
+def test_ensure_gives_up_on_pages_that_stay_empty():
+    pages_by_token = {None: page([shelf('', 'abcd', 'T0')])}
+    for n in range(20):  # every later page is filtered out entirely
+        pages_by_token['T%d' % n] = page([{'title': '', 'items': [video('s%d' % n, short=True)],
+                                           'continuation': 'T%d' % (n + 1), 'shorts': False, 'endpoint': None}])
+    load = loader(pages_by_token)
+    screen = model.Screen({'ep': 'browse'}, 'Feed', load, keep=lambda i: not i['short']).open()
+    screen.ensure(0)
+    assert len(load.calls) == 1 + model.MAX_EMPTY_PAGES
+    assert screen.can_grow()  # a later move may try again

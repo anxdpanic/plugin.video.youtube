@@ -57,14 +57,10 @@ class TVWindow(xbmcgui.WindowXML):
             self._fill_rail()
             self._show_rows()
             return
-        self._busy(True)
-        try:
-            self._load_rail()
-            first = next((e for e in self.entries if e['target'].get('type') == 'browse'), None)
-            if first:
-                self._open_entry(first)
-        finally:
-            self._busy(False)
+        self._guarded(self._load_rail)
+        first = next((e for e in self.entries if e['target'].get('type') == 'browse'), None)
+        if first:
+            self._guarded(self._open_entry, first)
 
     def onAction(self, action):  # noqa: N802
         action_id = action.getId()
@@ -125,15 +121,18 @@ class TVWindow(xbmcgui.WindowXML):
         elif entry['id'] == 'shorts':
             xbmc.executebuiltin('RunPlugin(%s)' % router.url_for('shorts', params=target.get('params')))
         elif kind == 'accounts':
-            xbmc.executebuiltin('RunPlugin(%s)' % router.url_for('accounts'), True)
-            kodi.Cache.prune(0)
-            self.stack = []
-            self.onInit()
+            before = auth.active_account()[0], auth.accounts()
+            # The plugin's own account dialogs, run here so the window reloads once they are done.
+            router.Plugin([router.url_for('accounts'), '-1', '']).accounts_menu()
+            if (auth.active_account()[0], auth.accounts()) != before:
+                self.stack = []
+                self.current_entry = None
+                self._init()
         elif kind == 'settings':
             kodi.ADDON.openSettings()
         elif kind == 'browse':
             desc = {'ep': 'browse', 'id': target['browse_id'], 'params': target.get('params')}
-            self._push(model.Screen(desc, entry['title'], self._load_page, pages.item_filter(target['browse_id']),
+            self._push(model.Screen(desc, entry['title'], self._load_page, self._keep(target['browse_id']),
                                     _string(30134, 'Channels')), replace=True, entry=entry['id'])
 
     # ------------------------------------------------------------ screens
@@ -146,6 +145,9 @@ class TVWindow(xbmcgui.WindowXML):
             self._busy(False)
         if self.stack:
             self.stack[-1].top = self.top
+            row = self._row(0)
+            if row:  # Back comes to this tile, however the new screen was opened
+                row.pos = self.getControl(ROWS[0]).getSelectedPosition()
         if replace:
             self.stack = []
             self.current_entry = entry
@@ -156,7 +158,7 @@ class TVWindow(xbmcgui.WindowXML):
         self.setFocusId(ROWS[0] if screen.rows else RAIL)
 
     def _back(self, focus):
-        if focus == RAIL:
+        if focus == RAIL or not self.entries:  # no rail to go back to (it failed to load): leave
             self.close()
         elif len(self.stack) > 1:
             self.stack.pop()
@@ -181,8 +183,7 @@ class TVWindow(xbmcgui.WindowXML):
     def _show_rows(self):
         screen = self.screen
         self.setProperty('screen.title', screen.title if screen else '')
-        self.setProperty('message', '' if not screen or screen.rows else
-                         screen.message or _string(30124, 'This page is empty'))
+        self.setProperty('message', '' if not screen or screen.rows else screen.message or self._empty_message(screen))
         for slot, control_id in enumerate(ROWS):
             control = self.getControl(control_id)
             control.reset()
@@ -195,6 +196,13 @@ class TVWindow(xbmcgui.WindowXML):
             control.addItems(row.listitems)
             control.selectItem(row.pos if slot == 0 else 0)
         self._describe_soon()
+
+    def _empty_message(self, screen):
+        """What to say on a page with nothing on it, as the plugin says it: the personal pages (FE...) are
+        empty until you sign in."""
+        if (screen.desc.get('id') or '').startswith('FE') and not self.pages.api.signed_in():
+            return kodi.string(30125)
+        return _string(30124, 'This page is empty')
 
     def _move(self, step):
         screen = self.screen
@@ -226,10 +234,23 @@ class TVWindow(xbmcgui.WindowXML):
             self._describe_soon()
 
     # ------------------------------------------------------------ tiles
-    def _tile(self, row, item):
+    def _keep(self, browse_id=None):
+        """The listing filter, with progress noted in this window applied first: YouTube's cached pages
+        don't have it yet, and hide-watched should go by it."""
+        keep = pages.item_filter(browse_id)
+
+        def check(item):
+            self._apply_watched(item)
+            return keep(item)
+        return check
+
+    def _apply_watched(self, item):
         video_id = model.video_id_of(item)
         if video_id in self.watched:  # played since YouTube's page was fetched
             item['watched_pct'] = self.watched[video_id]
+
+    def _tile(self, row, item):
+        self._apply_watched(item)
         return items.tile(item, self.descriptions.get(router.video_id_of(item)), self.threshold, row.avatars)
 
     def _activate(self, item):
@@ -246,13 +267,16 @@ class TVWindow(xbmcgui.WindowXML):
             playlist_id = target.get('playlist_id') or (target.get('browse_id') or '')[2:] or item.get('id')
             if router.is_mix(playlist_id):
                 xbmc.executebuiltin('RunPlugin(%s)' % router.url_for('play_playlist', list=playlist_id))
+            elif target.get('type') == 'browse' and target.get('browse_id'):
+                # Its own page, as the plugin opens it: not every playlist-like page is VL<id> (shows, podcasts).
+                self._open_browse(target['browse_id'], target.get('params'), item['title'])
             else:
                 self._open_browse('VL' + playlist_id, None, item['title'])
         elif target.get('type') == 'browse':
             self._open_browse(target['browse_id'], target.get('params'), item['title'])
         elif target.get('type') == 'search':
             self._push(model.Screen({'ep': 'search', 'q': target['query'], 'params': target.get('params')},
-                                    target['query'], self._load_page, pages.item_filter()))
+                                    target['query'], self._load_page, self._keep()))
 
     # ------------------------------------------------------------ search
     def _search_rows(self):
@@ -285,7 +309,7 @@ class TVWindow(xbmcgui.WindowXML):
 
     def _search(self, query):
         self.pages._remember_search(query)
-        self._push(model.Screen({'ep': 'search', 'q': query}, query, self._load_page, pages.item_filter()))
+        self._push(model.Screen({'ep': 'search', 'q': query}, query, self._load_page, self._keep()))
 
     def _forget(self, query):
         self.pages._forget_search(query)
@@ -300,7 +324,7 @@ class TVWindow(xbmcgui.WindowXML):
 
     def _open_browse(self, browse_id, params, title):
         desc = {'ep': 'browse', 'id': browse_id, 'params': params}
-        self._push(model.Screen(desc, title, self._load_page, pages.item_filter(browse_id),
+        self._push(model.Screen(desc, title, self._load_page, self._keep(browse_id),
                                 _string(30134, 'Channels')))
 
     def _play(self, item, start=None):
@@ -313,6 +337,8 @@ class TVWindow(xbmcgui.WindowXML):
                 return
             start = resume_at if choice == 0 else 0
         xbmc.executebuiltin('PlayMedia(%s)' % router.url_for('play', v=video_id, t=start or None))
+        if item['live'] or item.get('upcoming'):
+            return  # a stream keeps no progress: its position is only where the live edge was
         threading.Thread(target=self._follow_playback, args=(video_id,), name='leanback-tv-progress').start()
 
     def _follow_playback(self, video_id):
@@ -383,7 +409,7 @@ class TVWindow(xbmcgui.WindowXML):
             choices.append((_string(30105, 'Full details'),
                             lambda: xbmc.executebuiltin('RunPlugin(%s)' % router.url_for('details', v=video_id))))
             choices.append((_string(30104, 'Related videos'), lambda: self._push(
-                model.Screen({'ep': 'next', 'v': video_id}, item['title'], self._load_page, pages.item_filter()))))
+                model.Screen({'ep': 'next', 'v': video_id}, item['title'], self._load_page, self._keep()))))
             if not item['live'] and not item['short']:
                 choices.append((_string(30139, 'Chapters'),
                                 lambda: xbmc.executebuiltin('RunPlugin(%s)' % router.url_for('chapters', v=video_id))))
@@ -417,11 +443,12 @@ class TVWindow(xbmcgui.WindowXML):
             describe.fetch_all([video_id for video_id, _, _ in wanted], self.descriptions)
         except (InnerTubeError, http.HTTPError) as exc:
             kodi.log('TV interface: descriptions failed: %s' % exc)
-            return
         for video_id, item, li in wanted:
             known = self.descriptions.get(video_id)
             if known:
                 li.setProperty('plot', router.video_plot(item, known, self.threshold))
+            else:
+                self._described.discard(video_id)  # not read this time: try again when it is shown next
 
     # ------------------------------------------------------------ helpers
     def _load_page(self, desc):

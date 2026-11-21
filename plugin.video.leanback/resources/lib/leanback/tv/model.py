@@ -5,14 +5,16 @@ from .. import pages
 
 GRID_COLUMNS = 4  # tiles per row when a single list (a feed, search results, uploads) is cut into rows
 LOOKAHEAD = 2  # rows kept loaded below the focused one
-END_MARGIN = 10  # seconds: stopped this close to the end counts as watched to the end
+END_MARGIN = 10  # seconds: stopped this close to the end counts as watched to the end...
+END_SHARE = 0.05  # ...or this share of the video, if that is less (so a short clip isn't done at once)
+MAX_EMPTY_PAGES = 3  # pages in a row that add nothing (all filtered out) before loading more gives up
 
 
 def watched_percent(position, total):
     """How much of a video was watched, from where playback stopped; 0 when unknown."""
     if total <= 0 or position <= 0:
         return 0
-    if total - position <= END_MARGIN:
+    if total - position <= min(END_MARGIN, total * END_SHARE):
         return 100
     return max(1, min(100, int(position * 100 / total)))
 
@@ -77,11 +79,16 @@ class Screen:
 
     def ensure(self, index):
         """Load more until there are LOOKAHEAD rows below `index`, or nothing more to load."""
+        empty = 0
         while index + LOOKAHEAD >= len(self.rows) and self.can_grow():
             before = len(self.rows), self._grid_count()
             self._grow()
-            if (len(self.rows), self._grid_count()) == before and not self.can_grow():
-                break
+            if (len(self.rows), self._grid_count()) == before:
+                empty += 1
+                if empty >= MAX_EMPTY_PAGES:
+                    break  # pages keep coming back empty once filtered: try again on the next move
+            else:
+                empty = 0
 
     def _grid_count(self):
         return len(self.grid['items']) if self.grid else 0

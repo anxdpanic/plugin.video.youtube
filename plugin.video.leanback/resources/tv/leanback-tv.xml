@@ -170,16 +170,6 @@
             </control>
         </control>
 
-        <control type="label">
-            <left>180</left>
-            <top>520</top>
-            <width>1500</width>
-            <height>200</height>
-            <font>@font:hero_plot@</font>
-            <textcolor>FFB4BED2</textcolor>
-            <wrapmultiline>true</wrapmultiline>
-            <label>$INFO[Window.Property(message)]</label>
-        </control>
 
         <!-- The navigation rail: icons, widening with labels while it has focus. -->
         <control type="image">
@@ -188,6 +178,19 @@
             <visible>Control.HasFocus(100)</visible>
             <animation effect="fade" time="160">VisibleChange</animation>
             <texture colordiffuse="B3000000">@media@/white.png</texture>
+        </control>
+        <!-- What an empty page says: above the dimming, and moved clear of the open rail. -->
+        <control type="label">
+            <left>180</left>
+            <top>520</top>
+            <width>1400</width>
+            <height>200</height>
+            <font>@font:hero_plot@</font>
+            <textcolor>FFB4BED2</textcolor>
+            <wrapmultiline>true</wrapmultiline>
+            <animation effect="slide" end="310,0" time="160" tween="cubic" easing="out"
+                       condition="Control.HasFocus(100)">Conditional</animation>
+            <label>$INFO[Window.Property(message)]</label>
         </control>
         <control type="image">
             <width>130</width>
