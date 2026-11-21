@@ -18,6 +18,8 @@ from . import items, model
 RAIL = 100
 ROWS = (200, 201)
 MORE_AT = 6  # load more of a row once the focus is this close to its end
+PLAY_WAIT = 60  # seconds to wait for a chosen video to start before giving up on following it
+PLAY_POLL = 2  # seconds between readings of the playback position
 
 ACTION_LEFT, ACTION_RIGHT, ACTION_UP, ACTION_DOWN = 1, 2, 3, 4
 ACTION_BACK = (9, 10, 92)  # parent dir, previous menu, back
@@ -39,6 +41,7 @@ class TVWindow(xbmcgui.WindowXML):
         self.top = 0  # index of the focused row
         self.current_entry = None
         self._described = set()
+        self.watched = {}  # video id -> percent watched, for videos played from this window
 
     # ------------------------------------------------------------ Kodi callbacks
     def onInit(self):  # noqa: N802 (Kodi API)
@@ -225,6 +228,9 @@ class TVWindow(xbmcgui.WindowXML):
 
     # ------------------------------------------------------------ tiles
     def _tile(self, row, item):
+        video_id = model.video_id_of(item)
+        if video_id in self.watched:  # played since YouTube's page was fetched
+            item['watched_pct'] = self.watched[video_id]
         return items.tile(item, self.descriptions.get(router.video_id_of(item)), self.threshold, row.avatars)
 
     def _activate(self, item):
@@ -260,6 +266,53 @@ class TVWindow(xbmcgui.WindowXML):
                 return
             start = resume_at if choice == 0 else 0
         xbmc.executebuiltin('PlayMedia(%s)' % router.url_for('play', v=video_id, t=start or None))
+        threading.Thread(target=self._follow_playback, args=(video_id,), name='leanback-tv-progress').start()
+
+    def _follow_playback(self, video_id):
+        """Note how far into the video playback gets, then show it on its tiles. Kodi doesn't say where a
+        video was stopped, so the position is read every couple of seconds while it plays."""
+        player = xbmc.Player()
+        monitor = xbmc.Monitor()
+
+        def playing_this():
+            try:
+                playing = player.getPlayingFile() if player.isPlayingVideo() else ''
+            except RuntimeError:
+                return False
+            # A live stream plays YouTube's own manifest, whose address doesn't name the video.
+            return bool(playing) and (video_id in playing or '/mpd/' not in playing)
+
+        for _ in range(PLAY_WAIT * 2):
+            if playing_this():
+                break
+            if monitor.waitForAbort(0.5):
+                return
+        else:
+            return
+        position = total = 0
+        while playing_this():
+            try:
+                position, total = player.getTime(), player.getTotalTime()
+            except RuntimeError:
+                break
+            if monitor.waitForAbort(PLAY_POLL):
+                return
+        percent = model.watched_percent(position, total)
+        if percent:
+            self._mark_watched(video_id, percent)
+
+    def _mark_watched(self, video_id, percent):
+        """Show new progress on every tile of this video, in place: the tiles are the window's own items."""
+        self.watched[video_id] = percent
+        known = self.descriptions.get(video_id)
+        for screen in self.stack:
+            for row, index in screen.find_video(video_id):
+                item = row.items[index]
+                item['watched_pct'] = percent
+                if row.listitems and index < len(row.listitems):
+                    li = row.listitems[index]
+                    li.setProperty('progress', str(percent))
+                    li.setProperty('plot', router.video_plot(item, known, self.threshold))
 
     def _context_menu(self):
         row = self._row(0)

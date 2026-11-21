@@ -5,6 +5,20 @@ from .. import pages
 
 GRID_COLUMNS = 4  # tiles per row when a single list (a feed, search results, uploads) is cut into rows
 LOOKAHEAD = 2  # rows kept loaded below the focused one
+END_MARGIN = 10  # seconds: stopped this close to the end counts as watched to the end
+
+
+def watched_percent(position, total):
+    """How much of a video was watched, from where playback stopped; 0 when unknown."""
+    if total <= 0 or position <= 0:
+        return 0
+    if total - position <= END_MARGIN:
+        return 100
+    return max(1, min(100, int(position * 100 / total)))
+
+
+def video_id_of(item):
+    return item['target'].get('video_id') or item.get('id') if item.get('kind') == 'video' else None
 
 
 class Row:
@@ -108,6 +122,13 @@ class Screen:
         for offset in range(len(full) * GRID_COLUMNS, len(grid['items']), GRID_COLUMNS):
             chunk = grid['items'][offset:offset + GRID_COLUMNS]
             self.rows.append(Row(grid['title'] if offset == 0 else '', chunk, grid=True))
+
+    def find_video(self, video_id):
+        """(row, index) of every tile of this video on the screen."""
+        for row in self.rows:
+            for index, item in enumerate(row.items):
+                if video_id_of(item) == video_id:
+                    yield row, index
 
     def more_items(self, row):
         """The next items of a shelf's row (it scrolls on to the right); [] when it has no more."""

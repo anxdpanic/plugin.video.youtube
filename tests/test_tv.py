@@ -116,3 +116,17 @@ def test_video_tile_badges_and_meta():
     assert li.getProperty('badge') == '10:35'
     assert li.getProperty('progress') == '40'
     assert items.short_count(51000) == '51K' and items.short_count(999) == '999'
+
+
+def test_watched_percent():
+    assert model.watched_percent(0, 600) == 0
+    assert model.watched_percent(30, 0) == 0
+    assert model.watched_percent(150, 600) == 25
+    assert model.watched_percent(2, 600) == 1  # just started still shows a sliver
+    assert model.watched_percent(595, 600) == 100  # stopped in the closing seconds
+
+
+def test_find_video_on_every_row():
+    load = loader({None: page([shelf('A', 'abc'), shelf('B', 'cd')])})
+    screen = model.Screen({'ep': 'browse'}, 'Home', load).open()
+    assert [(r.title, i) for r, i in screen.find_video('c')] == [('A', 2), ('B', 0)]
