@@ -62,6 +62,22 @@ def is_mix(playlist_id):
     return (playlist_id or '').startswith('RD')
 
 
+def video_id_of(item):
+    return item['target'].get('video_id') or item.get('id')
+
+
+def channel_of(item):
+    """The channel an item is, or belongs to."""
+    browse_id = item['target'].get('browse_id') or ''
+    return browse_id if browse_id.startswith('UC') else item.get('channel_id')
+
+
+def paged_token(shelves, page):
+    """The token that continues these rows as one list: the one row that pages, else the page's own."""
+    paged = [s for s in shelves if s['continuation']]
+    return paged[0]['continuation'] if len(paged) == 1 else page['continuation']
+
+
 def url_for(route, **params):
     params = {k: v for k, v in params.items() if v not in (None, '')}
     return BASE_URL + route + ('?' + urllib.parse.urlencode(params) if params else '')
@@ -183,8 +199,9 @@ class Plugin:
     def menu_entries(self, include_hidden=False):
         """Sidebar entries after the user's customisation (order, hidden, pinned channels)."""
         state = self._state().get('menu', {})
-        entries = [e for e in self.guide() if not e['channel']]
-        channels = [e for e in self.guide() if e['channel']]
+        guide = self.guide()
+        entries = [e for e in guide if not e['channel']]
+        channels = [e for e in guide if e['channel']]
         for pin in state.get('pinned', []):
             if not any(e['id'] == pin['id'] for e in entries):
                 entries.append({'id': pin['id'], 'title': pin['title'], 'thumb': pin.get('thumb', ''),
@@ -307,9 +324,7 @@ class Plugin:
     def _list_batch(self, page):
         """A continuation page as one list: its items and the token that continues them."""
         shelves = self._continued_rows(page)
-        paged = [s for s in shelves if s['continuation']]
-        token = paged[0]['continuation'] if len(paged) == 1 else page['continuation']
-        return [i for s in shelves for i in s['items']], token
+        return [i for s in shelves for i in s['items']], paged_token(shelves, page)
 
     def _pages_per_listing(self):
         return min(max(kodi.setting_int('pages_per_listing') or 1, 1), 5)
@@ -429,9 +444,8 @@ class Plugin:
         flatten = not kodi.setting_bool('shelves_as_folders') or (shelves and untitled * 2 >= len(shelves))
         if len(shelves) == 1 or (shelves and flatten):
             # One list; with search's extra rows flattened in, the results shelf is the one that pages.
-            paged = [s for s in shelves if s['continuation']]
-            token = paged[0]['continuation'] if len(paged) == 1 else page['continuation']
-            items, token = self._more_pages(desc['ep'], [i for s in shelves for i in s['items']], token)
+            items, token = self._more_pages(desc['ep'], [i for s in shelves for i in s['items']],
+                                            paged_token(shelves, page))
             rendered.extend(self._render_items(items, browse_id=browse_id))
             if token:
                 self._add_next(desc['ep'], token, browse_id)
@@ -543,16 +557,13 @@ class Plugin:
     def _prefetch(self, items, hide_shorts):
         """Before anything is drawn: the banners of channels not seen before and, when turned on, the
         descriptions of listed videos, all looked up at once and in parallel."""
-        channels = []
-        for item in items:
-            browse_id = item['target'].get('browse_id') or ''
-            channels.append(browse_id if browse_id.startswith('UC') else item.get('channel_id'))
+        channels = [channel_of(item) for item in items]
         banner_lookup = None
         if not self.fanart and self.banners.unknown(channels):
             banner_lookup = threading.Thread(target=self.banners.fetch_all, args=(channels,), name='leanback-art')
             banner_lookup.start()
         if describe.enabled():
-            missing = [item['target'].get('video_id') or item.get('id') for item in items
+            missing = [video_id_of(item) for item in items
                        if item['kind'] == 'video' and not item.get('upcoming')
                        and not (hide_shorts and item['short'])]
             missing = [v for v in missing if v and not (self.descriptions.get(v) or {}).get('w')]
@@ -562,7 +573,7 @@ class Plugin:
             banner_lookup.join()
         if not self.fanart:
             # Some tiles (Home's rows) don't name their channel; the watch pages just read do.
-            named = [(self.descriptions.get(item['target'].get('video_id') or item.get('id')) or {}).get('c')
+            named = [(self.descriptions.get(video_id_of(item)) or {}).get('c')
                      for item in items if item['kind'] == 'video' and not item.get('channel_id')]
             if self.banners.unknown(named):
                 self.banners.fetch_all(named)
@@ -613,8 +624,7 @@ class Plugin:
         return '\n'.join(line for line in lines if line)
 
     def _add_video(self, item, threshold):
-        target = item['target']
-        video_id = target.get('video_id') or item.get('id')
+        video_id = video_id_of(item)
         if not video_id:
             return
         title = item['title']
@@ -688,7 +698,7 @@ class Plugin:
         tag.setPlot('\n'.join(lines))
         thumb = item.get('thumb') or 'DefaultFolder.png'
         browse_id = target.get('browse_id') or ''
-        channel_id = browse_id if browse_id.startswith('UC') else item.get('channel_id')
+        channel_id = channel_of(item)
         li.setArt({'thumb': thumb, 'icon': thumb,
                    'fanart': self._channel_fanart(channel_id) or item.get('thumb') or ''})
         menu = []
@@ -771,7 +781,7 @@ class Plugin:
             translate = [x.strip() for x in (kodi.setting('subs_translate').strip() or hl).split(',')]
             translate += [x.strip() for x in kodi.setting('subs_more').split(',') if x.strip()]
             subs = mpd.subtitle_tracks(resp, kodi.setting_bool('subs_asr'), translate)
-            port = xbmcgui.Window(10000).getProperty('leanback.port')
+            port = xbmcgui.Window(10000).getProperty(http.PORT_PROPERTY)
             if subs and port:
                 # Subtitles go through the local server, which retries YouTube's rate limits (429 on
                 # translated tracks) and returns an empty track instead of an error.
@@ -824,16 +834,7 @@ class Plugin:
             self._notify(kodi.string(30124))
             return
         self._end(False)
-        playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
-        playlist.clear()
-        for item in items:
-            video_id = item['target'].get('video_id') or item.get('id')
-            li = xbmcgui.ListItem(item['title'], offscreen=True)
-            li.setArt({'thumb': item['thumb']})
-            li.getVideoInfoTag().setTitle(item['title'])
-            li.setProperty('IsPlayable', 'true')
-            playlist.add(url_for('play', v=video_id), li)
-        xbmc.Player().play(playlist)
+        self._play_videos((video_id_of(item), item['title'], item['thumb']) for item in items)
 
     def shorts(self):
         """Like the TV app's Shorts button: start playing the Shorts feed as a playlist."""
@@ -842,11 +843,17 @@ class Plugin:
         if not videos:
             self._notify(kodi.string(30124))
             return
+        self._play_videos((video_id, video_id, thumb) for video_id, thumb in videos)
+
+    @staticmethod
+    def _play_videos(videos):
+        """Play (video_id, title, thumb) entries as Kodi's video playlist."""
         playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         playlist.clear()
-        for video_id, thumb in videos:
-            li = xbmcgui.ListItem(video_id, offscreen=True)
+        for video_id, title, thumb in videos:
+            li = xbmcgui.ListItem(title, offscreen=True)
             li.setArt({'thumb': thumb, 'icon': thumb})
+            li.getVideoInfoTag().setTitle(title)
             li.setProperty('IsPlayable', 'true')
             playlist.add(url_for('play', v=video_id), li)
         xbmc.Player().play(playlist)
