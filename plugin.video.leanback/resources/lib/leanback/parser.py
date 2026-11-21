@@ -599,6 +599,16 @@ def _find_renderer(node, key):
     return None
 
 
+def channel_banner(resp):
+    """The banner from a channel page: the TV-sized one (2120x1192) where there is one."""
+    header = _find_renderer(resp, 'c4TabbedHeaderRenderer') or {}
+    for key in ('tvBanner', 'banner'):
+        url = best_thumb(header.get(key, {}).get('thumbnails'))
+        if url:
+            return url
+    return (parse_page(resp).get('header') or {}).get('fanart', '')
+
+
 def description_text(node):
     """A description's text with its links in full: the runs show them shortened ("https://ex.com/a...")."""
     if not isinstance(node, dict) or 'runs' not in node:
@@ -641,6 +651,8 @@ def video_details(player_resp, next_resp=None):
         info['published'] = text(meta.get('dateText')) or text(meta.get('publishedTimeText'))
         owner = meta.get('owner', {}).get('videoOwnerRenderer', {})
         info['channel'] = info['channel'] or text(owner.get('title'))
+        owner_link = owner.get('navigationEndpoint', {}).get('browseEndpoint', {})
+        info['channel_id'] = info['channel_id'] or owner_link.get('browseId', '')
         info['subscribers'] = text(owner.get('subscriberCountText'))
         info['channel_thumb'] = best_thumb(owner.get('thumbnail', {}).get('thumbnails'))
         desc = description_text(meta.get('description'))

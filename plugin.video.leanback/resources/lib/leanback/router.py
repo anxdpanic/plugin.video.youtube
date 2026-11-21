@@ -2,6 +2,7 @@
 # Copyright (C) 2026 anxdpanic
 """Plugin entry: routes, directory listings, playback and the account/menu dialogs."""
 import json
+import threading
 import time
 import urllib.parse
 
@@ -125,8 +126,6 @@ class Plugin:
         except auth.AuthError:
             self._notify(kodi.string(30132), error=True)
             self._end(False)
-        # The listing is on screen by now; fetch the channel banners it lacked for next time.
-        self.banners.fetch_missing()
 
     # ================================================================ helpers
     def _end(self, succeeded=True, cache=False):
@@ -527,14 +526,7 @@ class Plugin:
         hide_watched = kodi.setting_bool('hide_watched') and browse_id not in NO_WATCHED_FILTER \
             and not (browse_id or '').startswith('VL')
         threshold = kodi.setting_int('watched_threshold') or 80
-        if describe.enabled():
-            # Every listed video's description, fetched at once before anything is drawn.
-            missing = [item['target'].get('video_id') or item.get('id') for item in items
-                       if item['kind'] == 'video' and not item.get('upcoming')
-                       and not (hide_shorts and item['short'])]
-            missing = [v for v in missing if v and not (self.descriptions.get(v) or {}).get('w')]
-            if missing:
-                describe.fetch_all(missing, self.descriptions)
+        self._prefetch(items, hide_shorts)
         shown = []
         for item in items:
             if hide_shorts and item['short']:
@@ -547,6 +539,33 @@ class Plugin:
                 self._add_folder_item(item)
             shown.append(item)
         return shown
+
+    def _prefetch(self, items, hide_shorts):
+        """Before anything is drawn: the banners of channels not seen before and, when turned on, the
+        descriptions of listed videos, all looked up at once and in parallel."""
+        channels = []
+        for item in items:
+            browse_id = item['target'].get('browse_id') or ''
+            channels.append(browse_id if browse_id.startswith('UC') else item.get('channel_id'))
+        banner_lookup = None
+        if not self.fanart and self.banners.unknown(channels):
+            banner_lookup = threading.Thread(target=self.banners.fetch_all, args=(channels,), name='leanback-art')
+            banner_lookup.start()
+        if describe.enabled():
+            missing = [item['target'].get('video_id') or item.get('id') for item in items
+                       if item['kind'] == 'video' and not item.get('upcoming')
+                       and not (hide_shorts and item['short'])]
+            missing = [v for v in missing if v and not (self.descriptions.get(v) or {}).get('w')]
+            if missing:
+                describe.fetch_all(missing, self.descriptions)
+        if banner_lookup:
+            banner_lookup.join()
+        if not self.fanart:
+            # Some tiles (Home's rows) don't name their channel; the watch pages just read do.
+            named = [(self.descriptions.get(item['target'].get('video_id') or item.get('id')) or {}).get('c')
+                     for item in items if item['kind'] == 'video' and not item.get('channel_id')]
+            if self.banners.unknown(named):
+                self.banners.fetch_all(named)
 
     def _use_channel_fanart(self, browse_id, header):
         """On a channel's pages, its banner is the fanart for everything listed."""
@@ -610,6 +629,7 @@ class Plugin:
         tag.setMediaType('video')
         tag.setTitle(title)
         known = self.descriptions.get(video_id)
+        channel_id = item['channel_id'] or (known or {}).get('c')
         plot = self._video_plot(item, known, threshold)
         tag.setPlot(plot)
         # Some views (Estuary's Poster, Shift, Fanart) show the outline instead of the plot when it is set.
@@ -630,13 +650,13 @@ class Plugin:
         if item['views']:
             tag.setVotes(item['views'])
         li.setArt({'thumb': item['thumb'], 'icon': item['thumb'],
-                   'fanart': self._channel_fanart(item['channel_id']) or item['thumb'], 'landscape': item['thumb']})
+                   'fanart': self._channel_fanart(channel_id) or item['thumb'], 'landscape': item['thumb']})
         li.setProperty('IsPlayable', 'true')
         li.setProperty('leanback.video_id', video_id)
         menu = []
-        if item['channel_id']:
+        if channel_id:
             menu.append((kodi.string(30103), 'Container.Update(%s)' % url_for(
-                'browse', id=item['channel_id'], title=item['channel'])))
+                'browse', id=channel_id, title=item['channel'])))
         menu.append((kodi.string(30104), 'Container.Update(%s)' % url_for('related', v=video_id)))
         menu.append((kodi.string(30105), 'RunPlugin(%s)' % url_for('details', v=video_id)))
         if not item['live'] and not item['short']:

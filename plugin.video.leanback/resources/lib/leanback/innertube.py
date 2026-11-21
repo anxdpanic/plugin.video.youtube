@@ -17,6 +17,7 @@ API = 'https://www.youtube.com/youtubei/v1/'
 # The same API as the mobile apps reach it. Tested 2026-11-21: 2 x 40 watch page requests at once, all
 # answered in about 3 s each, where www.youtube.com answers bursts with its automated-queries page.
 APPS_API = 'https://youtubei.googleapis.com/youtubei/v1/'
+ABOUT_PARAMS = 'EgVhYm91dPIGBAoCEgA='  # a channel's About tab
 
 TV = {
     'key': 'tv',
@@ -170,6 +171,12 @@ class InnerTube:
         if params and not continuation:
             body['params'] = params
         return self._post('search', body, TV)
+
+    def channel_about(self, channel_id):
+        """A channel's About tab as the visionOS app gets it: about 15 KB with the channel's banners, where
+        the TV client's channel page is 0.4-1 MB."""
+        body = {'browseId': channel_id, 'params': ABOUT_PARAMS}
+        return self._post('browse', body, PLAYER_CLIENTS[0], use_auth=False, api=APPS_API)
 
     def watch_page(self, video_id):
         """The watch page as the visionOS app gets it: unlike the TV client's, it carries the description,

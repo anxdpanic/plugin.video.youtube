@@ -19,9 +19,9 @@ def no_request_pacing(monkeypatch):
 
 @pytest.fixture(autouse=True)
 def no_banner_fetching(monkeypatch):
-    """Listings fetch missing channel banners after they end; tests stay offline."""
+    """Listings look up unknown channels' banners before drawing; tests stay offline."""
     from resources.lib.leanback import art
-    monkeypatch.setattr(art.Banners, 'fetch_missing', lambda self, limit=0: None)
+    monkeypatch.setattr(art.Banners, 'fetch_all', lambda self, channel_ids, fetch=None: 0)
 
 
 @pytest.fixture(autouse=True)

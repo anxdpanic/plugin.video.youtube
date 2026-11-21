@@ -1,18 +1,17 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright (C) 2026 anxdpanic
-"""Channel banners, used as fanart for a channel's videos. A banner only comes with the channel's
-own page, which is large, so banners are remembered for a week and missing ones are fetched after
-a listing is already on screen."""
+"""Channel banners, used as fanart for a channel's videos. List tiles don't carry them, so the banners
+of channels not seen before are looked up (from each channel's small About page) before a listing is
+drawn, and remembered for a week. Only the addresses are kept: Kodi fetches and caches the images."""
 import threading
 import time
 
 from . import http, kodi, parser
-from .innertube import APPS_API, InnerTube, InnerTubeError
+from .innertube import InnerTube, InnerTubeError
 
 STORE = 'channel_art.json'
 TTL = 7 * 86400
-FETCH_LIMIT = 12  # channel pages fetched after one listing (about 0.8 MB each)
-WORKERS = 4
+WORKERS = 16
 
 
 def _fresh(entries):
@@ -59,32 +58,41 @@ class Banners:
         stored.update(self._entries or {})
         kodi.save_json(STORE, stored)
 
-    def fetch_missing(self, limit=FETCH_LIMIT):
-        """Fetch banners for channels seen without one; called once the listing is shown."""
-        todo = self.missing[:limit]
+    def unknown(self, channel_ids):
+        """The channels among these whose banner isn't remembered yet."""
+        entries = self._load()
+        return [c for c in dict.fromkeys(channel_ids) if (c or '').startswith('UC') and c not in entries]
+
+    def fetch_all(self, channel_ids, fetch=None):
+        """Look up these channels' banners in parallel and remember them. Returns how many were found."""
+        todo = self.unknown(channel_ids)
+        total = len(todo)
         if not todo:
-            return
+            return 0
+        if fetch is None:
+            api = InnerTube()
+
+            def fetch(channel_id):
+                return parser.channel_banner(api.channel_about(channel_id))
+
         found = {}
+        lock = threading.Lock()
+        blocked = []
 
         def work():
-            # Background: the request broker runs these after anything on screen.
-            api = InnerTube(priority=http.BACKGROUND)
-            while todo:
+            while not blocked:
+                with lock:
+                    if not todo:
+                        return
+                    channel_id = todo.pop(0)
                 try:
-                    channel_id = todo.pop()
-                except IndexError:
-                    return
-                try:
-                    # The apps' host takes these in parallel; www.youtube.com would need them paced.
-                    header = parser.parse_page(api.browse(channel_id, api=APPS_API))['header'] or {}
+                    found[channel_id] = fetch(channel_id) or ''
                 except (InnerTubeError, http.HTTPError) as exc:
                     kodi.log('no banner for %s: %s' % (channel_id, exc))
                     if getattr(exc, 'blocked', False):
-                        del todo[:]  # YouTube is holding requests back: try the rest another time
-                    continue
-                found[channel_id] = header.get('fanart') or ''
+                        blocked.append(True)  # YouTube is holding requests back: the rest can wait
 
-        threads = [threading.Thread(target=work, name='leanback-art') for _ in range(min(WORKERS, len(todo)))]
+        threads = [threading.Thread(target=work, name='leanback-art') for _ in range(min(WORKERS, total))]
         for thread in threads:
             thread.start()
         for thread in threads:
@@ -93,5 +101,8 @@ class Banners:
             entries = self._load()
             for channel_id, url in found.items():
                 entries[channel_id] = {'url': url, 'ts': time.time()}
+                if channel_id in self.missing:
+                    self.missing.remove(channel_id)
             self._save()
-            kodi.log('remembered %d channel banners' % len(found))
+        kodi.log('looked up %d of %d channel banners' % (len(found), total))
+        return len([u for u in found.values() if u])

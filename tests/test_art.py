@@ -46,18 +46,87 @@ def test_videos_use_their_channel_banner_as_fanart(monkeypatch):
     assert plugin.banners.missing == ['UCdddddddddddddddddddddd']
 
 
-from resources.lib.leanback import art as _art  # noqa: E402
 
-_REAL_FETCH_MISSING = _art.Banners.fetch_missing  # conftest stubs it out for every test
+from resources.lib.leanback import innertube  # noqa: E402
+
+REAL_FETCH_ALL = art.Banners.fetch_all  # conftest stubs it out for every test
 
 
-def test_banner_channel_pages_go_to_the_apps_host(monkeypatch):
-    from resources.lib.leanback import art, innertube
-    monkeypatch.setattr(art.Banners, 'fetch_missing', _REAL_FETCH_MISSING)
-    sent = []
-    monkeypatch.setattr(innertube.http, 'request_json', lambda url, **kw: sent.append(url) or {})
-    monkeypatch.setattr(innertube.InnerTube, 'visitor_data', lambda self, refresh=False: 'V')
+def test_banners_are_looked_up_before_drawing(monkeypatch):
+    """Unknown channels get their banner on the very first view, looked up in parallel."""
+    looked_up = []
+
+    def fetch_all(self, channel_ids, fetch=None):
+        looked_up.append(list(channel_ids))
+        return REAL_FETCH_ALL(self, channel_ids, lambda c: 'https://yt3/%s' % c[-4:])
+
+    monkeypatch.setattr(art.Banners, 'fetch_all', fetch_all)
+    art.Banners().remember('UCcccccccccccccccccccccc', 'https://yt3/known')
+    item = parser._item_base('video', 'A', 'https://i.ytimg.com/a.jpg', {'type': 'video', 'video_id': 'aaaaaaaaaaa'})
+    item.update(id='aaaaaaaaaaa', channel_id='UCcccccccccccccccccccccc', duration=10)
+    other = dict(item, id='bbbbbbbbbbb', target={'type': 'video', 'video_id': 'bbbbbbbbbbb'},
+                 channel_id='UCdddddddddddddddddddddd')
+    router.Plugin(['plugin://plugin.video.leanback/browse', '1', ''])._render_items([item, other])
+    assert [li.art['fanart'] for _, li, _ in xbmcplugin.ITEMS] == ['https://yt3/known', 'https://yt3/dddd']
+    assert art.Banners().get('UCdddddddddddddddddddddd') == 'https://yt3/dddd'  # remembered for next time
+
+
+def test_fetch_all_skips_known_channels_and_remembers_ones_without_a_banner():
+    art.Banners().remember('UCaaaaaaaaaaaaaaaaaaaaaa', 'https://yt3/a')
+    asked = []
     banners = art.Banners()
-    banners.missing = ['UCSMOQeBJ2RAnuFungnQOxLg']
-    banners.fetch_missing()
-    assert sent == ['https://youtubei.googleapis.com/youtubei/v1/browse?prettyPrint=false']
+    found = REAL_FETCH_ALL(banners, ['UCaaaaaaaaaaaaaaaaaaaaaa', 'UCbbbbbbbbbbbbbbbbbbbbbb', 'not-a-channel'],
+                           lambda c: asked.append(c) or '')
+    assert asked == ['UCbbbbbbbbbbbbbbbbbbbbbb'] and found == 0
+    assert art.Banners().unknown(['UCbbbbbbbbbbbbbbbbbbbbbb']) == []  # no banner, but not looked up again
+
+
+def test_banner_lookup_reads_the_small_about_page(monkeypatch):
+    sent = []
+    monkeypatch.setattr(innertube.http, 'request_json', lambda url, data=None, **kw: sent.append((url, data)) or {})
+    monkeypatch.setattr(innertube.InnerTube, 'visitor_data', lambda self, refresh=False: 'V')
+    REAL_FETCH_ALL(art.Banners(), ['UCSMOQeBJ2RAnuFungnQOxLg'])
+    [(url, data)] = sent
+    assert url == 'https://youtubei.googleapis.com/youtubei/v1/browse?prettyPrint=false'
+    body = __import__('json').loads(data)
+    assert body['params'] == innertube.ABOUT_PARAMS and body['context']['client']['clientName'] == 'VISIONOS'
+
+
+def test_channel_banner_prefers_the_tv_banner():
+    def thumbs(width, height):
+        return {'thumbnails': [{'url': 'https://yt3/%dx%d' % (width, height), 'width': width, 'height': height}]}
+
+    resp = {'header': {'c4TabbedHeaderRenderer': {'banner': thumbs(2560, 424), 'tvBanner': thumbs(2120, 1192)}}}
+    assert parser.channel_banner(resp) == 'https://yt3/2120x1192'
+    del resp['header']['c4TabbedHeaderRenderer']['tvBanner']
+    assert parser.channel_banner(resp) == 'https://yt3/2560x424'
+
+
+def test_tiles_without_a_channel_take_it_from_the_watch_page(monkeypatch):
+    """Home's row tiles don't name their channel; the watch page read for the description does."""
+    import xbmcaddon
+
+    from resources.lib.leanback import describe, descriptions
+    xbmcaddon.SETTINGS['fetch_descriptions'] = True
+
+    def fetch_all(video_ids, store, fetch=None):
+        store.remember_all({'video_id': v, 'plot': 'About', 'channel_id': 'UCeeeeeeeeeeeeeeeeeeeeee'}
+                           for v in video_ids)
+        return len(video_ids)
+
+    monkeypatch.setattr(describe, 'fetch_all', fetch_all)
+    monkeypatch.setattr(art.Banners, 'fetch_all',
+                        lambda self, ids, fetch=None: REAL_FETCH_ALL(self, ids, lambda c: 'https://yt3/' + c[-4:]))
+    item = parser._item_base('video', 'A', 'https://i.ytimg.com/a.jpg', {'type': 'video', 'video_id': 'aaaaaaaaaaa'})
+    item.update(id='aaaaaaaaaaa', channel_id='', duration=10)
+    router.Plugin(['plugin://plugin.video.leanback/browse', '1', ''])._render_items([item])
+    assert [li.art['fanart'] for _, li, _ in xbmcplugin.ITEMS] == ['https://yt3/eeee']
+    assert descriptions.Descriptions().get('aaaaaaaaaaa')['c'] == 'UCeeeeeeeeeeeeeeeeeeeeee'
+
+
+def test_watch_page_names_the_channel():
+    meta = {'owner': {'videoOwnerRenderer': {
+        'title': {'runs': [{'text': 'Blender'}]},
+        'navigationEndpoint': {'browseEndpoint': {'browseId': 'UCSMOQeBJ2RAnuFungnQOxLg'}}}}}
+    nxt = {'contents': [{'videoMetadataRenderer': meta}]}
+    assert parser.video_details({}, nxt)['channel_id'] == 'UCSMOQeBJ2RAnuFungnQOxLg'

@@ -27,7 +27,8 @@ class Descriptions:
         return self._load().get(video_id)
 
     def remember(self, video_id, description, published='', facts=None, save=True):
-        """facts: what the watch page adds to a video, as {'s': subscribers, 'l': likes, 't': age text},
+        """facts: what the watch page adds to a video, as {'s': subscribers, 'l': likes, 't': age text,
+        'c': channel id},
         with 'w' set once the watch page was read."""
         facts = {k: v for k, v in (facts or {}).items() if v}
         # A watch page without a description (Shorts often have none) is kept too, so it isn't read again.
@@ -46,7 +47,8 @@ class Descriptions:
     def remember_details(self, info, save=True):
         """Keep the description and watch-page facts from parser.video_details()."""
         self.remember(info.get('video_id'), info.get('plot'), info.get('date'),
-                      {'s': info.get('subscribers'), 'l': info.get('likes'), 't': info.get('published'), 'w': 1},
+                      {'s': info.get('subscribers'), 'l': info.get('likes'), 't': info.get('published'),
+                       'c': info.get('channel_id'), 'w': 1},
                       save=save)
 
     def remember_all(self, infos):
