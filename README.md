@@ -34,8 +34,6 @@ written for them work after changing only the add-on id:
 | `/kodion/search/input/`, `/kodion/search/list/`, `/kodion/search/remove/?q=…` | new search, search history, remove a search |
 | `/kodion/playback_history/` | your YouTube history |
 | `/kodion/watch_later/list/` | Watch later |
-| `/sign/in/`, `/sign/out/` | sign in, sign out |
-| `/config/youtube/` | Leanback's settings |
 
 ## Development
 

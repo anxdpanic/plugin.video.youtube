@@ -1,5 +1,4 @@
 import pytest
-import xbmc
 
 from resources.lib.leanback import compat, router
 
@@ -35,9 +34,6 @@ def translate(path, **params):
     ('/kodion/search/remove/', {'q': 'cats'}, ('search/remove', {'q': 'cats'})),
     ('/kodion/playback_history/', {}, ('browse', {'id': 'FEhistory'})),
     ('/kodion/watch_later/list/', {}, ('browse', {'id': 'VLWL'})),
-    ('/sign/in/', {}, ('account/sign_in', {})),
-    ('/sign/out/', {}, ('account/sign_out', {})),
-    ('/config/youtube/', {}, ('settings', {})),
 ])
 def test_other_addon_paths_map_to_leanback_routes(path, params, expected):
     assert translate(path, **params) == expected
@@ -59,6 +55,8 @@ def test_unknown_and_unsupported_paths_are_left_alone():
     # Settings-only and account-editing paths of the other add-on aren't mapped.
     assert translate('/maintenance/clear/', target='data_cache') == ('maintenance/clear', {'target': 'data_cache'})
     assert translate('/users/switch/') == ('users/switch', {})
+    assert translate('/sign/in/') == ('sign/in', {})
+    assert translate('/config/youtube/') == ('config/youtube', {})
     assert translate('/video/rate/', rating='like') == ('video/rate', {'rating': 'like'})
 
 
@@ -73,8 +71,3 @@ def test_plugin_applies_translation():
     plugin = router.Plugin(['plugin://plugin.video.leanback/play/', '1', '?video_id=abcdefghijk&seek=5'])
     assert (plugin.route, plugin.params) == ('play', {'v': 'abcdefghijk', 't': '5'})
 
-
-def test_settings_route_opens_addon_settings():
-    del xbmc.BUILTINS[:]
-    router.Plugin(['plugin://plugin.video.leanback/config/youtube/', '1', '']).dispatch()
-    assert xbmc.BUILTINS == ['Addon.OpenSettings(plugin.video.leanback)']

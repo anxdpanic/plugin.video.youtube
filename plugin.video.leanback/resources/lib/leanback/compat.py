@@ -43,9 +43,6 @@ ALIASES = (
     (r'kodion/search/remove', lambda m, p: ('search/remove', {'q': p.get('q')})),
     (r'kodion/playback_history(?:/list)?', lambda m, p: ('browse', {'id': 'FEhistory'})),
     (r'kodion/watch_later(?:/list)?', lambda m, p: ('browse', {'id': 'VLWL'})),
-    (r'sign/in', lambda m, p: ('account/sign_in', {})),
-    (r'sign/out', lambda m, p: ('account/sign_out', {})),
-    (r'config/youtube', lambda m, p: ('settings', {})),
 )
 _COMPILED = tuple((re.compile(pattern + '$'), handler) for pattern, handler in ALIASES)
 

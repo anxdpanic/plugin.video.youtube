@@ -107,7 +107,6 @@ ROUTES = {  # route -> Plugin method
     'menu/customise': 'customise_menu',
     'menu/reset': 'reset_menu',
     'maintenance': 'maintenance',
-    'settings': 'open_settings',
 }
 
 
@@ -1046,10 +1045,6 @@ class Plugin:
         else:
             message = maintenance.text(30159)
         self._notify(message)
-
-    def open_settings(self):
-        self._end(False)
-        xbmc.executebuiltin('Addon.OpenSettings(%s)' % kodi.ADDON_ID)
 
     def reset_menu(self):
         state = self._state()
