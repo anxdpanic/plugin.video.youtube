@@ -141,3 +141,21 @@ class Screen:
         fresh = [i for i in items if self._keep(i) and not (i.get('id') and i['id'] in seen)]
         row.items.extend(fresh)
         return fresh
+
+
+class LocalScreen(Screen):
+    """A screen made here rather than fetched from YouTube (the search screen). build() returns its rows,
+    and is asked again whenever the screen comes back into view, so it shows what changed meanwhile."""
+
+    def __init__(self, title, build):
+        super().__init__({'ep': None}, title, load=None)
+        self._build = build
+
+    def open(self):
+        self.rows = self._build()
+        return self
+
+    refresh = open
+
+    def can_grow(self):
+        return False

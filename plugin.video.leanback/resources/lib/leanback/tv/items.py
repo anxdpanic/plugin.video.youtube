@@ -98,5 +98,28 @@ def folder_tile(item, avatar=False):
     return li
 
 
+def action_tile(item):
+    """A thing to do rather than a page (New search, Clear search history): an icon on a plain tile."""
+    li = xbmcgui.ListItem(item['title'], offscreen=True)
+    li.setArt({'icon': icon(item['icon'])})
+    li.setProperty('icon_tile', '1')
+    li.setProperty('plot', item.get('plot', ''))
+    return li
+
+
+def query_tile(item):
+    """A past search, its words written large on the tile."""
+    li = xbmcgui.ListItem(item['title'], offscreen=True)
+    li.setProperty('text_tile', '1')
+    li.setProperty('plot', item.get('plot', ''))
+    return li
+
+
 def tile(item, known, threshold, avatar=False):
-    return video_tile(item, known, threshold) if item['kind'] == 'video' else folder_tile(item, avatar)
+    if item['kind'] == 'video':
+        return video_tile(item, known, threshold)
+    if item['kind'] == 'action':
+        return action_tile(item)
+    if item['kind'] == 'query':
+        return query_tile(item)
+    return folder_tile(item, avatar)

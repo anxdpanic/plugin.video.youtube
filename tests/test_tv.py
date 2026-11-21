@@ -130,3 +130,14 @@ def test_find_video_on_every_row():
     load = loader({None: page([shelf('A', 'abc'), shelf('B', 'cd')])})
     screen = model.Screen({'ep': 'browse'}, 'Home', load).open()
     assert [(r.title, i) for r, i in screen.find_video('c')] == [('A', 2), ('B', 0)]
+
+
+def test_local_screen_rebuilds_on_refresh():
+    searches = ['cats']
+    screen = model.LocalScreen('Search', lambda: [model.Row('Recent', [{'kind': 'query', 'title': q}
+                                                                       for q in searches])]).open()
+    assert [i['title'] for i in screen.rows[0].items] == ['cats']
+    searches.insert(0, 'dogs')
+    screen.refresh()
+    assert [i['title'] for i in screen.rows[0].items] == ['dogs', 'cats']
+    assert not screen.can_grow()

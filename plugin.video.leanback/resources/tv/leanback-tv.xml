@@ -99,6 +99,7 @@
                     <width>400</width>
                     <height>36</height>
                     <font>@font:tile_title@</font>
+                    <visible>!String.IsEqual(ListItem.Property(text_tile),1)</visible>
                     <textcolor>FFC8D0E0</textcolor>
                     <label>$INFO[ListItem.Label]</label>
                 </control>
@@ -131,6 +132,7 @@
                     <width>400</width>
                     <height>36</height>
                     <font>@font:tile_title@</font>
+                    <visible>!String.IsEqual(ListItem.Property(text_tile),1)</visible>
                     <textcolor>FFFFFFFF</textcolor>
                     <scroll>true</scroll>
                     <label>$INFO[ListItem.Label]</label>
@@ -294,6 +296,27 @@
             <aspectratio>scale</aspectratio>
             <visible>!String.IsEqual(ListItem.Property(round),1)</visible>
             <texture background="true" diffuse="@media@/tile_mask.png">$INFO[ListItem.Art(thumb)]</texture>
+        </control>
+        <control type="image">
+            <left>172</left>
+            <top>74</top>
+            <width>96</width>
+            <height>96</height>
+            <visible>String.IsEqual(ListItem.Property(icon_tile),1)</visible>
+            <texture colordiffuse="FFFFFFFF">$INFO[ListItem.Art(icon)]</texture>
+        </control>
+        <control type="label">
+            <left>44</left>
+            <top>10</top>
+            <width>352</width>
+            <height>225</height>
+            <visible>String.IsEqual(ListItem.Property(text_tile),1)</visible>
+            <font>@font:row_title@</font>
+            <align>center</align>
+            <aligny>center</aligny>
+            <wrapmultiline>true</wrapmultiline>
+            <textcolor>FFFFFFFF</textcolor>
+            <label>$INFO[ListItem.Label]</label>
         </control>
         <control type="image">
             <left>107</left>

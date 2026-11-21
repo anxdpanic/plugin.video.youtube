@@ -11,7 +11,7 @@ import traceback
 import xbmc
 import xbmcgui
 
-from .. import auth, describe, descriptions, http, kodi, pages, parser, router
+from .. import auth, describe, descriptions, http, kodi, maintenance, pages, parser, router
 from ..innertube import InnerTubeError
 from . import items, model
 
@@ -121,11 +121,7 @@ class TVWindow(xbmcgui.WindowXML):
         target = entry['target']
         kind = target.get('type')
         if entry['id'] == 'search' or kind == 'search':
-            query = xbmcgui.Dialog().input(kodi.string(30100))
-            if query:
-                self.pages._remember_search(query)
-                self._push(model.Screen({'ep': 'search', 'q': query}, query, self._load_page, pages.item_filter()),
-                           replace=True, entry='search')
+            self._push(model.LocalScreen(entry['title'], self._search_rows), replace=True, entry='search')
         elif entry['id'] == 'shorts':
             xbmc.executebuiltin('RunPlugin(%s)' % router.url_for('shorts', params=target.get('params')))
         elif kind == 'accounts':
@@ -164,7 +160,10 @@ class TVWindow(xbmcgui.WindowXML):
             self.close()
         elif len(self.stack) > 1:
             self.stack.pop()
-            self.top = getattr(self.stack[-1], 'top', 0)
+            screen = self.stack[-1]
+            if hasattr(screen, 'refresh'):  # the search screen: a search just made goes to the top
+                screen.refresh()
+            self.top = min(getattr(screen, 'top', 0), max(len(screen.rows) - 1, 0))
             self._show_rows()
         else:
             self.setFocusId(RAIL)
@@ -236,7 +235,11 @@ class TVWindow(xbmcgui.WindowXML):
     def _activate(self, item):
         target = item['target'] or {}
         kind = item['kind']
-        if kind == 'video':
+        if kind == 'action':
+            self._search_action(target['type'])
+        elif kind == 'query':
+            self._search(target['query'])
+        elif kind == 'video':
             self._play(item)
         elif kind == 'playlist' or target.get('type') == 'play_playlist' or (
                 target.get('type') == 'video' and target.get('playlist_id')):
@@ -250,6 +253,50 @@ class TVWindow(xbmcgui.WindowXML):
         elif target.get('type') == 'search':
             self._push(model.Screen({'ep': 'search', 'q': target['query'], 'params': target.get('params')},
                                     target['query'], self._load_page, pages.item_filter()))
+
+    # ------------------------------------------------------------ search
+    def _search_rows(self):
+        """The search screen: New search (and Clear when there is something to clear), then past searches."""
+        past = self.pages._searches()
+        actions = [{'kind': 'action', 'title': _string(30101, 'New search'), 'icon': 'search',
+                    'target': {'type': 'new_search'}, 'plot': _string(30175, 'Type what to search YouTube for')}]
+        if past:
+            actions.append({'kind': 'action', 'title': _string(30171, 'Clear search history'), 'icon': 'clear',
+                            'target': {'type': 'clear_searches'},
+                            'plot': _string(30172, 'Forget all %d past searches') % len(past)})
+        rows = [model.Row(_string(30100, 'Search'), actions)]
+        if past:
+            again = _string(30176, 'Search again for "%s"')
+            rows.append(model.Row(_string(30174, 'Recent searches'), [
+                {'kind': 'query', 'title': query, 'target': {'type': 'search', 'query': query},
+                 'plot': again % query} for query in past]))
+        return rows
+
+    def _search_action(self, action):
+        if action == 'new_search':
+            query = xbmcgui.Dialog().input(_string(30100, 'Search'))
+            if query:
+                self._search(query)
+        elif action == 'clear_searches':
+            if xbmcgui.Dialog().yesno(_string(30171, 'Clear search history'),
+                                      _string(30173, 'Forget every past search?')):
+                maintenance.clear_search_history()
+                self._refresh_search()
+
+    def _search(self, query):
+        self.pages._remember_search(query)
+        self._push(model.Screen({'ep': 'search', 'q': query}, query, self._load_page, pages.item_filter()))
+
+    def _forget(self, query):
+        self.pages._forget_search(query)
+        self._refresh_search()
+
+    def _refresh_search(self):
+        screen = self.screen
+        if hasattr(screen, 'refresh'):
+            screen.refresh()
+            self.top = min(self.top, max(len(screen.rows) - 1, 0))
+            self._show_rows()
 
     def _open_browse(self, browse_id, params, title):
         desc = {'ep': 'browse', 'id': browse_id, 'params': params}
@@ -320,6 +367,15 @@ class TVWindow(xbmcgui.WindowXML):
         if not row or not 0 <= position < len(row.items):
             return
         item = row.items[position]
+        if item['kind'] == 'query':
+            choices = [(_string(30128, 'Remove from search history'), lambda: self._forget(item['title'])),
+                       (_string(30171, 'Clear search history'), lambda: self._search_action('clear_searches'))]
+            choice = xbmcgui.Dialog().contextmenu([label for label, _ in choices])
+            if choice >= 0:
+                choices[choice][1]()
+            return
+        if item['kind'] == 'action':
+            return
         channel_id = router.channel_of(item)
         choices = []
         if item['kind'] == 'video':
