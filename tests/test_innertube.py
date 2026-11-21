@@ -53,3 +53,17 @@ def test_bad_request_is_not_retried(api, monkeypatch):
     with pytest.raises(innertube.InnerTubeError, match='invalid argument'):
         api.browse('VLRDx')
     assert calls == ['browse']
+
+
+def test_retry_stays_on_the_apps_api_host(api, monkeypatch):
+    hosts = []
+
+    def request_json(url, data=None, headers=None, **kwargs):
+        hosts.append(url.split('/youtubei/')[0])
+        if len(hosts) == 1:
+            raise http.HTTPError(503)
+        return {'ok': True}
+
+    monkeypatch.setattr(http, 'request_json', request_json)
+    assert api.watch_page('abcdefghijk') == {'ok': True}
+    assert hosts == ['https://youtubei.googleapis.com'] * 2
