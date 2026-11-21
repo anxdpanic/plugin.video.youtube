@@ -41,6 +41,8 @@
                 <texture colordiffuse="FF0B0F1A">@media@/fade_v.png</texture>
             </control>
             <control type="textbox">
+                <!-- Kodi scrolls a long text by itself, half lines and all; show it from the top instead. -->
+                <autoscroll>false</autoscroll>
                 <left>180</left>
                 <top>70</top>
                 <width>900</width>
@@ -50,6 +52,8 @@
                 <label>$INFO[Container(200).ListItem.Label]</label>
             </control>
             <control type="textbox">
+                <!-- Kodi scrolls a long text by itself, half lines and all; show it from the top instead. -->
+                <autoscroll>false</autoscroll>
                 <left>180</left>
                 <top>228</top>
                 <width>820</width>
