@@ -132,6 +132,7 @@ ROUTES = {  # route -> Plugin method
     'menu/customise': 'customise_menu',
     'menu/reset': 'reset_menu',
     'maintenance': 'maintenance',
+    'tv': 'tv_interface',
 }
 
 
@@ -198,6 +199,10 @@ class Plugin(pages.Pages):
                 channels = sorted(channels, key=lambda e: e['title'].lower())
             for entry in channels:
                 self._add_menu_entry(entry)
+        li = xbmcgui.ListItem(kodi.string(30167) or 'TV interface', offscreen=True)
+        li.setArt({'icon': kodi.icon_path('icon.png'), 'thumb': kodi.icon_path('icon.png')})
+        # Opens a window rather than listing anything, so not a folder (see Accounts below).
+        self._add(url_for('tv'), li, False)
         account_id, account = auth.active_account()
         li = xbmcgui.ListItem(kodi.string(30108), offscreen=True)
         li.setLabel2(account.get('name') or '' if account else kodi.string(30123))
@@ -859,6 +864,12 @@ class Plugin(pages.Pages):
         li.setPath(url_for('play', v=video_id))
         li.setProperty('IsPlayable', 'true')
         xbmcgui.Dialog().info(li)
+
+    # ================================================================ TV interface
+    def tv_interface(self):
+        from .tv import open_window
+
+        open_window()
 
     # ================================================================ menu customisation
     def pin(self):

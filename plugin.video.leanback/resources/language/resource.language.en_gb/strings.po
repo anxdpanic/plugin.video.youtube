@@ -451,3 +451,19 @@ msgstr ""
 msgctxt "#30166"
 msgid "Videos"
 msgstr ""
+
+msgctxt "#30167"
+msgid "TV interface"
+msgstr ""
+
+msgctxt "#30168"
+msgid "Upcoming"
+msgstr ""
+
+msgctxt "#30169"
+msgid "Playlist"
+msgstr ""
+
+msgctxt "#30170"
+msgid "Loading…"
+msgstr ""

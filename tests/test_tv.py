@@ -1,0 +1,118 @@
+import xbmcaddon
+
+from resources.lib.leanback import parser
+from resources.lib.leanback.tv import items, model, skin
+
+
+def video(video_id, short=False, watched=0):
+    item = parser._item_base('video', 'Video ' + video_id, 'https://i.ytimg.com/%s.jpg' % video_id,
+                             {'type': 'video', 'video_id': video_id})
+    item.update(id=video_id, short=short, watched_pct=watched, duration=100)
+    return item
+
+
+def shelf(title, ids, token=None):
+    return {'title': title, 'items': [video(i) for i in ids], 'continuation': token, 'shorts': False,
+            'endpoint': None}
+
+
+def page(shelves, token=None, tabs=None):
+    return {'header': None, 'tabs': tabs or [], 'shelves': shelves, 'continuation': token, 'message': ''}
+
+
+def loader(pages_by_token):
+    calls = []
+
+    def load(desc):
+        calls.append(desc.get('ctoken'))
+        return pages_by_token[desc.get('ctoken')]
+    load.calls = calls
+    return load
+
+
+def test_shelves_become_rows_and_more_load_near_the_end():
+    load = loader({
+        None: page([shelf('Trending', 'ab', 'T1'), shelf('Music', 'cd')], token='P2'),
+        'P2': page([shelf('Music', 'cd'), shelf('Gaming', 'ef')], token=None),
+        'T1': page([shelf('', 'bg', 'T2')]),
+    })
+    screen = model.Screen({'ep': 'browse', 'id': 'FEtopics'}, 'Home', load).open()
+    assert [r.title for r in screen.rows] == ['Trending', 'Music']
+    screen.ensure(0)
+    assert [r.title for r in screen.rows] == ['Trending', 'Music', 'Gaming']  # repeated Music left out
+    assert not screen.can_grow()
+    fresh = screen.more_items(screen.rows[0])
+    assert [i['id'] for i in fresh] == ['g']  # b was already in the row
+    assert screen.rows[0].token == 'T2'
+
+
+def test_single_list_is_cut_into_rows_and_keeps_filling():
+    load = loader({
+        None: page([shelf('', 'abcdef', 'G2')]),
+        'G2': page([shelf('', 'fghij')]),
+    })
+    screen = model.Screen({'ep': 'browse', 'id': 'FEsubscriptions'}, 'Subscriptions', load).open()
+    assert [len(r.items) for r in screen.rows] == [4, 2]
+    first = screen.rows[0]
+    first.pos = 3
+    screen.ensure(0)
+    assert [[i['id'] for i in r.items] for r in screen.rows] == [list('abcd'), list('efgh'), list('ij')]
+    assert screen.rows[0] is first and first.pos == 3  # full rows keep their state
+    assert all(r.grid for r in screen.rows)
+
+
+def test_tabs_row_and_filter():
+    tabs = [{'kind': 'channel', 'title': t, 'selected': t == 'All', 'target': {'type': 'browse'}}
+            for t in ('All', 'Grian', 'LTT')]
+    load = loader({None: page([{'title': 'Today', 'items': [video('a'), video('s', short=True)],
+                                'continuation': None, 'shorts': False, 'endpoint': None}], tabs=tabs)})
+    screen = model.Screen({'ep': 'browse'}, 'Subscriptions', load, keep=lambda i: not i['short'],
+                          tabs_title='Channels').open()
+    assert screen.rows[0].title == 'Channels'
+    assert [t['title'] for t in screen.rows[0].items] == ['Grian', 'LTT']
+    assert [i['id'] for i in screen.rows[1].items] == ['a']
+
+
+def test_pick_fonts_by_size_and_weight():
+    fonts = [('font13', 30, False, False), ('font12', 25, False, False), ('font27', 27, False, False),
+             ('font52_title', 52, True, False), ('font45_title', 45, True, False), ('font32_title', 32, True, False),
+             ('font20_title', 20, True, False), ('font23_narrow', 23, False, False),
+             ('font_MainMenu', 60, True, True), ('Mono26', 26, False, False)]
+    picked = skin.pick_fonts(fonts)
+    assert picked['hero_title'] == 'font52_title'
+    assert picked['row_title'] == 'font32_title'
+    assert picked['hero_plot'] == 'font27'
+    assert picked['tile_meta'] == 'font23_narrow'
+    assert picked['badge'] == 'font20_title'
+    assert skin.pick_fonts([])['rail'] == 'font13'
+
+
+def test_read_fonts_scales_and_skips(tmp_path):
+    font_xml = tmp_path / 'Font.xml'
+    font_xml.write_text('''<fonts><fontset id="Other"><font><name>x</name><filename>a.ttf</filename><size>9</size>
+        </font></fontset><fontset id="Arial">
+        <font><name>font13</name><filename>arial.ttf</filename><size>20</size></font>
+        <font><name>big</name><filename>arial.ttf</filename><size>30</size><style>bold</style></font>
+        <font><name>caps</name><filename>arial.ttf</filename><size>30</size><style>uppercase</style></font>
+        <font><name>clock</name><filename>Roboto-Thin.ttf</filename><size>50</size></font>
+        </fontset></fonts>''')
+    fonts = skin.read_fonts(str(font_xml), 'Arial', 720)
+    assert fonts == [('font13', 30.0, False, False), ('big', 45.0, True, False), ('caps', 45.0, False, True)]
+
+
+def test_render_fills_template():
+    template = ('<window><controls>@include:tile@<font>@font:rail@</font></controls>'
+                '<include name="tile"><texture>@media@/white.png</texture></include></window>')
+    xml = skin.render(template, {'rail': 'font30'}, 'C:\\addon\\media', '/icon.png')
+    assert xml == '<window><controls><texture>C:/addon/media/white.png</texture><font>font30</font></controls></window>'
+
+
+def test_video_tile_badges_and_meta():
+    xbmcaddon.STRINGS.clear()
+    item = video('a', watched=40)
+    item.update(channel='Blender', views=1234567, published='2 weeks ago', duration=635)
+    li = items.video_tile(item, None, 80)
+    assert li.label2 == 'Blender • 1.2M views • 2 weeks ago'
+    assert li.getProperty('badge') == '10:35'
+    assert li.getProperty('progress') == '40'
+    assert items.short_count(51000) == '51K' and items.short_count(999) == '999'
