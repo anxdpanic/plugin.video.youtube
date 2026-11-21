@@ -12,6 +12,7 @@ import string
 import time
 
 from . import auth, http, kodi
+from .parser import text
 
 API = 'https://www.youtube.com/youtubei/v1/'
 # The same API as the mobile apps reach it. Tested 2026-11-21: 2 x 40 watch page requests at once, all
@@ -226,8 +227,8 @@ class InnerTube:
             if isinstance(node, dict):
                 item = node.get('accountItem') or node.get('accountItemRenderer')
                 if isinstance(item, dict):
-                    name = _text(item.get('accountName'))
-                    handle = _text(item.get('channelHandle') or item.get('accountByline'))
+                    name = text(item.get('accountName'))
+                    handle = text(item.get('channelHandle') or item.get('accountByline'))
                     if name:
                         names.append((item.get('isSelected', False), name, handle))
                 for value in node.values():
@@ -275,7 +276,7 @@ class InnerTube:
                 kodi.log('player: %s ok (%d direct formats, hls=%s)'
                          % (client['key'], len(direct), bool(data.get('hlsManifestUrl'))))
                 return resp, client
-            reason = status.get('reason') or _text(
+            reason = status.get('reason') or text(
                 status.get('errorScreen', {}).get('playerErrorMessageRenderer', {}).get('subreason')) \
                 or status.get('status')
             kodi.log('player: %s gave %s (%s)' % (client['key'], status.get('status'), reason))
@@ -290,16 +291,3 @@ def _thumb(endpoint):
         return thumbs[-1].get('url', '')
     return 'https://i.ytimg.com/vi/%s/oar2.jpg' % endpoint.get('videoId')
 
-
-def _text(node):
-    if not node:
-        return ''
-    if isinstance(node, str):
-        return node
-    if 'simpleText' in node:
-        return node['simpleText']
-    if 'runs' in node:
-        return ''.join(run.get('text', '') for run in node['runs'])
-    if 'content' in node:
-        return node['content']
-    return ''

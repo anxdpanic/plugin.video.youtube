@@ -4,6 +4,8 @@
 import re
 from xml.sax.saxutils import escape, quoteattr
 
+from .parser import text
+
 SUPPORTED_VIDEO = ('avc1', 'vp9', 'vp09', 'av01')
 SUPPORTED_AUDIO = ('mp4a', 'opus', 'ec-3', 'ac-3')
 TRANSFER_SCHEME = 'urn:mpeg:mpegB:cicp:TransferCharacteristics'
@@ -193,7 +195,7 @@ def subtitle_tracks(player_resp, include_asr=True, translate_to=None):
     if not tracks:
         return []
     translatable = {t.get('languageCode') for t in renderer.get('translationLanguages', [])}
-    names = {t.get('languageCode'): _name(t.get('languageName')) for t in renderer.get('translationLanguages', [])}
+    names = {t.get('languageCode'): text(t.get('languageName')) for t in renderer.get('translationLanguages', [])}
     subs = []
     native = set()
     for track in tracks:
@@ -201,7 +203,7 @@ def subtitle_tracks(player_resp, include_asr=True, translate_to=None):
         if kind == 'asr' and not include_asr:
             continue
         lang = track.get('languageCode', 'und')
-        label = _name(track.get('name')) or lang
+        label = text(track.get('name')) or lang
         if kind != 'asr':
             native.add(lang.split('-')[0])
         subs.append({'lang': lang, 'label': label, 'kind': kind, 'url': track['baseUrl'] + '&fmt=vtt'})
@@ -220,12 +222,3 @@ def subtitle_tracks(player_resp, include_asr=True, translate_to=None):
                      'url': source['baseUrl'] + '&fmt=vtt&tlang=' + lang})
     return subs
 
-
-def _name(node):
-    if not node:
-        return ''
-    if isinstance(node, str):
-        return node
-    if 'simpleText' in node:
-        return node['simpleText']
-    return ''.join(run.get('text', '') for run in node.get('runs', []))
