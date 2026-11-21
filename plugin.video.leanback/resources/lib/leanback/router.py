@@ -641,7 +641,7 @@ class Plugin(pages.Pages):
         # Not a folder: Kodi runs it as a script, so the Container.Update to the results isn't
         # undone by Kodi going back from a failed folder.
         self._add(url_for('search/new'), li, False)
-        for past in self._state().get('search_history', []):
+        for past in self._searches():
             li = xbmcgui.ListItem(past, offscreen=True)
             li.setArt({'icon': 'DefaultAddonsSearch.png'})
             li.addContextMenuItems([(kodi.string(30128), 'RunPlugin(%s)' % url_for('search/remove', q=past))])
@@ -655,9 +655,7 @@ class Plugin(pages.Pages):
             xbmc.executebuiltin('Container.Update(%s)' % url_for('search', q=query))
 
     def search_remove(self):
-        state = self._state()
-        state['search_history'] = [q for q in state.get('search_history', []) if q != self.params.get('q')]
-        self._save_state(state)
+        self._forget_search(self.params.get('q'))
         xbmc.executebuiltin('Container.Refresh')
 
     # ================================================================ playback

@@ -78,6 +78,14 @@ class Pages:
         state['search_history'] = [query] + history[:19]
         self._save_state(state)
 
+    def _searches(self):
+        return self._state().get('search_history', [])
+
+    def _forget_search(self, query):
+        state = self._state()
+        state['search_history'] = [q for q in state.get('search_history', []) if q != query]
+        self._save_state(state)
+
     @staticmethod
     def _account_key():
         return auth.active_account()[0] or 'guest'
