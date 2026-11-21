@@ -62,6 +62,20 @@ def parse_count(value):
     return int(amount * {'': 1, 'K': 1e3, 'M': 1e6, 'B': 1e9}[match.group(2).upper()])
 
 
+def walk_dicts(node):
+    """Every dict in a response, depth first in document order: for finding a renderer wherever a client
+    nests it."""
+    if isinstance(node, dict):
+        yield node
+        children = node.values()
+    elif isinstance(node, list):
+        children = node
+    else:
+        return
+    for child in children:
+        yield from walk_dicts(child)
+
+
 # ------------------------------------------------------------------ endpoints
 def _unquote(value):
     """The TV client sends endpoint params percent-encoded ('...%3D'); InnerTube wants them raw."""
@@ -91,12 +105,10 @@ def endpoint_target(command):
     if 'searchEndpoint' in command:
         ep = command['searchEndpoint']
         return {'type': 'search', 'query': ep.get('query', ''), 'params': _unquote(ep.get('params'))}
-    for key in ('commandExecutorCommand',):
-        if key in command:
-            for sub in command[key].get('commands', []):
-                target = endpoint_target(sub)
-                if target:
-                    return target
+    for sub in command.get('commandExecutorCommand', {}).get('commands', []):
+        target = endpoint_target(sub)
+        if target:
+            return target
     return None
 
 
@@ -105,6 +117,16 @@ def _item_base(kind, title, thumb='', target=None):
     return {'kind': kind, 'title': title, 'thumb': thumb, 'target': target or {},
             'plot_lines': [], 'duration': 0, 'channel': '', 'channel_id': '', 'views': 0,
             'published': '', 'watched_pct': 0, 'short': False, 'live': False, 'upcoming': '', 'badges': []}
+
+
+def _resolve_kind(kind, target):
+    """The item kind from its content type, or from where it leads when the type is unknown."""
+    if not kind:
+        return 'video' if target and target['type'] == 'video' else 'folder'
+    if kind == 'video' and target and target['type'] == 'browse':
+        # A show ("629 episodes") is a video card of its latest episode that opens the show's playlist.
+        return 'playlist' if (target.get('browse_id') or '').startswith('VL') else 'folder'
+    return kind
 
 
 def parse_tile(tile):
@@ -119,11 +141,7 @@ def parse_tile(tile):
         'TILE_CONTENT_TYPE_CHANNEL': 'channel',
         'TILE_CONTENT_TYPE_PLAYLIST': 'playlist',
     }.get(content_type)
-    if not kind:
-        kind = 'video' if target and target['type'] == 'video' else 'folder'
-    elif kind == 'video' and target and target['type'] == 'browse':
-        # A show ("629 episodes") is a video tile of its latest episode that opens the show's playlist.
-        kind = 'playlist' if (target.get('browse_id') or '').startswith('VL') else 'folder'
+    kind = _resolve_kind(kind, target)
     item = _item_base(kind, title, thumb, target)
     item['id'] = tile.get('contentId') or (target or {}).get('video_id') or (target or {}).get('browse_id')
     item['short'] = tile.get('tvhtml5ShelfRendererType') == TILE_SHORTS or bool(target and target.get('short'))
@@ -198,11 +216,7 @@ def parse_lockup(lockup):
         'LOCKUP_CONTENT_TYPE_PODCAST': 'playlist',
         'LOCKUP_CONTENT_TYPE_ALBUM': 'playlist',
     }.get(content_type)
-    if not kind:
-        kind = 'video' if target and target['type'] == 'video' else 'folder'
-    elif kind == 'video' and target and target['type'] == 'browse':
-        # As with tiles: a video card that opens a page (a show) isn't a single video.
-        kind = 'playlist' if (target.get('browse_id') or '').startswith('VL') else 'folder'
+    kind = _resolve_kind(kind, target)
     item = _item_base(kind, title, thumb, target)
     item['id'] = lockup.get('contentId')
     item['short'] = content_type == 'LOCKUP_CONTENT_TYPE_SHORT' or bool(target and target.get('short'))
@@ -296,49 +310,29 @@ def parse_channel_header(header):
     return item
 
 
+DESCRIPTION_KEYS = ('description', 'content', 'compactDescription', 'descriptionText')
+
+
 def _find_description(node):
     """Longest text in a channel's description panel (falls back to the compact one)."""
     best = ''
-
-    def walk(value):
-        nonlocal best
-        if isinstance(value, dict):
-            for key, sub in value.items():
-                if key in ('description', 'content', 'compactDescription', 'descriptionText') and text(sub):
-                    candidate = text(sub).replace(' ...more', '')
-                    if len(candidate) > len(best):
-                        best = candidate
-                walk(sub)
-        elif isinstance(value, list):
-            for sub in value:
-                walk(sub)
-
-    walk(node or {})
+    for value in walk_dicts(node or {}):
+        for key in DESCRIPTION_KEYS:
+            candidate = text(value.get(key)).replace(' ...more', '')
+            if len(candidate) > len(best):
+                best = candidate
     return best
 
 
 def _with_channel(item, node):
     """Most video tiles name their channel only in the long-press menu (Go to channel)."""
     if item and item['kind'] == 'video' and not item['channel_id']:
-        found = []
-
-        def walk(value):
-            if found:
-                return
-            if isinstance(value, dict):
-                browse_id = value.get('browseEndpoint', {}).get('browseId', '') \
-                    if isinstance(value.get('browseEndpoint'), dict) else ''
-                if browse_id.startswith('UC'):
-                    found.append(browse_id)
-                    return
-                for child in value.values():
-                    walk(child)
-            elif isinstance(value, list):
-                for child in value:
-                    walk(child)
-        walk(node)
-        if found:
-            item['channel_id'] = found[0]
+        for value in walk_dicts(node):
+            endpoint = value.get('browseEndpoint')
+            browse_id = endpoint.get('browseId') or '' if isinstance(endpoint, dict) else ''
+            if browse_id.startswith('UC'):
+                item['channel_id'] = browse_id
+                break
     return item
 
 
@@ -584,19 +578,7 @@ def chapters(next_resp):
 
 def _find_renderer(node, key):
     """The first `key` renderer anywhere in a response (clients nest the watch page differently)."""
-    if isinstance(node, dict):
-        if key in node:
-            return node[key]
-        children = node.values()
-    elif isinstance(node, list):
-        children = node
-    else:
-        return None
-    for child in children:
-        found = _find_renderer(child, key)
-        if found is not None:
-            return found
-    return None
+    return next((value[key] for value in walk_dicts(node) if key in value), None)
 
 
 def channel_banner(resp):

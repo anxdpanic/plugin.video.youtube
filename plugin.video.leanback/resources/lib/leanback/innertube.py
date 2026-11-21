@@ -12,7 +12,7 @@ import string
 import time
 
 from . import auth, http, kodi
-from .parser import text
+from .parser import text, walk_dicts
 
 API = 'https://www.youtube.com/youtubei/v1/'
 # The same API as the mobile apps reach it. Tested 2026-11-21: 2 x 40 watch page requests at once, all
@@ -223,22 +223,13 @@ class InnerTube:
         except InnerTubeError:
             return None
         names = []
-
-        def walk(node):
-            if isinstance(node, dict):
-                item = node.get('accountItem') or node.get('accountItemRenderer')
-                if isinstance(item, dict):
-                    name = text(item.get('accountName'))
-                    handle = text(item.get('channelHandle') or item.get('accountByline'))
-                    if name:
-                        names.append((item.get('isSelected', False), name, handle))
-                for value in node.values():
-                    walk(value)
-            elif isinstance(node, list):
-                for value in node:
-                    walk(value)
-
-        walk(resp)
+        for node in walk_dicts(resp):
+            item = node.get('accountItem') or node.get('accountItemRenderer')
+            if isinstance(item, dict):
+                name = text(item.get('accountName'))
+                handle = text(item.get('channelHandle') or item.get('accountByline'))
+                if name:
+                    names.append((item.get('isSelected', False), name, handle))
         if not names:
             return None
         names.sort(key=lambda x: not x[0])
