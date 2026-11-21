@@ -7,7 +7,7 @@ import threading
 import time
 
 from . import http, kodi, parser
-from .innertube import InnerTube, InnerTubeError
+from .innertube import APPS_API, InnerTube, InnerTubeError
 
 STORE = 'channel_art.json'
 TTL = 7 * 86400
@@ -75,7 +75,8 @@ class Banners:
                 except IndexError:
                     return
                 try:
-                    header = parser.parse_page(api.browse(channel_id))['header'] or {}
+                    # The apps' host takes these in parallel; www.youtube.com would need them paced.
+                    header = parser.parse_page(api.browse(channel_id, api=APPS_API))['header'] or {}
                 except (InnerTubeError, http.HTTPError) as exc:
                     kodi.log('no banner for %s: %s' % (channel_id, exc))
                     if getattr(exc, 'blocked', False):

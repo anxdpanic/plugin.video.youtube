@@ -155,7 +155,7 @@ class InnerTube:
     def guide(self):
         return self._post('guide', {}, TV)
 
-    def browse(self, browse_id=None, params=None, continuation=None):
+    def browse(self, browse_id=None, params=None, continuation=None, api=API):
         body = {}
         if continuation:
             body['continuation'] = continuation
@@ -163,7 +163,7 @@ class InnerTube:
             body['browseId'] = browse_id
             if params:
                 body['params'] = params
-        return self._post('browse', body, TV)
+        return self._post('browse', body, TV, api=api)
 
     def search(self, query=None, params=None, continuation=None):
         body = {'continuation': continuation} if continuation else {'query': query}

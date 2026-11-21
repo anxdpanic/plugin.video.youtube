@@ -44,3 +44,20 @@ def test_videos_use_their_channel_banner_as_fanart(monkeypatch):
     fanart = [li.art['fanart'] for _, li, _ in xbmcplugin.ITEMS]
     assert fanart == ['https://yt3/banner', 'https://i.ytimg.com/a.jpg']  # no banner yet: the thumbnail
     assert plugin.banners.missing == ['UCdddddddddddddddddddddd']
+
+
+from resources.lib.leanback import art as _art  # noqa: E402
+
+_REAL_FETCH_MISSING = _art.Banners.fetch_missing  # conftest stubs it out for every test
+
+
+def test_banner_channel_pages_go_to_the_apps_host(monkeypatch):
+    from resources.lib.leanback import art, innertube
+    monkeypatch.setattr(art.Banners, 'fetch_missing', _REAL_FETCH_MISSING)
+    sent = []
+    monkeypatch.setattr(innertube.http, 'request_json', lambda url, **kw: sent.append(url) or {})
+    monkeypatch.setattr(innertube.InnerTube, 'visitor_data', lambda self, refresh=False: 'V')
+    banners = art.Banners()
+    banners.missing = ['UCSMOQeBJ2RAnuFungnQOxLg']
+    banners.fetch_missing()
+    assert sent == ['https://youtubei.googleapis.com/youtubei/v1/browse?prettyPrint=false']
