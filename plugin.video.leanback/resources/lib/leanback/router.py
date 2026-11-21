@@ -11,12 +11,10 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 
-from . import art, auth, compat, describe, descriptions, history, http, kodi, maintenance, mpd, parser, playback
+from . import art, auth, compat, describe, descriptions, history, http, kodi, maintenance, mpd, pages, parser, playback
 from .innertube import InnerTube, InnerTubeError
 
 BASE_URL = 'plugin://%s/' % kodi.ADDON_ID
-PAGE_TTL = 600
-GUIDE_TTL = 3600
 ROW_PAGES = 3  # pages of rows per listing at least: one page holds only three or four rows
 NO_WATCHED_FILTER = ('FEhistory', 'FElibrary', 'FEmy_youtube', 'FEplaylist_aggregation')
 ISA = 'inputstream.adaptive'
@@ -73,10 +71,38 @@ def channel_of(item):
     return browse_id if browse_id.startswith('UC') else item.get('channel_id')
 
 
-def paged_token(shelves, page):
-    """The token that continues these rows as one list: the one row that pages, else the page's own."""
-    paged = [s for s in shelves if s['continuation']]
-    return paged[0]['continuation'] if len(paged) == 1 else page['continuation']
+def video_plot(item, known, threshold):
+    """The info panel's text, laid out like Full details: channel, subscribers, age, views and likes,
+    then status, then the description."""
+    known = known or {}
+    facts = [item['channel'], item.get('subscribers') or known.get('s'),
+             item['published'] or known.get('t') or known.get('p')]
+    if item['views']:
+        facts.append('{:,} {}'.format(item['views'], 'watching' if item['live'] else 'views'))
+    if known.get('l'):
+        facts.append('%s likes' % format_count(known['l']))
+    status = []
+    if item['live']:
+        status.append(kodi.string(30127) or 'Live')
+    elif item.get('upcoming'):
+        status.append(item['upcoming'])
+    status.extend(item['badges'])
+    if item['watched_pct'] >= threshold:
+        status.append(kodi.string(30142) or 'Watched')
+    elif item['watched_pct'] > 0:
+        label = kodi.string(30141)
+        status.append(label % item['watched_pct'] if '%d' in label else 'Watched %d%%' % item['watched_pct'])
+    lines = [' • '.join(x for x in facts if x), ' • '.join(status)]
+    if known and known.get('d'):
+        lines.append('\n' + known['d'])
+    else:
+        # Lines from the tile that say more than the facts above (e.g. "Scheduled for ...").
+        said = ' '.join(lines)
+        for line in item['plot_lines']:
+            parts = [p for p in line.split(' • ') if p and p not in said and not parser.is_count(p)]
+            if parts:
+                lines.append(' • '.join(parts))
+    return '\n'.join(line for line in lines if line)
 
 
 def url_for(route, **params):
@@ -110,7 +136,7 @@ ROUTES = {  # route -> Plugin method
 }
 
 
-class Plugin:
+class Plugin(pages.Pages):
     def __init__(self, argv):
         parsed = urllib.parse.urlparse(argv[0])
         self.route = parsed.path.strip('/')
@@ -118,7 +144,7 @@ class Plugin:
         query = argv[2][1:] if len(argv) > 2 and argv[2].startswith('?') else (argv[2] if len(argv) > 2 else '')
         self.params = dict(urllib.parse.parse_qsl(query))
         self.route, self.params = compat.translate(self.route, self.params, ROUTES)
-        self.api = InnerTube()
+        super().__init__(InnerTube())
         self.banners = art.Banners()
         self.fanart = ''  # a channel page's banner, for everything listed on it
         self.descriptions = descriptions.Descriptions()
@@ -161,68 +187,7 @@ class Plugin:
     def _add(self, url, li, folder):
         xbmcplugin.addDirectoryItem(self.handle, url, li, isFolder=folder)
 
-    def _state(self):
-        return kodi.load_json('state.json', {})
-
-    def _save_state(self, state):
-        kodi.save_json('state.json', state)
-
-    def _account_key(self):
-        return auth.active_account()[0] or 'guest'
-
-    # --------------------------------------------------------- page fetching
-    def fetch(self, desc, use_cache=True):
-        """Fetch a page described by desc = {'ep': browse|search|next, ...}; cached briefly so opening
-        a shelf from a page re-uses the response."""
-        key = self._account_key() + ':' + json.dumps(desc, sort_keys=True)
-        if use_cache:
-            cached = kodi.Cache.get(key, PAGE_TTL)
-            if cached is not None:
-                return cached
-        ep = desc['ep']
-        token = desc.get('ctoken')
-        if ep == 'browse':
-            resp = self.api.browse(desc.get('id'), desc.get('params'), continuation=token)
-        elif ep == 'search':
-            resp = self.api.search(desc.get('q'), desc.get('params'), continuation=token)
-        elif ep == 'next':
-            resp = self.api.next(desc.get('v'), desc.get('list'), continuation=token)
-        else:
-            raise InnerTubeError('bad page %s' % ep)
-        kodi.Cache.set(key, resp)
-        return resp
-
-    def guide(self):
-        key = 'guide:' + self._account_key() + ':' + self.api.hl
-        entries = kodi.Cache.get(key, GUIDE_TTL)
-        if entries is None:
-            entries = parser.parse_guide(self.api.guide())
-            kodi.Cache.set(key, entries)
-        return entries
-
     # ================================================================ root menu
-    def menu_entries(self, include_hidden=False):
-        """Sidebar entries after the user's customisation (order, hidden, pinned channels)."""
-        state = self._state().get('menu', {})
-        guide = self.guide()
-        entries = [e for e in guide if not e['channel']]
-        channels = [e for e in guide if e['channel']]
-        for pin in state.get('pinned', []):
-            if not any(e['id'] == pin['id'] for e in entries):
-                entries.append({'id': pin['id'], 'title': pin['title'], 'thumb': pin.get('thumb', ''),
-                                'target': {'type': 'browse', 'browse_id': pin['id']}, 'channel': False,
-                                'pinned': True})
-        order = state.get('order', [])
-        if order:
-            rank = {entry_id: index for index, entry_id in enumerate(order)}
-            entries.sort(key=lambda e: rank.get(e['id'], len(rank)))
-        if not include_hidden:
-            hidden = set(state.get('hidden', []))
-            entries = [e for e in entries if e['id'] not in hidden]
-            if kodi.setting_bool('hide_shorts'):
-                entries = [e for e in entries if e['id'] != 'shorts']
-        return entries, channels
-
     def root(self):
         kodi.Cache.prune()
         self._maybe_whos_watching()
@@ -316,21 +281,6 @@ class Plugin:
                 return items, shelf['continuation']
         return [], None
 
-    @staticmethod
-    def _continued_rows(page):
-        """The rows a continuation page continues. A row's continuation (search results) comes back
-        with side rows such as Songs repeated on every page; keep to the row being paged."""
-        shelves = [s for s in page['shelves'] if s['items']]
-        if page['continuation'] or len(shelves) < 2:
-            return shelves
-        paged = [s for s in shelves if s['continuation']]
-        return paged[:1] if len(paged) == 1 else shelves[:1]
-
-    def _list_batch(self, page):
-        """A continuation page as one list: its items and the token that continues them."""
-        shelves = self._continued_rows(page)
-        return [i for s in shelves for i in s['items']], paged_token(shelves, page)
-
     def _pages_per_listing(self):
         return min(max(kodi.setting_int('pages_per_listing') or 1, 1), 5)
 
@@ -343,7 +293,7 @@ class Plugin:
     def _more_pages(self, ep, items, token, batch=None):
         """Follow the continuation until the listing holds pages_per_listing pages, so each listing
         is longer and needs fewer Next page clicks. Returns (items, token for the page after)."""
-        batch = batch or self._list_batch
+        batch = batch or pages.list_batch
         seen = {i.get('id') for i in items if i.get('id')}
         for _ in range(self._pages_per_listing() - 1):
             if not token:
@@ -372,7 +322,7 @@ class Plugin:
             except (InnerTubeError, http.HTTPError) as exc:
                 kodi.log('stopped loading more rows: %s' % exc)  # keep what loaded, page on from here
                 break
-            for index, shelf in enumerate(self._visible_shelves(page)):
+            for index, shelf in enumerate(pages.visible_shelves(page)):
                 if shelf['title'] and shelf['title'] in titles:
                     continue  # a row repeated where pages meet
                 titles.add(shelf['title'])
@@ -388,7 +338,7 @@ class Plugin:
     def shelf(self):
         desc = json.loads(self.params['src'])
         page = parser.parse_page(self.fetch(desc))
-        shelves = self._visible_shelves(page)
+        shelves = pages.visible_shelves(page)
         index = int(self.params.get('i', 0))
         if index >= len(shelves):
             return self._end(False)
@@ -406,12 +356,6 @@ class Plugin:
         items = [i for s in page['shelves'] for i in s['items']]
         self._render_items(items)
         self._finish_listing(items)
-
-    def _visible_shelves(self, page):
-        shelves = page['shelves']
-        if kodi.setting_bool('hide_shorts'):
-            shelves = [s for s in shelves if not s['shorts']]
-        return [s for s in shelves if s['items']]
 
     def render(self, desc, browse_id=None):
         resp = self.fetch(desc)
@@ -440,9 +384,9 @@ class Plugin:
             li.getVideoInfoTag().setPlot(', '.join(t['title'] for t in others[:40]))
             li.setProperty('SpecialSort', 'top')
             self._add(url_for('browse', id=browse_id, params=desc.get('params'), tabs=1), li, True)
-        shelves = self._visible_shelves(page)
+        shelves = pages.visible_shelves(page)
         if desc.get('ctoken'):
-            continued = self._continued_rows(page)
+            continued = pages.continued_rows(page)
             shelves = [s for s in shelves if s in continued]
         # Untitled rows (the Subscriptions feed, a channel's uploads) read better as one list.
         untitled = sum(1 for s in shelves if not s['title'])
@@ -450,7 +394,7 @@ class Plugin:
         if len(shelves) == 1 or (shelves and flatten):
             # One list; with search's extra rows flattened in, the results shelf is the one that pages.
             items, token = self._more_pages(desc['ep'], [i for s in shelves for i in s['items']],
-                                            paged_token(shelves, page))
+                                            pages.paged_token(shelves, page))
             rendered.extend(self._render_items(items, browse_id=browse_id))
             if token:
                 self._add_next(desc['ep'], token, browse_id)
@@ -594,40 +538,6 @@ class Plugin:
     def _channel_fanart(self, channel_id):
         return self.fanart or self.banners.get(channel_id)
 
-    @staticmethod
-    def _video_plot(item, known, threshold):
-        """The info panel's text, laid out like Full details: channel, subscribers, age, views and likes,
-        then status, then the description."""
-        known = known or {}
-        facts = [item['channel'], item.get('subscribers') or known.get('s'),
-                 item['published'] or known.get('t') or known.get('p')]
-        if item['views']:
-            facts.append('{:,} {}'.format(item['views'], 'watching' if item['live'] else 'views'))
-        if known.get('l'):
-            facts.append('%s likes' % format_count(known['l']))
-        status = []
-        if item['live']:
-            status.append(kodi.string(30127) or 'Live')
-        elif item.get('upcoming'):
-            status.append(item['upcoming'])
-        status.extend(item['badges'])
-        if item['watched_pct'] >= threshold:
-            status.append(kodi.string(30142) or 'Watched')
-        elif item['watched_pct'] > 0:
-            label = kodi.string(30141)
-            status.append(label % item['watched_pct'] if '%d' in label else 'Watched %d%%' % item['watched_pct'])
-        lines = [' • '.join(x for x in facts if x), ' • '.join(status)]
-        if known and known.get('d'):
-            lines.append('\n' + known['d'])
-        else:
-            # Lines from the tile that say more than the facts above (e.g. "Scheduled for ...").
-            said = ' '.join(lines)
-            for line in item['plot_lines']:
-                parts = [p for p in line.split(' • ') if p and p not in said and not parser.is_count(p)]
-                if parts:
-                    lines.append(' • '.join(parts))
-        return '\n'.join(line for line in lines if line)
-
     def _add_video(self, item, threshold):
         video_id = video_id_of(item)
         if not video_id:
@@ -645,7 +555,7 @@ class Plugin:
         tag.setTitle(title)
         known = self.descriptions.get(video_id)
         channel_id = item['channel_id'] or (known or {}).get('c')
-        plot = self._video_plot(item, known, threshold)
+        plot = video_plot(item, known, threshold)
         tag.setPlot(plot)
         # Some views (Estuary's Poster, Shift, Fanart) show the outline instead of the plot when it is set.
         tag.setPlotOutline(plot)
