@@ -115,16 +115,20 @@ class Cache:
 
     @staticmethod
     def prune(max_age=86400):
-        if not os.path.isdir(CACHE_DIR):
-            return
-        now = time.time()
-        for name in os.listdir(CACHE_DIR):
-            path = os.path.join(CACHE_DIR, name)
-            try:
-                if now - os.path.getmtime(path) > max_age:
-                    os.remove(path)
-            except OSError:
-                pass
+        prune_dir(CACHE_DIR, max_age)
+
+
+def prune_dir(path, max_age):
+    """Delete the files in a folder that are older than max_age seconds."""
+    if not os.path.isdir(path):
+        return
+    now = time.time()
+    for name in os.listdir(path):
+        try:
+            if now - os.path.getmtime(os.path.join(path, name)) > max_age:
+                os.remove(os.path.join(path, name))
+        except OSError:
+            pass
 
 
 def temp_file(name):

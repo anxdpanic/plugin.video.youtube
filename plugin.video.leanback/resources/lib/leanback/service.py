@@ -29,6 +29,7 @@ PORT_IN_USE = 'Port %d is in use, using %d'
 MANIFEST = re.compile(r'^/mpd/([A-Za-z0-9_-]{11})\.mpd$')
 SUBTITLE = re.compile(r'^/sub/([A-Za-z0-9_-]{11})/(\d+)\.vtt$')
 EMPTY_VTT = b'WEBVTT\n\n'
+TEMP_MAX_AGE = 6 * 3600  # manifests and subtitle lists outlive any playback by far
 
 
 class _Server(ThreadingMixIn, HTTPServer):
@@ -199,17 +200,8 @@ class _Monitor(xbmc.Monitor):
         self.settings_changed = True
 
 
-def _cleanup(max_age=6 * 3600):
-    if not os.path.isdir(kodi.TEMP_DIR):
-        return
-    now = time.time()
-    for name in os.listdir(kodi.TEMP_DIR):
-        path = os.path.join(kodi.TEMP_DIR, name)
-        try:
-            if now - os.path.getmtime(path) > max_age:
-                os.remove(path)
-        except OSError:
-            pass
+def _cleanup():
+    kodi.prune_dir(kodi.TEMP_DIR, TEMP_MAX_AGE)
 
 
 def run():
