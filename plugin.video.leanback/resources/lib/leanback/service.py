@@ -18,7 +18,11 @@ import xbmcgui
 from . import broker, history, http, kodi
 
 PORT_PROPERTY = http.PORT_PROPERTY
-PREFERRED_PORTS = (50152, 50153, 50154, 0)
+# Fixed ports so the manifest URLs stay stable, kept clear of other add-ons' servers (plugin.video.youtube
+# binds 50152 by default and fails with "Address already in use" when it's taken) and above Linux's
+# ephemeral range (32768-60999), so outgoing connections never hold them. Any free port is the last resort.
+PREFERRED_PORTS = (61152, 61153, 61154, 0)
+OTHER_ADDON_PORTS = (50152,)  # plugin.video.youtube
 MANIFEST = re.compile(r'^/mpd/([A-Za-z0-9_-]{11})\.mpd$')
 SUBTITLE = re.compile(r'^/sub/([A-Za-z0-9_-]{11})/(\d+)\.vtt$')
 EMPTY_VTT = b'WEBVTT\n\n'

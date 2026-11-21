@@ -61,3 +61,9 @@ def test_exiting_service_keeps_a_newer_instances_port(monkeypatch):
 
     port = run_service(monkeypatch, newer_instance_started)
     assert xbmcgui.Window(10000).getProperty(service.PORT_PROPERTY) == str(port + 1)
+
+
+def test_preferred_ports_avoid_other_addons_and_ephemeral_range():
+    fixed = [port for port in service.PREFERRED_PORTS if port]
+    assert not set(fixed) & set(service.OTHER_ADDON_PORTS)
+    assert all(port > 60999 for port in fixed)  # above Linux's default ephemeral range
