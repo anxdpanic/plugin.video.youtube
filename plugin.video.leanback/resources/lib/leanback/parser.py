@@ -7,6 +7,7 @@ Handles both item shapes the TV client sends: legacy `tileRenderer` and the newe
 """
 import json
 import re
+import urllib.parse
 from urllib.parse import unquote
 
 SHELF_SHORTS = 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS'
@@ -581,6 +582,36 @@ def chapters(next_resp):
     return []
 
 
+def _find_renderer(node, key):
+    """The first `key` renderer anywhere in a response (clients nest the watch page differently)."""
+    if isinstance(node, dict):
+        if key in node:
+            return node[key]
+        children = node.values()
+    elif isinstance(node, list):
+        children = node
+    else:
+        return None
+    for child in children:
+        found = _find_renderer(child, key)
+        if found is not None:
+            return found
+    return None
+
+
+def description_text(node):
+    """A description's text with its links in full: the runs show them shortened ("https://ex.com/a...")."""
+    if not isinstance(node, dict) or 'runs' not in node:
+        return text(node)
+    parts = []
+    for run in node['runs']:
+        url = run.get('navigationEndpoint', {}).get('urlEndpoint', {}).get('url', '')
+        if url.startswith('https://www.youtube.com/redirect'):
+            url = urllib.parse.parse_qs(urllib.parse.urlsplit(url).query).get('q', [url])[0]
+        parts.append(url if url and run.get('text', '').endswith('...') else run.get('text', ''))
+    return ''.join(parts)
+
+
 def video_details(player_resp, next_resp=None):
     """Full information for a single video from the player (and optionally next) response."""
     details = player_resp.get('videoDetails', {}) if player_resp else {}
@@ -604,24 +635,18 @@ def video_details(player_resp, next_resp=None):
     if micro:
         info['date'] = (micro.get('publishDate') or micro.get('uploadDate') or '')[:10]
         info['genre'] = micro.get('category', '')
-    if next_resp:
-        results = next_resp.get('contents', {}).get('singleColumnWatchNextResults', {}) \
-            .get('results', {}).get('results', {}).get('contents', [])
-        for section in results:
-            for entry in section.get('itemSectionRenderer', {}).get('contents', []):
-                meta = entry.get('videoMetadataRenderer')
-                if not meta:
-                    continue
-                info['title'] = info['title'] or text(meta.get('title'))
-                info['published'] = text(meta.get('dateText')) or text(meta.get('publishedTimeText'))
-                owner = meta.get('owner', {}).get('videoOwnerRenderer', {})
-                info['channel'] = info['channel'] or text(owner.get('title'))
-                info['subscribers'] = text(owner.get('subscriberCountText'))
-                info['channel_thumb'] = best_thumb(owner.get('thumbnail', {}).get('thumbnails'))
-                desc = text(meta.get('description'))
-                if desc and len(desc) > len(info['plot']):
-                    info['plot'] = desc
-                likes = meta.get('likeButton', {}).get('likeButtonRenderer', {}).get('likeCount')
-                if likes:
-                    info['likes'] = str(likes)
+    meta = _find_renderer(next_resp, 'videoMetadataRenderer') if next_resp else None
+    if meta:
+        info['title'] = info['title'] or text(meta.get('title'))
+        info['published'] = text(meta.get('dateText')) or text(meta.get('publishedTimeText'))
+        owner = meta.get('owner', {}).get('videoOwnerRenderer', {})
+        info['channel'] = info['channel'] or text(owner.get('title'))
+        info['subscribers'] = text(owner.get('subscriberCountText'))
+        info['channel_thumb'] = best_thumb(owner.get('thumbnail', {}).get('thumbnails'))
+        desc = description_text(meta.get('description'))
+        if desc and len(desc) > len(info['plot']):
+            info['plot'] = desc
+        likes = meta.get('likeButton', {}).get('likeButtonRenderer', {}).get('likeCount')
+        if likes:
+            info['likes'] = str(likes)
     return info

@@ -26,6 +26,29 @@ def test_video_plot_lists_info_then_description():
     plugin._render_items([video('aaaaaaaaaaa', badges=['4K'], watched_pct=40),
                           video('bbbbbbbbbbb', live=True, plot_lines=['Chan • 1.2M watching', 'Extra line'])])
     plots = [li.tag.values['plot'] for _, li, _ in xbmcplugin.ITEMS]
-    assert plots[0] == 'Chan • 1,234,567 views • 2 days ago • 12:34\n4K • Watched 40%\n\nThe description.'
+    assert plots[0] == 'Chan • 2 days ago • 1,234,567 views\n4K • Watched 40%\n\nThe description.'
     # No description yet: the tile's own lines, minus what the info line already says.
-    assert plots[1] == 'Chan • 1,234,567 watching • 2 days ago • 12:34\nstr30127\nExtra line'
+    assert plots[1] == 'Chan • 2 days ago • 1,234,567 watching\nstr30127\nExtra line'
+    # Neither has been read from its watch page yet, so both go to the service.
+    assert plugin.undescribed == ['aaaaaaaaaaa', 'bbbbbbbbbbb']
+
+
+def test_video_plot_leads_like_full_details():
+    """Channel • subscribers • age • views • likes, as Full details shows it."""
+    descriptions.Descriptions().remember_details({
+        'video_id': 'aaaaaaaaaaa', 'plot': 'Watch page text.', 'date': '2023-05-01',
+        'subscribers': '1.2M subscribers', 'likes': '456789', 'published': '3 years ago'})
+    plugin = router.Plugin(['plugin://plugin.video.leanback/browse', '1', ''])
+    item = video('aaaaaaaaaaa')
+    item['published'] = ''  # the tile gave no age: the watch page's is used
+    plugin._render_items([item])
+    [(_, li, _)] = xbmcplugin.ITEMS
+    assert li.tag.values['plot'] == ('Chan • 1.2M subscribers • 3 years ago • 1,234,567 views • 456,789 likes'
+                                     '\n\nWatch page text.')
+    assert plugin.undescribed == []  # already read: not fetched again
+
+
+def test_format_count():
+    assert router.format_count('456789') == '456,789'
+    assert router.format_count(1200) == '1,200'
+    assert router.format_count('456K') == '456K'

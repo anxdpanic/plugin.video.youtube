@@ -168,6 +168,12 @@ class InnerTube:
             body['params'] = params
         return self._post('search', body, TV)
 
+    def watch_page(self, video_id):
+        """The watch page as the visionOS app gets it: unlike the TV client's, it carries the description,
+        like count and subscribers, in a small response."""
+        body = {'videoId': video_id, 'racyCheckOk': True, 'contentCheckOk': True}
+        return self._post('next', body, PLAYER_CLIENTS[0], use_auth=False)
+
     def next(self, video_id=None, playlist_id=None, params=None, continuation=None):
         if continuation:
             body = {'continuation': continuation}

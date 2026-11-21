@@ -307,3 +307,33 @@ def test_channels_in_two_sections_are_listed_once():
     guide = {'items': [{'guideSectionRenderer': {'items': [entry('UCa'), entry('UCb')]}},
                        {'guideSubscriptionsSectionRenderer': {'items': [entry('UCb'), entry('UCc')]}}]}
     assert [e['id'] for e in parser.parse_guide(guide)] == ['UCa', 'UCb', 'UCc']
+
+
+def test_video_details_from_the_visionos_watch_page():
+    """visionOS nests the watch page in tabs and is the client whose watch page has the description."""
+    meta = {
+        'title': {'runs': [{'text': 'T'}]},
+        'dateText': {'runs': [{'text': '12 years ago'}]},
+        'owner': {'videoOwnerRenderer': {'title': {'runs': [{'text': 'Blender'}]},
+                                         'subscriberCountText': {'runs': [{'text': '1.26M subscribers'}]}}},
+        'description': {'runs': [
+            {'text': 'More info: '},
+            {'text': 'https://studio.blender.org/projects/b...',
+             'navigationEndpoint': {'urlEndpoint': {'url': 'https://studio.blender.org/projects/big-buck-bunny/'}}},
+            {'text': ' and '},
+            {'text': 'example.com/x...', 'navigationEndpoint': {'urlEndpoint': {
+                'url': 'https://www.youtube.com/redirect?event=video_description&q=https%3A%2F%2Fexample.com%2Fxyz'}}},
+            {'text': ' or '},
+            {'text': '#blender', 'navigationEndpoint': {'browseEndpoint': {'browseId': 'FEhashtag'}}},
+        ]},
+        'likeButton': {'likeButtonRenderer': {'likeCount': 110530}},
+    }
+    nxt = {'contents': {'singleColumnWatchNextResults': {'results': {'watchNextTabbedResultsRenderer': {
+        'tabs': [{'tabRenderer': {'content': {'sectionListRenderer': {'contents': [
+            {'itemSectionRenderer': {'contents': [{'videoMetadataRenderer': meta}]}}]}}}}]}}}}}
+    info = parser.video_details({}, nxt)
+    assert info['plot'] == ('More info: https://studio.blender.org/projects/big-buck-bunny/'
+                            ' and https://example.com/xyz or #blender')
+    assert info['likes'] == '110530'
+    assert info['subscribers'] == '1.26M subscribers'
+    assert info['published'] == '12 years ago'

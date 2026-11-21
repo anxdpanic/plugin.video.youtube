@@ -79,6 +79,11 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="fetch_descriptions" type="boolean" label="30161" help="30162">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="pages_per_listing" type="integer" label="30046" help="30047">
                     <level>0</level>
                     <default>2</default>

@@ -9,7 +9,7 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 
-from . import art, auth, descriptions, history, http, kodi, maintenance, mpd, parser
+from . import art, auth, describe, descriptions, history, http, kodi, maintenance, mpd, parser
 from .innertube import InnerTube, InnerTubeError
 
 BASE_URL = 'plugin://%s/' % kodi.ADDON_ID
@@ -44,6 +44,12 @@ def error_message(exc):
     return kodi.string(string_id) or ERRORS[string_id]
 
 
+def format_count(value):
+    """'456789' -> '456,789'; text YouTube already formatted ('456K') is kept."""
+    value = str(value)
+    return f'{int(value):,}' if value.isdigit() else value
+
+
 def format_time(seconds):
     seconds = int(seconds)
     hours, rest = divmod(seconds, 3600)
@@ -71,6 +77,8 @@ class Plugin:
         self.banners = art.Banners()
         self.fanart = ''  # a channel page's banner, for everything listed on it
         self.descriptions = descriptions.Descriptions()
+        self.path = argv[0] + (argv[2] if len(argv) > 2 and argv[2].startswith('?') else '')
+        self.undescribed = []  # listed videos whose watch page hasn't been read yet
 
     # ================================================================ dispatch
     def dispatch(self):
@@ -119,7 +127,10 @@ class Plugin:
         except auth.AuthError:
             self._notify(kodi.string(30132), error=True)
             self._end(False)
-        # The listing is on screen by now; fetch the channel banners it lacked for next time.
+        # The listing is on screen by now: have the service fetch the descriptions it lacks, and fetch
+        # the channel banners it lacked for next time.
+        if self.undescribed and self.handle >= 0:
+            describe.request(self.path, self.undescribed)
         self.banners.fetch_missing()
 
     # ================================================================ helpers
@@ -542,13 +553,15 @@ class Plugin:
 
     @staticmethod
     def _video_plot(item, known, threshold):
-        """The info panel's text: what the list knows about the video, then its description."""
-        facts = [item['channel'], item.get('subscribers')]
+        """The info panel's text, laid out like Full details: channel, subscribers, age, views and likes,
+        then status, then the description."""
+        known = known or {}
+        facts = [item['channel'], item.get('subscribers') or known.get('s'),
+                 item['published'] or known.get('t') or known.get('p')]
         if item['views']:
             facts.append('{:,} {}'.format(item['views'], 'watching' if item['live'] else 'views'))
-        facts.append(item['published'] or (known or {}).get('p'))
-        if item['duration']:
-            facts.append(format_time(item['duration']))
+        if known.get('l'):
+            facts.append('%s likes' % format_count(known['l']))
         status = []
         if item['live']:
             status.append(kodi.string(30127) or 'Live')
@@ -589,6 +602,8 @@ class Plugin:
         tag.setMediaType('video')
         tag.setTitle(title)
         known = self.descriptions.get(video_id)
+        if not (known and known.get('w')) and not item.get('upcoming'):
+            self.undescribed.append(video_id)
         tag.setPlot(self._video_plot(item, known, threshold))
         tag.setPlotOutline(' • '.join(x for x in (item['channel'], item['published']) if x))
         if known and known.get('p'):
@@ -810,14 +825,14 @@ class Plugin:
 
     def _apply_details(self, li, info):
         # Played or opened in Info: keep the description for the video's plot in listings.
-        self.descriptions.remember(info['video_id'], info['plot'], info.get('date'))
+        self.descriptions.remember_details(info)
         tag = li.getVideoInfoTag()
         tag.setMediaType('video')
         tag.setTitle(info['title'])
         plot = info['plot']
         facts = [x for x in (info['channel'], info.get('subscribers'), info.get('published') or info.get('date'),
                              ('%s views' % '{:,}'.format(info['views'])) if info['views'] else '',
-                             ('%s likes' % info['likes']) if info.get('likes') else '') if x]
+                             ('%s likes' % format_count(info['likes'])) if info.get('likes') else '') if x]
         if facts:
             plot = ' • '.join(facts) + ('\n\n' + plot if plot else '')
         tag.setPlot(plot)
@@ -885,7 +900,7 @@ class Plugin:
                 player_resp, _ = self.api.player(video_id)
             except InnerTubeError:
                 pass
-            next_resp = self.api.next(video_id)
+            next_resp = self.api.watch_page(video_id)
         finally:
             xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
         info = parser.video_details(player_resp or {}, next_resp)

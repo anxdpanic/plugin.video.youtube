@@ -427,3 +427,11 @@ msgstr ""
 msgctxt "#30160"
 msgid "Clear"
 msgstr ""
+
+msgctxt "#30161"
+msgid "Fetch descriptions for listed videos"
+msgstr ""
+
+msgctxt "#30162"
+msgid "Read each listed video's watch page in the background for its full description, subscribers and likes. Descriptions fill in over a minute or so, one request every few seconds."
+msgstr ""
