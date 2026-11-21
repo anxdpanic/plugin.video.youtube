@@ -11,7 +11,7 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 
-from . import art, auth, compat, describe, descriptions, history, http, kodi, maintenance, mpd, parser
+from . import art, auth, compat, describe, descriptions, history, http, kodi, maintenance, mpd, parser, playback
 from .innertube import InnerTube, InnerTubeError
 
 BASE_URL = 'plugin://%s/' % kodi.ADDON_ID
@@ -823,8 +823,9 @@ class Plugin:
             li.setProperty(ISA + '.play_timeshift_buffer', 'true')
         info = parser.video_details(resp)
         self._apply_details(li, info)
-        if self.params.get('t'):  # start at a chapter
+        if self.params.get('t'):  # start part way in (a chapter, or a start time in the path)
             li.setProperty('StartOffset', self.params['t'])
+            playback.request(video_id, self.params['t'])
         if self.api.signed_in() and kodi.setting_bool('report_history'):
             history.publish(video_id, path)
         xbmcplugin.setResolvedUrl(self.handle, True, li)

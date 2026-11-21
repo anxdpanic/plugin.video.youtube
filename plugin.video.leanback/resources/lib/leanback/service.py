@@ -16,7 +16,7 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 
-from . import broker, history, http, kodi
+from . import broker, history, http, kodi, playback
 
 PORT_PROPERTY = http.PORT_PROPERTY
 # Default port, kept clear of other add-ons' servers (plugin.video.youtube binds 50152 by default and
@@ -219,6 +219,7 @@ def run():
     shutil.rmtree(kodi.LEGACY_TEMP_DIR, ignore_errors=True)
     _cleanup()
     tracker = history.Tracker()
+    start_at = playback.StartAt()  # noqa: F841 (Kodi calls it while it exists)
     last_cleanup = time.time()
     while not monitor.waitForAbort(5):
         if monitor.settings_changed:
