@@ -56,6 +56,8 @@ class TVWindow(xbmcgui.WindowXML):
         if self.stack:  # back from playback or a dialog: Kodi rebuilt the window
             self._fill_rail()
             self._show_rows()
+            if not self.screen.rows:
+                self.setFocusId(RAIL)  # the layout focuses the rows, and an empty page has none
             return
         self._guarded(self._load_rail)
         first = next((e for e in self.entries if e['target'].get('type') == 'browse'), None)
@@ -127,13 +129,34 @@ class TVWindow(xbmcgui.WindowXML):
             if (auth.active_account()[0], auth.accounts()) != before:
                 self.stack = []
                 self.current_entry = None
+                self.watched = {}  # watched on the other account
                 self._init()
         elif kind == 'settings':
             kodi.ADDON.openSettings()
+            self._settings_changed()
         elif kind == 'browse':
             desc = {'ep': 'browse', 'id': target['browse_id'], 'params': target.get('params')}
             self._push(model.Screen(desc, entry['title'], self._load_page, self._keep(target['browse_id']),
                                     _string(30134, 'Channels')), replace=True, entry=entry['id'])
+
+    def _settings_changed(self):
+        """Apply settings changed meanwhile: the rail (hide Shorts), the watched threshold and the page's
+        filters, by building the shown page again (from the cache, so it costs nothing)."""
+        self.threshold = pages.watched_threshold()
+        self._load_rail()
+        screen = self.screen
+        if not screen:
+            return
+        if hasattr(screen, 'refresh'):
+            screen.refresh()
+        else:
+            fresh = model.Screen(screen.desc, screen.title, self._load_page, self._keep(screen.desc.get('id')),
+                                 _string(30134, 'Channels')).open()
+            fresh.ensure(self.top)
+            self.stack[-1] = fresh
+            screen = fresh
+        self.top = min(self.top, max(len(screen.rows) - 1, 0))
+        self._show_rows()
 
     # ------------------------------------------------------------ screens
     def _push(self, screen, replace=False, entry=None):

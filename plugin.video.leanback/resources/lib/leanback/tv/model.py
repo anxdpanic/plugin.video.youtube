@@ -23,6 +23,13 @@ def video_id_of(item):
     return item['target'].get('video_id') or item.get('id') if item.get('kind') == 'video' else None
 
 
+def is_channel_tab(tab, page_id=None):
+    """A secondary tab that is a channel: it has the channel's picture, or leads to another channel (a
+    channel's own sections lead back to the channel itself)."""
+    browse_id = tab.get('target', {}).get('browse_id') or ''
+    return bool(tab.get('thumb')) or (browse_id.startswith('UC') and browse_id != page_id)
+
+
 class Row:
     def __init__(self, title, items, token=None, grid=False, avatars=False):
         self.title = title
@@ -62,7 +69,11 @@ class Screen:
         self.message = page.get('message') or ''
         tabs = [t for t in page['tabs'] if not t.get('selected')]
         if tabs:
-            self.rows.append(Row(self._tabs_title, tabs, avatars=True))
+            channels = sum(1 for t in tabs if is_channel_tab(t, self.desc.get('id')))
+            if channels * 2 > len(tabs):  # Subscriptions: a tab per channel followed (and the odd extra)
+                self.rows.append(Row(self._tabs_title, tabs, avatars=True))
+            else:  # a page's own sections
+                self.rows.append(Row('', tabs))
         shelves = pages.visible_shelves(page)
         untitled = sum(1 for s in shelves if not s['title'])
         if len(shelves) == 1 or (shelves and untitled * 2 >= len(shelves)):

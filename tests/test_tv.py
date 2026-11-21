@@ -62,8 +62,8 @@ def test_single_list_is_cut_into_rows_and_keeps_filling():
 
 
 def test_tabs_row_and_filter():
-    tabs = [{'kind': 'channel', 'title': t, 'selected': t == 'All', 'target': {'type': 'browse'}}
-            for t in ('All', 'Grian', 'LTT')]
+    tabs = [{'kind': 'channel', 'title': t, 'selected': t == 'All', 'target': {'type': 'browse'},
+             'thumb': 'https://yt3.example/%s.jpg' % t} for t in ('All', 'Grian', 'LTT')]
     load = loader({None: page([{'title': 'Today', 'items': [video('a'), video('s', short=True)],
                                 'continuation': None, 'shorts': False, 'endpoint': None}], tabs=tabs)})
     screen = model.Screen({'ep': 'browse'}, 'Subscriptions', load, keep=lambda i: not i['short'],
@@ -158,3 +158,13 @@ def test_ensure_gives_up_on_pages_that_stay_empty():
     screen.ensure(0)
     assert len(load.calls) == 1 + model.MAX_EMPTY_PAGES
     assert screen.can_grow()  # a later move may try again
+
+
+def test_section_tabs_are_not_a_channel_row():
+    tabs = [{'kind': 'folder', 'title': t, 'selected': t == 'Home',
+             'target': {'type': 'browse', 'browse_id': 'UCx', 'params': t}, 'thumb': ''}
+            for t in ('Home', 'Videos', 'Playlists')]
+    load = loader({None: page([shelf('Uploads', 'ab'), shelf('Popular', 'cd')], tabs=tabs)})
+    screen = model.Screen({'ep': 'browse', 'id': 'UCx'}, 'Channel', load, tabs_title='Channels').open()
+    assert screen.rows[0].title == '' and not screen.rows[0].avatars
+    assert [t['title'] for t in screen.rows[0].items] == ['Videos', 'Playlists']

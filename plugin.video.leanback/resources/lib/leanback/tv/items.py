@@ -61,7 +61,7 @@ def video_tile(item, known, threshold):
     """A video's tile; `known` is what its watch page said (descriptions store), if it was read."""
     li = xbmcgui.ListItem(item['title'], offscreen=True)
     known = known or {}
-    meta = [item['channel'] or known.get('n', '')]
+    meta = [item['channel']]
     if item['views']:
         meta.append('%s %s' % (short_count(item['views']), 'watching' if item['live'] else 'views'))
     if item['published']:
