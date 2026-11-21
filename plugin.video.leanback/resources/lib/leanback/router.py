@@ -16,7 +16,6 @@ from .innertube import InnerTube, InnerTubeError
 
 BASE_URL = 'plugin://%s/' % kodi.ADDON_ID
 ROW_PAGES = 3  # pages of rows per listing at least: one page holds only three or four rows
-NO_WATCHED_FILTER = ('FEhistory', 'FElibrary', 'FEmy_youtube', 'FEplaylist_aggregation')
 ISA = 'inputstream.adaptive'
 
 
@@ -486,15 +485,12 @@ class Plugin(pages.Pages):
     # ------------------------------------------------------------------ items
     def _render_items(self, items, browse_id=None):
         hide_shorts = kodi.setting_bool('hide_shorts')
-        hide_watched = kodi.setting_bool('hide_watched') and browse_id not in NO_WATCHED_FILTER \
-            and not (browse_id or '').startswith('VL')
-        threshold = kodi.setting_int('watched_threshold') or 80
+        keep = pages.item_filter(browse_id)
+        threshold = pages.watched_threshold()
         self._prefetch(items, hide_shorts)
         shown = []
         for item in items:
-            if hide_shorts and item['short']:
-                continue
-            if hide_watched and item['kind'] == 'video' and item['watched_pct'] >= threshold:
+            if not keep(item):
                 continue
             if item['kind'] == 'video':
                 self._add_video(item, threshold)
@@ -658,12 +654,6 @@ class Plugin(pages.Pages):
         state['search_history'] = [q for q in state.get('search_history', []) if q != self.params.get('q')]
         self._save_state(state)
         xbmc.executebuiltin('Container.Refresh')
-
-    def _remember_search(self, query):
-        state = self._state()
-        history = [q for q in state.get('search_history', []) if q.lower() != query.lower()]
-        state['search_history'] = [query] + history[:19]
-        self._save_state(state)
 
     # ================================================================ playback
     def play(self):

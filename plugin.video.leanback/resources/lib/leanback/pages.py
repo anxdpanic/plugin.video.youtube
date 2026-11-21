@@ -8,6 +8,27 @@ from .innertube import InnerTube, InnerTubeError
 
 PAGE_TTL = 600
 GUIDE_TTL = 3600
+# Pages that are about what was watched: watched videos stay on them even with hide_watched on.
+NO_WATCHED_FILTER = ('FEhistory', 'FElibrary', 'FEmy_youtube', 'FEplaylist_aggregation')
+
+
+def watched_threshold():
+    return kodi.setting_int('watched_threshold') or 80
+
+
+def item_filter(browse_id=None):
+    """A test for the items a listing shows: Shorts and watched videos are left out when those settings are
+    on (watched ones stay in History, the Library and playlists)."""
+    hide_shorts = kodi.setting_bool('hide_shorts')
+    hide_watched = (kodi.setting_bool('hide_watched') and browse_id not in NO_WATCHED_FILTER
+                    and not (browse_id or '').startswith('VL'))
+    threshold = watched_threshold()
+
+    def keep(item):
+        if hide_shorts and item['short']:
+            return False
+        return not (hide_watched and item['kind'] == 'video' and item['watched_pct'] >= threshold)
+    return keep
 
 
 def visible_shelves(page):
@@ -50,6 +71,12 @@ class Pages:
     @staticmethod
     def _save_state(state):
         kodi.save_json('state.json', state)
+
+    def _remember_search(self, query):
+        state = self._state()
+        history = [q for q in state.get('search_history', []) if q.lower() != query.lower()]
+        state['search_history'] = [query] + history[:19]
+        self._save_state(state)
 
     @staticmethod
     def _account_key():
