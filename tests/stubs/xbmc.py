@@ -43,9 +43,11 @@ class Player:
     TIME = 0.0
     SEEKS = []
     PLAYED = []
+    START_POSITIONS = []
 
-    def play(self, item=None, listitem=None):
+    def play(self, item=None, listitem=None, windowed=False, startpos=-1):
         Player.PLAYED.append(item)
+        Player.START_POSITIONS.append(startpos)
 
     def isPlayingVideo(self):  # noqa: N802
         return bool(Player.PLAYING)

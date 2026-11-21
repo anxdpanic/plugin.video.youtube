@@ -1,5 +1,6 @@
 import json
 
+import xbmc
 import xbmcaddon
 import xbmcplugin
 
@@ -284,3 +285,31 @@ def test_channel_rows_pointing_back_at_the_channel_open_the_row(monkeypatch):
     urls = [u for u, _, _ in xbmcplugin.ITEMS]
     assert urls[0].startswith(router.url_for('shelf'))
     assert urls[1] == router.url_for('browse', id='VLPLx', title='A playlist')
+
+
+def playlist_items(monkeypatch, ids):
+    items = []
+    for video_id in ids:
+        item = parser._item_base('video', 'T ' + video_id, '', {'type': 'video', 'video_id': video_id})
+        item['id'] = video_id
+        items.append(item)
+    monkeypatch.setattr(router.Plugin, 'fetch', lambda self, desc, use_cache=True: {})
+    monkeypatch.setattr(parser, 'parse_page', lambda resp: {'shelves': [{'items': items}]})
+
+
+def queued(query):
+    del xbmc.Player.PLAYED[:], xbmc.Player.START_POSITIONS[:]
+    router.Plugin(['plugin://plugin.video.leanback/play_playlist', '1', query]).dispatch()
+    playlist = xbmc.Player.PLAYED[-1]
+    return [url.rsplit('=', 1)[1] for url, _ in playlist.items], xbmc.Player.START_POSITIONS[-1]
+
+
+def test_playlist_order_and_start_video(monkeypatch):
+    playlist_items(monkeypatch, ['a', 'b', 'c'])
+    assert queued('?list=PLx') == (['a', 'b', 'c'], 0)
+    assert queued('?list=PLx&order=reverse') == (['c', 'b', 'a'], 0)
+    assert queued('?list=PLx&v=b') == (['a', 'b', 'c'], 1)
+    # A chosen first video keeps the playlist's order, even when shuffle is asked for.
+    assert queued('?list=PLx&order=shuffle&v=c') == (['a', 'b', 'c'], 2)
+    shuffled, position = queued('?list=PLx&order=shuffle')
+    assert sorted(shuffled) == ['a', 'b', 'c'] and position == 0

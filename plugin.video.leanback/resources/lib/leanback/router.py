@@ -2,6 +2,7 @@
 # Copyright (C) 2026 anxdpanic
 """Plugin entry: routes, directory listings, playback and the account/menu dialogs."""
 import json
+import random
 import threading
 import time
 import urllib.parse
@@ -834,7 +835,15 @@ class Plugin:
             self._notify(kodi.string(30124))
             return
         self._end(False)
-        self._play_videos((video_id_of(item), item['title'], item['thumb']) for item in items)
+        videos = [(video_id_of(item), item['title'], item['thumb']) for item in items]
+        start = self.params.get('v')
+        order = self.params.get('order')
+        if order == 'reverse':
+            videos.reverse()
+        elif order == 'shuffle' and not start:  # a chosen first video keeps the playlist's order
+            random.shuffle(videos)
+        position = next((i for i, video in enumerate(videos) if video[0] == start), 0)
+        self._play_videos(videos, position)
 
     def shorts(self):
         """Like the TV app's Shorts button: start playing the Shorts feed as a playlist."""
@@ -846,8 +855,8 @@ class Plugin:
         self._play_videos((video_id, video_id, thumb) for video_id, thumb in videos)
 
     @staticmethod
-    def _play_videos(videos):
-        """Play (video_id, title, thumb) entries as Kodi's video playlist."""
+    def _play_videos(videos, position=0):
+        """Play (video_id, title, thumb) entries as Kodi's video playlist, from the one at `position`."""
         playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         playlist.clear()
         for video_id, title, thumb in videos:
@@ -856,7 +865,7 @@ class Plugin:
             li.getVideoInfoTag().setTitle(title)
             li.setProperty('IsPlayable', 'true')
             playlist.add(url_for('play', v=video_id), li)
-        xbmc.Player().play(playlist)
+        xbmc.Player().play(playlist, startpos=position)
 
     def _apply_details(self, li, info):
         # Played or opened in Info: keep the description for the video's plot in listings.
