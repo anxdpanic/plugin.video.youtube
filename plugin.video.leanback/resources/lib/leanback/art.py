@@ -3,11 +3,10 @@
 """Channel banners, used as fanart for a channel's videos. List tiles don't carry them, so the banners
 of channels not seen before are looked up (from each channel's small About page) before a listing is
 drawn, and remembered for a week. Only the addresses are kept: Kodi fetches and caches the images."""
-import threading
 import time
 
-from . import http, kodi, parser
-from .innertube import InnerTube, InnerTubeError
+from . import kodi, parser, tasks
+from .innertube import InnerTube
 
 STORE = 'channel_art.json'
 TTL = 7 * 86400
@@ -75,28 +74,8 @@ class Banners:
             def fetch(channel_id):
                 return parser.channel_banner(api.channel_about(channel_id))
 
-        found = {}
-        lock = threading.Lock()
-        blocked = []
-
-        def work():
-            while not blocked:
-                with lock:
-                    if not todo:
-                        return
-                    channel_id = todo.pop(0)
-                try:
-                    found[channel_id] = fetch(channel_id) or ''
-                except (InnerTubeError, http.HTTPError) as exc:
-                    kodi.log('no banner for %s: %s' % (channel_id, exc))
-                    if getattr(exc, 'blocked', False):
-                        blocked.append(True)  # YouTube is holding requests back: the rest can wait
-
-        threads = [threading.Thread(target=work, name='leanback-art') for _ in range(min(WORKERS, total))]
-        for thread in threads:
-            thread.start()
-        for thread in threads:
-            thread.join()
+        found = tasks.run_parallel(todo, lambda channel_id: fetch(channel_id) or '', WORKERS, 'leanback-art',
+                                   'banner')
         if found:
             entries = self._load()
             for channel_id, url in found.items():

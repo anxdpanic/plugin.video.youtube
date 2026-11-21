@@ -6,10 +6,8 @@ List tiles carry no description, and each video's costs a watch page request. Th
 once, in parallel, before the listing is drawn, so every view shows the full text straight away and
 nothing refreshes afterwards. The requests go to youtubei.googleapis.com (see InnerTube.watch_page),
 which takes a burst like this without the block page www.youtube.com answers bursts with."""
-import threading
-
-from . import http, kodi, parser
-from .innertube import InnerTube, InnerTubeError
+from . import kodi, parser, tasks
+from .innertube import InnerTube
 
 WORKERS = 32
 
@@ -31,31 +29,11 @@ def fetch_all(video_ids, store, fetch=None):
         def fetch(video_id):
             return parser.video_details({}, api.watch_page(video_id))
 
-    found = {}
-    lock = threading.Lock()
-    blocked = []
+    def describe(video_id):
+        # Kept even without a description, so it isn't read again.
+        return dict(fetch(video_id), video_id=video_id)
 
-    def work():
-        while not blocked:
-            with lock:
-                if not todo:
-                    return
-                video_id = todo.pop(0)
-            try:
-                info = fetch(video_id)
-            except (InnerTubeError, http.HTTPError) as exc:
-                kodi.log('no description for %s: %s' % (video_id, exc))
-                if getattr(exc, 'blocked', False):
-                    blocked.append(True)  # YouTube is holding requests back: the rest can wait
-                continue
-            info['video_id'] = video_id
-            found[video_id] = info  # kept even without a description, so it isn't read again
-
-    threads = [threading.Thread(target=work, name='leanback-describe') for _ in range(min(WORKERS, total))]
-    for thread in threads:
-        thread.start()
-    for thread in threads:
-        thread.join()
+    found = tasks.run_parallel(todo, describe, WORKERS, 'leanback-describe', 'description')
     if found:
         store.remember_all(found.values())
     kodi.log('read %d of %d watch pages' % (len(found), total))
