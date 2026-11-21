@@ -1,6 +1,7 @@
 import json
 import urllib.request
 
+import pytest
 import xbmcaddon
 import xbmcgui
 
@@ -134,3 +135,71 @@ def test_request_respects_the_setting(monkeypatch):
     xbmcaddon.SETTINGS['fetch_descriptions'] = False
     describe.request(PATH, ids(1))
     assert sent == []
+
+
+class Focus:
+    """A fake clock and focused item for the focus watcher."""
+
+    def __init__(self, screen):
+        self.now = 100.0
+        self.item = ''
+        self.fetched = []
+        self.describer = describe.Describer(
+            fetch=lambda video_id: pytest.fail('background fetch used'),
+            fetch_now=self.fetch, current_path=lambda: screen.path, refresh=screen.refresh,
+            wait=lambda seconds: False, focused=lambda: self.item, clock=lambda: self.now)
+
+    def fetch(self, video_id):
+        self.fetched.append(video_id)
+        return details(video_id)
+
+    def rest_on(self, video_id, seconds):
+        self.item = 'plugin://plugin.video.leanback/play?v=' + video_id
+        self.describer.check_focus()
+        self.now += seconds
+        return self.describer.check_focus()
+
+
+def test_focus_resting_on_a_video_fetches_it_straight_away():
+    screen = Screen()
+    focus = Focus(screen)
+    assert focus.rest_on('fffffffffff', 1.0)
+    assert focus.fetched == ['fffffffffff'] and screen.refreshes == 1
+    assert descriptions.Descriptions().get('fffffffffff')['w'] == 1
+    focus.now += 5
+    assert not focus.describer.check_focus()  # already described: nothing more
+    assert focus.fetched == ['fffffffffff']
+
+
+def test_focus_passing_over_videos_fetches_nothing():
+    focus = Focus(Screen())
+    assert not focus.rest_on('aaaaaaaaaaa', 0.3)
+    assert not focus.rest_on('bbbbbbbbbbb', 0.3)
+    assert focus.fetched == []
+
+
+def test_focus_ignores_folders_and_other_addons():
+    screen = Screen()
+    focus = Focus(screen)
+    focus.item = 'plugin://plugin.video.leanback/browse?id=UCx'
+    focus.describer.check_focus()
+    focus.now += 2
+    assert not focus.describer.check_focus()
+    screen.path = 'plugin://plugin.video.youtube/'
+    assert not focus.rest_on('aaaaaaaaaaa', 2)
+    assert focus.fetched == []
+
+
+def test_background_skips_what_focus_already_described():
+    screen = Screen()
+    focus = Focus(screen)
+    focus.rest_on('00000000001', 1)
+    fetched = []
+
+    def fetch(video_id):
+        fetched.append(video_id)
+        return details(video_id)
+
+    focus.describer._fetch = fetch
+    assert focus.describer.work(PATH, ids(3)) == 2
+    assert fetched == ['00000000000', '00000000002']
