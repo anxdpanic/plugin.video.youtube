@@ -100,8 +100,8 @@ def _start_server():
     for port in PREFERRED_PORTS:
         try:
             return _Server(('127.0.0.1', port), _Handler)
-        except OSError:
-            continue
+        except OSError as exc:  # EADDRINUSE: another service instance, or another program, has it
+            kodi.log('port %d unavailable: %s' % (port, exc))
     return None
 
 
@@ -145,7 +145,10 @@ def run():
             _cleanup()
             last_cleanup = time.time()
     tracker.finish()
-    window.clearProperty(PORT_PROPERTY)
+    # A service from a newer copy of the add-on (an update or re-enable) can start before this one
+    # exits; it then took the next free port and published that. Only withdraw our own port.
+    if window.getProperty(PORT_PROPERTY) == str(port):
+        window.clearProperty(PORT_PROPERTY)
     server.shutdown()
-    server.server_close()
+    server.server_close()  # closes the listening socket too, so the port is free for the next start
     requests.stop()
