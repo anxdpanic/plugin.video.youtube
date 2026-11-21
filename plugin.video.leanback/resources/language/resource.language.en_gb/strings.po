@@ -383,3 +383,47 @@ msgstr ""
 msgctxt "#30146"
 msgid "Port %d is in use, using %d"
 msgstr ""
+
+msgctxt "#30150"
+msgid "Maintenance"
+msgstr ""
+
+msgctxt "#30151"
+msgid "Cached pages"
+msgstr ""
+
+msgctxt "#30152"
+msgid "Temporary files"
+msgstr ""
+
+msgctxt "#30153"
+msgid "Channel art and descriptions"
+msgstr ""
+
+msgctxt "#30154"
+msgid "Search history"
+msgstr ""
+
+msgctxt "#30155"
+msgid "YouTube visitor ID"
+msgstr ""
+
+msgctxt "#30156"
+msgid "All of the above"
+msgstr ""
+
+msgctxt "#30157"
+msgid "%s will be cleared. Continue?"
+msgstr ""
+
+msgctxt "#30158"
+msgid "Cleared: %s"
+msgstr ""
+
+msgctxt "#30159"
+msgid "Nothing to clear"
+msgstr ""
+
+msgctxt "#30160"
+msgid "Clear"
+msgstr ""

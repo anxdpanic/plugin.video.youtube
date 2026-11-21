@@ -9,7 +9,7 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 
-from . import art, auth, descriptions, history, http, kodi, mpd, parser
+from . import art, auth, descriptions, history, http, kodi, maintenance, mpd, parser
 from .innertube import InnerTube, InnerTubeError
 
 BASE_URL = 'plugin://%s/' % kodi.ADDON_ID
@@ -96,6 +96,7 @@ class Plugin:
             'account/sign_out': self.sign_out,
             'menu/customise': self.customise_menu,
             'menu/reset': self.reset_menu,
+            'maintenance': self.maintenance,
         }
         handler = routes.get(self.route)
         if handler is None:
@@ -105,7 +106,7 @@ class Plugin:
         # dropping the query string, e.g. plugin://.../browse/. Show the main menu instead of failing.
         required = {'browse': 'id', 'shelf': 'src', 'page': 'ctoken', 'related': 'v', 'play': 'v',
                     'play_playlist': 'list', 'pin': 'id', 'unpin': 'id',
-                    'chapters': 'v'}
+                    'chapters': 'v', 'maintenance': 'what'}
         if self.route in required and not self.params.get(required[self.route]):
             kodi.log('route %s without %s, showing main menu' % (self.route, required[self.route]))
             handler = self.root
@@ -963,6 +964,23 @@ class Plugin:
             state.setdefault('menu', {})['order'] = order
             self._save_state(state)
             changed = True
+
+    def maintenance(self):
+        """Settings > Maintenance buttons: confirm, clear, and say what it freed."""
+        entry = maintenance.ACTIONS.get(self.params['what'])
+        if entry is None:
+            return
+        string_id, action = entry
+        label = maintenance.text(string_id)
+        if not xbmcgui.Dialog().yesno(kodi.ADDON.getAddonInfo('name'), maintenance.text(30157) % label):
+            return
+        freed = action()
+        kodi.log('maintenance: cleared %s (%d bytes)' % (self.params['what'], freed))
+        if freed:
+            message = maintenance.text(30158) % ('%s, %s' % (label, maintenance.human_size(freed)))
+        else:
+            message = maintenance.text(30159)
+        self._notify(message)
 
     def reset_menu(self):
         state = self._state()

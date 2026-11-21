@@ -199,6 +199,52 @@
                 </setting>
             </group>
         </category>
+        <category id="maintenance" label="30150">
+            <group id="maintenance_clear" label="30160">
+                <setting id="clear_cache" type="action" label="30151">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.leanback/maintenance?what=cache)</data>
+                    <control type="button" format="action">
+                        <close>false</close>
+                    </control>
+                </setting>
+                <setting id="clear_temp" type="action" label="30152">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.leanback/maintenance?what=temp)</data>
+                    <control type="button" format="action">
+                        <close>false</close>
+                    </control>
+                </setting>
+                <setting id="clear_art" type="action" label="30153">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.leanback/maintenance?what=art)</data>
+                    <control type="button" format="action">
+                        <close>false</close>
+                    </control>
+                </setting>
+                <setting id="clear_search" type="action" label="30154">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.leanback/maintenance?what=search)</data>
+                    <control type="button" format="action">
+                        <close>false</close>
+                    </control>
+                </setting>
+                <setting id="clear_visitor" type="action" label="30155">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.leanback/maintenance?what=visitor)</data>
+                    <control type="button" format="action">
+                        <close>false</close>
+                    </control>
+                </setting>
+                <setting id="clear_all" type="action" label="30156">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.leanback/maintenance?what=all)</data>
+                    <control type="button" format="action">
+                        <close>false</close>
+                    </control>
+                </setting>
+            </group>
+        </category>
         <category id="advanced" label="30143">
             <group id="advanced_service">
                 <setting id="service_port" type="integer" label="30144" help="30145">
