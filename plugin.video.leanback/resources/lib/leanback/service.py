@@ -157,7 +157,7 @@ class Httpd:
         kodi.log('manifest server on 127.0.0.1:%d' % self.port)
         if wanted and self.port != wanted:
             # Kodi loads strings at startup, so right after an update a new one can still be empty.
-            message = (kodi.string(30146) or PORT_IN_USE) % (wanted, self.port)
+            message = kodi.formatted(30146, PORT_IN_USE, wanted, self.port)
             xbmcgui.Dialog().notification(kodi.ADDON.getAddonInfo('name'), message, xbmcgui.NOTIFICATION_WARNING, 6000)
         if old is not None:
             self._close(old)

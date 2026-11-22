@@ -316,13 +316,12 @@ class TVWindow(xbmcgui.WindowXML):
         if past:
             actions.append({'kind': 'action', 'title': _string(30171, 'Clear search history'), 'icon': 'clear',
                             'target': {'type': 'clear_searches'},
-                            'plot': _string(30172, 'Forget all %d past searches') % len(past)})
+                            'plot': kodi.formatted(30172, 'Forget all %d past searches', len(past))})
         rows = [model.Row(_string(30100, 'Search'), actions)]
         if past:
-            again = _string(30176, 'Search again for "%s"')
             rows.append(model.Row(_string(30174, 'Recent searches'), [
                 {'kind': 'query', 'title': query, 'target': {'type': 'search', 'query': query},
-                 'plot': again % query} for query in past]))
+                 'plot': kodi.formatted(30176, 'Search again for "%s"', query)} for query in past]))
         return rows
 
     def _search_action(self, action):

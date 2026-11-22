@@ -39,7 +39,7 @@ def error_message(exc):
     elif status and status >= 500:
         string_id = 30137
     else:
-        return kodi.string(30129) % exc
+        return kodi.formatted(30129, 'Request failed: %s', exc)
     return kodi.string(string_id) or ERRORS[string_id]
 
 
@@ -89,8 +89,7 @@ def video_plot(item, known, threshold):
     if item['watched_pct'] >= threshold:
         status.append(kodi.string(30142) or 'Watched')
     elif item['watched_pct'] > 0:
-        label = kodi.string(30141)
-        status.append(label % item['watched_pct'] if '%d' in label else 'Watched %d%%' % item['watched_pct'])
+        status.append(kodi.formatted(30141, 'Watched %d%%', item['watched_pct']))
     lines = [' • '.join(x for x in facts if x), ' • '.join(status)]
     if known and known.get('d'):
         lines.append('\n' + known['d'])
@@ -206,7 +205,7 @@ class Plugin(pages.Pages):
         account_id, account = auth.active_account()
         li = xbmcgui.ListItem(kodi.string(30108), offscreen=True)
         li.setLabel2(account.get('name') or '' if account else kodi.string(30123))
-        li.getVideoInfoTag().setPlot(kodi.string(30112) % (account.get('name') or '') if account
+        li.getVideoInfoTag().setPlot(kodi.formatted(30112, 'Signed in as %s', account.get('name') or '') if account
                                      else kodi.string(30123))
         li.setArt({'icon': 'DefaultUser.png', 'thumb': 'DefaultUser.png'})
         # Only opens a dialog: as a folder its failed listing made Kodi leave the add-on (and re-run it on Back).
@@ -925,7 +924,7 @@ class Plugin(pages.Pages):
             index = xbmcgui.Dialog().select(kodi.string(30121), labels)
             if index < 0:
                 return changed
-            target = xbmcgui.Dialog().select(kodi.string(30118) % labels[index],
+            target = xbmcgui.Dialog().select(kodi.formatted(30118, 'Move "%s" to position', labels[index]),
                                              ['%d. %s' % (i + 1, label) for i, label in enumerate(labels)],
                                              preselect=index)
             if target < 0 or target == index:
@@ -945,12 +944,14 @@ class Plugin(pages.Pages):
             return
         string_id, action = entry
         label = maintenance.text(string_id)
-        if not xbmcgui.Dialog().yesno(kodi.ADDON.getAddonInfo('name'), maintenance.text(30157) % label):
+        question = kodi.formatted(30157, maintenance.FALLBACK[30157], label)
+        if not xbmcgui.Dialog().yesno(kodi.ADDON.getAddonInfo('name'), question):
             return
         freed = action()
         kodi.log('maintenance: cleared %s (%d bytes)' % (self.params['what'], freed))
         if freed:
-            message = maintenance.text(30158) % ('%s, %s' % (label, maintenance.human_size(freed)))
+            cleared = '%s, %s' % (label, maintenance.human_size(freed))
+            message = kodi.formatted(30158, maintenance.FALLBACK[30158], cleared)
         else:
             message = maintenance.text(30159)
         self._notify(message)
@@ -997,15 +998,15 @@ class Plugin(pages.Pages):
         try:
             code = auth.request_device_code()
         except Exception as exc:  # network or OAuth errors
-            self._notify(kodi.string(30113) % exc, error=True)
+            self._notify(kodi.formatted(30113, 'Sign-in failed: %s', exc), error=True)
             return
         url = code.get('verification_url') or 'youtube.com/activate'
         url = url.replace('https://', '').replace('http://', '').replace('www.', '')
         interval = max(int(code.get('interval', 5)), 2)
         deadline = time.time() + int(code.get('expires_in', 1800))
         progress = xbmcgui.DialogProgress()
-        message = '%s\n[B][COLOR yellow]%s[/COLOR][/B]\n%s' % (kodi.string(30110) % url, code['user_code'],
-                                                              kodi.string(30111))
+        go_to = kodi.formatted(30110, 'On a phone or computer, go to [B]%s[/B] and enter this code:', url)
+        message = '%s\n[B][COLOR yellow]%s[/COLOR][/B]\n%s' % (go_to, code['user_code'], kodi.string(30111))
         progress.create(kodi.string(30109), message)
         token = None
         monitor = xbmc.Monitor()
@@ -1020,7 +1021,7 @@ class Plugin(pages.Pages):
                 try:
                     token = auth.poll_token(code['device_code'])
                 except auth.AuthError as exc:
-                    self._notify(kodi.string(30113) % exc, error=True)
+                    self._notify(kodi.formatted(30113, 'Sign-in failed: %s', exc), error=True)
                     return
                 if token:
                     break
@@ -1030,9 +1031,9 @@ class Plugin(pages.Pages):
             self._notify(kodi.string(30130), error=True)
             return
         account_id = auth.add_account(token)
-        name = InnerTube().account_name() or kodi.string(30131) % len(auth.accounts())
+        name = InnerTube().account_name() or kodi.formatted(30131, 'Account %s', len(auth.accounts()))
         auth.rename_account(account_id, name)
-        self._notify(kodi.string(30112) % name)
+        self._notify(kodi.formatted(30112, 'Signed in as %s', name))
         xbmc.executebuiltin('Container.Refresh')
 
     def sign_out(self):
