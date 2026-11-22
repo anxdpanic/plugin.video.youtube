@@ -57,8 +57,9 @@ def rail_item(entry):
     return li
 
 
-def video_tile(item, known, threshold):
-    """A video's tile; `known` is what its watch page said (descriptions store), if it was read.
+def video_tile(item, known, threshold, fanart=''):
+    """A video's tile; `known` is what its watch page said (descriptions store), if it was read, and
+    `fanart` its channel's banner, when known.
 
     Not offscreen: the window's worker threads set its plot and progress while it is shown, and an
     offscreen item skips Kodi's GUI lock, so those writes would race the render thread and crash Kodi."""
@@ -70,7 +71,7 @@ def video_tile(item, known, threshold):
     if item['published']:
         meta.append(item['published'])
     li.setLabel2(' • '.join(m for m in meta if m))
-    li.setArt({'thumb': item['thumb'], 'fanart': item['thumb']})
+    li.setArt({'thumb': item['thumb'], 'fanart': fanart or item['thumb']})
     li.setProperty('plot', router.video_plot(item, known, threshold))
     if item['live']:
         li.setProperty('badge', kodi.string(30127) or 'Live')
@@ -118,9 +119,9 @@ def query_tile(item):
     return li
 
 
-def tile(item, known, threshold, avatar=False):
+def tile(item, known, threshold, avatar=False, fanart=''):
     if item['kind'] == 'video':
-        return video_tile(item, known, threshold)
+        return video_tile(item, known, threshold, fanart)
     if item['kind'] == 'action':
         return action_tile(item)
     if item['kind'] == 'query':

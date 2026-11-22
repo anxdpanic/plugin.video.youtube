@@ -177,3 +177,52 @@ def test_resume_label_handles_both_kodi_wordings(monkeypatch):
     assert window.resume_label('1:05') == 'Resume from 1:05'  # Kodi 19+: "Resume from {0:s}"
     monkeypatch.setitem(xbmc.LOCALIZED, 12022, 'Resume from %s')
     assert window.resume_label('1:05') == 'Resume from 1:05'
+
+
+def test_video_tile_fanart_is_the_channel_banner_when_known():
+    item = video('a')
+    assert items.video_tile(item, None, 80).art['fanart'] == item['thumb']
+    assert items.video_tile(item, None, 80, 'https://banner').art['fanart'] == 'https://banner'
+    assert items.tile(item, None, 80, fanart='https://banner').art['fanart'] == 'https://banner'
+
+
+class FakeBanners:
+    def __init__(self, found):
+        self.found = found  # channel id -> banner, '' when the channel has none
+        self.known = {}
+
+    def fetch_all(self, channel_ids):
+        self.known.update((c, self.found[c]) for c in channel_ids if c in self.found)
+
+    def unknown(self, channel_ids):
+        return [c for c in channel_ids if c not in self.known]
+
+    def get(self, channel_id):
+        return self.known.get(channel_id, '')
+
+
+def test_window_sets_banners_and_retries_channels_not_looked_up():
+    from resources.lib.leanback.tv import window
+
+    win = window.TVWindow()
+    win.banners = FakeBanners({'UCa': 'https://banner-a', 'UCb': ''})
+    tiles = {v: items.video_tile(video(v), None, 80) for v in ('1', '2', '3')}
+    win._bannered.update(tiles)
+    win._show_banners([('1', 'UCa', tiles['1']), ('2', 'UCb', tiles['2']), ('3', 'UCc', tiles['3'])])
+    assert tiles['1'].art['fanart'] == 'https://banner-a'
+    assert tiles['2'].art['fanart'] == video('2')['thumb']  # the channel has no banner
+    assert win._bannered == {'1', '2'}  # UCc's lookup failed: tried again next time it is shown
+
+
+def test_window_looks_up_banners_of_shown_videos_with_a_known_channel(monkeypatch):
+    from resources.lib.leanback.tv import window
+
+    win = window.TVWindow()
+    shown = [('1', dict(video('1'), channel_id='UCa'), 'tile1'), ('2', video('2'), 'tile2')]
+    monkeypatch.setattr(win, '_shown_videos', lambda: iter(shown))
+    started = []
+    monkeypatch.setattr(window.threading, 'Thread',
+                        lambda target, args, name: type('T', (), {'start': lambda s: started.append(args)})())
+    win._banners_soon()
+    win._banners_soon()  # already on its way: not asked for again
+    assert started == [([('1', 'UCa', 'tile1')],)]

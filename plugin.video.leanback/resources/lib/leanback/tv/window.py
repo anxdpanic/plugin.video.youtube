@@ -11,7 +11,7 @@ import traceback
 import xbmc
 import xbmcgui
 
-from .. import auth, describe, descriptions, http, kodi, maintenance, pages, parser, router
+from .. import art, auth, describe, descriptions, http, kodi, maintenance, pages, parser, router
 from ..innertube import InnerTubeError
 from . import items, model
 
@@ -41,6 +41,9 @@ class TVWindow(xbmcgui.WindowXML):
         super().__init__(*args, **kwargs)
         self.pages = pages.Pages()
         self.descriptions = descriptions.Descriptions()
+        self.banners = art.Banners()
+        self._banner_lock = threading.Lock()  # one banner lookup at a time: they share the store
+        self._bannered = set()  # video ids whose tile has its channel's banner, or whose channel has none
         self.threshold = pages.watched_threshold()
         self.entries = []
         self.stack = []  # screens, the one shown last
@@ -225,6 +228,7 @@ class TVWindow(xbmcgui.WindowXML):
             control.addItems(row.listitems)
             control.selectItem(row.pos if slot == 0 else 0)
         self._describe_soon()
+        self._banners_soon()
 
     def _empty_message(self, screen):
         """What to say on a page with nothing on it, as the plugin says it: the personal pages (FE...) are
@@ -261,6 +265,7 @@ class TVWindow(xbmcgui.WindowXML):
             row.listitems.extend(new)
             control.addItems(new)
             self._describe_soon()
+            self._banners_soon()
 
     # ------------------------------------------------------------ tiles
     def _keep(self, browse_id=None):
@@ -280,7 +285,14 @@ class TVWindow(xbmcgui.WindowXML):
 
     def _tile(self, row, item):
         self._apply_watched(item)
-        return items.tile(item, self.descriptions.get(router.video_id_of(item)), self.threshold, row.avatars)
+        known = self.descriptions.get(router.video_id_of(item))
+        fanart = self.banners.get(self._channel_of(item, known)) if item['kind'] == 'video' else ''
+        return items.tile(item, known, self.threshold, row.avatars, fanart)
+
+    @staticmethod
+    def _channel_of(item, known):
+        """A video's channel, from its tile or else from its watch page (Home's tiles don't name it)."""
+        return item.get('channel_id') or (known or {}).get('c') or ''
 
     def _activate(self, item):
         target = item['target'] or {}
@@ -477,6 +489,45 @@ class TVWindow(xbmcgui.WindowXML):
                 li.setProperty('plot', router.video_plot(item, known, self.threshold))
             else:
                 self._described.discard(video_id)  # not read this time: try again when it is shown next
+        self._banners_soon()  # the watch pages name the channels of tiles that didn't
+
+    # ------------------------------------------------------------ banners
+    def _shown_videos(self):
+        """(video id, item, tile) for the videos in the shown rows."""
+        for row in (self._row(0), self._row(1)):
+            if not row or not row.listitems:
+                continue
+            for item, li in zip(row.items, row.listitems):
+                video_id = router.video_id_of(item) if item['kind'] == 'video' else None
+                if video_id:
+                    yield video_id, item, li
+
+    def _banners_soon(self):
+        """Look up the channel banners of the shown videos in the background and make them the tiles'
+        fanart, the backdrop of the focused video. Videos whose channel isn't known yet wait for their
+        watch page."""
+        wanted = []
+        for video_id, item, li in self._shown_videos():
+            channel_id = self._channel_of(item, self.descriptions.get(video_id))
+            if video_id not in self._bannered and channel_id.startswith('UC'):
+                self._bannered.add(video_id)
+                wanted.append((video_id, channel_id, li))
+        if wanted:
+            threading.Thread(target=self._show_banners, args=(wanted,), name='leanback-tv-art').start()
+
+    def _show_banners(self, wanted):
+        with self._banner_lock:
+            try:
+                self.banners.fetch_all([channel_id for _, channel_id, _ in wanted])
+            except (InnerTubeError, http.HTTPError) as exc:
+                kodi.log('TV interface: banners failed: %s' % exc)
+            for video_id, channel_id, li in wanted:
+                if channel_id in self.banners.unknown([channel_id]):
+                    self._bannered.discard(video_id)  # not looked up this time: try again when shown next
+                    continue
+                banner = self.banners.get(channel_id)
+                if banner:
+                    li.setArt({'fanart': banner})
 
     # ------------------------------------------------------------ helpers
     def _load_page(self, desc):
