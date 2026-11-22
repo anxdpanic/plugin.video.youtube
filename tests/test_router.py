@@ -373,3 +373,33 @@ def test_play_without_streams_fails_with_youtubes_reason(monkeypatch):
     ok, _ = play(PlayerApi(error=InnerTubeError('Video unavailable')), monkeypatch)
     assert not ok
     assert xbmcgui.NOTIFICATIONS[-1][1] == 'Video unavailable'
+
+
+def sign_in(monkeypatch, polls, expires_in=1800):
+    """Run the sign-in flow with the dialog left open and auth.poll_token returning each poll in turn."""
+    import xbmc
+
+    from resources.lib.leanback import auth
+    added = []
+    monkeypatch.setattr(xbmcgui.DialogProgress, 'iscanceled', lambda self: False)
+    monkeypatch.setattr(xbmc.Monitor, 'waitForAbort', lambda self, timeout=0: False)
+    monkeypatch.setattr(auth, 'request_device_code', lambda: {
+        'device_code': 'D', 'user_code': 'ABC-DEF', 'verification_url': 'https://www.google.com/device',
+        'interval': 0, 'expires_in': expires_in})
+    pending = list(polls)
+    monkeypatch.setattr(auth, 'poll_token', lambda device_code: pending.pop(0) if pending else None)
+    monkeypatch.setattr(auth, 'add_account', lambda token: added.append(token) or 'acct')
+    monkeypatch.setattr(auth, 'rename_account', lambda account_id, name: None)
+    monkeypatch.setattr(router.InnerTube, 'account_name', lambda self: 'Viewer')
+    run('account/sign_in').sign_in()
+    return added
+
+
+def test_sign_in_adds_the_account_once_approved(monkeypatch):
+    assert sign_in(monkeypatch, [None, None, {'access_token': 'T'}]) == [{'access_token': 'T'}]
+    assert 'Viewer' in xbmcgui.NOTIFICATIONS[-1][1]
+
+
+def test_sign_in_stops_when_the_code_expires(monkeypatch):
+    assert sign_in(monkeypatch, [], expires_in=0) == []
+    assert xbmcgui.NOTIFICATIONS
