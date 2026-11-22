@@ -30,6 +30,12 @@ def _string(string_id, fallback):
     return kodi.string(string_id) or fallback
 
 
+def resume_label(position):
+    """Kodi's "Resume from ..." label. Kodi 19 and later word it with "{0:s}", older builds with "%s"."""
+    label = xbmc.getLocalizedString(12022) or 'Resume from {0:s}'
+    return label.replace('{0:s}', position).replace('%s', position)
+
+
 class TVWindow(xbmcgui.WindowXML):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -354,7 +360,7 @@ class TVWindow(xbmcgui.WindowXML):
         video_id = router.video_id_of(item)
         if start is None and item['duration'] and 0 < item['watched_pct'] < self.threshold:
             resume_at = item['duration'] * item['watched_pct'] // 100
-            choice = xbmcgui.Dialog().contextmenu([xbmc.getLocalizedString(12022) % router.format_time(resume_at),
+            choice = xbmcgui.Dialog().contextmenu([resume_label(router.format_time(resume_at)),
                                                    xbmc.getLocalizedString(12021)])
             if choice < 0:
                 return

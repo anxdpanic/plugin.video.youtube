@@ -19,6 +19,14 @@ def executebuiltin(command, wait=False):
     BUILTINS.append(command)
 
 
+# Kodi's own strings, worded as Kodi 21 ships them.
+LOCALIZED = {12021: 'Play from beginning', 12022: 'Resume from {0:s}'}
+
+
+def getLocalizedString(string_id):  # noqa: N802
+    return LOCALIZED.get(string_id, '')
+
+
 class Monitor:
     def abortRequested(self):  # noqa: N802
         return False

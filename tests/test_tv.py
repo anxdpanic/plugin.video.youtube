@@ -168,3 +168,12 @@ def test_section_tabs_are_not_a_channel_row():
     screen = model.Screen({'ep': 'browse', 'id': 'UCx'}, 'Channel', load, tabs_title='Channels').open()
     assert screen.rows[0].title == '' and not screen.rows[0].avatars
     assert [t['title'] for t in screen.rows[0].items] == ['Videos', 'Playlists']
+
+
+def test_resume_label_handles_both_kodi_wordings(monkeypatch):
+    import xbmc
+
+    from resources.lib.leanback.tv import window
+    assert window.resume_label('1:05') == 'Resume from 1:05'  # Kodi 19+: "Resume from {0:s}"
+    monkeypatch.setitem(xbmc.LOCALIZED, 12022, 'Resume from %s')
+    assert window.resume_label('1:05') == 'Resume from 1:05'

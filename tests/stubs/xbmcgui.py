@@ -103,3 +103,8 @@ class Window:
 
     def clearProperty(self, key):  # noqa: N802
         _PROPERTIES.pop(key, None)
+
+
+class WindowXML(Window):
+    def __init__(self, xml_file='', script_path='', default_skin='Default', default_res='720p', *args):
+        Window.__init__(self)
