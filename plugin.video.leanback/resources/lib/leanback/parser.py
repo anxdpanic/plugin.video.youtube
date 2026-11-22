@@ -414,6 +414,160 @@ def parse_shelf(shelf):
     return _shelf(title.strip(), raw, cont, shelf.get('tvhtml5ShelfRendererType', ''), endpoint)
 
 
+def _new_page():
+    return {'header': None, 'tabs': [], 'shelves': [], 'continuation': None, 'message': ''}
+
+
+def _add_shelf(page, shelf):
+    """Add a shelf built from a row that may have parsed to nothing."""
+    if shelf['items']:
+        page['shelves'].append(shelf)
+
+
+def _cluster_shelves(cluster_shelf):
+    """Search rows such as "Recently uploaded" or "Shows", each headed by a button."""
+    for cluster in cluster_shelf.get('clusters', []):
+        renderer = cluster.get('clusterRenderer', {})
+        button = renderer.get('headerRenderer', {}).get('buttonViewModel', {})
+        yield _shelf(text(button.get('title')).strip(), renderer.get('items', []), None,
+                     endpoint=endpoint_target(button.get('onTap')))
+
+
+def _grid_shelf(grid, title=''):
+    return _shelf(title, grid.get('items', []), _continuation(grid))
+
+
+def _grid_title(grid):
+    return text(grid.get('header', {}).get('gridHeaderRenderer', {}).get('title'))
+
+
+def _parse_section_list(page, section_list):
+    for entry in section_list.get('contents', []):
+        if 'shelfRenderer' in entry:
+            page['shelves'].append(parse_shelf(entry['shelfRenderer']))
+        elif 'itemSectionRenderer' in entry:
+            section = entry['itemSectionRenderer']
+            _add_shelf(page, _shelf('', section.get('contents', []), _continuation(section)))
+        elif 'clusterShelfRenderer' in entry:
+            for shelf in _cluster_shelves(entry['clusterShelfRenderer']):
+                _add_shelf(page, shelf)
+        elif 'gridRenderer' in entry:
+            grid = entry['gridRenderer']
+            page['shelves'].append(_grid_shelf(grid, _grid_title(grid)))
+    page['continuation'] = _continuation(section_list) or page['continuation']
+
+
+def _surface_header(surface):
+    header = surface.get('header', {}).get('channelHeaderRenderer') or surface.get('channelHeaderRenderer')
+    return parse_channel_header(header) if header else None
+
+
+def _promo_message(content):
+    """An empty page's own explanation ("Videos you upload to YouTube will appear here")."""
+    promo = content.get('genericPromoRenderer')
+    return (text(promo.get('bodyText')) or text(promo.get('title'))) if promo else ''
+
+
+def _parse_surface(page, surface):
+    content = surface.get('content', {})
+    page['header'] = _surface_header(surface) or page['header']
+    page['message'] = _promo_message(content) or page['message']
+    if 'sectionListRenderer' in content:
+        _parse_section_list(page, content['sectionListRenderer'])
+    elif 'gridRenderer' in content:
+        page['shelves'].append(_grid_shelf(content['gridRenderer']))
+    elif 'twoColumnRenderer' in content:
+        _parse_two_column(page, content['twoColumnRenderer'])
+
+
+def _playlist_header(left_column):
+    for key in ('entityMetadataRenderer', 'playlistHeaderRenderer'):
+        if key in left_column:
+            meta = left_column[key]
+            header = _item_base('playlist', text(meta.get('title')),
+                                best_thumb(meta.get('thumbnail', {}).get('thumbnails')))
+            header['plot_lines'] = [text(meta.get('description'))] + \
+                [text(b) for b in meta.get('bylines', []) if text(b)]
+            return header
+    return None
+
+
+def _parse_two_column(page, two):
+    page['header'] = _playlist_header(two.get('leftColumn', {})) or page['header']
+    right = two.get('rightColumn', {})
+    if 'playlistVideoListRenderer' in right:
+        vlist = right['playlistVideoListRenderer']
+        page['shelves'].append(_shelf('', vlist.get('contents', []), _continuation(vlist)))
+    elif 'sectionListRenderer' in right:
+        _parse_section_list(page, right['sectionListRenderer'])
+
+
+def _nav_tabs(secondary_nav):
+    """Each tab once: a channel can sit in more than one section (recently active and the full list)."""
+    seen = set()
+    for section in secondary_nav.get('sections', []):
+        for tab in section.get('tvSecondaryNavSectionRenderer', {}).get('tabs', []):
+            tab_r = tab.get('tabRenderer')
+            if not tab_r:
+                continue
+            target = endpoint_target(tab_r.get('endpoint'))
+            key = json.dumps(target, sort_keys=True) if target else text(tab_r.get('title'))
+            if key not in seen:
+                seen.add(key)
+                yield tab_r, target
+
+
+def _tab_entry(tab_r, target):
+    entry = _item_base('tab', text(tab_r.get('title')), best_thumb(tab_r.get('thumbnail', {}).get('thumbnails')),
+                       target)
+    entry['selected'] = tab_r.get('selected', False)
+    return entry
+
+
+def _parse_secondary_nav(page, secondary_nav):
+    for tab_r, target in _nav_tabs(secondary_nav):
+        entry = _tab_entry(tab_r, target)
+        page['tabs'].append(entry)
+        surface = tab_r.get('content', {}).get('tvSurfaceContentRenderer')
+        if surface and entry['selected']:
+            _parse_surface(page, surface)
+
+
+def _parse_contents(page, contents):
+    browse = contents.get('tvBrowseRenderer', {}).get('content', {})
+    if 'tvSurfaceContentRenderer' in browse:
+        _parse_surface(page, browse['tvSurfaceContentRenderer'])
+    if 'tvSecondaryNavRenderer' in browse:
+        _parse_secondary_nav(page, browse['tvSecondaryNavRenderer'])
+    if 'sectionListRenderer' in contents:  # search
+        _parse_section_list(page, contents['sectionListRenderer'])
+    pivot = contents.get('singleColumnWatchNextResults', {}).get('pivot', {})  # next
+    if 'sectionListRenderer' in pivot:
+        _parse_section_list(page, pivot['sectionListRenderer'])
+
+
+LIST_CONTINUATIONS = ('horizontalListContinuation', 'gridContinuation', 'playlistVideoListContinuation',
+                      'verticalListContinuation')
+
+
+def _parse_continuation_contents(page, continuation_contents):
+    for key, value in continuation_contents.items():
+        if key == 'sectionListContinuation':
+            _parse_section_list(page, value)
+        elif key in LIST_CONTINUATIONS:
+            raw = value.get('items') or value.get('contents') or []
+            page['shelves'].append(_shelf('', raw, _continuation(value)))
+        elif key == 'tvSurfaceContentContinuation':
+            _parse_surface(page, value)
+
+
+def _parse_appended_items(page, actions):
+    for action in actions or []:
+        append = action.get('appendContinuationItemsAction') or action.get('reloadContinuationItemsCommand')
+        if append:
+            page['shelves'].append(_shelf('', append.get('continuationItems', []), None))
+
+
 def parse_page(resp):
     """Normalise any browse/search/next response into:
 
@@ -421,112 +575,10 @@ def parse_page(resp):
     'message' is what YouTube says about an empty page, if anything.
     Each shelf: {'title', 'items', 'continuation', 'shorts', 'endpoint'}.
     """
-    page = {'header': None, 'tabs': [], 'shelves': [], 'continuation': None, 'message': ''}
-
-    def handle_section_list(section_list):
-        for entry in section_list.get('contents', []):
-            if 'shelfRenderer' in entry:
-                page['shelves'].append(parse_shelf(entry['shelfRenderer']))
-            elif 'itemSectionRenderer' in entry:
-                raw = entry['itemSectionRenderer'].get('contents', [])
-                shelf = _shelf('', raw, _continuation(entry['itemSectionRenderer']))
-                if shelf['items']:
-                    page['shelves'].append(shelf)
-            elif 'clusterShelfRenderer' in entry:
-                # Search rows such as "Recently uploaded" or "Shows", each headed by a button.
-                for cluster in entry['clusterShelfRenderer'].get('clusters', []):
-                    renderer = cluster.get('clusterRenderer', {})
-                    button = renderer.get('headerRenderer', {}).get('buttonViewModel', {})
-                    shelf = _shelf(text(button.get('title')).strip(), renderer.get('items', []), None,
-                                   endpoint=endpoint_target(button.get('onTap')))
-                    if shelf['items']:
-                        page['shelves'].append(shelf)
-            elif 'gridRenderer' in entry:
-                grid = entry['gridRenderer']
-                page['shelves'].append(_shelf(text(grid.get('header', {}).get('gridHeaderRenderer', {}).get('title')),
-                                              grid.get('items', []), _continuation(grid)))
-        page['continuation'] = _continuation(section_list) or page['continuation']
-
-    def handle_surface(surface):
-        content = surface.get('content', {})
-        header = surface.get('header', {})
-        if 'channelHeaderRenderer' in header:
-            page['header'] = parse_channel_header(header['channelHeaderRenderer'])
-        elif 'channelHeaderRenderer' in surface:
-            page['header'] = parse_channel_header(surface['channelHeaderRenderer'])
-        if 'genericPromoRenderer' in content:
-            # An empty page's own explanation ("Videos you upload to YouTube will appear here").
-            promo = content['genericPromoRenderer']
-            page['message'] = text(promo.get('bodyText')) or text(promo.get('title'))
-        if 'sectionListRenderer' in content:
-            handle_section_list(content['sectionListRenderer'])
-        elif 'gridRenderer' in content:
-            grid = content['gridRenderer']
-            page['shelves'].append(_shelf('', grid.get('items', []), _continuation(grid)))
-        elif 'twoColumnRenderer' in content:
-            handle_two_column(content['twoColumnRenderer'])
-
-    def handle_two_column(two):
-        left = two.get('leftColumn', {})
-        for key in ('entityMetadataRenderer', 'playlistHeaderRenderer'):
-            if key in left:
-                meta = left[key]
-                header = _item_base('playlist', text(meta.get('title')),
-                                    best_thumb(meta.get('thumbnail', {}).get('thumbnails')))
-                header['plot_lines'] = [text(meta.get('description'))] + \
-                    [text(b) for b in meta.get('bylines', []) if text(b)]
-                page['header'] = header
-        right = two.get('rightColumn', {})
-        if 'playlistVideoListRenderer' in right:
-            vlist = right['playlistVideoListRenderer']
-            page['shelves'].append(_shelf('', vlist.get('contents', []), _continuation(vlist)))
-        elif 'sectionListRenderer' in right:
-            handle_section_list(right['sectionListRenderer'])
-
-    contents = resp.get('contents', {})
-    browse = contents.get('tvBrowseRenderer', {}).get('content', {})
-    if 'tvSurfaceContentRenderer' in browse:
-        handle_surface(browse['tvSurfaceContentRenderer'])
-    if 'tvSecondaryNavRenderer' in browse:
-        # A channel can sit in more than one section (recently active and the full list); list it once.
-        seen_tabs = set()
-        for section in browse['tvSecondaryNavRenderer'].get('sections', []):
-            for tab in section.get('tvSecondaryNavSectionRenderer', {}).get('tabs', []):
-                tab_r = tab.get('tabRenderer')
-                if not tab_r:
-                    continue
-                thumb = best_thumb(tab_r.get('thumbnail', {}).get('thumbnails'))
-                entry = _item_base('tab', text(tab_r.get('title')), thumb, endpoint_target(tab_r.get('endpoint')))
-                entry['selected'] = tab_r.get('selected', False)
-                key = json.dumps(entry['target'], sort_keys=True) if entry['target'] else entry['title']
-                if key in seen_tabs:
-                    continue
-                seen_tabs.add(key)
-                page['tabs'].append(entry)
-                surface = tab_r.get('content', {}).get('tvSurfaceContentRenderer')
-                if surface and tab_r.get('selected'):
-                    handle_surface(surface)
-    if 'sectionListRenderer' in contents:  # search
-        handle_section_list(contents['sectionListRenderer'])
-    if 'singleColumnWatchNextResults' in contents:  # next
-        pivot = contents['singleColumnWatchNextResults'].get('pivot', {})
-        if 'sectionListRenderer' in pivot:
-            handle_section_list(pivot['sectionListRenderer'])
-
-    cont = resp.get('continuationContents', {})
-    for key, value in cont.items():
-        if key == 'sectionListContinuation':
-            handle_section_list(value)
-        elif key in ('horizontalListContinuation', 'gridContinuation', 'playlistVideoListContinuation',
-                     'verticalListContinuation'):
-            raw = value.get('items') or value.get('contents') or []
-            page['shelves'].append(_shelf('', raw, _continuation(value)))
-        elif key == 'tvSurfaceContentContinuation':
-            handle_surface(value)
-    for action in resp.get('onResponseReceivedActions', []) or []:
-        append = action.get('appendContinuationItemsAction') or action.get('reloadContinuationItemsCommand')
-        if append:
-            page['shelves'].append(_shelf('', append.get('continuationItems', []), None))
+    page = _new_page()
+    _parse_contents(page, resp.get('contents', {}))
+    _parse_continuation_contents(page, resp.get('continuationContents', {}))
+    _parse_appended_items(page, resp.get('onResponseReceivedActions'))
     return page
 
 
