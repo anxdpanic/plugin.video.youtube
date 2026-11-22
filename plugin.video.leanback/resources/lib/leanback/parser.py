@@ -373,6 +373,38 @@ def _with_channel(item, node):
     return item
 
 
+def _video_renderer_base(video):
+    """The fields pivotVideoRenderer and playlistVideoRenderer share."""
+    item = _item_base('video', text(video.get('title')), best_thumb(video.get('thumbnail', {}).get('thumbnails')),
+                      endpoint_target(video.get('navigationEndpoint')))
+    item['id'] = video.get('videoId')
+    item['channel'] = text(video.get('shortBylineText'))
+    return item
+
+
+def parse_pivot_video(pivot):
+    item = _video_renderer_base(pivot)
+    item['views'] = parse_count(text(pivot.get('viewCountText')))
+    item['published'] = text(pivot.get('publishedTimeText'))
+    item['duration'] = parse_duration(text(pivot.get('lengthText')))
+    return item
+
+
+def parse_playlist_video(video):
+    item = _video_renderer_base(video)
+    item['duration'] = int(video.get('lengthSeconds') or 0)
+    return item
+
+
+def parse_button(button):
+    """A grid/tile button as a folder, or None when it leads nowhere."""
+    target = endpoint_target(button.get('onPress') or button.get('navigationEndpoint'))
+    if not target:
+        return None
+    return _item_base('folder', text(button.get('title') or button.get('text')),
+                      best_thumb(button.get('thumbnail', {}).get('thumbnails')), target)
+
+
 def parse_item(node):
     """Any list entry -> item dict, or None for things we don't show."""
     if not isinstance(node, dict):
@@ -382,32 +414,11 @@ def parse_item(node):
     if 'lockupViewModel' in node:
         return _with_channel(parse_lockup(node['lockupViewModel']), node)
     if 'pivotVideoRenderer' in node:
-        pivot = node['pivotVideoRenderer']
-        item = _item_base('video', text(pivot.get('title')),
-                          best_thumb(pivot.get('thumbnail', {}).get('thumbnails')),
-                          endpoint_target(pivot.get('navigationEndpoint')))
-        item['id'] = pivot.get('videoId')
-        item['channel'] = text(pivot.get('shortBylineText'))
-        item['views'] = parse_count(text(pivot.get('viewCountText')))
-        item['published'] = text(pivot.get('publishedTimeText'))
-        item['duration'] = parse_duration(text(pivot.get('lengthText')))
-        return item
+        return parse_pivot_video(node['pivotVideoRenderer'])
     if 'playlistVideoRenderer' in node:
-        video = node['playlistVideoRenderer']
-        item = _item_base('video', text(video.get('title')),
-                          best_thumb(video.get('thumbnail', {}).get('thumbnails')),
-                          endpoint_target(video.get('navigationEndpoint')))
-        item['id'] = video.get('videoId')
-        item['channel'] = text(video.get('shortBylineText'))
-        item['duration'] = int(video.get('lengthSeconds') or 0)
-        return item
-    if 'gridButtonRenderer' in node or 'tileButtonRenderer' in node:
-        button = node.get('gridButtonRenderer') or node.get('tileButtonRenderer')
-        target = endpoint_target(button.get('onPress') or button.get('navigationEndpoint'))
-        if target:
-            return _item_base('folder', text(button.get('title') or button.get('text')),
-                              best_thumb(button.get('thumbnail', {}).get('thumbnails')), target)
-    return None
+        return parse_playlist_video(node['playlistVideoRenderer'])
+    button = node.get('gridButtonRenderer') or node.get('tileButtonRenderer')
+    return parse_button(button) if button else None
 
 
 # ------------------------------------------------------------------- shelves
