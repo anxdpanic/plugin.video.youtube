@@ -129,134 +129,171 @@ def _resolve_kind(kind, target):
     return kind
 
 
-def parse_tile(tile):
-    content_type = tile.get('contentType', '')
-    header = tile.get('header', {}).get('tileHeaderRenderer', {})
-    meta = tile.get('metadata', {}).get('tileMetadataRenderer', {})
-    target = endpoint_target(tile.get('onSelectCommand'))
-    title = text(meta.get('title'))
-    thumb = best_thumb(header.get('thumbnail', {}).get('thumbnails'))
-    kind = {
-        'TILE_CONTENT_TYPE_VIDEO': 'video',
-        'TILE_CONTENT_TYPE_CHANNEL': 'channel',
-        'TILE_CONTENT_TYPE_PLAYLIST': 'playlist',
-    }.get(content_type)
-    kind = _resolve_kind(kind, target)
-    item = _item_base(kind, title, thumb, target)
-    item['id'] = tile.get('contentId') or (target or {}).get('video_id') or (target or {}).get('browse_id')
-    item['short'] = tile.get('tvhtml5ShelfRendererType') == TILE_SHORTS or bool(target and target.get('short'))
+TILE_KINDS = {
+    'TILE_CONTENT_TYPE_VIDEO': 'video',
+    'TILE_CONTENT_TYPE_CHANNEL': 'channel',
+    'TILE_CONTENT_TYPE_PLAYLIST': 'playlist',
+}
 
-    for overlay in header.get('thumbnailOverlays', []):
+
+def _apply_time_status(item, status):
+    """A tile's corner label: LIVE, SHORTS, Upcoming, or a duration."""
+    label = text(status.get('text'))
+    style = status.get('style')
+    if style == 'LIVE' or label.upper() == 'LIVE':
+        item['live'] = True
+    elif style == 'SHORTS':
+        item['short'] = True
+    elif style == 'UPCOMING':
+        item['upcoming'] = label  # "Upcoming" / "Premiere", already in the UI language
+    elif item['kind'] == 'video':
+        item['duration'] = parse_duration(label)
+
+
+def _apply_tile_overlays(item, overlays):
+    for overlay in overlays:
         if 'tileMetadataRenderer' in overlay:
             # Shortcut tiles (Library's History, Watch later...; Movies' Explore) print their name on the image.
             item['title'] = item['title'] or text(overlay['tileMetadataRenderer'].get('title'))
         elif 'thumbnailOverlayResumePlaybackRenderer' in overlay:
             item['watched_pct'] = overlay['thumbnailOverlayResumePlaybackRenderer'].get('percentDurationWatched', 0)
         elif 'thumbnailOverlayTimeStatusRenderer' in overlay:
-            status = overlay['thumbnailOverlayTimeStatusRenderer']
-            label = text(status.get('text'))
-            if status.get('style') == 'LIVE' or label.upper() == 'LIVE':
-                item['live'] = True
-            elif status.get('style') == 'SHORTS':
-                item['short'] = True
-            elif status.get('style') == 'UPCOMING':
-                item['upcoming'] = label  # "Upcoming" / "Premiere", already in the UI language
-            elif kind == 'video':
-                item['duration'] = parse_duration(label)
+            _apply_time_status(item, overlay['thumbnailOverlayTimeStatusRenderer'])
 
-    lines = []
-    for line in meta.get('lines', []):
-        parts = []
-        for line_item in line.get('lineRenderer', {}).get('items', []):
-            renderer = line_item.get('lineItemRenderer', {})
-            value = text(renderer.get('text'))
-            if renderer.get('badge'):
-                badge = text(renderer['badge'].get('metadataBadgeRenderer', {}).get('label'))
-                if badge:
-                    item['badges'].append(badge)
-            if not value or value.strip() == '•':
-                continue
-            parts.append(value)
-            runs = (renderer.get('text') or {}).get('runs') or []
-            for run in runs:
-                nav = endpoint_target(run.get('navigationEndpoint'))
-                if nav and nav['type'] == 'browse' and (nav['browse_id'] or '').startswith('UC'):
-                    item['channel'] = run.get('text', '')
-                    item['channel_id'] = nav['browse_id']
-        if parts:
-            lines.append(parts)
+
+def _channel_run(runs, endpoint_key):
+    """(channel name, channel id) from the last text run that links to a channel, else None."""
+    found = None
+    for run in runs:
+        nav = endpoint_target(run.get(endpoint_key))
+        if nav and nav['type'] == 'browse' and (nav['browse_id'] or '').startswith('UC'):
+            found = run.get('text', ''), nav['browse_id']
+    return found
+
+
+def _tile_line(item, line):
+    """One metadata line's texts; also picks up its badges and channel link."""
+    parts = []
+    for line_item in line.get('lineRenderer', {}).get('items', []):
+        renderer = line_item.get('lineItemRenderer', {})
+        badge = text(renderer.get('badge', {}).get('metadataBadgeRenderer', {}).get('label'))
+        if badge:
+            item['badges'].append(badge)
+        value = text(renderer.get('text'))
+        if not value or value.strip() == '•':
+            continue
+        parts.append(value)
+        channel = _channel_run((renderer.get('text') or {}).get('runs') or [], 'navigationEndpoint')
+        if channel:
+            item['channel'], item['channel_id'] = channel
+    return parts
+
+
+def _long_press_line(tile):
+    """Carousel tiles (TILE_STYLE_YTLR_CAROUSEL) carry no metadata block; the long-press menu has it."""
+    menu = (tile.get('onLongPressCommand') or {}).get('showMenuCommand', {})
+    subtitle = text(menu.get('subtitle'))
+    line = [part.strip() for part in subtitle.split('•') if part.strip()][:1] or [subtitle]
+    return text(menu.get('title')), line if subtitle else None
+
+
+def parse_tile(tile):
+    header = tile.get('header', {}).get('tileHeaderRenderer', {})
+    meta = tile.get('metadata', {}).get('tileMetadataRenderer', {})
+    target = endpoint_target(tile.get('onSelectCommand'))
+    kind = _resolve_kind(TILE_KINDS.get(tile.get('contentType', '')), target)
+    item = _item_base(kind, text(meta.get('title')), best_thumb(header.get('thumbnail', {}).get('thumbnails')), target)
+    item['id'] = tile.get('contentId') or (target or {}).get('video_id') or (target or {}).get('browse_id')
+    item['short'] = tile.get('tvhtml5ShelfRendererType') == TILE_SHORTS or bool(target and target.get('short'))
+    _apply_tile_overlays(item, header.get('thumbnailOverlays', []))
+    lines = [parts for parts in (_tile_line(item, line) for line in meta.get('lines', [])) if parts]
     if not lines or not item['title']:
-        # Carousel tiles (TILE_STYLE_YTLR_CAROUSEL) carry no metadata block; the long-press menu has it.
-        menu = (tile.get('onLongPressCommand') or {}).get('showMenuCommand', {})
-        item['title'] = item['title'] or text(menu.get('title'))
-        subtitle = text(menu.get('subtitle'))
-        if subtitle and not lines:
-            lines.append([part.strip() for part in subtitle.split('•') if part.strip()][:1] or [subtitle])
+        title, line = _long_press_line(tile)
+        item['title'] = item['title'] or title
+        if line and not lines:
+            lines.append(line)
     _apply_lines(item, lines)
     return item
+
+
+LOCKUP_KINDS = {
+    'LOCKUP_CONTENT_TYPE_VIDEO': 'video',
+    'LOCKUP_CONTENT_TYPE_SHORT': 'video',
+    'LOCKUP_CONTENT_TYPE_CHANNEL': 'channel',
+    'LOCKUP_CONTENT_TYPE_PLAYLIST': 'playlist',
+    'LOCKUP_CONTENT_TYPE_PODCAST': 'playlist',
+    'LOCKUP_CONTENT_TYPE_ALBUM': 'playlist',
+}
+
+
+def _lockup_thumbnail_vm(image):
+    """The thumbnailViewModel of a video, or of a playlist's front image."""
+    return image.get('thumbnailViewModel') or image.get('collectionThumbnailViewModel', {}).get(
+        'primaryThumbnail', {}).get('thumbnailViewModel') or {}
+
+
+def _lockup_thumb(image, thumb_vm):
+    thumb = best_thumb(thumb_vm.get('image', {}).get('sources'))
+    if not thumb and 'decoratedAvatarViewModel' in image:
+        avatar = image['decoratedAvatarViewModel'].get('avatar', {}).get('avatarViewModel', {})
+        thumb = best_thumb(avatar.get('image', {}).get('sources'))
+    return thumb
+
+
+def _overlay_badges(overlay):
+    return overlay.get('thumbnailBottomOverlayViewModel', {}).get('badges', []) + \
+        overlay.get('thumbnailOverlayBadgeViewModel', {}).get('thumbnailBadges', [])
+
+
+def _apply_lockup_badge(item, badge):
+    label = badge.get('text', '')
+    if 'LIVE' in badge.get('badgeStyle', '') or label.upper() == 'LIVE':
+        item['live'] = True
+    elif parse_duration(label):
+        item['duration'] = parse_duration(label)
+    elif label and item['kind'] == 'playlist':
+        item['badges'].append(label)
+    elif label and item['kind'] == 'video' and not item['short']:
+        item['upcoming'] = label  # "Upcoming" / "Premiere", already in the UI language
+
+
+def _apply_lockup_overlays(item, overlays):
+    for overlay in overlays:
+        for badge_vm in _overlay_badges(overlay):
+            _apply_lockup_badge(item, badge_vm.get('thumbnailBadgeViewModel', {}))
+        progress = overlay.get('thumbnailBottomOverlayViewModel', {}).get('progressBar', {}) \
+            .get('thumbnailOverlayProgressBarViewModel', {})
+        if progress.get('startPercent') is not None:
+            item['watched_pct'] = progress['startPercent']
+
+
+def _lockup_row(item, row):
+    """One metadata row's texts; also picks up its channel link."""
+    parts = []
+    for part in row.get('metadataParts', []):
+        value = text(part.get('text'))
+        if not value:
+            continue
+        parts.append(value)
+        channel = _channel_run(part.get('text', {}).get('commandRuns') or [], 'onTap')
+        if channel:
+            item['channel'], item['channel_id'] = value, channel[1]
+    return parts
 
 
 def parse_lockup(lockup):
     content_type = lockup.get('contentType', '')
     target = endpoint_target(lockup.get('rendererContext', {}).get('commandContext', {}).get('onTap'))
     meta = lockup.get('metadata', {}).get('lockupMetadataViewModel', {})
-    title = text(meta.get('title'))
     image = lockup.get('contentImage', {})
-    thumb_vm = image.get('thumbnailViewModel') or image.get('collectionThumbnailViewModel', {}).get(
-        'primaryThumbnail', {}).get('thumbnailViewModel') or {}
-    thumb = best_thumb(thumb_vm.get('image', {}).get('sources'))
-    if not thumb and 'decoratedAvatarViewModel' in image:
-        avatar = image['decoratedAvatarViewModel'].get('avatar', {}).get('avatarViewModel', {})
-        thumb = best_thumb(avatar.get('image', {}).get('sources'))
-    kind = {
-        'LOCKUP_CONTENT_TYPE_VIDEO': 'video',
-        'LOCKUP_CONTENT_TYPE_SHORT': 'video',
-        'LOCKUP_CONTENT_TYPE_CHANNEL': 'channel',
-        'LOCKUP_CONTENT_TYPE_PLAYLIST': 'playlist',
-        'LOCKUP_CONTENT_TYPE_PODCAST': 'playlist',
-        'LOCKUP_CONTENT_TYPE_ALBUM': 'playlist',
-    }.get(content_type)
-    kind = _resolve_kind(kind, target)
-    item = _item_base(kind, title, thumb, target)
+    thumb_vm = _lockup_thumbnail_vm(image)
+    kind = _resolve_kind(LOCKUP_KINDS.get(content_type), target)
+    item = _item_base(kind, text(meta.get('title')), _lockup_thumb(image, thumb_vm), target)
     item['id'] = lockup.get('contentId')
     item['short'] = content_type == 'LOCKUP_CONTENT_TYPE_SHORT' or bool(target and target.get('short'))
-
-    for overlay in thumb_vm.get('overlays', []):
-        for badge_vm in overlay.get('thumbnailBottomOverlayViewModel', {}).get('badges', []) + \
-                overlay.get('thumbnailOverlayBadgeViewModel', {}).get('thumbnailBadges', []):
-            badge = badge_vm.get('thumbnailBadgeViewModel', {})
-            label = badge.get('text', '')
-            style = badge.get('badgeStyle', '')
-            if 'LIVE' in style or label.upper() == 'LIVE':
-                item['live'] = True
-            elif parse_duration(label):
-                item['duration'] = parse_duration(label)
-            elif label and kind == 'playlist':
-                item['badges'].append(label)
-            elif label and kind == 'video' and not item['short']:
-                item['upcoming'] = label  # "Upcoming" / "Premiere", already in the UI language
-        progress = overlay.get('thumbnailBottomOverlayViewModel', {}).get('progressBar', {}) \
-            .get('thumbnailOverlayProgressBarViewModel', {})
-        if progress.get('startPercent') is not None:
-            item['watched_pct'] = progress['startPercent']
-
-    lines = []
+    _apply_lockup_overlays(item, thumb_vm.get('overlays', []))
     rows = meta.get('metadata', {}).get('contentMetadataViewModel', {}).get('metadataRows', [])
-    for row in rows:
-        parts = []
-        for part in row.get('metadataParts', []):
-            value = text(part.get('text'))
-            if value:
-                parts.append(value)
-                cmd = part.get('text', {}).get('commandRuns') or []
-                for run in cmd:
-                    nav = endpoint_target(run.get('onTap'))
-                    if nav and nav['type'] == 'browse' and (nav['browse_id'] or '').startswith('UC'):
-                        item['channel_id'] = nav['browse_id']
-                        item['channel'] = value
-        if parts:
-            lines.append(parts)
-    _apply_lines(item, lines)
+    _apply_lines(item, [parts for parts in (_lockup_row(item, row) for row in rows) if parts])
     return item
 
 
