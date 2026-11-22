@@ -321,9 +321,15 @@ class Plugin(pages.Pages):
                 self._add_menu_entry(entry)
         li = xbmcgui.ListItem(kodi.string(30167) or 'TV interface', offscreen=True)
         li.setArt({'icon': kodi.icon_path('icon.png'), 'thumb': kodi.icon_path('icon.png')})
-        # Opens a window rather than listing anything, so not a folder (see Accounts below).
+        # Opens a window rather than listing anything, so not a folder (see _add_accounts_entry).
         self._add(url_for('tv'), li, self._browsed_from_outside())
-        account_id, account = auth.active_account()
+        if kodi.setting_bool('show_accounts'):
+            self._add_accounts_entry()
+        xbmcplugin.setContent(self.handle, 'files')
+        self._end()
+
+    def _add_accounts_entry(self):
+        _, account = auth.active_account()
         li = xbmcgui.ListItem(kodi.string(30108), offscreen=True)
         li.setLabel2(account.get('name') or '' if account else kodi.string(30123))
         li.getVideoInfoTag().setPlot(kodi.formatted(30112, 'Signed in as %s', account.get('name') or '') if account
@@ -331,8 +337,6 @@ class Plugin(pages.Pages):
         li.setArt({'icon': 'DefaultUser.png', 'thumb': 'DefaultUser.png'})
         # Only opens a dialog: as a folder its failed listing made Kodi leave the add-on (and re-run it on Back).
         self._add(url_for('accounts'), li, self._browsed_from_outside())
-        xbmcplugin.setContent(self.handle, 'files')
-        self._end()
 
     @staticmethod
     def _browsed_from_outside():

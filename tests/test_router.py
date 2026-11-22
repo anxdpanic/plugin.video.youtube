@@ -282,6 +282,15 @@ def test_window_entries_are_folders_for_shortcut_pickers(monkeypatch):
     assert folders[router.url_for('accounts')] is True
 
 
+def test_accounts_entry_can_be_hidden(monkeypatch):
+    xbmcaddon.SETTINGS['show_accounts'] = False
+    monkeypatch.setattr(router.Plugin, 'guide', lambda self: guide_entries())
+    run('').dispatch()
+    urls = [url for url, _, _ in xbmcplugin.ITEMS]
+    assert router.url_for('accounts') not in urls
+    assert router.url_for('tv') in urls
+
+
 def test_tv_interface_ends_the_listing_before_opening_the_window(monkeypatch):
     from resources.lib.leanback import tv
 

@@ -491,3 +491,7 @@ msgstr ""
 msgctxt "#30176"
 msgid "Search again for \"%s\""
 msgstr ""
+
+msgctxt "#30177"
+msgid "Show Accounts in the main menu"
+msgstr ""

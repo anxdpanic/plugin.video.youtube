@@ -69,6 +69,11 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="show_accounts" type="boolean" label="30177">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="sort_subscriptions" type="boolean" label="30015">
                     <level>0</level>
                     <default>false</default>
