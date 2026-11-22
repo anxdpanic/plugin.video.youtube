@@ -322,7 +322,7 @@ class Plugin(pages.Pages):
         li = xbmcgui.ListItem(kodi.string(30167) or 'TV interface', offscreen=True)
         li.setArt({'icon': kodi.icon_path('icon.png'), 'thumb': kodi.icon_path('icon.png')})
         # Opens a window rather than listing anything, so not a folder (see Accounts below).
-        self._add(url_for('tv'), li, False)
+        self._add(url_for('tv'), li, self._browsed_from_outside())
         account_id, account = auth.active_account()
         li = xbmcgui.ListItem(kodi.string(30108), offscreen=True)
         li.setLabel2(account.get('name') or '' if account else kodi.string(30123))
@@ -330,9 +330,16 @@ class Plugin(pages.Pages):
                                      else kodi.string(30123))
         li.setArt({'icon': 'DefaultUser.png', 'thumb': 'DefaultUser.png'})
         # Only opens a dialog: as a folder its failed listing made Kodi leave the add-on (and re-run it on Back).
-        self._add(url_for('accounts'), li, False)
+        self._add(url_for('accounts'), li, self._browsed_from_outside())
         xbmcplugin.setContent(self.handle, 'files')
         self._end()
+
+    @staticmethod
+    def _browsed_from_outside():
+        """True when the menu is read from outside a media window, e.g. by a skin's shortcut picker or a
+        home widget. Those only offer folders, so the window-opening entries are listed as folders there;
+        opened from a shortcut (ActivateWindow(...,return)) their failed listing just goes back."""
+        return not xbmc.getCondVisibility('Window.IsMedia')
 
     def _add_menu_entry(self, entry):
         target = entry['target']
@@ -958,6 +965,7 @@ class Plugin(pages.Pages):
     def tv_interface(self):
         from .tv import open_window
 
+        self._end(False)  # opened as a folder (a home menu shortcut): don't keep Kodi waiting for a listing
         open_window()
 
     # ================================================================ menu customisation

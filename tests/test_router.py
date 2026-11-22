@@ -269,6 +269,27 @@ def test_shorts_menu_entry_runs_as_a_script(monkeypatch):
     assert folders[router.url_for('shorts', params='CA8=')] is False
     assert folders[router.url_for('accounts')] is False  # only opens a dialog
     assert folders[router.url_for('browse', id='FEtopics', title='Home')] is True
+    assert folders[router.url_for('tv')] is False
+
+
+def test_window_entries_are_folders_for_shortcut_pickers(monkeypatch):
+    """Skin shortcut pickers (read from the home screen) only offer an add-on's folders."""
+    monkeypatch.setitem(xbmc.CONDITIONS, 'Window.IsMedia', False)
+    monkeypatch.setattr(router.Plugin, 'guide', lambda self: guide_entries())
+    run('').dispatch()
+    folders = {url: folder for url, _, folder in xbmcplugin.ITEMS}
+    assert folders[router.url_for('tv')] is True
+    assert folders[router.url_for('accounts')] is True
+
+
+def test_tv_interface_ends_the_listing_before_opening_the_window(monkeypatch):
+    from resources.lib.leanback import tv
+
+    order = []
+    monkeypatch.setattr(xbmcplugin, 'endOfDirectory', lambda handle, succeeded=True, **kw: order.append(succeeded))
+    monkeypatch.setattr(tv, 'open_window', lambda: order.append('window'))
+    run('tv').dispatch()
+    assert order == [False, 'window']
 
 
 def test_empty_page_shows_youtubes_own_message(monkeypatch):

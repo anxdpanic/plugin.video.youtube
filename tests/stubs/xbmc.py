@@ -19,6 +19,13 @@ def executebuiltin(command, wait=False):
     BUILTINS.append(command)
 
 
+CONDITIONS = {'Window.IsMedia': True}  # browsed in the Videos window unless a test says otherwise
+
+
+def getCondVisibility(condition):  # noqa: N802
+    return CONDITIONS.get(condition, False)
+
+
 # Kodi's own strings, worded as Kodi 21 ships them.
 LOCALIZED = {12021: 'Play from beginning', 12022: 'Resume from {0:s}'}
 
