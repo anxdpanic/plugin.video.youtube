@@ -1604,3 +1604,11 @@ msgstr ""
 msgctxt "#30824"
 msgid "Filter by channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel'"
 msgstr ""
+
+msgctxt "#30825"
+msgid "Translate subtitles locally"
+msgstr ""
+
+msgctxt "#30826"
+msgid "YouTube may refuse auto-translated subtitles. Download the original subtitles and translate them with Google Translate instead? Only the subtitle text is sent. (Default: No)"
+msgstr ""

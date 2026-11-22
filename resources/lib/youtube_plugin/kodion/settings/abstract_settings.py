@@ -184,6 +184,12 @@ class AbstractSettings(object):
     def set_subtitle_download(self, value):
         return self.set_bool(SETTINGS.SUBTITLE_DOWNLOAD, value)
 
+    def subtitle_translate_locally(self):
+        return self.get_bool(SETTINGS.SUBTITLE_TRANSLATE_LOCALLY, False)
+
+    def set_subtitle_translate_locally(self, value):
+        return self.set_bool(SETTINGS.SUBTITLE_TRANSLATE_LOCALLY, value)
+
     _THUMB_SIZES = {
         3: {  # default (4:3)
             'size': 120 * 90,

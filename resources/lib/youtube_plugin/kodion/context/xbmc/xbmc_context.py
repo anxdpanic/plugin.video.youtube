@@ -340,6 +340,8 @@ class XbmcContext(AbstractContext):
         'subscribed_channels': 30504,
         'subtitles.download': 30705,
         'subtitles.download.pre': 30706,
+        'subtitles.translate_locally': 30825,
+        'subtitles.translate_locally.pre': 30826,
         'subtitles.all': 30774,
         'subtitles.language': 21448,
         'subtitles.no_asr': 30602,

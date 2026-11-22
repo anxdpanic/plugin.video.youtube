@@ -26,6 +26,7 @@ AUDIO_ONLY = 'kodion.audio_only'  # (bool)
 
 SUBTITLE_SELECTION = 'kodion.subtitle.languages.num'  # (int)
 SUBTITLE_DOWNLOAD = 'kodion.subtitle.download'  # (bool)
+SUBTITLE_TRANSLATE_LOCALLY = 'kodion.subtitle.translate_locally'  # (bool)
 
 ITEMS_PER_PAGE = 'kodion.content.max_per_page'  # (int)
 HIDE_VIDEOS = 'youtube.view.hide_videos'  # (list[str])

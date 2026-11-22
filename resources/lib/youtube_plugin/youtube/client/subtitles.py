@@ -8,7 +8,13 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+import json
 import os
+
+try:
+    from urllib.request import Request, urlopen
+except ImportError:
+    from urllib2 import Request, urlopen
 
 from .request_client import YouTubeRequestClient
 from ...kodion import logging
@@ -95,6 +101,8 @@ class Subtitles(YouTubeRequestClient):
         self.translation_langs = None
 
         self.pre_download = settings.subtitle_download()
+        self.translate_locally = (self.pre_download
+                                  and settings.subtitle_translate_locally())
         self.sub_selection = settings.get_subtitle_selection()
         stream_features = settings.stream_features()
         if use_mpd is None:
@@ -224,6 +232,224 @@ class Subtitles(YouTubeRequestClient):
                         self.defaults['base'] = track
                         self.defaults['base_lang'] = base_lang
                         break
+
+    _MT_URL = 'https://translate.googleapis.com/translate_a/single'
+    _MT_BATCH_CHARS = 4000
+
+    def _get_local_translation(self, track, base_lang, tlang):
+        if not self.BASE_PATH or not base_lang or not tlang:
+            return None
+        file_path = os.path.join(self.BASE_PATH, '.'.join((
+            self.video_id,
+            '-'.join(('mt', base_lang, tlang)),
+            'vtt',
+        )))
+        if xbmcvfs.exists(file_path):
+            try:
+                with xbmcvfs.File(file_path) as sub_file:
+                    if sub_file.read().startswith('WEBVTT'):
+                        return file_path
+            except (IOError, OSError):
+                pass
+
+        source = track
+        for caption_track in self.caption_tracks:
+            if (caption_track.get('languageCode') == base_lang
+                    and caption_track.get('kind') != 'asr'
+                    and caption_track.get('baseUrl')):
+                source = caption_track
+                break
+        is_asr = source.get('kind') == 'asr'
+
+        url = self._set_query_param(
+            self._normalize_url(source.get('baseUrl')),
+            ('fmt', 'json3'),
+            ('tlang', None),
+            ('xosf', None),
+        )
+        if not url:
+            return None
+        response = self.request(
+            url,
+            headers=self.headers,
+            error_title='Local translation: source subtitle download failed',
+        )
+        if response is None:
+            return None
+        with response:
+            try:
+                events = (response.json() or {}).get('events') or []
+            except ValueError:
+                events = []
+        cues = self._json3_cues(events, is_asr)
+        if not cues:
+            self.log.warning('Local translation: no cues in source subtitle')
+            return None
+
+        texts = self._mt_translate([cue[2] for cue in cues],
+                                   base_lang,
+                                   tlang)
+        if not texts:
+            return None
+
+        output = ['WEBVTT', '']
+        for (start, end, _), text in zip(cues, texts):
+            output.append('{0} --> {1}'.format(self._vtt_time(start),
+                                               self._vtt_time(end)))
+            output.append(text)
+            output.append('')
+        try:
+            with xbmcvfs.File(file_path, 'w') as sub_file:
+                success = sub_file.write(bytearray('\n'.join(output),
+                                                   encoding='utf8'))
+        except (IOError, OSError):
+            self.log.exception('Local translation: write failed')
+            return None
+        if not success:
+            return None
+        self.log.info(('Local translation created',
+                       'Source: {lang!r} ({kind}), cues: {num}',
+                       'File: {file}'),
+                      lang=base_lang,
+                      kind='asr' if is_asr else 'manual',
+                      num=len(cues),
+                      file=file_path)
+        return file_path
+
+    @staticmethod
+    def _vtt_time(ms):
+        ms = max(0, int(ms))
+        return '{0:02d}:{1:02d}:{2:02d}.{3:03d}'.format(
+            ms // 3600000, (ms // 60000) % 60, (ms // 1000) % 60, ms % 1000
+        )
+
+    @staticmethod
+    def _json3_cues(events, is_asr):
+        raw = []
+        for event in events:
+            segs = event.get('segs')
+            if not segs or event.get('aAppend'):
+                continue
+            text = ''.join(seg.get('utf8', '') for seg in segs)
+            text = ' '.join(text.split())
+            if not text:
+                continue
+            start = int(event.get('tStartMs', 0))
+            end = start + int(event.get('dDurationMs', 0))
+            raw.append([start, end, text])
+        raw.sort(key=lambda cue: cue[0])
+        if not is_asr:
+            return raw
+
+        # Auto-generated lines roll and overlap: end each line when the next
+        # one starts, then join lines into sentence-like cues for translation
+        for idx in range(len(raw) - 1):
+            next_start = raw[idx + 1][0]
+            if raw[idx][1] > next_start > raw[idx][0]:
+                raw[idx][1] = next_start
+        merged = []
+        current = None
+        for start, end, text in raw:
+            if current is None:
+                current = [start, end, text]
+                continue
+            ends_sentence = current[2].rstrip('"\')]').endswith(
+                ('.', '!', '?', '\u2026')
+            )
+            if (ends_sentence
+                    or len(current[2]) + len(text) > 90
+                    or end - current[0] > 7000
+                    or start - current[1] > 1500):
+                merged.append(current)
+                current = [start, end, text]
+            else:
+                current[1] = end
+                current[2] = ' '.join((current[2], text))
+        if current:
+            merged.append(current)
+        return merged
+
+    # YouTube and Google Translate use different codes for some languages
+    _MT_LANG_MAP = {
+        'iw': 'he',
+        'jw': 'jv',
+        'fil': 'tl',
+        'zh-Hans': 'zh-CN',
+        'zh-Hant': 'zh-TW',
+        'zh-HK': 'zh-TW',
+    }
+
+    @classmethod
+    def _mt_lang(cls, lang, source=False):
+        if not lang:
+            return 'auto'
+        if lang in cls._MT_LANG_MAP:
+            return cls._MT_LANG_MAP[lang]
+        base_lang = lang.partition('-')[0]
+        if source or base_lang not in ('pt', 'zh'):
+            return cls._MT_LANG_MAP.get(base_lang, base_lang)
+        return lang
+
+    def _mt_request(self, text, source_lang, target_lang):
+        # Plain urllib on purpose: Google answers requests made through the
+        # addon requests session with HTTP 429, while plain requests succeed
+        url = '?'.join((self._MT_URL, urlencode({
+            'client': 'gtx',
+            'sl': self._mt_lang(source_lang, source=True),
+            'tl': self._mt_lang(target_lang),
+            'dt': 't',
+        })))
+        request = Request(
+            url,
+            data=urlencode({'q': text}).encode('utf-8'),
+            headers={'User-Agent': ('Mozilla/5.0 (X11; Linux aarch64) '
+                                    'AppleWebKit/537.36 (KHTML, like Gecko) '
+                                    'Chrome/131.0.0.0 Safari/537.36')},
+        )
+        try:
+            response = urlopen(request, timeout=15)
+            data = json.loads(response.read().decode('utf-8'))
+        except Exception as exc:
+            self.log.warning('Local translation: request failed: %r', exc)
+            return None
+        try:
+            return ''.join(part[0] for part in data[0] if part and part[0])
+        except (IndexError, TypeError):
+            return None
+
+    def _mt_translate(self, texts, source_lang, target_lang):
+        batches = []
+        batch = []
+        size = 0
+        for text in texts:
+            if batch and size + len(text) + 1 > self._MT_BATCH_CHARS:
+                batches.append(batch)
+                batch = []
+                size = 0
+            batch.append(text)
+            size += len(text) + 1
+        if batch:
+            batches.append(batch)
+
+        result = []
+        for batch in batches:
+            translated = self._mt_request('\n'.join(batch),
+                                          source_lang,
+                                          target_lang)
+            if not translated:
+                # Network error or blocked: give up, do not hammer the service
+                return None
+            lines = translated.split('\n')
+            if len(lines) == len(batch):
+                result.extend(line.strip() for line in lines)
+                continue
+            self.log.debug('Local translation: line mismatch, per cue')
+            for text in batch:
+                single = self._mt_request(text, source_lang, target_lang)
+                if not single:
+                    return None
+                result.append(single.strip())
+        return result
 
     def get_lang_details(self):
         return {
@@ -426,6 +652,15 @@ class Subtitles(YouTubeRequestClient):
         if lang and lang != base_lang:
             tlang = lang
             lang = '-'.join((base_lang, tlang))
+            # YouTube may refuse requests for auto-translated subtitles
+            # (HTTP 429, see #1250). If enabled, download the source track and
+            # translate it with Google Translate instead.
+            if self.translate_locally:
+                local_path = self._get_local_translation(track,
+                                                         base_lang,
+                                                         tlang)
+                if local_path:
+                    return local_path, self.FORMATS['vtt']
         elif kind == 'asr':
             lang = '-'.join((base_lang, kind))
             sub_format = self.FORMATS['_fallback']
@@ -481,6 +716,11 @@ class Subtitles(YouTubeRequestClient):
         with response:
             response_text = response.text
             if not response_text:
+                return None, None
+            # Do not save an HTML error page (e.g. HTTP 429) as subtitles
+            if response_text.lstrip()[:1] == '<' and sub_format != 'ttml':
+                self.log.warning('Subtitle response is not a subtitle file'
+                                 ' for: %r', lang)
                 return None, None
 
         output = bytearray(self._unescape(response_text),

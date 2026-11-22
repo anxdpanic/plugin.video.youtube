@@ -108,6 +108,17 @@ def _config_actions(context, action, *_args):
             if result > -1:
                 settings.set_subtitle_download(result == 1)
 
+        # Local translation needs downloaded subtitle files
+        if not settings.subtitle_download():
+            settings.set_subtitle_translate_locally(False)
+        else:
+            result = ui.on_yes_no_input(
+                localize('subtitles.translate_locally'),
+                localize('subtitles.translate_locally.pre')
+            )
+            if result > -1:
+                settings.set_subtitle_translate_locally(result == 1)
+
     elif action == 'listen_ip':
         addresses = get_listen_addresses()
         selected_address = ui.on_select(localize('select.listen.ip'), addresses)

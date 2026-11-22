@@ -231,6 +231,11 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="kodion.subtitle.translate_locally" type="boolean" help="">
+                    <level>4</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
             </group>
             <group id="list_views">
                 <setting id="kodion.content.max_per_page" type="integer" label="30022" help="">
