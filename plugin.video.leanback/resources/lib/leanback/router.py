@@ -24,6 +24,8 @@ ERRORS = {  # string id -> English fallback (Kodi only loads new strings after a
     30136: "YouTube couldn't open this page",
     30137: "YouTube isn't responding, try again later",
     30138: "Can't reach YouTube, check the network connection",
+    30183: "YouTube wants to confirm you're not a bot. This mostly happens on a VPN; "
+           "try playing with Kodi left out of the VPN",
 }
 
 
@@ -128,6 +130,10 @@ def _player_error_message(exc):
     # An upcoming stream's reason already says it all ("This live event will begin in 61 minutes.").
     if exc.status is not None:
         return error_message(exc)
+    if getattr(exc, 'bot_check', False):
+        # YouTube's own wording ("Sign in to confirm...") reads as if signing in to Leanback would
+        # help, but it judges the connection: see InnerTube.player.
+        return kodi.string(30183) or ERRORS[30183]
     if str(exc) in ('', 'unplayable'):
         return kodi.string(30120)
     return str(exc)

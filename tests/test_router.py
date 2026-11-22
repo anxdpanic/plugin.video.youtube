@@ -450,3 +450,14 @@ def test_sign_in_adds_the_account_once_approved(monkeypatch):
 def test_sign_in_stops_when_the_code_expires(monkeypatch):
     assert sign_in(monkeypatch, [], expires_in=0) == []
     assert xbmcgui.NOTIFICATIONS
+
+
+def test_bot_check_gets_its_own_message():
+    from resources.lib.leanback.innertube import InnerTubeError
+    message = router._player_error_message(InnerTubeError("Sign in to confirm you're not a bot", bot_check=True))
+    assert message == 'str30183'  # the stub's stand-in for the string that names the VPN
+
+
+def test_other_playability_reasons_are_shown_as_given():
+    from resources.lib.leanback.innertube import InnerTubeError
+    assert router._player_error_message(InnerTubeError('Video unavailable')) == 'Video unavailable'

@@ -515,3 +515,7 @@ msgstr ""
 msgctxt "#30182"
 msgid "As sent by YouTube"
 msgstr ""
+
+msgctxt "#30183"
+msgid "YouTube wants to confirm you're not a bot. This mostly happens on a VPN; try playing with Kodi left out of the VPN"
+msgstr ""
