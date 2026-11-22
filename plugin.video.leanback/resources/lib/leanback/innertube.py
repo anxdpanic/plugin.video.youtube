@@ -75,6 +75,41 @@ class InnerTubeError(Exception):
         self.blocked = blocked
 
 
+def _client_headers(client):
+    headers = {
+        'Content-Type': 'application/json',
+        'User-Agent': client['ua'],
+        'Origin': 'https://www.youtube.com',
+        'X-YouTube-Client-Name': str(client['id']),
+        'X-YouTube-Client-Version': client['context']['clientVersion'],
+    }
+    if client.get('referer'):
+        headers['Referer'] = client['referer']
+    return headers
+
+
+def _access_token():
+    """The signed-in account's token, or None when signed out or the sign-in lapsed."""
+    try:
+        return auth.access_token()
+    except auth.AuthError:
+        return None
+
+
+def _payload(body, context_client):
+    payload = dict(body)
+    payload['context'] = {'client': context_client, 'user': {'lockedSafetyMode': False},
+                          'request': {'useSsl': True}}
+    return json.dumps(payload).encode('utf-8')
+
+
+def _api_error(exc):
+    """An InnerTubeError carrying YouTube's own message for a failed request."""
+    if exc.blocked:
+        return InnerTubeError('YouTube is holding requests back', exc.status, blocked=True)
+    return InnerTubeError(exc.json().get('error', {}).get('message') or str(exc), exc.status)
+
+
 class InnerTube:
     def __init__(self, priority=http.FOREGROUND):
         """priority: http.BACKGROUND for work nobody is waiting on (banners, history), which the request
@@ -101,58 +136,48 @@ class InnerTube:
         return auth.active_account()[0] is not None
 
     def _post(self, endpoint, body, client, use_auth=True, visitor=True, retry=True, api=API):
+        headers = _client_headers(client)
         context_client = dict(client['context'], hl=self.hl, gl=self.gl, userAgent=client['ua'])
-        headers = {
-            'Content-Type': 'application/json',
-            'User-Agent': client['ua'],
-            'Origin': 'https://www.youtube.com',
-            'X-YouTube-Client-Name': str(client['id']),
-            'X-YouTube-Client-Version': client['context']['clientVersion'],
-        }
-        if client.get('referer'):
-            headers['Referer'] = client['referer']
         if visitor:
-            visitor_data = self.visitor_data()
-            if visitor_data:
-                context_client['visitorData'] = visitor_data
-                headers['X-Goog-Visitor-Id'] = visitor_data
-        token = None
-        if use_auth:
-            try:
-                token = auth.access_token()
-            except auth.AuthError:
-                token = None
-            if token:
-                headers['Authorization'] = 'Bearer ' + token
-        payload = dict(body)
-        payload['context'] = {'client': context_client, 'user': {'lockedSafetyMode': False},
-                              'request': {'useSsl': True}}
-        url = api + endpoint + '?prettyPrint=false'
+            self._add_visitor(headers, context_client)
+        token = _access_token() if use_auth else None
+        if token:
+            headers['Authorization'] = 'Bearer ' + token
         kodi.log('POST %s (%s%s)' % (endpoint, client['key'], ', auth' if token else ''))
         try:
-            return http.request_json(url, data=json.dumps(payload).encode('utf-8'), headers=headers,
-                                     priority=self.priority)
+            return http.request_json(api + endpoint + '?prettyPrint=false', data=_payload(body, context_client),
+                                     headers=headers, priority=self.priority)
         except http.HTTPError as exc:
-            if exc.blocked:
-                # Google's automated-queries page: the broker already waited out a hold and tried again.
-                raise InnerTubeError('YouTube is holding requests back', exc.status, blocked=True) from exc
-            if exc.status == 401 and token and retry:
-                auth.access_token(force_refresh=True)
-                return self._post(endpoint, body, client, use_auth, visitor, retry=False, api=api)
-            if exc.status in RETRY_STATUSES and retry:
-                # Google turns some requests away briefly (403/429, the odd 5xx or dropped connection);
-                # the same request usually succeeds a moment later. A 403 can also mean the visitor
-                # id went stale, so fetch a fresh one first.
-                kodi.log('HTTP %s on %s, retrying once' % (exc.status, endpoint))
-                time.sleep(RETRY_DELAY)
-                if exc.status == 403 and visitor:
-                    try:
-                        self.visitor_data(refresh=True)
-                    except InnerTubeError:
-                        pass
-                return self._post(endpoint, body, client, use_auth, visitor, retry=False, api=api)
-            message = exc.json().get('error', {}).get('message') or str(exc)
-            raise InnerTubeError(message, exc.status) from exc
+            if not (retry and self._recover(exc, endpoint, bool(token), visitor)):
+                raise _api_error(exc) from exc
+        return self._post(endpoint, body, client, use_auth, visitor, retry=False, api=api)
+
+    def _add_visitor(self, headers, context_client):
+        visitor_data = self.visitor_data()
+        if visitor_data:
+            context_client['visitorData'] = visitor_data
+            headers['X-Goog-Visitor-Id'] = visitor_data
+
+    def _recover(self, exc, endpoint, authed, visitor):
+        """Get ready to send a failed request once more; False when that wouldn't help."""
+        if exc.blocked:
+            return False  # Google's automated-queries page: the broker already waited out a hold and tried again.
+        if exc.status == 401 and authed:
+            auth.access_token(force_refresh=True)
+            return True
+        if exc.status not in RETRY_STATUSES:
+            return False
+        # Google turns some requests away briefly (403/429, the odd 5xx or dropped connection);
+        # the same request usually succeeds a moment later. A 403 can also mean the visitor
+        # id went stale, so fetch a fresh one first.
+        kodi.log('HTTP %s on %s, retrying once' % (exc.status, endpoint))
+        time.sleep(RETRY_DELAY)
+        if exc.status == 403 and visitor:
+            try:
+                self.visitor_data(refresh=True)
+            except InnerTubeError:
+                pass
+        return True
 
     # ------------------------------------------------------------- browsing
     def guide(self):
