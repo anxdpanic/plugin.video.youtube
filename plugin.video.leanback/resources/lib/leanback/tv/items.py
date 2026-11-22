@@ -58,8 +58,11 @@ def rail_item(entry):
 
 
 def video_tile(item, known, threshold):
-    """A video's tile; `known` is what its watch page said (descriptions store), if it was read."""
-    li = xbmcgui.ListItem(item['title'], offscreen=True)
+    """A video's tile; `known` is what its watch page said (descriptions store), if it was read.
+
+    Not offscreen: the window's worker threads set its plot and progress while it is shown, and an
+    offscreen item skips Kodi's GUI lock, so those writes would race the render thread and crash Kodi."""
+    li = xbmcgui.ListItem(item['title'])
     known = known or {}
     meta = [item['channel']]
     if item['views']:
