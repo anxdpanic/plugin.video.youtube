@@ -112,6 +112,53 @@ def video_plot(item, known, threshold):
     return '\n'.join(line for line in lines if line)
 
 
+def _player_error_message(exc):
+    """What to tell the viewer when YouTube offers no streams."""
+    # YouTube's own playability reasons ("Video unavailable") read fine; HTTP failures don't.
+    # An upcoming stream's reason already says it all ("This live event will begin in 61 minutes.").
+    if exc.status is not None:
+        return error_message(exc)
+    if str(exc) in ('', 'unplayable'):
+        return kodi.string(30120)
+    return str(exc)
+
+
+def _is_live(resp):
+    """A live stream (or one only offered as HLS, which a DASH manifest can't address)."""
+    data = resp.get('streamingData', {})
+    return bool(resp.get('videoDetails', {}).get('isLive')) or bool(
+        data.get('hlsManifestUrl') and not any(f.get('initRange') for f in data.get('adaptiveFormats', [])))
+
+
+def _subtitle_languages(hl):
+    """Languages to offer machine-translated captions in: the setting (or Kodi's language) plus extras."""
+    languages = [x.strip() for x in (kodi.setting('subs_translate').strip() or hl).split(',')]
+    return languages + [x.strip() for x in kodi.setting('subs_more').split(',') if x.strip()]
+
+
+def _proxy_subtitles(video_id, subs, ua, port):
+    """Point subtitles at the local server, which retries YouTube's rate limits (429 on translated
+    tracks) and returns an empty track instead of an error."""
+    with open(kodi.temp_file('%s.subs.json' % video_id), 'w', encoding='utf-8') as handle:
+        json.dump({'ua': ua, 'urls': [s['url'] for s in subs]}, handle)
+    for index, sub in enumerate(subs):
+        sub['url'] = 'http://127.0.0.1:%s/sub/%s/%d.vtt' % (port, video_id, index)
+
+
+def _stream_item(path, mime, ua, live):
+    """The ListItem inputstream.adaptive plays, with YouTube's user agent on every request."""
+    headers = 'User-Agent=%s' % urllib.parse.quote(ua)
+    li = xbmcgui.ListItem(path=path, offscreen=True)
+    li.setMimeType(mime)
+    li.setContentLookup(False)
+    li.setProperty('inputstream', ISA)
+    li.setProperty(ISA + '.manifest_headers', headers)
+    li.setProperty(ISA + '.stream_headers', headers)
+    if live:
+        li.setProperty(ISA + '.play_timeshift_buffer', 'true')
+    return li
+
+
 def url_for(route, **params):
     params = {k: v for k, v in params.items() if v not in (None, '')}
     return BASE_URL + route + ('?' + urllib.parse.urlencode(params) if params else '')
@@ -673,72 +720,53 @@ class Plugin(pages.Pages):
             resp, client = self.api.player(video_id)
         except (InnerTubeError, http.HTTPError) as exc:
             kodi.log('no streams for %s: %s' % (video_id, exc))
-            # YouTube's own playability reasons ("Video unavailable") read fine; HTTP failures don't.
-            # An upcoming stream's reason already says it all ("This live event will begin in 61 minutes.").
-            if exc.status is not None:
-                message = error_message(exc)
-            elif str(exc) in ('', 'unplayable'):
-                message = kodi.string(30120)
-            else:
-                message = str(exc)
-            self._notify(message, error=True)
-            xbmcplugin.setResolvedUrl(self.handle, False, xbmcgui.ListItem(offscreen=True))
-            return
-        data = resp.get('streamingData', {})
-        details = resp.get('videoDetails', {})
-        headers = 'User-Agent=%s' % urllib.parse.quote(client['ua'])
-        hl = self.api.hl
-        live = bool(details.get('isLive')) or bool(
-            data.get('hlsManifestUrl') and not any(f.get('initRange') for f in data.get('adaptiveFormats', [])))
-
-        path = None
-        mime = None
-        if not live:
-            translate = [x.strip() for x in (kodi.setting('subs_translate').strip() or hl).split(',')]
-            translate += [x.strip() for x in kodi.setting('subs_more').split(',') if x.strip()]
-            subs = mpd.subtitle_tracks(resp, kodi.setting_bool('subs_asr'), translate)
-            port = xbmcgui.Window(10000).getProperty(http.PORT_PROPERTY)
-            if subs and port:
-                # Subtitles go through the local server, which retries YouTube's rate limits (429 on
-                # translated tracks) and returns an empty track instead of an error.
-                with open(kodi.temp_file('%s.subs.json' % video_id), 'w', encoding='utf-8') as handle:
-                    json.dump({'ua': client['ua'], 'urls': [s['url'] for s in subs]}, handle)
-                for index, sub in enumerate(subs):
-                    sub['url'] = 'http://127.0.0.1:%s/sub/%s/%d.vtt' % (port, video_id, index)
-            manifest = mpd.build(resp, max_height=kodi.setting_int('max_quality'),
-                                 codec=kodi.setting('codec') or 'any', allow_hdr=kodi.setting_bool('allow_hdr'),
-                                 audio_pref=kodi.setting('audio_track') or 'original', ui_lang=hl, subtitles=subs)
-            if manifest and port:
-                with open(kodi.temp_file('%s.mpd' % video_id), 'w', encoding='utf-8') as handle:
-                    handle.write(manifest)
-                path = 'http://127.0.0.1:%s/mpd/%s.mpd' % (port, video_id)
-                mime = 'application/dash+xml'
-            elif manifest:
-                kodi.log('manifest server not running, falling back to HLS')
-        if not path and data.get('hlsManifestUrl'):
-            path = data['hlsManifestUrl']
-            mime = 'application/vnd.apple.mpegurl'
+            return self._fail_resolve(_player_error_message(exc))
+        live = _is_live(resp)
+        path, mime = self._stream_source(video_id, resp, client['ua'], live)
         if not path:
-            self._notify(kodi.string(30120), error=True)
-            xbmcplugin.setResolvedUrl(self.handle, False, xbmcgui.ListItem(offscreen=True))
-            return
-
-        li = xbmcgui.ListItem(path=path, offscreen=True)
-        li.setMimeType(mime)
-        li.setContentLookup(False)
-        li.setProperty('inputstream', ISA)
-        li.setProperty(ISA + '.manifest_headers', headers)
-        li.setProperty(ISA + '.stream_headers', headers)
-        if live:
-            li.setProperty(ISA + '.play_timeshift_buffer', 'true')
-        info = parser.video_details(resp)
-        self._apply_details(li, info)
+            return self._fail_resolve(kodi.string(30120))
+        li = _stream_item(path, mime, client['ua'], live)
+        self._apply_details(li, parser.video_details(resp))
         if self.params.get('t'):  # start part way in (a chapter, or a start time in the path)
             li.setProperty('StartOffset', self.params['t'])
             playback.request(video_id, self.params['t'])
         if self.api.signed_in() and kodi.setting_bool('report_history'):
             history.publish(video_id, path)
         xbmcplugin.setResolvedUrl(self.handle, True, li)
+
+    def _fail_resolve(self, message):
+        self._notify(message, error=True)
+        xbmcplugin.setResolvedUrl(self.handle, False, xbmcgui.ListItem(offscreen=True))
+
+    def _stream_source(self, video_id, resp, ua, live):
+        """(path, mime) to play: the local DASH manifest, else YouTube's HLS manifest, else (None, None)."""
+        if not live:
+            path = self._serve_manifest(video_id, resp, ua)
+            if path:
+                return path, 'application/dash+xml'
+        hls = resp.get('streamingData', {}).get('hlsManifestUrl')
+        if hls:
+            return hls, 'application/vnd.apple.mpegurl'
+        return None, None
+
+    def _serve_manifest(self, video_id, resp, ua):
+        """Write the DASH manifest for the local server and return its URL, or None."""
+        port = xbmcgui.Window(10000).getProperty(http.PORT_PROPERTY)
+        subs = mpd.subtitle_tracks(resp, kodi.setting_bool('subs_asr'), _subtitle_languages(self.api.hl))
+        if subs and port:
+            _proxy_subtitles(video_id, subs, ua, port)
+        manifest = mpd.build(resp, max_height=kodi.setting_int('max_quality'),
+                             codec=kodi.setting('codec') or 'any', allow_hdr=kodi.setting_bool('allow_hdr'),
+                             audio_pref=kodi.setting('audio_track') or 'original', ui_lang=self.api.hl,
+                             subtitles=subs)
+        if not manifest:
+            return None
+        if not port:
+            kodi.log('manifest server not running, falling back to HLS')
+            return None
+        with open(kodi.temp_file('%s.mpd' % video_id), 'w', encoding='utf-8') as handle:
+            handle.write(manifest)
+        return 'http://127.0.0.1:%s/mpd/%s.mpd' % (port, video_id)
 
     def play_playlist(self):
         playlist_id = self.params['list']
