@@ -495,3 +495,23 @@ msgstr ""
 msgctxt "#30177"
 msgid "Show Accounts in the main menu"
 msgstr ""
+
+msgctxt "#30178"
+msgid "Image quality"
+msgstr ""
+
+msgctxt "#30179"
+msgid "How large the thumbnails, channel pictures and banners are. YouTube sends them small; larger looks sharper on a big screen but takes longer to load and more room in Kodi's cache."
+msgstr ""
+
+msgctxt "#30180"
+msgid "High"
+msgstr ""
+
+msgctxt "#30181"
+msgid "Medium"
+msgstr ""
+
+msgctxt "#30182"
+msgid "As sent by YouTube"
+msgstr ""

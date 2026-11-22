@@ -37,7 +37,7 @@ class Banners:
             if channel_id not in self.missing:
                 self.missing.append(channel_id)
             return ''
-        return entry['url']
+        return parser.larger_art(entry['url'])  # at the width image_quality asks for now
 
     def remember(self, channel_id, url):
         if not (channel_id or '').startswith('UC'):

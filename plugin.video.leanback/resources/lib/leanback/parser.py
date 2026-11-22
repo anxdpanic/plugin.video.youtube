@@ -10,6 +10,8 @@ import re
 import urllib.parse
 from urllib.parse import unquote
 
+from . import kodi
+
 SHELF_SHORTS = 'TVHTML5_SHELF_RENDERER_TYPE_SHORTS'
 TILE_SHORTS = 'TVHTML5_TILE_RENDERER_TYPE_SHORTS'
 
@@ -29,12 +31,60 @@ def text(node):
     return ''
 
 
+# YouTube's image hosts are asked for smaller pictures than they have. Only what they're sure to serve
+# is asked for larger: other sizes or names of a picture often don't exist.
+# The image_quality setting -> (channel picture size, banner width, full-size video pictures). Channel
+# pictures are sent at 72-176px (None leaves them so) and banners at 2120 wide (they're uploaded at
+# 2560x1440); their host scales both to any size asked for, up to the original. Banners are remembered,
+# so each level names their width: one remembered at another level is set back to it.
+IMAGE_QUALITY = 'image_quality'
+ART_SIZES = {2: (800, 2560, True), 1: (400, 2120, True), 0: (None, 2120, False)}
+SQUARE_SIZE = re.compile(r'(//yt\d\.(?:ggpht|googleusercontent)\.com/[^=]+=)s\d+(?=-|$)')
+BANNER_SIZE = re.compile(r'(//yt\d\.(?:ggpht|googleusercontent)\.com/[^=]+=)w\d+(?=-fcrop64=)')
+# A video's 16:9 or Shorts picture with a query (sqp=-oaymw...) that only shrinks it, to 640x360 or so.
+# Without the query it is the full 1280x720 or 1080x1920. The 4:3 names (hqdefault, sddefault) are
+# left: their query also crops the black bars away. Custom thumbnails' queries (sqp=C...) are signed.
+SHRUNK_THUMB = re.compile(r'^(https://i\.ytimg\.com/vi(?:_webp)?/[^/]+/'
+                          r'(?:hq720(?:_\d)?|maxresdefault|maxres\d|oardefault|oar\d|sardefault)\.(?:jpg|webp))'
+                          r'\?sqp=-oaymw[^/]*$')
+
+
 def best_thumb(thumbs):
     if not thumbs:
         return ''
     thumb = max(thumbs, key=lambda t: (t.get('width') or 0) * (t.get('height') or 0))
     url = thumb.get('url', '')
-    return 'https:' + url if url.startswith('//') else url
+    return larger_art('https:' + url if url.startswith('//') else url)
+
+
+def art_sizes():
+    """(channel picture size, banner width, full-size video pictures) for the image_quality setting."""
+    return ART_SIZES.get(kodi.setting_int(IMAGE_QUALITY), ART_SIZES[0])
+
+
+def larger_art(url):
+    """The same picture at the size the image_quality setting asks for, where its host is sure to serve it."""
+    square, banner, full_thumbs = art_sizes()
+    if square:
+        url = square_art_at(url, square)
+    if banner:
+        url = banner_at(url, banner)
+    return full_size_thumb(url) if full_thumbs else url
+
+
+def square_art_at(url, size):
+    """A channel picture (yt3 '...=s176-c-k...') at this size; any other address unchanged."""
+    return SQUARE_SIZE.sub(r'\g<1>s%d' % size, url, count=1)
+
+
+def banner_at(url, width):
+    """A channel banner (yt3 '...=w2120-fcrop64=...') at this width; any other address unchanged."""
+    return BANNER_SIZE.sub(r'\g<1>w%d' % width, url, count=1)
+
+
+def full_size_thumb(url):
+    """A video picture without the query that shrinks it (see SHRUNK_THUMB); any other address unchanged."""
+    return SHRUNK_THUMB.sub(r'\g<1>', url, count=1)
 
 
 def parse_duration(value):

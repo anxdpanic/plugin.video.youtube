@@ -130,3 +130,9 @@ def test_watch_page_names_the_channel():
         'navigationEndpoint': {'browseEndpoint': {'browseId': 'UCSMOQeBJ2RAnuFungnQOxLg'}}}}}
     nxt = {'contents': [{'videoMetadataRenderer': meta}]}
     assert parser.video_details({}, nxt)['channel_id'] == 'UCSMOQeBJ2RAnuFungnQOxLg'
+
+
+def test_banners_remembered_small_are_given_at_full_width():
+    small = 'https://yt3.googleusercontent.com/x=w2120-fcrop64=1,00000000ffffffff-k-c0xffffffff-no-nd-rj'
+    art.Banners().remember('UCcccccccccccccccccccccc', small)
+    assert art.Banners().get('UCcccccccccccccccccccccc') == small.replace('=w2120-', '=w2560-')

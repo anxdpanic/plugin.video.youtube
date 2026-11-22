@@ -30,7 +30,7 @@ def clean_state():
     shutil.rmtree(xbmcvfs.ROOT, ignore_errors=True)
     xbmcaddon.SETTINGS.clear()
     xbmcaddon.SETTINGS.update({'shelves_as_folders': True, 'watched_threshold': 80, 'subs_asr': True,
-                                'show_accounts': True})
+                                'show_accounts': True, 'image_quality': 2})
     xbmcplugin.reset()
     del xbmcgui.NOTIFICATIONS[:]
     yield

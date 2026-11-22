@@ -100,6 +100,18 @@
                     </constraints>
                     <control type="spinner" format="string"/>
                 </setting>
+                <setting id="image_quality" type="integer" label="30178" help="30179">
+                    <level>0</level>
+                    <default>2</default>
+                    <constraints>
+                        <options>
+                            <option label="30180">2</option>
+                            <option label="30181">1</option>
+                            <option label="30182">0</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
                 <setting id="pages_per_listing" type="integer" label="30046" help="30047">
                     <level>0</level>
                     <default>2</default>

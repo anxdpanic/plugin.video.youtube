@@ -337,3 +337,54 @@ def test_video_details_from_the_visionos_watch_page():
     assert info['likes'] == '110530'
     assert info['subscribers'] == '1.26M subscribers'
     assert info['published'] == '12 years ago'
+
+
+def test_channel_pictures_are_asked_for_larger():
+    avatar = 'https://yt3.ggpht.com/abc-DEF_1=s176-c-k-c0x00ffffff-no-rj-mo'
+    assert parser.best_thumb([{'url': avatar, 'width': 176, 'height': 176}]) == \
+        'https://yt3.ggpht.com/abc-DEF_1=s800-c-k-c0x00ffffff-no-rj-mo'
+    assert parser.square_art_at('https://yt3.googleusercontent.com/x=s72', 800) == \
+        'https://yt3.googleusercontent.com/x=s800'
+    banner = 'https://yt3.googleusercontent.com/x=w2120-fcrop64=1,00000000ffffffff-k-c0xffffffff-no-nd-rj'
+    assert parser.square_art_at(banner, 800) == banner
+    assert parser.square_art_at('https://i.ytimg.com/vi/a/s176.jpg', 800) == 'https://i.ytimg.com/vi/a/s176.jpg'
+
+
+def test_banners_are_asked_for_at_full_width():
+    banner = 'https://yt3.googleusercontent.com/x=w2120-fcrop64=1,00000000ffffffff-k-c0xffffffff-no-nd-rj'
+    assert parser.larger_art(banner) == banner.replace('=w2120-', '=w2560-')
+    other = 'https://lh3.googleusercontent.com/x=w3840-h2160'
+    assert parser.larger_art(other) == other
+
+
+def test_video_pictures_lose_the_query_that_shrinks_them():
+    base = 'https://i.ytimg.com/vi/abc/'
+    for name in ('hq720.jpg', 'hq720_2.jpg', 'maxresdefault.jpg', 'oardefault.jpg', 'oar2.jpg', 'sardefault.jpg'):
+        shrunk = base + name + '?sqp=-oaymwEVCIAFEOgCSFDyq4qpAwcVAACIQhgB&rs=AOn4CL&usqp=CBE'
+        assert parser.larger_art(shrunk) == base + name
+    for kept in ('hqdefault.jpg?sqp=-oaymwExCOADEI4CSFryq4qpAyMIARUAAIhCGAHwAQH4Ae4HgALQBYoCDAgAEAEYZSBFKEIwDw==&rs=A',
+                 'hq720_custom_2.jpg?sqp=CPDRjNgG-oaymwEVCIAFEOgCSFDyq4qpAwcVAACIQhgB&rs=AOn4CL',
+                 'sddefault.jpg?v=6aff0d94', 'hq720.jpg'):
+        assert parser.larger_art(base + kept) == base + kept
+    localized = 'https://i.ytimg.com/vi_lc/abc/hq720_en.jpg?sqp=-oaymwEVCIAFEOgCSFDyq4qpAwcVAACIQhgB&rs=A'
+    assert parser.larger_art(localized) == localized
+    thumbs = [{'url': base + 'hq720.jpg?sqp=-oaymwEVCIAFEOgC&rs=A', 'width': 640, 'height': 360}]
+    assert parser.best_thumb(thumbs) == base + 'hq720.jpg'
+
+
+def test_image_quality_setting_scales_every_kind(monkeypatch):
+    import xbmcaddon
+
+    avatar = 'https://yt3.ggpht.com/x=s176-c-k-c0x00ffffff-no-rj-mo'
+    banner = 'https://yt3.googleusercontent.com/x=w2560-fcrop64=1,00000000ffffffff-k-c0xffffffff-no-nd-rj'
+    thumb = 'https://i.ytimg.com/vi/abc/hq720.jpg?sqp=-oaymwEVCIAFEOgC&rs=A'
+    expected = {
+        2: ('=s800-', '=w2560-', 'https://i.ytimg.com/vi/abc/hq720.jpg'),
+        1: ('=s400-', '=w2120-', 'https://i.ytimg.com/vi/abc/hq720.jpg'),
+        0: ('=s176-', '=w2120-', thumb),  # as YouTube sends them; a banner remembered larger goes back
+    }
+    for quality, (square, width, full) in expected.items():
+        monkeypatch.setitem(xbmcaddon.SETTINGS, 'image_quality', quality)
+        assert square in parser.larger_art(avatar)
+        assert width in parser.larger_art(banner)
+        assert parser.larger_art(thumb) == full
