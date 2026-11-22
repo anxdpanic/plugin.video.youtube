@@ -1,4 +1,5 @@
 import json
+import urllib.parse
 
 import xbmc
 import xbmcaddon
@@ -323,6 +324,22 @@ def test_playlist_order_and_start_video(monkeypatch):
     assert queued('?list=PLx&order=shuffle&v=c') == (['a', 'b', 'c'], 2)
     shuffled, position = queued('?list=PLx&order=shuffle')
     assert sorted(shuffled) == ['a', 'b', 'c'] and position == 0
+
+
+def test_header_info_play_button_plays_the_whole_playlist(monkeypatch):
+    """The info dialog's Play on a playlist page's header failed with "One or more items failed to play"."""
+    assert router.header_playlist('VLPLx') == 'PLx'
+    assert router.header_playlist('UCabc') == 'UUabc'  # a channel's uploads
+    assert router.header_playlist('FEtopics') is None
+    shown = []
+    monkeypatch.setattr(xbmcgui.Dialog, 'info', lambda self, li: shown.append(li))
+    header = json.dumps({'title': 'A playlist', 'plot': '', 'thumb': None, 'fanart': None})
+    run('details', '?' + urllib.parse.urlencode({'header': header, 'list': 'PLx'})).dispatch()
+    assert shown[0].path == router.url_for('play_playlist', list='PLx')
+    # Kodi starts it as a playable item: fail that resolve before the playlist plays, or Kodi skips video one.
+    playlist_items(monkeypatch, ['a', 'b'])
+    assert queued('?list=PLx') == (['a', 'b'], 0)
+    assert xbmcplugin.RESOLVED[0][0] is False
 
 
 class PlayerApi:

@@ -58,6 +58,16 @@ def c_int(value):
     return min(int(value), C_INT_MAX)
 
 
+def header_playlist(browse_id):
+    """The playlist a page's header can play: the playlist itself, or a channel's uploads."""
+    browse_id = browse_id or ''
+    if browse_id.startswith('VL'):
+        return browse_id[2:]
+    if browse_id.startswith('UC'):
+        return 'UU' + browse_id[2:]
+    return None
+
+
 def format_time(seconds):
     seconds = int(seconds)
     hours, rest = divmod(seconds, 3600)
@@ -475,7 +485,7 @@ class Plugin(pages.Pages):
         page = parser.parse_page(self.fetch(desc))
         self._use_channel_fanart(browse_id, page['header'])
         if page['header']:
-            self._add_header(page['header'])
+            self._add_header(page['header'], header_playlist(browse_id))
         tabs = page['tabs']
         if tabs and self.params.get('tabs'):
             return self._render_tabs(tabs)
@@ -599,7 +609,7 @@ class Plugin(pages.Pages):
             url = url_for('shelf', src=json.dumps(desc, sort_keys=True), i=index)
         self._add(url, li, True)
 
-    def _add_header(self, header):
+    def _add_header(self, header, playlist_id=None):
         li = xbmcgui.ListItem('[B]%s[/B]' % header['title'], offscreen=True)
         tag = li.getVideoInfoTag()
         tag.setTitle(header['title'])
@@ -611,7 +621,8 @@ class Plugin(pages.Pages):
         li.setProperty('IsPlayable', 'false')
         self._add(url_for('details', header=json.dumps({'title': header['title'], 'plot': tag.getPlot(),
                                                         'thumb': header.get('thumb'),
-                                                        'fanart': header.get('fanart')})), li, False)
+                                                        'fanart': header.get('fanart')}),
+                          list=playlist_id), li, False)
 
     # ------------------------------------------------------------------ items
     def _render_items(self, items, browse_id=None):
@@ -805,6 +816,11 @@ class Plugin(pages.Pages):
 
     def play_playlist(self):
         playlist_id = self.params['list']
+        if self.handle >= 0:
+            # Started as a playable item (the Play button in a page header's info dialog): let Kodi's own
+            # attempt fail now, before the playlist starts, or Kodi counts the failure against the
+            # playlist and skips its first video.
+            xbmcplugin.setResolvedUrl(self.handle, False, xbmcgui.ListItem(offscreen=True))
         if is_mix(playlist_id):
             items = self._mix_items(playlist_id)[0]
         else:
@@ -913,6 +929,10 @@ class Plugin(pages.Pages):
             tag.setTitle(header['title'])
             tag.setPlot(header['plot'])
             li.setArt({k: v for k, v in (('thumb', header.get('thumb')), ('fanart', header.get('fanart'))) if v})
+            # The info dialog always has a Play button; without a path it fails with "One or more items
+            # failed to play". On a playlist or channel page it plays everything, like "Play all".
+            if self.params.get('list'):
+                li.setPath(url_for('play_playlist', list=self.params['list']))
             xbmcgui.Dialog().info(li)
             return
         video_id = self.params['v']
