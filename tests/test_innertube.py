@@ -67,3 +67,20 @@ def test_retry_stays_on_the_apps_api_host(api, monkeypatch):
     monkeypatch.setattr(http, 'request_json', request_json)
     assert api.watch_page('abcdefghijk') == {'ok': True}
     assert hosts == ['https://youtubei.googleapis.com'] * 2
+
+
+def test_401_refreshes_the_token_and_retries(api, monkeypatch):
+    from resources.lib.leanback import auth
+    refreshed = []
+    monkeypatch.setattr(auth, 'access_token', lambda force_refresh=False: refreshed.append(force_refresh) or 'TOKEN')
+    calls = responses(monkeypatch, http.HTTPError(401), {'ok': True})
+    assert api.browse('FEtopics') == {'ok': True}
+    assert calls == ['browse', 'browse']
+    assert True in refreshed
+
+
+def test_blocked_request_is_not_retried(api, monkeypatch):
+    calls = responses(monkeypatch, http.HTTPError(429, blocked=True))
+    with pytest.raises(innertube.InnerTubeError) as err:
+        api.browse('FEtopics')
+    assert err.value.blocked and calls == ['browse']
