@@ -159,6 +159,53 @@ def _stream_item(path, mime, ua, live):
     return li
 
 
+def video_label(item):
+    """A video's listing label, flagged when it is live or upcoming."""
+    if item['live']:
+        return '[COLOR red]%s[/COLOR] %s' % (kodi.string(30127), item['title'])
+    if item.get('upcoming'):
+        return '[COLOR yellow]%s[/COLOR] %s' % (item['upcoming'], item['title'])
+    return item['title']
+
+
+def _set_video_tag(tag, item, known, threshold):
+    """Fill a video's info tag: plot, channel, duration, watch progress, badges and views."""
+    tag.setMediaType('video')
+    tag.setTitle(item['title'])
+    plot = video_plot(item, known, threshold)
+    tag.setPlot(plot)
+    # Some views (Estuary's Poster, Shift, Fanart) show the outline instead of the plot when it is set.
+    tag.setPlotOutline(plot)
+    if known and known.get('p'):
+        tag.setPremiered(known['p'])
+    if item['channel']:
+        tag.setStudios([item['channel']])
+        tag.setDirectors([item['channel']])
+    if item['duration']:
+        tag.setDuration(item['duration'])
+        if 0 < item['watched_pct'] < threshold:
+            tag.setResumePoint(item['duration'] * item['watched_pct'] / 100.0, item['duration'])
+    if item['watched_pct'] >= threshold:
+        tag.setPlaycount(1)
+    if item['badges']:
+        tag.setTags(item['badges'])
+    if item['views']:
+        tag.setVotes(c_int(item['views']))
+
+
+def _video_menu(item, video_id, channel_id):
+    """A video's context menu: its channel, related videos, details and chapters."""
+    menu = []
+    if channel_id:
+        menu.append((kodi.string(30103), 'Container.Update(%s)' % url_for(
+            'browse', id=channel_id, title=item['channel'])))
+    menu.append((kodi.string(30104), 'Container.Update(%s)' % url_for('related', v=video_id)))
+    menu.append((kodi.string(30105), 'RunPlugin(%s)' % url_for('details', v=video_id)))
+    if not item['live'] and not item['short']:
+        menu.append((kodi.string(30139) or 'Chapters', 'RunPlugin(%s)' % url_for('chapters', v=video_id)))
+    return menu
+
+
 def url_for(route, **params):
     params = {k: v for k, v in params.items() if v not in (None, '')}
     return BASE_URL + route + ('?' + urllib.parse.urlencode(params) if params else '')
@@ -614,51 +661,15 @@ class Plugin(pages.Pages):
         video_id = video_id_of(item)
         if not video_id:
             return
-        title = item['title']
-        if item['live']:
-            label = '[COLOR red]%s[/COLOR] %s' % (kodi.string(30127), title)
-        elif item.get('upcoming'):
-            label = '[COLOR yellow]%s[/COLOR] %s' % (item['upcoming'], title)
-        else:
-            label = title
-        li = xbmcgui.ListItem(label, offscreen=True)
-        tag = li.getVideoInfoTag()
-        tag.setMediaType('video')
-        tag.setTitle(title)
         known = self.descriptions.get(video_id)
         channel_id = item['channel_id'] or (known or {}).get('c')
-        plot = video_plot(item, known, threshold)
-        tag.setPlot(plot)
-        # Some views (Estuary's Poster, Shift, Fanart) show the outline instead of the plot when it is set.
-        tag.setPlotOutline(plot)
-        if known and known.get('p'):
-            tag.setPremiered(known['p'])
-        if item['channel']:
-            tag.setStudios([item['channel']])
-            tag.setDirectors([item['channel']])
-        if item['duration']:
-            tag.setDuration(item['duration'])
-            if 0 < item['watched_pct'] < threshold:
-                tag.setResumePoint(item['duration'] * item['watched_pct'] / 100.0, item['duration'])
-        if item['watched_pct'] >= threshold:
-            tag.setPlaycount(1)
-        if item['badges']:
-            tag.setTags(item['badges'])
-        if item['views']:
-            tag.setVotes(c_int(item['views']))
+        li = xbmcgui.ListItem(video_label(item), offscreen=True)
+        _set_video_tag(li.getVideoInfoTag(), item, known, threshold)
         li.setArt({'thumb': item['thumb'], 'icon': item['thumb'],
                    'fanart': self._channel_fanart(channel_id) or item['thumb'], 'landscape': item['thumb']})
         li.setProperty('IsPlayable', 'true')
         li.setProperty('leanback.video_id', video_id)
-        menu = []
-        if channel_id:
-            menu.append((kodi.string(30103), 'Container.Update(%s)' % url_for(
-                'browse', id=channel_id, title=item['channel'])))
-        menu.append((kodi.string(30104), 'Container.Update(%s)' % url_for('related', v=video_id)))
-        menu.append((kodi.string(30105), 'RunPlugin(%s)' % url_for('details', v=video_id)))
-        if not item['live'] and not item['short']:
-            menu.append((kodi.string(30139) or 'Chapters', 'RunPlugin(%s)' % url_for('chapters', v=video_id)))
-        li.addContextMenuItems(menu)
+        li.addContextMenuItems(_video_menu(item, video_id, channel_id))
         self._add(url_for('play', v=video_id), li, False)
 
     def _add_folder_item(self, item):
