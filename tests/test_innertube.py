@@ -84,3 +84,52 @@ def test_blocked_request_is_not_retried(api, monkeypatch):
     with pytest.raises(innertube.InnerTubeError) as err:
         api.browse('FEtopics')
     assert err.value.blocked and calls == ['browse']
+
+
+BOT_CHECK = {'playabilityStatus': {'status': 'LOGIN_REQUIRED', 'reason': "Sign in to confirm you're not a bot"}}
+PLAYABLE = {'playabilityStatus': {'status': 'OK'},
+            'streamingData': {'adaptiveFormats': [{'itag': 137, 'url': 'https://example/v'}]}}
+
+
+def player_hosts(monkeypatch, *results):
+    """Answer player requests with each result in turn; returns the hosts they went to."""
+    hosts = []
+    pending = list(results)
+
+    def request_json(url, data=None, headers=None, **kwargs):
+        hosts.append(url.split('/youtubei/')[0])
+        return pending.pop(0)
+
+    monkeypatch.setattr(http, 'request_json', request_json)
+    return hosts
+
+
+def test_bot_check_asks_the_apps_host_again(api, monkeypatch):
+    hosts = player_hosts(monkeypatch, BOT_CHECK, PLAYABLE)
+    resp, client = api.player('abcdefghijk')
+    assert resp is PLAYABLE and client is innertube.PLAYER_CLIENTS[0]
+    assert hosts == ['https://www.youtube.com', 'https://youtubei.googleapis.com']
+
+
+def test_after_a_bot_check_the_other_clients_use_the_apps_host(api, monkeypatch):
+    hosts = player_hosts(monkeypatch, BOT_CHECK, BOT_CHECK, PLAYABLE)
+    resp, client = api.player('abcdefghijk')
+    assert client is innertube.PLAYER_CLIENTS[1]
+    assert hosts[1:] == ['https://youtubei.googleapis.com'] * 2
+
+
+def test_bot_check_everywhere_is_reported_as_one(api, monkeypatch):
+    hosts = player_hosts(monkeypatch, *[BOT_CHECK] * (len(innertube.PLAYER_CLIENTS) + 1))
+    with pytest.raises(innertube.InnerTubeError) as err:
+        api.player('abcdefghijk')
+    assert err.value.bot_check and err.value.status is None
+    assert len(hosts) == len(innertube.PLAYER_CLIENTS) + 1  # no visitor refreshes in between
+
+
+def test_other_unplayable_reasons_are_not_bot_checks(api, monkeypatch):
+    gone = {'playabilityStatus': {'status': 'ERROR', 'reason': 'Video unavailable'}}
+    hosts = player_hosts(monkeypatch, *[gone] * len(innertube.PLAYER_CLIENTS))
+    with pytest.raises(innertube.InnerTubeError, match='Video unavailable') as err:
+        api.player('abcdefghijk')
+    assert not err.value.bot_check
+    assert set(hosts) == {'https://www.youtube.com'}

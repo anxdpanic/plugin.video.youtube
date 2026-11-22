@@ -67,12 +67,14 @@ RETRY_DELAY = 1.5  # seconds
 
 
 class InnerTubeError(Exception):
-    """status is the HTTP status (0 when YouTube couldn't be reached, None when not an HTTP failure)."""
+    """status is the HTTP status (0 when YouTube couldn't be reached, None when not an HTTP failure).
+    bot_check is set when YouTube refused the streams with its "confirm you're not a bot" check."""
 
-    def __init__(self, message, status=None, blocked=False):
+    def __init__(self, message, status=None, blocked=False, bot_check=False):
         Exception.__init__(self, message)
         self.status = status
         self.blocked = blocked
+        self.bot_check = bot_check
 
 
 def _client_headers(client):
@@ -270,36 +272,73 @@ class InnerTube:
     def player(self, video_id):
         """Returns (player_response, client). Raises InnerTubeError when nothing is playable."""
         cpn = new_cpn()
-        reason = None
+        api = API
+        status = {}
         for client in PLAYER_CLIENTS:
-            body = {
-                'videoId': video_id,
-                'cpn': cpn,
-                'contentCheckOk': True,
-                'racyCheckOk': True,
-                'playbackContext': {'contentPlaybackContext': {'html5Preference': 'HTML5_PREF_WANTS'}},
-            }
-            if client.get('params'):
-                body['params'] = client['params']
-            try:
-                resp = self._post('player', body, client, use_auth=False)
-            except InnerTubeError as exc:
-                reason = str(exc)
-                continue
-            status = resp.get('playabilityStatus', {})
-            data = resp.get('streamingData', {})
-            direct = [f for f in data.get('adaptiveFormats', []) if f.get('url')]
-            if status.get('status') == 'OK' and (direct or data.get('hlsManifestUrl')):
-                kodi.log('player: %s ok (%d direct formats, hls=%s)'
-                         % (client['key'], len(direct), bool(data.get('hlsManifestUrl'))))
+            resp, status = self._player_on(api, video_id, cpn, client)
+            if resp:
                 return resp, client
-            reason = status.get('reason') or text(
-                status.get('errorScreen', {}).get('playerErrorMessageRenderer', {}).get('subreason')) \
-                or status.get('status')
-            kodi.log('player: %s gave %s (%s)' % (client['key'], status.get('status'), reason))
-            if status.get('status') == 'LOGIN_REQUIRED' and 'bot' in (reason or ''):
-                self.visitor_data(refresh=True)
-        raise InnerTubeError(reason or 'unplayable')
+            if status.get('status') == 'LOGIN_REQUIRED' and api == API:
+                # Usually "Sign in to confirm you're not a bot", which is YouTube judging the
+                # connection rather than the request: player requests go out signed out, and
+                # signed-out requests from shared or flagged addresses (VPN exits above all) get it
+                # from every client. A fresh visitor id doesn't clear it (seen in a VPN user's log,
+                # 2026-11-22), and the TV sign-in can't stand in: the other clients reject its token
+                # with HTTP 400, and the TV player only offers SABR streams, which Kodi can't play.
+                # What's left is youtubei.googleapis.com, the host the mobile apps use, which has
+                # answered bursts www.youtube.com turned away. Whether it also lets a flagged
+                # address through is untested, so it's a second chance rather than a cure: ask it
+                # again for this client and the rest. Any LOGIN_REQUIRED counts because the reason
+                # text is in the viewer's language; for other sign-in walls (age checks) it costs
+                # one extra request.
+                api = APPS_API
+                resp, status = self._player_on(api, video_id, cpn, client)
+                if resp:
+                    return resp, client
+        reason = _unplayable_reason(status)
+        raise InnerTubeError(reason or 'unplayable', bot_check=_is_bot_check(status))
+
+    def _player_on(self, api, video_id, cpn, client):
+        """One client's player request. (response, None) when it has streams Kodi can play, else
+        (None, its playabilityStatus); a failed request reads as a status whose reason is the error."""
+        try:
+            resp = self._post('player', _player_body(video_id, cpn, client), client, use_auth=False, api=api)
+        except InnerTubeError as exc:
+            return None, {'reason': str(exc)}
+        status = resp.get('playabilityStatus', {})
+        data = resp.get('streamingData', {})
+        direct = [f for f in data.get('adaptiveFormats', []) if f.get('url')]
+        if status.get('status') == 'OK' and (direct or data.get('hlsManifestUrl')):
+            kodi.log('player: %s ok (%d direct formats, hls=%s)'
+                     % (client['key'], len(direct), bool(data.get('hlsManifestUrl'))))
+            return resp, None
+        kodi.log('player: %s gave %s (%s)' % (client['key'], status.get('status'), _unplayable_reason(status)))
+        return None, status
+
+
+def _player_body(video_id, cpn, client):
+    body = {
+        'videoId': video_id,
+        'cpn': cpn,
+        'contentCheckOk': True,
+        'racyCheckOk': True,
+        'playbackContext': {'contentPlaybackContext': {'html5Preference': 'HTML5_PREF_WANTS'}},
+    }
+    if client.get('params'):
+        body['params'] = client['params']
+    return body
+
+
+def _unplayable_reason(status):
+    """YouTube's reason a player response has no streams, as plain text."""
+    subreason = status.get('errorScreen', {}).get('playerErrorMessageRenderer', {}).get('subreason')
+    return status.get('reason') or text(subreason) or status.get('status')
+
+
+def _is_bot_check(status):
+    """YouTube's "Sign in to confirm you're not a bot" refusal. Only recognised in languages where
+    the reason says "bot" (English, German, ...); elsewhere the viewer just sees YouTube's reason."""
+    return status.get('status') == 'LOGIN_REQUIRED' and 'bot' in (status.get('reason') or '').lower()
 
 
 def new_cpn():
