@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.leanback" name="Leanback" version="0.2.4" provider-name="anxdpanic">
+<addon id="plugin.video.leanback" name="Leanback" version="0.2.5" provider-name="anxdpanic">
     <requires>
         <import addon="xbmc.python" version="3.0.1"/>
         <import addon="inputstream.adaptive" version="21.0.0"/>
