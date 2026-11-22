@@ -12,6 +12,9 @@ class InfoTagVideo:
     def __getattr__(self, name):
         if name.startswith('set'):
             def setter(*args):
+                for arg in args:  # Kodi converts ints to a C long, 32 bits on the Vero
+                    if isinstance(arg, int) and not -2 ** 31 <= arg < 2 ** 31:
+                        raise OverflowError('Python int too large to convert to C long')
                 self.values[name[3:].lower()] = args[0] if len(args) == 1 else args
             return setter
         if name.startswith('get'):

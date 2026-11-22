@@ -73,6 +73,15 @@ def test_render_items_hides_shorts_and_watched():
     assert resume.tag.values['resumepoint'] == (50.0, 100)
 
 
+def test_huge_view_counts_fit_a_c_int():
+    """Music playlists hold videos with billions of views; 32-bit Kodi overflowed on setVotes."""
+    item = video('a')
+    item['views'] = 8_900_000_000
+    run('browse', '?id=VLPLx')._render_items([item], browse_id='VLPLx')
+    [(_, li, _)] = xbmcplugin.ITEMS
+    assert li.tag.values['votes'] == 2 ** 31 - 1
+
+
 def test_history_is_not_filtered_for_watched():
     xbmcaddon.SETTINGS.update(hide_watched=True, watched_threshold=80)
     shown = run('browse', '?id=FEhistory')._render_items([video('a', watched=100)], browse_id='FEhistory')

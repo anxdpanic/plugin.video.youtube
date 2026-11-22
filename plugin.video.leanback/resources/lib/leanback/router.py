@@ -49,6 +49,15 @@ def format_count(value):
     return f'{int(value):,}' if value.isdigit() else value
 
 
+C_INT_MAX = 2 ** 31 - 1
+
+
+def c_int(value):
+    """Clamp for InfoTag setters that take a C int: 32-bit Kodi builds (the Vero) overflow on
+    view counts above about 2.1 billion."""
+    return min(int(value), C_INT_MAX)
+
+
 def format_time(seconds):
     seconds = int(seconds)
     hours, rest = divmod(seconds, 3600)
@@ -573,7 +582,7 @@ class Plugin(pages.Pages):
         if item['badges']:
             tag.setTags(item['badges'])
         if item['views']:
-            tag.setVotes(item['views'])
+            tag.setVotes(c_int(item['views']))
         li.setArt({'thumb': item['thumb'], 'icon': item['thumb'],
                    'fanart': self._channel_fanart(channel_id) or item['thumb'], 'landscape': item['thumb']})
         li.setProperty('IsPlayable', 'true')
@@ -795,7 +804,7 @@ class Plugin(pages.Pages):
         if info['tags']:
             tag.setTags(info['tags'][:20])
         if info['views']:
-            tag.setVotes(info['views'])
+            tag.setVotes(c_int(info['views']))
         if info.get('date'):
             tag.setPremiered(info['date'])
         if info.get('genre'):
