@@ -417,66 +417,82 @@ class Plugin(pages.Pages):
         self._finish_listing(items)
 
     def render(self, desc, browse_id=None):
-        resp = self.fetch(desc)
-        page = parser.parse_page(resp)
-        rendered = []
+        page = parser.parse_page(self.fetch(desc))
         self._use_channel_fanart(browse_id, page['header'])
-
         if page['header']:
             self._add_header(page['header'])
-
         tabs = page['tabs']
         if tabs and self.params.get('tabs'):
-            # The secondary navigation on its own (e.g. every subscribed channel).
-            tabs = [t for t in tabs if not t.get('selected')]
-            if kodi.setting_bool('sort_subscriptions'):
-                tabs = sorted(tabs, key=lambda t: t['title'].lower())
-            for tab in tabs:
-                self._add_folder_item(tab)
-            return self._finish_listing([{'kind': 'folder'}])
+            return self._render_tabs(tabs)
         if len(tabs) > 2 and not desc.get('params'):
             # Like the TV app: show the selected tab ("All") and put the other tabs in one folder.
-            others = [t for t in tabs if not t.get('selected')]
-            label = kodi.string(30134) or 'Channels'
-            li = xbmcgui.ListItem('[B]%s[/B] (%d)' % (label, len(others)), offscreen=True)
-            li.setArt({'icon': 'DefaultArtist.png', 'thumb': 'DefaultArtist.png'})
-            li.getVideoInfoTag().setPlot(', '.join(t['title'] for t in others[:40]))
-            li.setProperty('SpecialSort', 'top')
-            self._add(url_for('browse', id=browse_id, params=desc.get('params'), tabs=1), li, True)
+            self._add_channels_folder([t for t in tabs if not t.get('selected')], browse_id, desc.get('params'))
+        shelves = self._listing_shelves(desc, page)
+        rendered = self._render_shelves(desc, page, shelves, browse_id)
+        if not tabs and not shelves and not page['header']:
+            self._notify(self._empty_message(page, browse_id))
+        self._finish_listing(rendered or [{'kind': 'folder'}])
+
+    def _render_tabs(self, tabs):
+        """The secondary navigation on its own (e.g. every subscribed channel)."""
+        tabs = [t for t in tabs if not t.get('selected')]
+        if kodi.setting_bool('sort_subscriptions'):
+            tabs = sorted(tabs, key=lambda t: t['title'].lower())
+        for tab in tabs:
+            self._add_folder_item(tab)
+        self._finish_listing([{'kind': 'folder'}])
+
+    def _add_channels_folder(self, others, browse_id, params):
+        label = kodi.string(30134) or 'Channels'
+        li = xbmcgui.ListItem('[B]%s[/B] (%d)' % (label, len(others)), offscreen=True)
+        li.setArt({'icon': 'DefaultArtist.png', 'thumb': 'DefaultArtist.png'})
+        li.getVideoInfoTag().setPlot(', '.join(t['title'] for t in others[:40]))
+        li.setProperty('SpecialSort', 'top')
+        self._add(url_for('browse', id=browse_id, params=params, tabs=1), li, True)
+
+    @staticmethod
+    def _listing_shelves(desc, page):
+        """The rows to show: on a continuation page, only those it continues."""
         shelves = pages.visible_shelves(page)
         if desc.get('ctoken'):
             continued = pages.continued_rows(page)
             shelves = [s for s in shelves if s in continued]
-        # Untitled rows (the Subscriptions feed, a channel's uploads) read better as one list.
+        return shelves
+
+    @staticmethod
+    def _flatten_shelves(shelves):
+        """Whether to list every row's items as one list rather than a folder per row. Untitled rows
+        (the Subscriptions feed, a channel's uploads) read better as one list."""
+        if len(shelves) == 1:
+            return True
         untitled = sum(1 for s in shelves if not s['title'])
-        flatten = not kodi.setting_bool('shelves_as_folders') or (shelves and untitled * 2 >= len(shelves))
-        if len(shelves) == 1 or (shelves and flatten):
+        return bool(shelves) and (not kodi.setting_bool('shelves_as_folders') or untitled * 2 >= len(shelves))
+
+    def _render_shelves(self, desc, page, shelves, browse_id):
+        """List the rows; returns the items listed when they were flattened into one list."""
+        if self._flatten_shelves(shelves):
             # One list; with search's extra rows flattened in, the results shelf is the one that pages.
             items, token = self._more_pages(desc['ep'], [i for s in shelves for i in s['items']],
                                             pages.paged_token(shelves, page))
-            rendered.extend(self._render_items(items, browse_id=browse_id))
-            if token:
-                self._add_next(desc['ep'], token, browse_id)
-        elif page['continuation']:
-            # Rows as folders: the continuation brings more rows, not more items.
-            for index, shelf in enumerate(shelves):
-                self._add_shelf_folder(desc, index, shelf)
-            token = self._more_rows(desc['ep'], page['continuation'], {s['title'] for s in shelves})
-            if token:
-                self._add_next(desc['ep'], token, browse_id)
+            rendered = self._render_items(items, browse_id=browse_id)
         else:
             for index, shelf in enumerate(shelves):
                 self._add_shelf_folder(desc, index, shelf)
+            # Rows as folders: the continuation brings more rows, not more items.
+            token = page['continuation'] and self._more_rows(desc['ep'], page['continuation'],
+                                                             {s['title'] for s in shelves})
+            rendered = []
+        if token:
+            self._add_next(desc['ep'], token, browse_id)
+        return rendered
 
-        if not tabs and not shelves and not page['header']:
-            if page.get('message'):
-                message = page['message']
-            elif (browse_id or '').startswith('FE') and not self.api.signed_in():
-                message = kodi.string(30125)
-            else:
-                message = kodi.string(30124)
-            self._notify(message)
-        self._finish_listing(rendered or [{'kind': 'folder'}])
+    def _empty_message(self, page, browse_id):
+        """YouTube's own words for an empty page, else why it's empty."""
+        if page.get('message'):
+            return page['message']
+        if (browse_id or '').startswith('FE') and not self.api.signed_in():
+            return kodi.string(30125)
+        return kodi.string(30124)
 
     def _finish_listing(self, items):
         videos = sum(1 for i in items if i.get('kind') == 'video')
