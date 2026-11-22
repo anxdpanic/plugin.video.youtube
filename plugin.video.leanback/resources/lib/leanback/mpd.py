@@ -198,6 +198,42 @@ def build(player_resp, max_height=0, codec='any', allow_hdr=True, audio_pref='or
     return '\n'.join(out)
 
 
+def _translation_source(tracks):
+    """The track to machine-translate from: a translatable native track, else any translatable one."""
+    return next((t for t in tracks if t.get('kind') != 'asr' and t.get('isTranslatable', True)), None) or \
+        next((t for t in tracks if t.get('isTranslatable', True)), None)
+
+
+def _translatable_code(lang, translatable):
+    """YouTube's code for a wanted language ('pt' may only be offered as 'pt-PT'), or None."""
+    if not translatable or lang in translatable:
+        return lang
+    return next((code for code in translatable if code.split('-')[0] == lang.split('-')[0]), None)
+
+
+def _native_subtitles(tracks, include_asr):
+    for track in tracks:
+        kind = track.get('kind', '')
+        if kind == 'asr' and not include_asr:
+            continue
+        lang = track.get('languageCode', 'und')
+        yield {'lang': lang, 'label': text(track.get('name')) or lang, 'kind': kind,
+               'url': track['baseUrl'] + '&fmt=vtt'}
+
+
+def _translated_subtitles(renderer, source, native, translate_to):
+    languages = renderer.get('translationLanguages', [])
+    translatable = {t.get('languageCode') for t in languages}
+    names = {t.get('languageCode'): text(t.get('languageName')) for t in languages}
+    for wanted in translate_to or []:
+        if not wanted or wanted.split('-')[0] in native:
+            continue
+        lang = _translatable_code(wanted, translatable)
+        if lang:
+            yield {'lang': lang, 'label': '%s (%s)' % (names.get(lang) or lang, 'auto-translated'),
+                   'kind': 'translated', 'url': source['baseUrl'] + '&fmt=vtt&tlang=' + lang}
+
+
 def subtitle_tracks(player_resp, include_asr=True, translate_to=None):
     """Caption tracks to offer: native tracks, auto-generated (optional) and machine translations
     into the requested languages when no native track exists."""
@@ -205,30 +241,9 @@ def subtitle_tracks(player_resp, include_asr=True, translate_to=None):
     tracks = renderer.get('captionTracks', [])
     if not tracks:
         return []
-    translatable = {t.get('languageCode') for t in renderer.get('translationLanguages', [])}
-    names = {t.get('languageCode'): text(t.get('languageName')) for t in renderer.get('translationLanguages', [])}
-    subs = []
-    native = set()
-    for track in tracks:
-        kind = track.get('kind', '')
-        if kind == 'asr' and not include_asr:
-            continue
-        lang = track.get('languageCode', 'und')
-        label = text(track.get('name')) or lang
-        if kind != 'asr':
-            native.add(lang.split('-')[0])
-        subs.append({'lang': lang, 'label': label, 'kind': kind, 'url': track['baseUrl'] + '&fmt=vtt'})
-    source = next((t for t in tracks if t.get('kind') != 'asr' and t.get('isTranslatable', True)), None) or \
-        next((t for t in tracks if t.get('isTranslatable', True)), None)
-    for lang in translate_to or []:
-        if not lang or lang.split('-')[0] in native or source is None:
-            continue
-        if translatable and lang not in translatable:
-            match = [code for code in translatable if code.split('-')[0] == lang.split('-')[0]]
-            if not match:
-                continue
-            lang = match[0]
-        label = '%s (%s)' % (names.get(lang) or lang, 'auto-translated')
-        subs.append({'lang': lang, 'label': label, 'kind': 'translated',
-                     'url': source['baseUrl'] + '&fmt=vtt&tlang=' + lang})
+    subs = list(_native_subtitles(tracks, include_asr))
+    native = {sub['lang'].split('-')[0] for sub in subs if sub['kind'] != 'asr'}
+    source = _translation_source(tracks)
+    if source is not None:
+        subs.extend(_translated_subtitles(renderer, source, native, translate_to))
     return subs
