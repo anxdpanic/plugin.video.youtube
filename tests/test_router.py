@@ -2,6 +2,7 @@ import json
 
 import xbmc
 import xbmcaddon
+import xbmcgui
 import xbmcplugin
 
 from resources.lib.leanback import parser, router
@@ -322,3 +323,53 @@ def test_playlist_order_and_start_video(monkeypatch):
     assert queued('?list=PLx&order=shuffle&v=c') == (['a', 'b', 'c'], 2)
     shuffled, position = queued('?list=PLx&order=shuffle')
     assert sorted(shuffled) == ['a', 'b', 'c'] and position == 0
+
+
+class PlayerApi:
+    """Just enough InnerTube for play(): one player response, signed out."""
+    hl = 'en'
+
+    def __init__(self, resp=None, error=None):
+        self.resp, self.error = resp, error
+
+    def player(self, video_id):
+        if self.error:
+            raise self.error
+        return self.resp, {'ua': 'Test UA/1.0'}
+
+    def signed_in(self):
+        return False
+
+
+def play(api, monkeypatch, port='50152'):
+    monkeypatch.setitem(xbmcgui._PROPERTIES, 'leanback.port', port)
+    plugin = run('play', '?v=abcdefghijk')
+    plugin.api = api
+    plugin.play()
+    [(ok, li)] = xbmcplugin.RESOLVED
+    return ok, li
+
+
+def test_play_serves_a_dash_manifest(monkeypatch):
+    from test_mpd import FORMATS
+    resp = {'streamingData': {'adaptiveFormats': FORMATS}, 'videoDetails': {'videoId': 'abcdefghijk', 'title': 'T'}}
+    ok, li = play(PlayerApi(resp), monkeypatch)
+    assert ok and li.path == 'http://127.0.0.1:50152/mpd/abcdefghijk.mpd'
+    assert li.mime == 'application/dash+xml'
+    assert li.properties['inputstream.adaptive.stream_headers'] == 'User-Agent=Test%20UA/1.0'
+    assert 'inputstream.adaptive.play_timeshift_buffer' not in li.properties
+
+
+def test_play_live_uses_hls_with_timeshift(monkeypatch):
+    resp = {'streamingData': {'hlsManifestUrl': 'https://manifest.googlevideo.com/x.m3u8'},
+            'videoDetails': {'videoId': 'abcdefghijk', 'isLive': True}}
+    ok, li = play(PlayerApi(resp), monkeypatch)
+    assert ok and li.path.endswith('x.m3u8') and li.mime == 'application/vnd.apple.mpegurl'
+    assert li.properties['inputstream.adaptive.play_timeshift_buffer'] == 'true'
+
+
+def test_play_without_streams_fails_with_youtubes_reason(monkeypatch):
+    from resources.lib.leanback.innertube import InnerTubeError
+    ok, _ = play(PlayerApi(error=InnerTubeError('Video unavailable')), monkeypatch)
+    assert not ok
+    assert xbmcgui.NOTIFICATIONS[-1][1] == 'Video unavailable'
