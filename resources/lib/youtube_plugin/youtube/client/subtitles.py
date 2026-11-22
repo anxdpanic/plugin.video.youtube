@@ -239,6 +239,31 @@ class Subtitles(YouTubeRequestClient):
     def _get_local_translation(self, track, base_lang, tlang):
         if not self.BASE_PATH or not base_lang or not tlang:
             return None
+        # Prefer subtitles in the language of the default caption track (the
+        # original audio). Videos with auto-dubbed audio also have ASR tracks
+        # in the dubbed languages and the first ASR track may be one of them.
+        source = None
+        source_langs = []
+        for lang in (self.defaults.get('default_lang'), base_lang):
+            if lang and lang != 'und' and lang not in source_langs:
+                source_langs.append(lang)
+        for lang in source_langs:
+            candidates = [
+                caption_track
+                for caption_track in self.caption_tracks
+                if caption_track.get('languageCode') == lang
+                and caption_track.get('baseUrl')
+                and caption_track.get('isTranslatable', True)
+            ]
+            candidates.sort(key=lambda t: t.get('kind') == 'asr')
+            if candidates:
+                source = candidates[0]
+                break
+        if not source:
+            source = track
+        base_lang = source.get('languageCode') or base_lang
+        is_asr = source.get('kind') == 'asr'
+
         file_path = os.path.join(self.BASE_PATH, '.'.join((
             self.video_id,
             '-'.join(('mt', base_lang, tlang)),
@@ -251,15 +276,6 @@ class Subtitles(YouTubeRequestClient):
                         return file_path
             except (IOError, OSError):
                 pass
-
-        source = track
-        for caption_track in self.caption_tracks:
-            if (caption_track.get('languageCode') == base_lang
-                    and caption_track.get('kind') != 'asr'
-                    and caption_track.get('baseUrl')):
-                source = caption_track
-                break
-        is_asr = source.get('kind') == 'asr'
 
         url = self._set_query_param(
             self._normalize_url(source.get('baseUrl')),
