@@ -206,6 +206,14 @@ def _video_menu(item, video_id, channel_id):
     return menu
 
 
+def _device_code_message(code):
+    """Where to go and what code to enter, for the sign-in dialog."""
+    url = code.get('verification_url') or 'youtube.com/activate'
+    url = url.replace('https://', '').replace('http://', '').replace('www.', '')
+    go_to = kodi.formatted(30110, 'On a phone or computer, go to [B]%s[/B] and enter this code:', url)
+    return '%s\n[B][COLOR yellow]%s[/COLOR][/B]\n%s' % (go_to, code['user_code'], kodi.string(30111))
+
+
 def url_for(route, **params):
     params = {k: v for k, v in params.items() if v not in (None, '')}
     return BASE_URL + route + ('?' + urllib.parse.urlencode(params) if params else '')
@@ -1064,36 +1072,40 @@ class Plugin(pages.Pages):
         except Exception as exc:  # network or OAuth errors
             self._notify(kodi.formatted(30113, 'Sign-in failed: %s', exc), error=True)
             return
-        url = code.get('verification_url') or 'youtube.com/activate'
-        url = url.replace('https://', '').replace('http://', '').replace('www.', '')
+        token = self._wait_for_approval(code)
+        if token:
+            self._add_signed_in_account(token)
+
+    def _wait_for_approval(self, code):
+        """Show the device code until the viewer approves it; returns the token, or None after
+        cancelling, an error or the code expiring (the viewer has been told why)."""
+        expires_in = int(code.get('expires_in', 1800))
         interval = max(int(code.get('interval', 5)), 2)
-        deadline = time.time() + int(code.get('expires_in', 1800))
+        deadline = time.time() + expires_in
+        message = _device_code_message(code)
         progress = xbmcgui.DialogProgress()
-        go_to = kodi.formatted(30110, 'On a phone or computer, go to [B]%s[/B] and enter this code:', url)
-        message = '%s\n[B][COLOR yellow]%s[/COLOR][/B]\n%s' % (go_to, code['user_code'], kodi.string(30111))
         progress.create(kodi.string(30109), message)
-        token = None
         monitor = xbmc.Monitor()
         try:
             while time.time() < deadline:
                 if progress.iscanceled() or monitor.abortRequested():
-                    return
-                remaining = (deadline - time.time()) / float(code.get('expires_in', 1800))
-                progress.update(int(remaining * 100), message)
+                    return None
+                progress.update(int((deadline - time.time()) / float(expires_in) * 100), message)
                 if monitor.waitForAbort(interval):
-                    return
+                    return None
                 try:
                     token = auth.poll_token(code['device_code'])
                 except auth.AuthError as exc:
                     self._notify(kodi.formatted(30113, 'Sign-in failed: %s', exc), error=True)
-                    return
+                    return None
                 if token:
-                    break
+                    return token
         finally:
             progress.close()
-        if not token:
-            self._notify(kodi.string(30130), error=True)
-            return
+        self._notify(kodi.string(30130), error=True)
+        return None
+
+    def _add_signed_in_account(self, token):
         account_id = auth.add_account(token)
         name = InnerTube().account_name() or kodi.formatted(30131, 'Account %s', len(auth.accounts()))
         auth.rename_account(account_id, name)
