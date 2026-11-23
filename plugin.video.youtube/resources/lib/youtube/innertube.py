@@ -269,7 +269,7 @@ class InnerTube:
         if not names:
             return None
         names.sort(key=lambda x: not x[0])
-        selected, name, handle = names[0]
+        _, name, handle = names[0]
         return '%s (%s)' % (name, handle) if handle and handle != name else name
 
     # -------------------------------------------------------------- player

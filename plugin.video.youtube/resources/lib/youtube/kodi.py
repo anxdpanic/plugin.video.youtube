@@ -12,7 +12,6 @@ import xbmcvfs
 
 ADDON = xbmcaddon.Addon()
 ADDON_ID = ADDON.getAddonInfo('id')
-ADDON_VERSION = ADDON.getAddonInfo('version')
 PROFILE = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
 ADDON_PATH = xbmcvfs.translatePath(ADDON.getAddonInfo('path'))
 CACHE_DIR = os.path.join(PROFILE, 'cache')

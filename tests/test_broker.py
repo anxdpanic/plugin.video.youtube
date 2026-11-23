@@ -185,7 +185,6 @@ def test_the_service_own_requests_go_straight_to_its_broker(net, monkeypatch):
     monkeypatch.setattr(http, '_broker', pool)
     url = 'https://www.youtube.com/api/timedtext?v=x'
     assert http.request(url) == (200, b'ok ' + url.encode())
-    monkeypatch.setattr(pool, 'held_back', lambda host: True)
     pool._blocked_until['www.youtube.com'] = time.time() + 30
     with pytest.raises(http.HTTPError) as caught:
         http.request('https://www.youtube.com/banner', priority=http.BACKGROUND)

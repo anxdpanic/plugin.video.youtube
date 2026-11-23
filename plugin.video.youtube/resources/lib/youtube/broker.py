@@ -115,10 +115,6 @@ class Broker:
             self._stopped = True
             self._cv.notify_all()
 
-    def held_back(self, host):
-        with self._cv:
-            return self._held_back(host)
-
     # ------------------------------------------------------------------ workers
     def _held_back(self, host):
         return self._blocked_until.get(host, 0) > time.time()
