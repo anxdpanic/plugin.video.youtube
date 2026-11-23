@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.leanback" name="Leanback" version="0.2.6" provider-name="anxdpanic">
+<addon id="plugin.video.leanback" name="Leanback" version="0.2.7" provider-name="anxdpanic">
     <requires>
         <import addon="xbmc.python" version="3.0.1"/>
         <import addon="inputstream.adaptive" version="21.0.0"/>
@@ -18,10 +18,13 @@
         <license>GPL-3.0-only</license>
         <website>https://gitea.panicked.xyz/anxdpanic/youtube_tv_addon</website>
         <source>https://gitea.panicked.xyz/anxdpanic/youtube_tv_addon</source>
-        <news>v0.2.6
+        <news>v0.2.7
+- Use the videos content type only for listings of videos
+- Take all text from the language files
+
+v0.2.6
 - Retry playback on another YouTube host when it asks to confirm you're not a bot
-- Explain the bot check as a VPN problem when playback still fails
-- Use the videos content type only for listings of videos</news>
+- Explain the bot check as a VPN problem when playback still fails</news>
         <assets>
             <icon>resources/media/icon.png</icon>
             <fanart>resources/media/fanart.jpg</fanart>
