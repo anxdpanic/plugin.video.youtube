@@ -20,6 +20,14 @@ TEMP_DIR = os.path.join(xbmcvfs.translatePath('special://temp/'), ADDON_ID)
 LEGACY_TEMP_DIR = os.path.join(PROFILE, 'temp')
 
 
+def refresh():
+    """Read settings and strings afresh from here on. With reuselanguageinvoker on, Kodi keeps this module
+    loaded between plugin runs, and an Addon object can go on answering with the settings it read when it
+    was made; the long-running service and TV window call this after the settings change."""
+    global ADDON
+    ADDON = xbmcaddon.Addon(ADDON_ID)
+
+
 def log(msg):
     """Log at debug level, so nothing appears unless Kodi debug logging is on."""
     xbmc.log('[%s] %s' % (ADDON_ID, msg), xbmc.LOGDEBUG)

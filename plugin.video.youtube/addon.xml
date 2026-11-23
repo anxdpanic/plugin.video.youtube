@@ -32,6 +32,6 @@
             <screenshot>resources/screenshots/screenshot-04.jpg</screenshot>
             <screenshot>resources/screenshots/screenshot-05.jpg</screenshot>
         </assets>
-        <reuselanguageinvoker>false</reuselanguageinvoker>
+        <reuselanguageinvoker>true</reuselanguageinvoker>
     </extension>
 </addon>

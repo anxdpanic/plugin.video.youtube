@@ -1230,4 +1230,5 @@ class Plugin(pages.Pages):
 
 
 def run(argv):
+    kodi.refresh()  # the module may still be loaded from an earlier run (reuselanguageinvoker)
     Plugin(argv).dispatch()

@@ -145,6 +145,7 @@ class TVWindow(xbmcgui.WindowXML):
     def _settings_changed(self):
         """Apply settings changed meanwhile: the rail (hide Shorts), the watched threshold and the page's
         filters, by building the shown page again (from the cache, so it costs nothing)."""
+        kodi.refresh()
         self.threshold = pages.watched_threshold()
         self._load_rail()
         screen = self.screen

@@ -221,6 +221,7 @@ def run():
     while not monitor.waitForAbort(5):
         if monitor.settings_changed:
             monitor.settings_changed = False
+            kodi.refresh()
             try:
                 httpd.follow_setting()
             except Exception as exc:  # a failed switch must never stop the service

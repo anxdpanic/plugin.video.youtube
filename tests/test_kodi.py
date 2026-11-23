@@ -42,3 +42,19 @@ def test_used_string_ids_are_in_strings_po():
         used.update(int(i) for i in re.findall(r'\b(?:string|formatted)\((3\d{4})\b',path.read_text(encoding='utf-8')))
     assert len(used) > 50
     assert used <= defined, sorted(used - defined)
+
+
+def test_refresh_reads_the_add_on_afresh():
+    """With reuselanguageinvoker on, this module outlives a settings change; refresh() makes a new Addon."""
+    before = kodi.ADDON
+    kodi.refresh()
+    assert kodi.ADDON is not before
+
+
+def test_run_refreshes_before_dispatch(monkeypatch):
+    from resources.lib.youtube import router
+    seen = []
+    monkeypatch.setattr(kodi, 'refresh', lambda: seen.append('refresh'))
+    monkeypatch.setattr(router.Plugin, 'dispatch', lambda self: seen.append('dispatch'))
+    router.run(['plugin://plugin.video.youtube/', '1', ''])
+    assert seen == ['refresh', 'dispatch']
