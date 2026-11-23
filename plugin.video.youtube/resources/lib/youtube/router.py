@@ -100,12 +100,29 @@ def video_plot(item, known, threshold):
     """The info panel's text, laid out like Full details: channel, subscribers, age, views and likes,
     then status, then the description."""
     known = known or {}
+    lines = [' • '.join(x for x in _plot_facts(item, known) if x), ' • '.join(_plot_status(item, threshold))]
+    if known.get('d'):
+        lines.append('\n' + known['d'])
+    else:
+        lines.extend(_tile_extras(item, ' '.join(lines)))
+    return '\n'.join(line for line in lines if line)
+
+
+def _plot_facts(item, known):
+    """Channel, subscribers, age, views and likes. `known` is what the watch page said, keyed by one
+    letter to keep the descriptions store small (s subscribers, t/p age, l likes); it fills what the
+    tile lacks."""
     facts = [item['channel'], item.get('subscribers') or known.get('s'),
              item['published'] or known.get('t') or known.get('p')]
     if item['views']:
         facts.append('{:,} {}'.format(item['views'], 'watching' if item['live'] else 'views'))
     if known.get('l'):
         facts.append('%s likes' % format_count(known['l']))
+    return facts
+
+
+def _plot_status(item, threshold):
+    """Live or upcoming, the tile's badges, and how much of it has been watched."""
     status = []
     if item['live']:
         status.append(kodi.string(30127))
@@ -116,17 +133,100 @@ def video_plot(item, known, threshold):
         status.append(kodi.string(30142))
     elif item['watched_pct'] > 0:
         status.append(kodi.formatted(30141, item['watched_pct']))
-    lines = [' • '.join(x for x in facts if x), ' • '.join(status)]
-    if known and known.get('d'):
-        lines.append('\n' + known['d'])
-    else:
-        # Lines from the tile that say more than the facts above (e.g. "Scheduled for ...").
-        said = ' '.join(lines)
-        for line in item['plot_lines']:
-            parts = [p for p in line.split(' • ') if p and p not in said and not parser.is_count(p)]
-            if parts:
-                lines.append(' • '.join(parts))
-    return '\n'.join(line for line in lines if line)
+    return status
+
+
+def _tile_extras(item, said):
+    """Lines from the tile that say more than `said` already does (e.g. "Scheduled for ..."), for when
+    there's no description to show instead. Counts are dropped: the facts line has them."""
+    extras = []
+    for line in item['plot_lines']:
+        parts = [p for p in line.split(' • ') if p and p not in said and not parser.is_count(p)]
+        if parts:
+            extras.append(' • '.join(parts))
+    return extras
+
+
+def _order_videos(videos, order, start):
+    """Put a playlist's videos in place in the order asked for ('reverse' or 'shuffle'). A chosen first
+    video keeps the playlist's order, so shuffle is ignored then."""
+    if order == 'reverse':
+        videos.reverse()
+    elif order == 'shuffle' and not start:
+        random.shuffle(videos)
+
+
+def _details_plot(info):
+    """The Info dialog's plot: a facts line (channel, subscribers, date, views, likes), then the
+    description."""
+    facts = [x for x in (info['channel'], info.get('subscribers'), info.get('published') or info.get('date'),
+                         ('%s views' % '{:,}'.format(info['views'])) if info['views'] else '',
+                         ('%s likes' % format_count(info['likes'])) if info.get('likes') else '') if x]
+    plot = info['plot']
+    if facts:
+        plot = ' • '.join(facts) + ('\n\n' + plot if plot else '')
+    return plot
+
+
+def _set_details_tag(tag, info):
+    """Fill a video's info tag from its watch page details. The channel stands in as both studio and
+    director, which is where skins show who made a video."""
+    tag.setMediaType('video')
+    tag.setTitle(info['title'])
+    tag.setPlot(_details_plot(info))
+    if info['channel']:
+        tag.setStudios([info['channel']])
+        tag.setDirectors([info['channel']])
+    if info['duration']:
+        tag.setDuration(info['duration'])
+    if info['tags']:
+        tag.setTags(info['tags'][:20])
+    if info['views']:
+        tag.setVotes(c_int(info['views']))
+    if info.get('date'):
+        tag.setPremiered(info['date'])
+    if info.get('genre'):
+        tag.setGenres([info['genre']])
+
+
+def _folder_url(item):
+    """Where a channel, playlist or other folder tile leads, or None for tiles that lead nowhere here.
+    A playlist's page is VL<playlist id>; it opens that page whether the tile points at the page or at
+    the playlist's first video (a "play all" tile)."""
+    target = item['target'] or {}
+    kind = item['kind']
+    if kind == 'playlist' or (target.get('type') == 'video' and target.get('playlist_id') and kind != 'video'):
+        playlist_id = target.get('playlist_id') or (target.get('browse_id') or '')[2:] or item.get('id')
+        browse_id = target.get('browse_id') if target.get('type') == 'browse' else 'VL' + playlist_id
+        return url_for('browse', id=browse_id, title=item['title'])
+    if target.get('type') == 'browse':
+        return url_for('browse', id=target['browse_id'], params=target.get('params'), title=item['title'])
+    if target.get('type') == 'search':
+        return url_for('search', q=target['query'], params=target.get('params'))
+    if target.get('type') == 'play_playlist':
+        return url_for('browse', id='VL' + target['playlist_id'], title=item['title'])
+    return None
+
+
+def _folder_plot(item):
+    lines = list(item['plot_lines'])
+    if item['badges']:
+        lines.append(' • '.join(item['badges']))
+    return '\n'.join(lines)
+
+
+def _folder_menu(item):
+    """Pin for channels, Play all for playlists."""
+    target = item['target'] or {}
+    browse_id = target.get('browse_id') or ''
+    menu = []
+    if item['kind'] == 'channel' or browse_id.startswith('UC'):
+        menu.append((kodi.string(30106), 'RunPlugin(%s)' % url_for(
+            'pin', id=browse_id or item.get('id'), title=item['title'], thumb=item.get('thumb'))))
+    if item['kind'] == 'playlist':
+        playlist_id = browse_id[2:] if browse_id.startswith('VL') else (target.get('playlist_id') or item.get('id'))
+        menu.append((kodi.string(30126), 'RunPlugin(%s)' % url_for('play_playlist', list=playlist_id)))
+    return menu
 
 
 def _player_error_message(exc):
@@ -662,26 +762,38 @@ class Plugin(pages.Pages):
     def _prefetch(self, items, hide_shorts):
         """Before anything is drawn: the banners of channels not seen before and, when turned on, the
         descriptions of listed videos, all looked up at once and in parallel."""
-        channels = [channel_of(item) for item in items]
-        banner_lookup = None
-        if not self.fanart and self.banners.unknown(channels):
-            banner_lookup = threading.Thread(target=self.banners.fetch_all, args=(channels,), name='youtube-art')
-            banner_lookup.start()
+        banner_lookup = self._start_banner_lookup([channel_of(item) for item in items])
         if describe.enabled():
-            missing = [video_id_of(item) for item in items
-                       if item['kind'] == 'video' and not item.get('upcoming')
-                       and not (hide_shorts and item['short'])]
-            missing = [v for v in missing if v and not (self.descriptions.get(v) or {}).get('w')]
-            if missing:
-                describe.fetch_all(missing, self.descriptions)
+            self._fetch_descriptions(items, hide_shorts)
         if banner_lookup:
             banner_lookup.join()
         if not self.fanart:
-            # Some tiles (Home's rows) don't name their channel; the watch pages just read do.
-            named = [(self.descriptions.get(video_id_of(item)) or {}).get('c')
-                     for item in items if item['kind'] == 'video' and not item.get('channel_id')]
-            if self.banners.unknown(named):
-                self.banners.fetch_all(named)
+            self._fetch_banners_named_by_descriptions(items)
+
+    def _start_banner_lookup(self, channels):
+        """Look up unknown channels' banners in the background. Returns the thread, or None when there's
+        nothing to look up or a channel page's own banner already covers everything."""
+        if self.fanart or not self.banners.unknown(channels):
+            return None
+        lookup = threading.Thread(target=self.banners.fetch_all, args=(channels,), name='youtube-art')
+        lookup.start()
+        return lookup
+
+    def _fetch_descriptions(self, items, hide_shorts):
+        """Read the watch pages of listed videos not read yet ('w' marks a full read). Upcoming
+        streams have nothing to read, and hidden Shorts aren't shown."""
+        wanted = [video_id_of(item) for item in items
+                  if item['kind'] == 'video' and not item.get('upcoming') and not (hide_shorts and item['short'])]
+        missing = [v for v in wanted if v and not (self.descriptions.get(v) or {}).get('w')]
+        if missing:
+            describe.fetch_all(missing, self.descriptions)
+
+    def _fetch_banners_named_by_descriptions(self, items):
+        """Some tiles (Home's rows) don't name their channel; the watch pages just read do ('c')."""
+        named = [(self.descriptions.get(video_id_of(item)) or {}).get('c')
+                 for item in items if item['kind'] == 'video' and not item.get('channel_id')]
+        if self.banners.unknown(named):
+            self.banners.fetch_all(named)
 
     def _use_channel_fanart(self, browse_id, header):
         """On a channel's pages, its banner is the fanart for everything listed."""
@@ -710,39 +822,17 @@ class Plugin(pages.Pages):
         self._add(url_for('play', v=video_id), li, False)
 
     def _add_folder_item(self, item):
-        target = item['target'] or {}
-        kind = item['kind']
-        if kind == 'playlist' or (target.get('type') == 'video' and target.get('playlist_id') and kind != 'video'):
-            playlist_id = target.get('playlist_id') or (target.get('browse_id') or '')[2:] or item.get('id')
-            browse_id = target.get('browse_id') if target.get('type') == 'browse' else 'VL' + playlist_id
-            url = url_for('browse', id=browse_id, title=item['title'])
-        elif target.get('type') == 'browse':
-            url = url_for('browse', id=target['browse_id'], params=target.get('params'), title=item['title'])
-        elif target.get('type') == 'search':
-            url = url_for('search', q=target['query'], params=target.get('params'))
-        elif target.get('type') == 'play_playlist':
-            url = url_for('browse', id='VL' + target['playlist_id'], title=item['title'])
-        else:
+        url = _folder_url(item)
+        if not url:
             return
         li = xbmcgui.ListItem(item['title'], offscreen=True)
         tag = li.getVideoInfoTag()
         tag.setTitle(item['title'])
-        lines = list(item['plot_lines'])
-        if item['badges']:
-            lines.append(' • '.join(item['badges']))
-        tag.setPlot('\n'.join(lines))
+        tag.setPlot(_folder_plot(item))
         thumb = item.get('thumb') or 'DefaultFolder.png'
-        browse_id = target.get('browse_id') or ''
-        channel_id = channel_of(item)
         li.setArt({'thumb': thumb, 'icon': thumb,
-                   'fanart': self._channel_fanart(channel_id) or item.get('thumb') or ''})
-        menu = []
-        if kind == 'channel' or browse_id.startswith('UC'):
-            menu.append((kodi.string(30106), 'RunPlugin(%s)' % url_for(
-                'pin', id=browse_id or item.get('id'), title=item['title'], thumb=item.get('thumb'))))
-        if kind == 'playlist':
-            playlist_id = browse_id[2:] if browse_id.startswith('VL') else (target.get('playlist_id') or item.get('id'))
-            menu.append((kodi.string(30126), 'RunPlugin(%s)' % url_for('play_playlist', list=playlist_id)))
+                   'fanart': self._channel_fanart(channel_of(item)) or item.get('thumb') or ''})
+        menu = _folder_menu(item)
         if menu:
             li.addContextMenuItems(menu)
         self._add(url, li, True)
@@ -833,30 +923,31 @@ class Plugin(pages.Pages):
         return 'http://127.0.0.1:%s/mpd/%s.mpd' % (port, video_id)
 
     def play_playlist(self):
+        """Play a playlist (or a mix) as Kodi's video playlist, in the order asked for, from the video
+        asked for."""
         playlist_id = self.params['list']
         if self.handle >= 0:
             # Started as a playable item (the Play button in a page header's info dialog): let Kodi's own
             # attempt fail now, before the playlist starts, or Kodi counts the failure against the
             # playlist and skips its first video.
             xbmcplugin.setResolvedUrl(self.handle, False, xbmcgui.ListItem(offscreen=True))
-        if is_mix(playlist_id):
-            items = self._mix_items(playlist_id)[0]
-        else:
-            page = parser.parse_page(self.fetch({'ep': 'browse', 'id': 'VL' + playlist_id}))
-            items = [i for s in page['shelves'] for i in s['items'] if i['kind'] == 'video']
+        items = self._playlist_videos(playlist_id)
         if not items:
             self._notify(kodi.string(30124))
             return
         self._end(False)
         videos = [(video_id_of(item), item['title'], item['thumb']) for item in items]
         start = self.params.get('v')
-        order = self.params.get('order')
-        if order == 'reverse':
-            videos.reverse()
-        elif order == 'shuffle' and not start:  # a chosen first video keeps the playlist's order
-            random.shuffle(videos)
+        _order_videos(videos, self.params.get('order'), start)
         position = next((i for i, video in enumerate(videos) if video[0] == start), 0)
         self._play_videos(videos, position)
+
+    def _playlist_videos(self, playlist_id):
+        """A playlist's video tiles. Mixes (RD...) have no playlist page; they come from the watch page."""
+        if is_mix(playlist_id):
+            return self._mix_items(playlist_id)[0]
+        page = parser.parse_page(self.fetch({'ep': 'browse', 'id': 'VL' + playlist_id}))
+        return [i for s in page['shelves'] for i in s['items'] if i['kind'] == 'video']
 
     def shorts(self):
         """Like the TV app's Shorts button: start playing the Shorts feed as a playlist."""
@@ -881,31 +972,10 @@ class Plugin(pages.Pages):
         xbmc.Player().play(playlist, startpos=position)
 
     def _apply_details(self, li, info):
-        # Played or opened in Info: keep the description for the video's plot in listings.
+        """Dress a played or Info-opened video's list item with its full details."""
+        # Keep the description, so the video's plot in listings has it from now on.
         self.descriptions.remember_details(info)
-        tag = li.getVideoInfoTag()
-        tag.setMediaType('video')
-        tag.setTitle(info['title'])
-        plot = info['plot']
-        facts = [x for x in (info['channel'], info.get('subscribers'), info.get('published') or info.get('date'),
-                             ('%s views' % '{:,}'.format(info['views'])) if info['views'] else '',
-                             ('%s likes' % format_count(info['likes'])) if info.get('likes') else '') if x]
-        if facts:
-            plot = ' • '.join(facts) + ('\n\n' + plot if plot else '')
-        tag.setPlot(plot)
-        if info['channel']:
-            tag.setStudios([info['channel']])
-            tag.setDirectors([info['channel']])
-        if info['duration']:
-            tag.setDuration(info['duration'])
-        if info['tags']:
-            tag.setTags(info['tags'][:20])
-        if info['views']:
-            tag.setVotes(c_int(info['views']))
-        if info.get('date'):
-            tag.setPremiered(info['date'])
-        if info.get('genre'):
-            tag.setGenres([info['genre']])
+        _set_details_tag(li.getVideoInfoTag(), info)
         thumb = 'https://i.ytimg.com/vi/%s/maxresdefault.jpg' % info['video_id'] if info['video_id'] else info['thumb']
         li.setArt({'thumb': info['thumb'] or thumb, 'icon': info['thumb'] or thumb,
                    'fanart': self._channel_fanart(info.get('channel_id')) or thumb})
@@ -940,37 +1010,43 @@ class Plugin(pages.Pages):
             player.play(url_for('play', v=video_id, t='%.3f' % start), li)
 
     def details(self):
+        """Kodi's Info dialog for a page header (channel or playlist) or for a video."""
         if self.params.get('header'):
-            header = json.loads(self.params['header'])
-            li = xbmcgui.ListItem(header['title'], offscreen=True)
-            tag = li.getVideoInfoTag()
-            tag.setTitle(header['title'])
-            tag.setPlot(header['plot'])
-            li.setArt({k: v for k, v in (('thumb', header.get('thumb')), ('fanart', header.get('fanart'))) if v})
-            # The info dialog always has a Play button; without a path it fails with "One or more items
-            # failed to play". On a playlist or channel page it plays everything, like "Play all".
-            if self.params.get('list'):
-                li.setPath(url_for('play_playlist', list=self.params['list']))
-            xbmcgui.Dialog().info(li)
+            self._header_details(json.loads(self.params['header']))
             return
         video_id = self.params['v']
-        xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
-        try:
-            player_resp = None
-            try:
-                player_resp, _ = self.api.player(video_id)
-            except InnerTubeError:
-                pass
-            next_resp = self.api.watch_page(video_id)
-        finally:
-            xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
-        info = parser.video_details(player_resp or {}, next_resp)
+        info = parser.video_details(*self._fetch_details(video_id))
         info['video_id'] = info['video_id'] or video_id
         li = xbmcgui.ListItem(info['title'], offscreen=True)
         self._apply_details(li, info)
         li.setPath(url_for('play', v=video_id))
         li.setProperty('IsPlayable', 'true')
         xbmcgui.Dialog().info(li)
+
+    def _header_details(self, header):
+        li = xbmcgui.ListItem(header['title'], offscreen=True)
+        tag = li.getVideoInfoTag()
+        tag.setTitle(header['title'])
+        tag.setPlot(header['plot'])
+        li.setArt({k: v for k, v in (('thumb', header.get('thumb')), ('fanart', header.get('fanart'))) if v})
+        # The info dialog always has a Play button; without a path it fails with "One or more items
+        # failed to play". On a playlist or channel page it plays everything, like "Play all".
+        if self.params.get('list'):
+            li.setPath(url_for('play_playlist', list=self.params['list']))
+        xbmcgui.Dialog().info(li)
+
+    def _fetch_details(self, video_id):
+        """(player response, watch page) for a video, behind a busy dialog. The player response only
+        adds details (duration, tags), so the dialog still opens when YouTube refuses it."""
+        xbmc.executebuiltin('ActivateWindow(busydialognocancel)')
+        try:
+            try:
+                player_resp, _ = self.api.player(video_id)
+            except InnerTubeError:
+                player_resp = None
+            return player_resp or {}, self.api.watch_page(video_id)
+        finally:
+            xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
 
     # ================================================================ TV interface
     def tv_interface(self):
