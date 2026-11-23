@@ -1,6 +1,6 @@
 import pytest
 
-from resources.lib.leanback import http, innertube
+from resources.lib.youtube import http, innertube
 
 
 @pytest.fixture
@@ -70,7 +70,7 @@ def test_retry_stays_on_the_apps_api_host(api, monkeypatch):
 
 
 def test_401_refreshes_the_token_and_retries(api, monkeypatch):
-    from resources.lib.leanback import auth
+    from resources.lib.youtube import auth
     refreshed = []
     monkeypatch.setattr(auth, 'access_token', lambda force_refresh=False: refreshed.append(force_refresh) or 'TOKEN')
     calls = responses(monkeypatch, http.HTTPError(401), {'ok': True})

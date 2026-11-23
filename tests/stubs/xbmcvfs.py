@@ -2,7 +2,7 @@
 import os
 import tempfile
 
-ROOT = os.path.join(tempfile.gettempdir(), 'leanback-tests')
+ROOT = os.path.join(tempfile.gettempdir(), 'youtube-tests')
 
 
 def translatePath(path):  # noqa: N802 (Kodi API name)

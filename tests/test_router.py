@@ -6,16 +6,16 @@ import xbmcaddon
 import xbmcgui
 import xbmcplugin
 
-from resources.lib.leanback import parser, router
+from resources.lib.youtube import parser, router
 
 
 def run(path, query=''):
-    plugin = router.Plugin(['plugin://plugin.video.leanback/' + path, '1', query])
+    plugin = router.Plugin(['plugin://plugin.video.youtube/' + path, '1', query])
     return plugin
 
 
 def test_url_for_drops_empty_params():
-    assert router.url_for('browse', id='FEtopics', params=None) == 'plugin://plugin.video.leanback/browse?id=FEtopics'
+    assert router.url_for('browse', id='FEtopics', params=None) == 'plugin://plugin.video.youtube/browse?id=FEtopics'
 
 
 def test_route_without_required_params_shows_main_menu(monkeypatch):
@@ -118,7 +118,7 @@ def test_mix_lists_watch_next_panel_instead_of_browsing(monkeypatch):
 def test_failed_requests_show_friendly_messages(monkeypatch):
     import xbmcgui
 
-    from resources.lib.leanback.innertube import InnerTubeError
+    from resources.lib.youtube.innertube import InnerTubeError
 
     def fail(status):
         def browse(self):
@@ -292,7 +292,7 @@ def test_accounts_entry_can_be_hidden(monkeypatch):
 
 
 def test_tv_interface_ends_the_listing_before_opening_the_window(monkeypatch):
-    from resources.lib.leanback import tv
+    from resources.lib.youtube import tv
 
     order = []
     monkeypatch.setattr(xbmcplugin, 'endOfDirectory', lambda handle, succeeded=True, **kw: order.append(succeeded))
@@ -340,7 +340,7 @@ def playlist_items(monkeypatch, ids):
 
 def queued(query):
     del xbmc.Player.PLAYED[:], xbmc.Player.START_POSITIONS[:]
-    router.Plugin(['plugin://plugin.video.leanback/play_playlist', '1', query]).dispatch()
+    router.Plugin(['plugin://plugin.video.youtube/play_playlist', '1', query]).dispatch()
     playlist = xbmc.Player.PLAYED[-1]
     return [url.rsplit('=', 1)[1] for url, _ in playlist.items], xbmc.Player.START_POSITIONS[-1]
 
@@ -389,7 +389,7 @@ class PlayerApi:
 
 
 def play(api, monkeypatch, port='50152'):
-    monkeypatch.setitem(xbmcgui._PROPERTIES, 'leanback.port', port)
+    monkeypatch.setitem(xbmcgui._PROPERTIES, 'youtube.port', port)
     plugin = run('play', '?v=abcdefghijk')
     plugin.api = api
     plugin.play()
@@ -416,7 +416,7 @@ def test_play_live_uses_hls_with_timeshift(monkeypatch):
 
 
 def test_play_without_streams_fails_with_youtubes_reason(monkeypatch):
-    from resources.lib.leanback.innertube import InnerTubeError
+    from resources.lib.youtube.innertube import InnerTubeError
     ok, _ = play(PlayerApi(error=InnerTubeError('Video unavailable')), monkeypatch)
     assert not ok
     assert xbmcgui.NOTIFICATIONS[-1][1] == 'Video unavailable'
@@ -426,7 +426,7 @@ def sign_in(monkeypatch, polls, expires_in=1800):
     """Run the sign-in flow with the dialog left open and auth.poll_token returning each poll in turn."""
     import xbmc
 
-    from resources.lib.leanback import auth
+    from resources.lib.youtube import auth
     added = []
     monkeypatch.setattr(xbmcgui.DialogProgress, 'iscanceled', lambda self: False)
     monkeypatch.setattr(xbmc.Monitor, 'waitForAbort', lambda self, timeout=0: False)
@@ -454,11 +454,11 @@ def test_sign_in_stops_when_the_code_expires(monkeypatch):
 
 
 def test_bot_check_gets_its_own_message():
-    from resources.lib.leanback.innertube import InnerTubeError
+    from resources.lib.youtube.innertube import InnerTubeError
     message = router._player_error_message(InnerTubeError("Sign in to confirm you're not a bot", bot_check=True))
     assert message == 'str30183'  # the stub's stand-in for the string that names the VPN
 
 
 def test_other_playability_reasons_are_shown_as_given():
-    from resources.lib.leanback.innertube import InnerTubeError
+    from resources.lib.youtube.innertube import InnerTubeError
     assert router._player_error_message(InnerTubeError('Video unavailable')) == 'Video unavailable'

@@ -14,7 +14,7 @@ import xbmcgui
 
 from . import auth, http, innertube, kodi
 
-PROPERTY = 'leanback.tracking'
+PROPERTY = 'youtube.tracking'
 INTERVAL = 30  # seconds between watch-time reports
 
 
@@ -95,7 +95,7 @@ def _send(url, ua):
             http.request(url, headers=headers, timeout=10, priority=http.BACKGROUND)
         except http.HTTPError as exc:
             kodi.log('history report failed: %s' % exc)
-    thread = threading.Thread(target=run, name='leanback-history')
+    thread = threading.Thread(target=run, name='youtube-history')
     thread.daemon = True
     thread.start()
 
@@ -149,7 +149,7 @@ class Tracker(xbmc.Player):
         self.playing = claimed
         if claimed:
             thread = threading.Thread(target=self._begin, args=(claimed, self._time() or 0.0),
-                                      name='leanback-history')
+                                      name='youtube-history')
             thread.daemon = True
             thread.start()
 

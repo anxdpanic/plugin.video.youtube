@@ -1,8 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright (C) 2026 anxdpanic
-import sys
-
-from resources.lib.leanback import router
+from resources.lib.youtube import tv
 
 if __name__ == '__main__':
-    router.run(sys.argv)
+    tv.open_window()

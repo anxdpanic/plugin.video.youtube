@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright (C) 2026 anxdpanic
-"""Paths shaped like another YouTube add-on's, so .strm files, keymaps and favourites written for it work
-here with only the add-on id changed: plugin://<id>/play/?video_id=... and the like.
+"""Paths shaped like those of earlier plugin.video.youtube versions, so .strm files, keymaps and favourites
+written for them keep working: plugin://plugin.video.youtube/play/?video_id=... and the like.
 
-translate() turns such a path into one of Leanback's own routes before dispatch. Leanback's own routes
-are never rewritten."""
+translate() turns such a path into one of the add-on's own routes before dispatch. Its own routes are
+never rewritten."""
 import re
 
 
@@ -48,8 +48,8 @@ _COMPILED = tuple((re.compile(pattern + '$'), handler) for pattern, handler in A
 
 
 def translate(route, params, native):
-    """(route, params) for Leanback. `route` has no leading or trailing slash; `native` is the set of
-    Leanback's own routes, which pass through unchanged (except search and play, whose own
+    """(route, params) for the add-on. `route` has no leading or trailing slash; `native` is the set of
+    its own routes, which pass through unchanged (except search and play, whose own
     parameters tell them apart)."""
     if route in native and route not in ('search', 'play'):
         return route, params

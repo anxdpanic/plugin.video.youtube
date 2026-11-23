@@ -12,15 +12,15 @@ def no_request_pacing(monkeypatch):
     """Requests are spaced out on a device; tests don't wait (test_broker and test_http check the pacing)."""
     import xbmcgui
 
-    from resources.lib.leanback import broker
+    from resources.lib.youtube import broker
     monkeypatch.setattr(broker, 'GAPS', {})
-    xbmcgui.Window(10000).clearProperty('leanback.port')  # no service: requests go straight to http.send
+    xbmcgui.Window(10000).clearProperty('youtube.port')  # no service: requests go straight to http.send
 
 
 @pytest.fixture(autouse=True)
 def no_banner_fetching(monkeypatch):
     """Listings look up unknown channels' banners before drawing; tests stay offline."""
-    from resources.lib.leanback import art
+    from resources.lib.youtube import art
     monkeypatch.setattr(art.Banners, 'fetch_all', lambda self, channel_ids, fetch=None: 0)
 
 

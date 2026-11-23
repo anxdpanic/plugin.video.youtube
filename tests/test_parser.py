@@ -1,4 +1,4 @@
-from resources.lib.leanback import parser
+from resources.lib.youtube import parser
 
 
 def tile(video_id='abcdefghijk', title='A video', overlays=None, lines=None, **extra):

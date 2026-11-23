@@ -1,4 +1,4 @@
-# Leanback (plugin.video.leanback)
+# YouTube (plugin.video.youtube)
 
 A Kodi video add-on that browses YouTube with the TV layout: the TV sidebar, shelves,
 subscriptions, library and search, full video information, and DASH/HLS playback through
@@ -14,10 +14,10 @@ InputStream Adaptive. It targets Kodi 21 (Omega) and later.
 - **Customisation:** show, hide or reorder main-menu items, pin channels, hide Shorts or
   watched videos, and set preferred quality, codec, HDR and audio track.
 
-## Paths shared with other YouTube add-ons
+## Paths from earlier versions
 
-Leanback also accepts the plugin paths other YouTube add-ons use, so `.strm` files, favourites and keymaps
-written for them work after changing only the add-on id:
+The add-on also accepts the plugin paths earlier versions of plugin.video.youtube used, so existing
+`.strm` files, favourites and keymaps keep working:
 
 | Path | Opens |
 |---|---|
@@ -49,7 +49,7 @@ To build an installable zip for Kodi's **Install from zip file**:
 python scripts/package.py
 ```
 
-This writes `dist/plugin.video.leanback-<version>.zip`, with the version taken from `addon.xml`.
+This writes `dist/plugin.video.youtube-<version>.zip`, with the version taken from `addon.xml`.
 
 ## License
 

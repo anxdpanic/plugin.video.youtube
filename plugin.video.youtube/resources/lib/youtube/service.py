@@ -19,11 +19,11 @@ import xbmcgui
 from . import broker, history, http, kodi, playback
 
 PORT_PROPERTY = http.PORT_PROPERTY
-# Default port, kept clear of other add-ons' servers (plugin.video.youtube binds 50152 by default and
-# fails with "Address already in use" when it's taken) and above Linux's ephemeral range (32768-60999),
-# so outgoing connections never hold it. The service_port setting overrides it; 0 means any free port.
+# Default port, kept clear of 50152, which earlier plugin.video.youtube versions bound, and above Linux's
+# ephemeral range (32768-60999), so outgoing connections never hold it. The service_port setting overrides
+# it; 0 means any free port.
 DEFAULT_PORT = 61152
-OTHER_ADDON_PORTS = (50152,)  # plugin.video.youtube
+OTHER_ADDON_PORTS = (50152,)  # earlier plugin.video.youtube versions
 FALLBACK_STEPS = 2  # also try the next ports before taking any free one
 MANIFEST = re.compile(r'^/mpd/([A-Za-z0-9_-]{11})\.mpd$')
 SUBTITLE = re.compile(r'^/sub/([A-Za-z0-9_-]{11})/(\d+)\.vtt$')
@@ -149,7 +149,7 @@ class Httpd:
         server = _start_server(candidate_ports(wanted))
         if server is None:
             return False
-        threading.Thread(target=server.serve_forever, name='leanback-httpd', daemon=True).start()
+        threading.Thread(target=server.serve_forever, name='youtube-httpd', daemon=True).start()
         old, self.server, self.wanted = self.server, server, wanted
         # Publish the new port before closing the old server, so no request finds neither.
         self.window.setProperty(PORT_PROPERTY, str(self.port))

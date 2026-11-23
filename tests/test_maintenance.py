@@ -4,7 +4,7 @@ import pytest
 import xbmc
 import xbmcgui
 
-from resources.lib.leanback import kodi, maintenance, router
+from resources.lib.youtube import kodi, maintenance, router
 
 
 def write(path, data='x' * 100):
@@ -16,7 +16,7 @@ def write(path, data='x' * 100):
 
 @pytest.fixture
 def stored():
-    """One of everything Leanback keeps, plus the user data Maintenance must leave alone."""
+    """One of everything the add-on keeps, plus the user data Maintenance must leave alone."""
     kodi.Cache.set('page', {'a': 1})
     write(kodi.temp_file('aaaaaaaaaaa.mpd'))
     write(kodi.temp_file('aaaaaaaaaaa.subs.json'))
@@ -79,7 +79,7 @@ def test_human_size():
 
 def run(what, confirm, monkeypatch):
     monkeypatch.setattr(xbmcgui.Dialog, 'yesno', lambda self, heading, message, **kw: confirm)
-    router.Plugin(['plugin://plugin.video.leanback/maintenance', '-1', '?what=' + what]).dispatch()
+    router.Plugin(['plugin://plugin.video.youtube/maintenance', '-1', '?what=' + what]).dispatch()
 
 
 def test_route_asks_first_then_clears_and_reports(stored, monkeypatch, english):

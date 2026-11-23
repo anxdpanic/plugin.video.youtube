@@ -375,7 +375,7 @@ class TVWindow(xbmcgui.WindowXML):
         xbmc.executebuiltin('PlayMedia(%s)' % router.url_for('play', v=video_id, t=start or None))
         if item['live'] or item.get('upcoming'):
             return  # a stream keeps no progress: its position is only where the live edge was
-        threading.Thread(target=self._follow_playback, args=(video_id,), name='leanback-tv-progress').start()
+        threading.Thread(target=self._follow_playback, args=(video_id,), name='youtube-tv-progress').start()
 
     def _follow_playback(self, video_id):
         """Note how far into the video playback gets, then show it on its tiles. Kodi doesn't say where a
@@ -472,7 +472,7 @@ class TVWindow(xbmcgui.WindowXML):
                     self._described.add(video_id)
                     wanted.append((video_id, item, li))
         if wanted:
-            threading.Thread(target=self._describe, args=(wanted,), name='leanback-tv-describe').start()
+            threading.Thread(target=self._describe, args=(wanted,), name='youtube-tv-describe').start()
 
     def _describe(self, wanted):
         try:
@@ -509,7 +509,7 @@ class TVWindow(xbmcgui.WindowXML):
                 self._bannered.add(video_id)
                 wanted.append((video_id, channel_id, li))
         if wanted:
-            threading.Thread(target=self._show_banners, args=(wanted,), name='leanback-tv-art').start()
+            threading.Thread(target=self._show_banners, args=(wanted,), name='youtube-tv-art').start()
 
     def _show_banners(self, wanted):
         with self._banner_lock:

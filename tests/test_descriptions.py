@@ -1,6 +1,6 @@
 import xbmcplugin
 
-from resources.lib.leanback import descriptions, parser, router
+from resources.lib.youtube import descriptions, parser, router
 
 
 def video(video_id, **extra):
@@ -23,7 +23,7 @@ def test_played_videos_keep_their_description():
 def test_video_plot_lists_info_then_description(english):
     english(30141)
     descriptions.Descriptions().remember('aaaaaaaaaaa', 'The description.', '2026-11-18')
-    plugin = router.Plugin(['plugin://plugin.video.leanback/browse', '1', ''])
+    plugin = router.Plugin(['plugin://plugin.video.youtube/browse', '1', ''])
     plugin._render_items([video('aaaaaaaaaaa', badges=['4K'], watched_pct=40),
                           video('bbbbbbbbbbb', live=True, plot_lines=['Chan • 1.2M watching', 'Extra line'])])
     plots = [li.tag.values['plot'] for _, li, _ in xbmcplugin.ITEMS]
@@ -37,7 +37,7 @@ def test_video_plot_leads_like_full_details():
     descriptions.Descriptions().remember_details({
         'video_id': 'aaaaaaaaaaa', 'plot': 'Watch page text.', 'date': '2023-05-01',
         'subscribers': '1.2M subscribers', 'likes': '456789', 'published': '3 years ago'})
-    plugin = router.Plugin(['plugin://plugin.video.leanback/browse', '1', ''])
+    plugin = router.Plugin(['plugin://plugin.video.youtube/browse', '1', ''])
     item = video('aaaaaaaaaaa')
     item['published'] = ''  # the tile gave no age: the watch page's is used
     plugin._render_items([item])

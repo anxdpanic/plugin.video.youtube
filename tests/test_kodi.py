@@ -1,18 +1,18 @@
 import xbmc
 
-from resources.lib.leanback import kodi
+from resources.lib.youtube import kodi
 
 
 def test_log_is_debug_only():
     del xbmc.LOG[:]
     kodi.log('hello')
-    assert xbmc.LOG == [(xbmc.LOGDEBUG, '[plugin.video.leanback] hello')]
+    assert xbmc.LOG == [(xbmc.LOGDEBUG, '[plugin.video.youtube] hello')]
 
 
 def test_log_error_keeps_error_level():
     del xbmc.LOG[:]
     kodi.log_error('boom')
-    assert xbmc.LOG == [(xbmc.LOGERROR, '[plugin.video.leanback] boom')]
+    assert xbmc.LOG == [(xbmc.LOGERROR, '[plugin.video.youtube] boom')]
 
 
 def test_formatted_fills_placeholders(monkeypatch):
@@ -34,7 +34,7 @@ def test_used_string_ids_are_in_strings_po():
     import pathlib
     import re
 
-    root = pathlib.Path(__file__).resolve().parent.parent / 'plugin.video.leanback'
+    root = pathlib.Path(__file__).resolve().parent.parent / 'plugin.video.youtube'
     po = (root / 'resources/language/resource.language.en_gb/strings.po').read_text(encoding='utf-8')
     defined = {int(i) for i in re.findall(r'msgctxt "#(\d+)"', po)}
     used = set()

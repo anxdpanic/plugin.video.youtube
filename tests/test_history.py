@@ -3,7 +3,7 @@ import urllib.parse
 import xbmc
 import xbmcgui
 
-from resources.lib.leanback import history
+from resources.lib.youtube import history
 
 PLAYBACK = 'https://s.youtube.com/api/stats/playback?docid=abcdefghijk&ei=E'
 WATCHTIME = 'https://s.youtube.com/api/stats/watchtime?docid=abcdefghijk&ei=E'

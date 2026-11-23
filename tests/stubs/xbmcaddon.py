@@ -4,8 +4,8 @@ import os
 import re
 import tempfile
 
-PROFILE = os.path.join(tempfile.gettempdir(), 'leanback-tests', 'profile')
-ADDON_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'plugin.video.leanback'))
+PROFILE = os.path.join(tempfile.gettempdir(), 'youtube-tests', 'profile')
+ADDON_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'plugin.video.youtube'))
 
 SETTINGS = {}
 STRINGS = {}
@@ -24,7 +24,7 @@ class Addon:
         pass
 
     def getAddonInfo(self, key):  # noqa: N802 (Kodi API name)
-        return {'id': 'plugin.video.leanback', 'name': 'Leanback', 'version': '0.0.0',
+        return {'id': 'plugin.video.youtube', 'name': 'YouTube', 'version': '0.0.0',
                 'profile': PROFILE, 'path': ADDON_PATH}.get(key, '')
 
     def getSetting(self, key):  # noqa: N802

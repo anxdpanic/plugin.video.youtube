@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 
-from resources.lib.leanback import mpd
+from resources.lib.youtube import mpd
 
 NS = {'d': 'urn:mpeg:dash:schema:mpd:2011'}
 

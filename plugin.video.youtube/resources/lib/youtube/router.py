@@ -121,7 +121,7 @@ def _player_error_message(exc):
     if exc.status is not None:
         return error_message(exc)
     if getattr(exc, 'bot_check', False):
-        # YouTube's own wording ("Sign in to confirm...") reads as if signing in to Leanback would
+        # YouTube's own wording ("Sign in to confirm...") reads as if signing in to the add-on would
         # help, but it judges the connection: see InnerTube.player.
         return kodi.string(30183)
     if str(exc) in ('', 'unplayable'):
@@ -374,9 +374,9 @@ class Plugin(pages.Pages):
         if not kodi.setting_bool('whos_watching') or not auth.accounts():
             return
         window = xbmcgui.Window(10000)
-        if window.getProperty('leanback.whos_watching'):
+        if window.getProperty('youtube.whos_watching'):
             return
-        window.setProperty('leanback.whos_watching', '1')
+        window.setProperty('youtube.whos_watching', '1')
         self._choose_account(kodi.string(30114), allow_add=False)
 
     # ================================================================ listings
@@ -650,7 +650,7 @@ class Plugin(pages.Pages):
         channels = [channel_of(item) for item in items]
         banner_lookup = None
         if not self.fanart and self.banners.unknown(channels):
-            banner_lookup = threading.Thread(target=self.banners.fetch_all, args=(channels,), name='leanback-art')
+            banner_lookup = threading.Thread(target=self.banners.fetch_all, args=(channels,), name='youtube-art')
             banner_lookup.start()
         if describe.enabled():
             missing = [video_id_of(item) for item in items
@@ -690,7 +690,7 @@ class Plugin(pages.Pages):
         li.setArt({'thumb': item['thumb'], 'icon': item['thumb'],
                    'fanart': self._channel_fanart(channel_id) or item['thumb'], 'landscape': item['thumb']})
         li.setProperty('IsPlayable', 'true')
-        li.setProperty('leanback.video_id', video_id)
+        li.setProperty('youtube.video_id', video_id)
         li.addContextMenuItems(_video_menu(item, video_id, channel_id))
         self._add(url_for('play', v=video_id), li, False)
 

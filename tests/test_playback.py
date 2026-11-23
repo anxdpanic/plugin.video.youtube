@@ -1,7 +1,7 @@
 import xbmc
 import xbmcgui
 
-from resources.lib.leanback import playback
+from resources.lib.youtube import playback
 
 
 def started(playing, time):

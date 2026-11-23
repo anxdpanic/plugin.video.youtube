@@ -1,6 +1,6 @@
 import pytest
 
-from resources.lib.leanback import compat, router
+from resources.lib.youtube import compat, router
 
 
 def translate(path, **params):
@@ -35,7 +35,7 @@ def translate(path, **params):
     ('/kodion/playback_history/', {}, ('browse', {'id': 'FEhistory'})),
     ('/kodion/watch_later/list/', {}, ('browse', {'id': 'VLWL'})),
 ])
-def test_other_addon_paths_map_to_leanback_routes(path, params, expected):
+def test_earlier_version_paths_map_to_routes(path, params, expected):
     assert translate(path, **params) == expected
 
 
@@ -47,7 +47,7 @@ def test_other_addon_paths_map_to_leanback_routes(path, params, expected):
     ('maintenance', {'what': 'cache'}),
     ('shelf', {'src': '{}', 'i': '0'}),
 ])
-def test_leanback_routes_pass_through(path, params):
+def test_own_routes_pass_through(path, params):
     assert translate(path, **params) == (path, params)
 
 
@@ -63,11 +63,11 @@ def test_unknown_and_unsupported_paths_are_left_alone():
 def test_play_playlist_path_reaches_play_all(monkeypatch):
     calls = []
     monkeypatch.setattr(router.Plugin, 'play_playlist', lambda self: calls.append(self.params))
-    router.Plugin(['plugin://plugin.video.leanback/play/', '1', '?playlist_id=PLx&play=1&order=reverse']).dispatch()
+    router.Plugin(['plugin://plugin.video.youtube/play/', '1', '?playlist_id=PLx&play=1&order=reverse']).dispatch()
     assert calls == [{'list': 'PLx', 'order': 'reverse'}]
 
 
 def test_plugin_applies_translation():
-    plugin = router.Plugin(['plugin://plugin.video.leanback/play/', '1', '?video_id=abcdefghijk&seek=5'])
+    plugin = router.Plugin(['plugin://plugin.video.youtube/play/', '1', '?video_id=abcdefghijk&seek=5'])
     assert (plugin.route, plugin.params) == ('play', {'v': 'abcdefghijk', 't': '5'})
 

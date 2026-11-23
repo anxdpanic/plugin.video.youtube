@@ -3,8 +3,8 @@ import threading
 import xbmcaddon
 import xbmcplugin
 
-from resources.lib.leanback import describe, descriptions, innertube, parser, router
-from resources.lib.leanback.innertube import InnerTubeError
+from resources.lib.youtube import describe, descriptions, innertube, parser, router
+from resources.lib.youtube.innertube import InnerTubeError
 
 
 def details(video_id):
@@ -70,7 +70,7 @@ def test_listing_fetches_missing_descriptions_before_drawing(monkeypatch):
     monkeypatch.setattr(describe, 'fetch_all', fetch_all)
     descriptions.Descriptions().remember_details(details('00000000000'))
     items = [video(v) for v in ids(3)] + [video('upcomingxxx', upcoming='Premieres soon')]
-    router.Plugin(['plugin://plugin.video.leanback/browse', '1', ''])._render_items(items)
+    router.Plugin(['plugin://plugin.video.youtube/browse', '1', ''])._render_items(items)
     assert asked == [['00000000001', '00000000002']]  # known and upcoming videos are skipped
     plots = [li.tag.values['plot'] for _, li, _ in xbmcplugin.ITEMS]
     assert plots[2].endswith('About 00000000002')
@@ -85,11 +85,11 @@ def test_listing_skips_fetching_when_turned_off(monkeypatch):
         raise AssertionError('fetched while turned off')
 
     monkeypatch.setattr(describe, 'fetch_all', fail)
-    router.Plugin(['plugin://plugin.video.leanback/browse', '1', ''])._render_items([video('00000000001')])
+    router.Plugin(['plugin://plugin.video.youtube/browse', '1', ''])._render_items([video('00000000001')])
 
 
 def test_video_listings_use_videos_content():
-    plugin = router.Plugin(['plugin://plugin.video.leanback/browse', '1', ''])
+    plugin = router.Plugin(['plugin://plugin.video.youtube/browse', '1', ''])
     plugin._finish_listing([{'kind': 'video'}, {'kind': 'video'}, {'kind': 'folder'}])
     assert xbmcplugin.CONTENT[-1] == 'videos'
     plugin._finish_listing([{'kind': 'folder'}, {'kind': 'folder'}, {'kind': 'video'}])

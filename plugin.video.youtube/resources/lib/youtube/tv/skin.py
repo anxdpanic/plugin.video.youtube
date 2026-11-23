@@ -3,7 +3,7 @@
 """The TV window's layout, made to work with any skin.
 
 A script's window uses the current skin's fonts, and skins name their fonts differently: only font13 is
-common to all. So the layout is a template (resources/tv/leanback-tv.xml) with a role in place of each font,
+common to all. So the layout is a template (resources/tv/youtube-tv.xml) with a role in place of each font,
 and before the window opens each role gets the current skin's font closest in size and weight. The result is
 written to Kodi's temp folder, which Kodi then loads the window from."""
 import json
@@ -16,10 +16,10 @@ import xbmcvfs
 
 from .. import kodi
 
-TEMPLATE = os.path.join(kodi.ADDON_PATH, 'resources', 'tv', 'leanback-tv.xml')
+TEMPLATE = os.path.join(kodi.ADDON_PATH, 'resources', 'tv', 'youtube-tv.xml')
 MEDIA = os.path.join(kodi.ADDON_PATH, 'resources', 'tv', 'media')
 WINDOW_DIR = os.path.join(kodi.TEMP_DIR, 'tv')  # Kodi looks for <dir>/resources/skins/Default/1080i/<file>
-XML_NAME = 'leanback-tv.xml'
+XML_NAME = 'youtube-tv.xml'
 FALLBACK = 'font13'
 
 # role -> (size at 1080 lines, bold)

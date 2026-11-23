@@ -21,9 +21,9 @@ import xbmcgui
 from . import broker, kodi
 
 FOREGROUND, BACKGROUND = broker.FOREGROUND, broker.BACKGROUND
-PORT_PROPERTY = 'leanback.port'
+PORT_PROPERTY = 'youtube.port'
 SERVICE_TIMEOUT = 180  # a listing's request may wait out a hold on the host, then run
-PACE_PROPERTY = 'leanback.next_request'  # fallback pacing when the service isn't running
+PACE_PROPERTY = 'youtube.next_request'  # fallback pacing when the service isn't running
 
 _broker = None  # set in the service process, whose own requests go straight onto the queue
 _pace_lock = threading.Lock()

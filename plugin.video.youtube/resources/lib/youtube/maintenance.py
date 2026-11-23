@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # Copyright (C) 2026 anxdpanic
-"""Settings > Maintenance: clear what Leanback keeps on disk, for when something is corrupt or for testing.
+"""Settings > Maintenance: clear what the add-on keeps on disk, for when something is corrupt or for testing.
 
 Only caches and leftovers are cleared here. Accounts, settings and the menu layout are left alone; they have
 their own Sign out and Reset menu actions."""
@@ -37,7 +37,7 @@ def _remove(path):
 
 
 def _playing_video():
-    """The video Leanback is playing right now, if any: its manifest and subtitles must stay."""
+    """The video the add-on is playing right now, if any: its manifest and subtitles must stay."""
     player = xbmc.Player()
     try:
         if player.isPlayingVideo():

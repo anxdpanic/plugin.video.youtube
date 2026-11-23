@@ -1,7 +1,7 @@
 import xbmcaddon
 
-from resources.lib.leanback import parser
-from resources.lib.leanback.tv import items, model, skin
+from resources.lib.youtube import parser
+from resources.lib.youtube.tv import items, model, skin
 
 
 def video(video_id, short=False, watched=0):
@@ -173,7 +173,7 @@ def test_section_tabs_are_not_a_channel_row():
 def test_resume_label_handles_both_kodi_wordings(monkeypatch):
     import xbmc
 
-    from resources.lib.leanback.tv import window
+    from resources.lib.youtube.tv import window
     assert window.resume_label('1:05') == 'Resume from 1:05'  # Kodi 19+: "Resume from {0:s}"
     monkeypatch.setitem(xbmc.LOCALIZED, 12022, 'Resume from %s')
     assert window.resume_label('1:05') == 'Resume from 1:05'
@@ -202,7 +202,7 @@ class FakeBanners:
 
 
 def test_window_sets_banners_and_retries_channels_not_looked_up():
-    from resources.lib.leanback.tv import window
+    from resources.lib.youtube.tv import window
 
     win = window.TVWindow()
     win.banners = FakeBanners({'UCa': 'https://banner-a', 'UCb': ''})
@@ -215,7 +215,7 @@ def test_window_sets_banners_and_retries_channels_not_looked_up():
 
 
 def test_window_looks_up_banners_of_shown_videos_with_a_known_channel(monkeypatch):
-    from resources.lib.leanback.tv import window
+    from resources.lib.youtube.tv import window
 
     win = window.TVWindow()
     shown = [('1', dict(video('1'), channel_id='UCa'), 'tile1'), ('2', video('2'), 'tile2')]

@@ -17,7 +17,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ADDON_DIR = os.path.join(ROOT, 'plugin.video.leanback')
+ADDON_DIR = os.path.join(ROOT, 'plugin.video.youtube')
 EXCLUDE_DIRS = {'__pycache__', '.pytest_cache', '.ruff_cache'}
 EXCLUDE_FILES = ['*.pyc', '*.pyo', '*.orig', '*.rej', '*~', 'Thumbs.db', 'desktop.ini']
 

@@ -5,7 +5,7 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 
-from resources.lib.leanback import service
+from resources.lib.youtube import service
 
 
 def busy_port():

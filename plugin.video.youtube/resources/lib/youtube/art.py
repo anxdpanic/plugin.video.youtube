@@ -74,7 +74,7 @@ class Banners:
             def fetch(channel_id):
                 return parser.channel_banner(api.channel_about(channel_id))
 
-        found = tasks.run_parallel(todo, lambda channel_id: fetch(channel_id) or '', WORKERS, 'leanback-art',
+        found = tasks.run_parallel(todo, lambda channel_id: fetch(channel_id) or '', WORKERS, 'youtube-art',
                                    'banner')
         if found:
             entries = self._load()

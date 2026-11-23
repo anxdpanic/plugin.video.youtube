@@ -1,6 +1,6 @@
 import xbmcplugin
 
-from resources.lib.leanback import art, parser, router
+from resources.lib.youtube import art, parser, router
 
 
 def test_banners_remember_and_report_missing(monkeypatch):
@@ -39,7 +39,7 @@ def test_videos_use_their_channel_banner_as_fanart(monkeypatch):
     item.update(id='aaaaaaaaaaa', channel_id='UCcccccccccccccccccccccc', duration=10)
     other = dict(item, id='bbbbbbbbbbb', target={'type': 'video', 'video_id': 'bbbbbbbbbbb'},
                  channel_id='UCdddddddddddddddddddddd')
-    plugin = router.Plugin(['plugin://plugin.video.leanback/browse', '1', ''])
+    plugin = router.Plugin(['plugin://plugin.video.youtube/browse', '1', ''])
     plugin._render_items([item, other])
     fanart = [li.art['fanart'] for _, li, _ in xbmcplugin.ITEMS]
     assert fanart == ['https://yt3/banner', 'https://i.ytimg.com/a.jpg']  # no banner yet: the thumbnail
@@ -47,7 +47,7 @@ def test_videos_use_their_channel_banner_as_fanart(monkeypatch):
 
 
 
-from resources.lib.leanback import innertube  # noqa: E402
+from resources.lib.youtube import innertube  # noqa: E402
 
 REAL_FETCH_ALL = art.Banners.fetch_all  # conftest stubs it out for every test
 
@@ -66,7 +66,7 @@ def test_banners_are_looked_up_before_drawing(monkeypatch):
     item.update(id='aaaaaaaaaaa', channel_id='UCcccccccccccccccccccccc', duration=10)
     other = dict(item, id='bbbbbbbbbbb', target={'type': 'video', 'video_id': 'bbbbbbbbbbb'},
                  channel_id='UCdddddddddddddddddddddd')
-    router.Plugin(['plugin://plugin.video.leanback/browse', '1', ''])._render_items([item, other])
+    router.Plugin(['plugin://plugin.video.youtube/browse', '1', ''])._render_items([item, other])
     assert [li.art['fanart'] for _, li, _ in xbmcplugin.ITEMS] == ['https://yt3/known', 'https://yt3/dddd']
     assert art.Banners().get('UCdddddddddddddddddddddd') == 'https://yt3/dddd'  # remembered for next time
 
@@ -106,7 +106,7 @@ def test_tiles_without_a_channel_take_it_from_the_watch_page(monkeypatch):
     """Home's row tiles don't name their channel; the watch page read for the description does."""
     import xbmcaddon
 
-    from resources.lib.leanback import describe, descriptions
+    from resources.lib.youtube import describe, descriptions
     xbmcaddon.SETTINGS['fetch_descriptions'] = True
 
     def fetch_all(video_ids, store, fetch=None):
@@ -119,7 +119,7 @@ def test_tiles_without_a_channel_take_it_from_the_watch_page(monkeypatch):
                         lambda self, ids, fetch=None: REAL_FETCH_ALL(self, ids, lambda c: 'https://yt3/' + c[-4:]))
     item = parser._item_base('video', 'A', 'https://i.ytimg.com/a.jpg', {'type': 'video', 'video_id': 'aaaaaaaaaaa'})
     item.update(id='aaaaaaaaaaa', channel_id='', duration=10)
-    router.Plugin(['plugin://plugin.video.leanback/browse', '1', ''])._render_items([item])
+    router.Plugin(['plugin://plugin.video.youtube/browse', '1', ''])._render_items([item])
     assert [li.art['fanart'] for _, li, _ in xbmcplugin.ITEMS] == ['https://yt3/eeee']
     assert descriptions.Descriptions().get('aaaaaaaaaaa')['c'] == 'UCeeeeeeeeeeeeeeeeeeeeee'
 

@@ -2,7 +2,7 @@
 # Kodi 21 on the target devices runs Python 3.9.
 target-version = "py39"
 line-length = 120
-extend-exclude = ["plugin.video.leanback/resources/media"]
+extend-exclude = ["plugin.video.youtube/resources/media"]
 
 [tool.ruff.lint]
 select = [
@@ -26,4 +26,4 @@ known-third-party = ["xbmc", "xbmcaddon", "xbmcgui", "xbmcplugin", "xbmcvfs"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["plugin.video.leanback", "tests/stubs"]
+pythonpath = ["plugin.video.youtube", "tests/stubs"]

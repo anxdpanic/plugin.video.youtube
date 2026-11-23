@@ -8,7 +8,7 @@ import json
 import xbmc
 import xbmcgui
 
-PROPERTY = 'leanback.start_at'
+PROPERTY = 'youtube.start_at'
 TOLERANCE = 2.0  # seconds: already this close (StartOffset did work), so don't seek again
 
 

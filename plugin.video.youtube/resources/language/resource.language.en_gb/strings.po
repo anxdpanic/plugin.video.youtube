@@ -1,9 +1,9 @@
 # Kodi Media Center language file
-# Addon Name: Leanback
-# Addon id: plugin.video.leanback
+# Addon Name: YouTube
+# Addon id: plugin.video.youtube
 msgid ""
 msgstr ""
-"Project-Id-Version: plugin.video.leanback\n"
+"Project-Id-Version: plugin.video.youtube\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -377,7 +377,7 @@ msgid "Service port"
 msgstr ""
 
 msgctxt "#30145"
-msgid "Local port for Leanback's background service, which serves video manifests and subtitles to the player. Only this device can reach it. Change it if another add-on or program needs this port; 0 picks any free port."
+msgid "Local port for the add-on's background service, which serves video manifests and subtitles to the player. Only this device can reach it. Change it if another add-on or program needs this port; 0 picks any free port."
 msgstr ""
 
 msgctxt "#30146"

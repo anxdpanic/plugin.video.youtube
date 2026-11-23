@@ -33,7 +33,7 @@ def fetch_all(video_ids, store, fetch=None):
         # Kept even without a description, so it isn't read again.
         return dict(fetch(video_id), video_id=video_id)
 
-    found = tasks.run_parallel(todo, describe, WORKERS, 'leanback-describe', 'description')
+    found = tasks.run_parallel(todo, describe, WORKERS, 'youtube-describe', 'description')
     if found:
         store.remember_all(found.values())
     kodi.log('read %d of %d watch pages' % (len(found), total))

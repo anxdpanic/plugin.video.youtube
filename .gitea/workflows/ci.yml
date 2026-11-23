@@ -29,7 +29,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: pip install -r requirements-dev.txt
       - name: Compile add-on sources
-        run: python -m compileall -q plugin.video.leanback
+        run: python -m compileall -q plugin.video.youtube
       - run: pytest -v
 
   addon-checker:
@@ -40,4 +40,4 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install kodi-addon-checker==0.0.36
-      - run: kodi-addon-checker --branch omega plugin.video.leanback
+      - run: kodi-addon-checker --branch omega plugin.video.youtube

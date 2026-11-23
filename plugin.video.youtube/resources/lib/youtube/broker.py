@@ -77,7 +77,7 @@ class Broker:
         self._blocked_until = {}  # host -> time
         self._strikes = {}  # host -> blocks in a row
         self._stopped = False
-        self._threads = [threading.Thread(target=self._work, name='leanback-net-%d' % i) for i in range(workers)]
+        self._threads = [threading.Thread(target=self._work, name='youtube-net-%d' % i) for i in range(workers)]
         for thread in self._threads:
             thread.daemon = True
             thread.start()

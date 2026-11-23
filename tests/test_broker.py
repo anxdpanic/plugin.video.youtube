@@ -4,7 +4,7 @@ import time
 import pytest
 import xbmcgui
 
-from resources.lib.leanback import broker, http, innertube, service
+from resources.lib.youtube import broker, http, innertube, service
 
 SORRY = (b'<html><head><title>Sorry...</title></head><body>... but your computer or network may be sending '
          b'automated queries.</body></html>')
