@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- SPDX-License-Identifier: GPL-3.0-only -->
-<!-- Copyright (C) 2026 anxdpanic -->
+<!-- Copyright (C) 2026 plugin.video.youtube -->
 <!-- The TV interface's window. A template: tv/skin.py fills in @media@ (this folder's media) and
      @font:<role>@ (the current skin's closest font for each role) before Kodi loads it. -->
 <window>

@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# Copyright (C) 2026 anxdpanic
+# Copyright (C) 2026 plugin.video.youtube
 """One place every request to Google goes through.
 
 Kodi runs each listing as its own short-lived interpreter, so they can't share a lock or a queue.

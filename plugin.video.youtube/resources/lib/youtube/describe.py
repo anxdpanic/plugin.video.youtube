@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# Copyright (C) 2026 anxdpanic
+# Copyright (C) 2026 plugin.video.youtube
 """Descriptions for listed videos, fetched before the listing is shown.
 
 List tiles carry no description, and each video's costs a watch page request. They are all fetched at

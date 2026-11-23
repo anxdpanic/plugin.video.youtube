@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# Copyright (C) 2026 anxdpanic
+# Copyright (C) 2026 plugin.video.youtube
 """The TV window's tiles and rail entries, from the parser's items and the guide's entries."""
 import os
 

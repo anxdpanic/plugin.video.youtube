@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# Copyright (C) 2026 anxdpanic
+# Copyright (C) 2026 plugin.video.youtube
 """Fetching YouTube's pages and the main menu, shared by the plugin's listings and the TV interface."""
 import json
 

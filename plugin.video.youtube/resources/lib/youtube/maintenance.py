@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# Copyright (C) 2026 anxdpanic
+# Copyright (C) 2026 plugin.video.youtube
 """Settings > Maintenance: clear what the add-on keeps on disk, for when something is corrupt or for testing.
 
 Only caches and leftovers are cleared here. Accounts, settings and the menu layout are left alone; they have

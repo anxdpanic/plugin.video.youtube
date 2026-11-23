@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# Copyright (C) 2026 anxdpanic
+# Copyright (C) 2026 plugin.video.youtube
 """Starting a video part way in. Kodi ignores StartOffset on an item a plugin resolves when the item it
 was asked to play didn't carry one (a .strm file, a favourite, Player.Open), so the plugin leaves the start
 time here and the service seeks once the video is playing."""

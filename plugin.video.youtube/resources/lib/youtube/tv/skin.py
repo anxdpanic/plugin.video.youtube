@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# Copyright (C) 2026 anxdpanic
+# Copyright (C) 2026 plugin.video.youtube
 """The TV window's layout, made to work with any skin.
 
 A script's window uses the current skin's fonts, and skins name their fonts differently: only font13 is

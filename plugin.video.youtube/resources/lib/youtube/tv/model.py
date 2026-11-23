@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# Copyright (C) 2026 anxdpanic
+# Copyright (C) 2026 plugin.video.youtube
 """What the TV interface shows, as rows: no Kodi calls here, so it can be tested on its own."""
 from .. import pages
 

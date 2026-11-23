@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# Copyright (C) 2026 anxdpanic
+# Copyright (C) 2026 plugin.video.youtube
 """The TV interface: YouTube's TV layout in a window of its own, built on the plugin's pages and playback."""
 
 

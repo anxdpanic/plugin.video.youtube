@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# Copyright (C) 2026 anxdpanic
+# Copyright (C) 2026 plugin.video.youtube
 """Video descriptions for the plot of listed videos. List tiles carry none, so a description is kept
 when the user plays a video or opens its Info, and shows in listings from then on."""
 import time

@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# Copyright (C) 2026 anxdpanic
+# Copyright (C) 2026 plugin.video.youtube
 """TV device-code sign-in (youtube.com/activate) and token storage, with multiple accounts."""
 import base64
 import time

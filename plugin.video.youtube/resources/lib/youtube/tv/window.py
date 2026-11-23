@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# Copyright (C) 2026 anxdpanic
+# Copyright (C) 2026 plugin.video.youtube
 """The TV interface's window: a navigation rail, the focused video's details, and rows of tiles.
 
 Kodi can't add rows to a window as it runs, so the window has two row lists: the focused row and a peek at the

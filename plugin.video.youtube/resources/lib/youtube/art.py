@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# Copyright (C) 2026 anxdpanic
+# Copyright (C) 2026 plugin.video.youtube
 """Channel banners, used as fanart for a channel's videos. List tiles don't carry them, so the banners
 of channels not seen before are looked up (from each channel's small About page) before a listing is
 drawn, and remembered for a week. Only the addresses are kept: Kodi fetches and caches the images."""

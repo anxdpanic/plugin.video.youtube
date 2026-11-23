@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# Copyright (C) 2026 anxdpanic
+# Copyright (C) 2026 plugin.video.youtube
 """Report playback to YouTube so watched videos land in the signed-in account's history and keep
 their progress. The streams come from anonymous player requests, whose stats URLs YouTube doesn't
 tie to the account, so the service asks the TV client's player for the account's own stats URLs

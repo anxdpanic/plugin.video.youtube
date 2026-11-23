@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# Copyright (C) 2026 anxdpanic
+# Copyright (C) 2026 plugin.video.youtube
 """Paths shaped like those of earlier plugin.video.youtube versions, so .strm files, keymaps and favourites
 written for them keep working: plugin://plugin.video.youtube/play/?video_id=... and the like.
 

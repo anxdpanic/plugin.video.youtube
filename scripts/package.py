@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-only
-# Copyright (C) 2026 anxdpanic
+# Copyright (C) 2026 plugin.video.youtube
 """Package the add-on as a zip that Kodi's "Install from zip file" accepts.
 
 The zip holds a single top-level folder named after the add-on id, and is written to

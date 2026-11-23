@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
-# Copyright (C) 2026 anxdpanic
+# Copyright (C) 2026 plugin.video.youtube
 """Artwork for the plugin's own menu entries, from resources/media. The TV interface has its own icons."""
 import os
 
