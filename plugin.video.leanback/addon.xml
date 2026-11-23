@@ -16,7 +16,12 @@
         <description lang="en_GB">Browse YouTube the way the TV app shows it: the TV sidebar, shelves, subscriptions, library and search, with full video information and DASH/HLS playback through InputStream Adaptive. Sign in with a TV code, customise the main menu, hide Shorts or watched videos, and set preferred quality, codec and subtitle languages.</description>
         <platform>all</platform>
         <license>GPL-3.0-only</license>
+        <website>https://gitea.panicked.xyz/anxdpanic/youtube_tv_addon</website>
         <source>https://gitea.panicked.xyz/anxdpanic/youtube_tv_addon</source>
+        <news>v0.2.6
+- Retry playback on another YouTube host when it asks to confirm you're not a bot
+- Explain the bot check as a VPN problem when playback still fails
+- Use the videos content type only for listings of videos</news>
         <assets>
             <icon>resources/media/icon.png</icon>
             <fanart>resources/media/fanart.jpg</fanart>
