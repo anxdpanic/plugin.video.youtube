@@ -11,7 +11,22 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 
-from . import art, auth, compat, describe, descriptions, history, http, kodi, maintenance, mpd, pages, parser, playback
+from . import (
+    art,
+    auth,
+    compat,
+    describe,
+    descriptions,
+    history,
+    http,
+    icons,
+    kodi,
+    maintenance,
+    mpd,
+    pages,
+    parser,
+    playback,
+)
 from .innertube import InnerTube, InnerTubeError
 
 BASE_URL = 'plugin://%s/' % kodi.ADDON_ID
@@ -316,7 +331,7 @@ class Plugin(pages.Pages):
             for entry in channels:
                 self._add_menu_entry(entry)
         li = xbmcgui.ListItem(kodi.string(30167), offscreen=True)
-        li.setArt({'icon': kodi.icon_path('icon.png'), 'thumb': kodi.icon_path('icon.png')})
+        li.setArt({'icon': icons.TV_INTERFACE, 'thumb': icons.TV_INTERFACE})
         # Opens a window rather than listing anything, so not a folder (see _add_accounts_entry).
         self._add(url_for('tv'), li, self._browsed_from_outside())
         if kodi.setting_bool('show_accounts'):
@@ -330,7 +345,7 @@ class Plugin(pages.Pages):
         li.setLabel2(account.get('name') or '' if account else kodi.string(30123))
         li.getVideoInfoTag().setPlot(kodi.formatted(30112, account.get('name') or '') if account
                                      else kodi.string(30123))
-        li.setArt({'icon': 'DefaultUser.png', 'thumb': 'DefaultUser.png'})
+        li.setArt({'icon': icons.media('user.png'), 'thumb': icons.media('user.png')})
         # Only opens a dialog: as a folder its failed listing made Kodi leave the add-on (and re-run it on Back).
         self._add(url_for('accounts'), li, self._browsed_from_outside())
 
@@ -345,17 +360,17 @@ class Plugin(pages.Pages):
         target = entry['target']
         if entry['id'] == 'search':
             url = url_for('search')
-            icon = 'DefaultAddonsSearch.png'
+            default = 'DefaultAddonsSearch.png'
         elif entry['id'] == 'shorts':
             url = url_for('shorts', params=target.get('params'))
-            icon = 'DefaultVideo.png'
+            default = 'DefaultVideo.png'
         elif target['type'] == 'browse':
             url = url_for('browse', id=target['browse_id'], params=target.get('params'), title=entry['title'])
-            icon = 'DefaultFolder.png'
+            default = 'DefaultFolder.png'
         else:
             return
         li = xbmcgui.ListItem(entry['title'], offscreen=True)
-        thumb = entry.get('thumb') or icon
+        thumb = entry.get('thumb') or icons.menu_entry(entry, default)
         li.setArt({'icon': thumb, 'thumb': thumb})
         menu = []
         if target['type'] == 'browse' and (target.get('browse_id') or '').startswith('UC'):
@@ -517,7 +532,7 @@ class Plugin(pages.Pages):
     def _add_channels_folder(self, others, browse_id, params):
         label = kodi.string(30134)
         li = xbmcgui.ListItem('[B]%s[/B] (%d)' % (label, len(others)), offscreen=True)
-        li.setArt({'icon': 'DefaultArtist.png', 'thumb': 'DefaultArtist.png'})
+        li.setArt({'icon': icons.media('channels.png'), 'thumb': icons.media('channels.png')})
         li.getVideoInfoTag().setPlot(', '.join(t['title'] for t in others[:40]))
         li.setProperty('SpecialSort', 'top')
         self._add(url_for('browse', id=browse_id, params=params, tabs=1), li, True)
@@ -741,13 +756,13 @@ class Plugin(pages.Pages):
             self.render({'ep': 'search', 'q': query, 'params': self.params.get('params')})
             return
         li = xbmcgui.ListItem('[B]%s[/B]' % kodi.string(30101), offscreen=True)
-        li.setArt({'icon': 'DefaultAddonsSearch.png'})
+        li.setArt({'icon': icons.media('new_search.png'), 'thumb': icons.media('new_search.png')})
         # Not a folder: Kodi runs it as a script, so the Container.Update to the results isn't
         # undone by Kodi going back from a failed folder.
         self._add(url_for('search/new'), li, False)
         for past in self._searches():
             li = xbmcgui.ListItem(past, offscreen=True)
-            li.setArt({'icon': 'DefaultAddonsSearch.png'})
+            li.setArt({'icon': icons.media('search.png'), 'thumb': icons.media('search.png')})
             li.addContextMenuItems([(kodi.string(30128), 'RunPlugin(%s)' % url_for('search/remove', q=past))])
             self._add(url_for('search', q=past), li, True)
         self._end()

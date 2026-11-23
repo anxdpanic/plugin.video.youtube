@@ -124,7 +124,7 @@ def prepare():
         template = handle.read()
     fonts = current_fonts()
     kodi.log('TV interface fonts for %s: %s' % (xbmc.getSkinDir(), fonts))
-    icon = os.path.join(kodi.ADDON_PATH, 'resources', 'media', 'icon.png')
+    icon = os.path.join(MEDIA, 'icon.png')
     target = os.path.join(WINDOW_DIR, 'resources', 'skins', 'Default', '1080i')
     os.makedirs(target, exist_ok=True)
     with open(os.path.join(target, XML_NAME), 'w', encoding='utf-8') as handle:
