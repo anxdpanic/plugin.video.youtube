@@ -18,11 +18,9 @@ InputStream Adaptive. It targets Kodi 21 (Omega) and later.
 ## Features
 
 - **Two ways to browse:** the add-on's folders in Kodi's own video window, using the skin's views,
-  or the TV interface, a full-screen window laid out like the YouTube TV app. Open the TV interface
-  from the **TV interface** entry in the main menu.
+  or the TV interface, a full-screen window laid out like the YouTube TV app.
 - **Menus:** the TV guide entries (Search, Home, Shorts, Subscriptions, Library and topics),
-  channel pages, playlists, related videos and paging. Home and Subscriptions need you to be
-  signed in; signed out, YouTube sends only a sign-in prompt for them.
+  channel pages, playlists, related videos and paging.
 - **Sign-in:** TV device code, with multiple accounts and an optional "Who's watching?" prompt.
 - **Playback:** a DASH manifest built from direct stream URLs, HLS for live streams, captions
   plus auto-translated tracks, and the Shorts feed as a playlist.
@@ -63,8 +61,6 @@ To build an installable zip for Kodi's **Install from zip file**:
 ```sh
 python scripts/package.py
 ```
-
-This writes `dist/plugin.video.youtube-<version>.zip`, with the version taken from `addon.xml`.
 
 ## License
 

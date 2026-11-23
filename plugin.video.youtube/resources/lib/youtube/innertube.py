@@ -71,7 +71,7 @@ PLAYER_CLIENTS = [
 VISITOR_TTL = 86400 * 3
 CPN_CHARS = string.ascii_letters + string.digits + '-_'
 RETRY_STATUSES = (0, 403, 429, 500, 502, 503, 504)
-RETRY_DELAY = 1.5  # seconds
+RETRY_DELAY = 1.5
 
 
 class InnerTubeError(Exception):
@@ -128,7 +128,6 @@ class InnerTube:
         self.hl, self.gl = kodi.language()
         self._state = kodi.load_json('state.json', {})
 
-    # ----------------------------------------------------------------- session
     def visitor_data(self, refresh=False):
         visitor = self._state.get('visitor')
         if not refresh and visitor and time.time() - visitor.get('ts', 0) < VISITOR_TTL:
@@ -189,7 +188,6 @@ class InnerTube:
                 pass
         return True
 
-    # ------------------------------------------------------------- browsing
     def guide(self):
         return self._post('guide', {}, TV)
 
@@ -272,7 +270,6 @@ class InnerTube:
         _, name, handle = names[0]
         return '%s (%s)' % (name, handle) if handle and handle != name else name
 
-    # -------------------------------------------------------------- player
     def player_tracking(self, video_id):
         """The TV client's player response for the signed-in account. Its streams need signature
         solving and go unused, but its stats URLs are the ones YouTube counts towards history."""

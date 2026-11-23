@@ -58,7 +58,6 @@ class Banners:
         kodi.save_json(STORE, stored)
 
     def unknown(self, channel_ids):
-        """The channels among these whose banner isn't remembered yet."""
         entries = self._load()
         return [c for c in dict.fromkeys(channel_ids) if (c or '').startswith('UC') and c not in entries]
 

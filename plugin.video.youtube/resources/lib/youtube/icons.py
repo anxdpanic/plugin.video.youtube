@@ -5,7 +5,7 @@ import os
 
 from . import kodi
 
-TV_INTERFACE = os.path.join(kodi.ADDON_PATH, 'resources', 'tv', 'media', 'icon.png')  # its entry in the menu
+TV_INTERFACE = os.path.join(kodi.ADDON_PATH, 'resources', 'tv', 'media', 'icon.png')
 
 # Guide entries by id, then by words in their icon type -> image in resources/media.
 BY_ID = {'search': 'search.png', 'shorts': 'shorts.png', 'FEwhat_to_watch': 'home.png', 'FEtopics': 'home.png',
@@ -20,7 +20,6 @@ BY_TYPE = (('WHAT_TO_WATCH', 'home.png'), ('HOME', 'home.png'), ('SUBSCRIPTION',
 
 
 def media(name):
-    """Path of an image in resources/media."""
     return kodi.icon_path(name)
 
 

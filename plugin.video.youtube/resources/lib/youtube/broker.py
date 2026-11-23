@@ -68,13 +68,13 @@ class Broker:
         self._background_gap = background_gap
         self._max_hold_wait = max_hold_wait
         self._cv = threading.Condition()
-        self._queue = []  # jobs waiting to be sent
+        self._queue = []
         self._order = itertools.count()
         self._jobs = {}  # key -> job, queued or running
         self._next_slot = {}  # host -> earliest time for its next request
         self._next_background = {}  # host -> earliest time for its next background request
         self._hold_started = {}  # host -> when its current hold began
-        self._blocked_until = {}  # host -> time
+        self._blocked_until = {}
         self._strikes = {}  # host -> blocks in a row
         self._stopped = False
         self._threads = [threading.Thread(target=self._work, name='youtube-net-%d' % i) for i in range(workers)]
@@ -82,7 +82,6 @@ class Broker:
             thread.daemon = True
             thread.start()
 
-    # ------------------------------------------------------------------ callers
     def request(self, url, data=None, headers=None, method=None, timeout=20, priority=FOREGROUND):
         """Queue a request and wait for it; returns (status, body) or raises what send raised (or Blocked)."""
         job = self.submit(url, data, headers, method, timeout, priority)
@@ -115,7 +114,6 @@ class Broker:
             self._stopped = True
             self._cv.notify_all()
 
-    # ------------------------------------------------------------------ workers
     def _held_back(self, host):
         return self._blocked_until.get(host, 0) > time.time()
 

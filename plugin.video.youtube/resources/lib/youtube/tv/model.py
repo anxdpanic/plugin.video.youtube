@@ -84,7 +84,6 @@ class Screen:
             self._add_shelves(shelves, page['continuation'])
         return self
 
-    # ------------------------------------------------------------ growing
     def can_grow(self):
         return bool(self.grid['token'] if self.grid else self._more_rows)
 

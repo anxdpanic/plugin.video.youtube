@@ -162,7 +162,6 @@ class Httpd:
         return True
 
     def follow_setting(self):
-        """Move to the port in the settings if it changed."""
         wanted = wanted_port()
         if wanted == self.wanted:
             return

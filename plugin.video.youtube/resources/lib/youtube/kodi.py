@@ -129,7 +129,6 @@ class Cache:
 
 
 def prune_dir(path, max_age):
-    """Delete the files in a folder that are older than max_age seconds."""
     if not os.path.isdir(path):
         return
     now = time.time()

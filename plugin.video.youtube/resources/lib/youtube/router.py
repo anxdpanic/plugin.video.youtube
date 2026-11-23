@@ -216,7 +216,6 @@ def _folder_plot(item):
 
 
 def _folder_menu(item):
-    """Pin for channels, Play all for playlists."""
     target = item['target'] or {}
     browse_id = target.get('browse_id') or ''
     menu = []
@@ -340,7 +339,7 @@ def url_for(route, **params):
     return BASE_URL + route + ('?' + urllib.parse.urlencode(params) if params else '')
 
 
-ROUTES = {  # route -> Plugin method
+ROUTES = {
     '': 'root',
     'browse': 'browse',
     'shelf': 'shelf',
@@ -380,7 +379,6 @@ class Plugin(pages.Pages):
         self.fanart = ''  # a channel page's banner, for everything listed on it
         self.descriptions = descriptions.Descriptions()
 
-    # ================================================================ dispatch
     def dispatch(self):
         name = ROUTES.get(self.route)
         if name is None:
@@ -405,7 +403,6 @@ class Plugin(pages.Pages):
             self._notify(kodi.string(30132), error=True)
             self._end(False)
 
-    # ================================================================ helpers
     def _end(self, succeeded=True, cache=False):
         if self.handle >= 0:
             xbmcplugin.endOfDirectory(self.handle, succeeded=succeeded, cacheToDisc=cache)
@@ -418,7 +415,6 @@ class Plugin(pages.Pages):
     def _add(self, url, li, folder):
         xbmcplugin.addDirectoryItem(self.handle, url, li, isFolder=folder)
 
-    # ================================================================ root menu
     def root(self):
         kodi.Cache.prune()
         self._maybe_whos_watching()
@@ -494,7 +490,6 @@ class Plugin(pages.Pages):
         window.setProperty('youtube.whos_watching', '1')
         self._choose_account(kodi.string(30114), allow_add=False)
 
-    # ================================================================ listings
     def browse(self):
         browse_id = self.params.get('id')
         if is_mix(browse_id[2:]):
@@ -742,7 +737,6 @@ class Plugin(pages.Pages):
                                                         'fanart': header.get('fanart')}),
                           list=playlist_id), li, False)
 
-    # ------------------------------------------------------------------ items
     def _render_items(self, items, browse_id=None):
         hide_shorts = kodi.setting_bool('hide_shorts')
         keep = pages.item_filter(browse_id)
@@ -837,7 +831,6 @@ class Plugin(pages.Pages):
             li.addContextMenuItems(menu)
         self._add(url, li, True)
 
-    # ================================================================ search
     def search(self):
         query = self.params.get('q')
         if query:
@@ -867,7 +860,6 @@ class Plugin(pages.Pages):
         self._forget_search(self.params.get('q'))
         xbmc.executebuiltin('Container.Refresh')
 
-    # ================================================================ playback
     def play(self):
         video_id = self.params['v']
         try:
@@ -972,7 +964,6 @@ class Plugin(pages.Pages):
         xbmc.Player().play(playlist, startpos=position)
 
     def _apply_details(self, li, info):
-        """Dress a played or Info-opened video's list item with its full details."""
         # Keep the description, so the video's plot in listings has it from now on.
         self.descriptions.remember_details(info)
         _set_details_tag(li.getVideoInfoTag(), info)
@@ -1010,7 +1001,6 @@ class Plugin(pages.Pages):
             player.play(url_for('play', v=video_id, t='%.3f' % start), li)
 
     def details(self):
-        """Kodi's Info dialog for a page header (channel or playlist) or for a video."""
         if self.params.get('header'):
             self._header_details(json.loads(self.params['header']))
             return
@@ -1048,14 +1038,12 @@ class Plugin(pages.Pages):
         finally:
             xbmc.executebuiltin('Dialog.Close(busydialognocancel)')
 
-    # ================================================================ TV interface
     def tv_interface(self):
         from .tv import open_window
 
         self._end(False)  # opened as a folder (a home menu shortcut): don't keep Kodi waiting for a listing
         open_window()
 
-    # ================================================================ menu customisation
     def pin(self):
         state = self._state()
         menu = state.setdefault('menu', {})
@@ -1149,7 +1137,6 @@ class Plugin(pages.Pages):
         self._save_state(state)
         self._notify(kodi.string(30119))
 
-    # ================================================================ accounts
     def accounts_menu(self):
         self._end(False)
         self._choose_account(kodi.string(30108), allow_add=True)

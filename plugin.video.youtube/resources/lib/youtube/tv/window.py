@@ -42,13 +42,12 @@ class TVWindow(xbmcgui.WindowXML):
         self._bannered = set()  # video ids whose tile has its channel's banner, or whose channel has none
         self.threshold = pages.watched_threshold()
         self.entries = []
-        self.stack = []  # screens, the one shown last
-        self.top = 0  # index of the focused row
+        self.stack = []
+        self.top = 0
         self.current_entry = None
         self._described = set()
         self.watched = {}  # video id -> percent watched, for videos played from this window
 
-    # ------------------------------------------------------------ Kodi callbacks
     def onInit(self):  # noqa: N802 (Kodi API)
         try:
             self._init()
@@ -95,7 +94,6 @@ class TVWindow(xbmcgui.WindowXML):
                 row.pos = position  # back from playback, the window is rebuilt on this tile
                 self._guarded(self._activate, row.items[position])
 
-    # ------------------------------------------------------------ rail
     def _load_rail(self):
         entries, _ = self.pages.menu_entries()
         account = auth.active_account()[1]
@@ -163,7 +161,6 @@ class TVWindow(xbmcgui.WindowXML):
         self.top = min(self.top, max(len(screen.rows) - 1, 0))
         self._show_rows()
 
-    # ------------------------------------------------------------ screens
     def _push(self, screen, replace=False, entry=None):
         self._busy(True)
         try:
@@ -263,7 +260,6 @@ class TVWindow(xbmcgui.WindowXML):
             self._describe_soon()
             self._banners_soon()
 
-    # ------------------------------------------------------------ tiles
     def _keep(self, browse_id=None):
         """The listing filter, with progress noted in this window applied first: YouTube's cached pages
         don't have it yet, and hide-watched should go by it."""
@@ -315,7 +311,6 @@ class TVWindow(xbmcgui.WindowXML):
             self._push(model.Screen({'ep': 'search', 'q': target['query'], 'params': target.get('params')},
                                     target['query'], self._load_page, self._keep()))
 
-    # ------------------------------------------------------------ search
     def _search_rows(self):
         """The search screen: New search (and Clear when there is something to clear), then past searches."""
         past = self.pages._searches()
@@ -458,7 +453,6 @@ class TVWindow(xbmcgui.WindowXML):
         if choice >= 0:
             self._guarded(choices[choice][1])
 
-    # ------------------------------------------------------------ descriptions
     def _describe_soon(self):
         """Read the watch pages of the shown rows' videos in the background, then fill in their details."""
         if not describe.enabled():
@@ -487,7 +481,6 @@ class TVWindow(xbmcgui.WindowXML):
                 self._described.discard(video_id)  # not read this time: try again when it is shown next
         self._banners_soon()  # the watch pages name the channels of tiles that didn't
 
-    # ------------------------------------------------------------ banners
     def _shown_videos(self):
         """(video id, item, tile) for the videos in the shown rows."""
         for row in (self._row(0), self._row(1)):
@@ -525,7 +518,6 @@ class TVWindow(xbmcgui.WindowXML):
                 if banner:
                     li.setArt({'fanart': banner})
 
-    # ------------------------------------------------------------ helpers
     def _load_page(self, desc):
         return parser.parse_page(self.pages.fetch(desc))
 

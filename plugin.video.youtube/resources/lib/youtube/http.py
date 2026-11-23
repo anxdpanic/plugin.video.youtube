@@ -106,7 +106,6 @@ def send(url, data=None, headers=None, method=None, timeout=20):
         raise HTTPError(0, b'', url) from exc
 
 
-# ------------------------------------------------------------------ via the service
 def _via_service(port, url, data, headers, method, timeout, priority):
     """Send the request through the service's broker, so every process shares one queue and one
     pace per host. The request travels as a JSON envelope (the body base64-encoded, since JSON can't
@@ -158,7 +157,6 @@ def allowed(url):
                                            for d in ('youtube.com', 'googleapis.com', 'google.com'))
 
 
-# ------------------------------------------------------------------ fallback pacing
 def _pace(url):
     """Without the service, space requests to a paced host through a home-window property that every
     process of the add-on reads, plus a lock for the threads of this one."""

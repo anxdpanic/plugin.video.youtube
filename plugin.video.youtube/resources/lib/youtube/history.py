@@ -15,7 +15,7 @@ import xbmcgui
 from . import auth, http, innertube, kodi
 
 PROPERTY = 'youtube.tracking'
-INTERVAL = 30  # seconds between watch-time reports
+INTERVAL = 30
 
 
 def tracking_info(player_resp, ua):

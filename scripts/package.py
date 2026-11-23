@@ -23,7 +23,6 @@ EXCLUDE_FILES = ['*.pyc', '*.pyo', '*.orig', '*.rej', '*~', 'Thumbs.db', 'deskto
 
 
 def addon_info(addon_dir):
-    """Return (id, version) from addon.xml."""
     root = ET.parse(os.path.join(addon_dir, 'addon.xml')).getroot()
     addon_id, version = root.get('id'), root.get('version')
     if not addon_id or not version:

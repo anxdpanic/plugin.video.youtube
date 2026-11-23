@@ -126,7 +126,6 @@ def walk_dicts(node):
         yield from walk_dicts(child)
 
 
-# ------------------------------------------------------------------ endpoints
 def _unquote(value):
     """The TV client sends endpoint params percent-encoded ('...%3D'); InnerTube wants them raw."""
     return unquote(value) if value and '%' in value else value
@@ -162,7 +161,6 @@ def endpoint_target(command):
     return None
 
 
-# --------------------------------------------------------------------- items
 def _item_base(kind, title, thumb='', target=None):
     return {'kind': kind, 'title': title, 'thumb': thumb, 'target': target or {},
             'plot_lines': [], 'duration': 0, 'channel': '', 'channel_id': '', 'views': 0,
@@ -471,7 +469,6 @@ def parse_item(node):
     return parse_button(button) if button else None
 
 
-# ------------------------------------------------------------------- shelves
 def _continuation(container):
     for entry in container.get('continuations', []) or []:
         # nextRadioContinuationData pages through a Mix; reload only re-fetches the same items.
@@ -637,9 +634,9 @@ def _parse_contents(page, contents):
         _parse_surface(page, browse['tvSurfaceContentRenderer'])
     if 'tvSecondaryNavRenderer' in browse:
         _parse_secondary_nav(page, browse['tvSecondaryNavRenderer'])
-    if 'sectionListRenderer' in contents:  # search
+    if 'sectionListRenderer' in contents:
         _parse_section_list(page, contents['sectionListRenderer'])
-    pivot = contents.get('singleColumnWatchNextResults', {}).get('pivot', {})  # next
+    pivot = contents.get('singleColumnWatchNextResults', {}).get('pivot', {})
     if 'sectionListRenderer' in pivot:
         _parse_section_list(page, pivot['sectionListRenderer'])
 
