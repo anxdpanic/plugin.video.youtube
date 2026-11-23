@@ -18,7 +18,15 @@ API = 'https://www.youtube.com/youtubei/v1/'
 # The same API as the mobile apps reach it. Tested 2026-11-21: 2 x 40 watch page requests at once, all
 # answered in about 3 s each, where www.youtube.com answers bursts with its automated-queries page.
 APPS_API = 'https://youtubei.googleapis.com/youtubei/v1/'
-ABOUT_PARAMS = 'EgVhYm91dPIGBAoCEgA='  # a channel's About tab
+# InnerTube "params" values are base64 (URL-safe) protobuf messages that the apps build themselves.
+# Decoded field by field (field number: value):
+# A channel's About tab: 2: "about" (the tab's name) and 110: {1: {2: {}}}, which the app sends with it.
+ABOUT_PARAMS = 'EgVhYm91dPIGBAoCEgA='
+# The Shorts feed with no seed video, as the TV app's Shorts button opens it: 1: 15.
+SHORTS_PARAMS = 'CA8='
+# Player requests from IOS and ANDROID: 59: 1. Those clients were probed with it on 2026-11-19 and
+# returned direct, non-ciphered adaptive URLs; re-probe without it before dropping it.
+PLAYER_PARAMS = '2AMB'
 
 TV = {
     'key': 'tv',
@@ -48,7 +56,7 @@ PLAYER_CLIENTS = [
         'context': {'clientName': 'IOS', 'clientVersion': '20.20.7', 'deviceMake': 'Apple',
                     'deviceModel': 'iPhone16,2', 'osName': 'iPhone', 'osVersion': '18.5.0.22F76'},
         'ua': 'com.google.ios.youtube/20.20.7 (iPhone16,2; U; CPU iOS 18_5_0 like Mac OS X;)',
-        'params': '2AMB',
+        'params': PLAYER_PARAMS,
     },
     {
         'key': 'android',
@@ -56,7 +64,7 @@ PLAYER_CLIENTS = [
         'context': {'clientName': 'ANDROID', 'clientVersion': '20.10.38', 'androidSdkVersion': 32,
                     'osName': 'Android', 'osVersion': '15'},
         'ua': 'com.google.android.youtube/20.10.38 (Linux; U; Android 15) gzip',
-        'params': '2AMB',
+        'params': PLAYER_PARAMS,
     },
 ]
 
@@ -226,9 +234,10 @@ class InnerTube:
                 body['params'] = params
         return self._post('next', body, TV)
 
-    def shorts(self, params='CA8='):
-        """The Shorts feed as the TV app's Shorts button opens it: [(video_id, thumb), ...]."""
-        first = self._post('reel/reel_item_watch', {'params': params,
+    def shorts(self, params=None):
+        """The Shorts feed as the TV app's Shorts button opens it: [(video_id, thumb), ...]. `params`
+        is the guide entry's own, when it has one."""
+        first = self._post('reel/reel_item_watch', {'params': params or SHORTS_PARAMS,
                                                     'inputType': 'REEL_WATCH_INPUT_TYPE_SEEDLESS'}, TV)
         videos = []
         replacement = first.get('replacementEndpoint', {}).get('reelWatchEndpoint', {})

@@ -156,6 +156,9 @@ class Broker:
         return None, (None if soonest is None else soonest - now)
 
     def _work(self):
+        """A worker thread: take the next job whose host is ready, send it, hand back the result.
+        A block page (YouTube's "unusual traffic" answer) puts the host on hold; a foreground job is
+        then queued again once, to run when the hold ends, and anything else fails as blocked."""
         while True:
             with self._cv:
                 while True:

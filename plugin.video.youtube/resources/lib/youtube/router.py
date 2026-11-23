@@ -861,7 +861,7 @@ class Plugin(pages.Pages):
     def shorts(self):
         """Like the TV app's Shorts button: start playing the Shorts feed as a playlist."""
         self._end(False)
-        videos = self.api.shorts(self.params.get('params') or 'CA8=')
+        videos = self.api.shorts(self.params.get('params'))
         if not videos:
             self._notify(kodi.string(30124))
             return

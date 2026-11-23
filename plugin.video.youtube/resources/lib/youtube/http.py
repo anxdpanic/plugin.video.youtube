@@ -108,6 +108,10 @@ def send(url, data=None, headers=None, method=None, timeout=20):
 
 # ------------------------------------------------------------------ via the service
 def _via_service(port, url, data, headers, method, timeout, priority):
+    """Send the request through the service's broker, so every process shares one queue and one
+    pace per host. The request travels as a JSON envelope (the body base64-encoded, since JSON can't
+    carry bytes); YouTube's status and whether it was blocked come back in X-Upstream-* headers, so the
+    local server's own status only ever says whether the envelope itself got through."""
     envelope = {'url': url, 'method': method, 'headers': headers, 'timeout': timeout, 'priority': priority,
                 'data': base64.b64encode(data).decode('ascii') if data else None}
     req = urllib.request.Request('http://127.0.0.1:%s/fetch' % port, json.dumps(envelope).encode('utf-8'),

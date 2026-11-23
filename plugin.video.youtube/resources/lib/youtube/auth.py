@@ -9,11 +9,16 @@ from . import http, kodi
 
 
 def _reveal(value):
-    """Undo the light scrambling below, which only keeps the values out of plain-text scrapes."""
+    """Undo the scrambling of the client values below: base64-decode, XOR every byte with 0x5a, then
+    reverse. It isn't protection (anyone with this file can undo it), only a way to keep the strings out
+    of plain-text searches and automated secret scanners that harvest OAuth clients from public code.
+    To scramble a new value: base64.b64encode(bytes(b ^ 0x5a for b in value.encode()[::-1]))."""
     return bytes(b ^ 0x5a for b in base64.b64decode(value))[::-1].decode()
 
 
-# OAuth client of the YouTube TV (leanback) app, the same one the TV web client uses.
+# OAuth client of the YouTube TV (leanback) app, the same one the TV web client uses. The device-code
+# flow (youtube.com/activate) only works for clients Google registered for TV-type devices, so the add-on
+# signs in as that app; tokens it gets are limited to SCOPE.
 CLIENT_ID = _reveal('NzU5dC40Py40NTkoPykvPzY9NTU9dCkqKjt0Ymw5NWk7OGI/OGwxYmsxPyo0Yj4+M29qMjZpNzY+bD53bm9uYmptbG9va2xi')
 CLIENT_SECRET = _reveal('DhsCER0dCRkiMzw7FChqKWMdNTIMNTgJ')
 SCOPE = 'http://gdata.youtube.com https://www.googleapis.com/auth/youtube'
