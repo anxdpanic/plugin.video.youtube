@@ -88,12 +88,9 @@ def test_listing_skips_fetching_when_turned_off(monkeypatch):
     router.Plugin(['plugin://plugin.video.leanback/browse', '1', ''])._render_items([video('00000000001')])
 
 
-def test_video_listings_use_movies_content_unless_set_to_videos():
+def test_video_listings_use_videos_content():
     plugin = router.Plugin(['plugin://plugin.video.leanback/browse', '1', ''])
     plugin._finish_listing([{'kind': 'video'}, {'kind': 'video'}, {'kind': 'folder'}])
-    assert xbmcplugin.CONTENT[-1] == 'movies'
-    xbmcaddon.SETTINGS['listing_content'] = 'videos'
-    plugin._finish_listing([{'kind': 'video'}])
     assert xbmcplugin.CONTENT[-1] == 'videos'
     plugin._finish_listing([{'kind': 'folder'}, {'kind': 'folder'}, {'kind': 'video'}])
     assert xbmcplugin.CONTENT[-1] == 'files'

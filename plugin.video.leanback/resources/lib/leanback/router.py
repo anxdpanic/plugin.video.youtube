@@ -578,12 +578,8 @@ class Plugin(pages.Pages):
 
     def _finish_listing(self, items):
         videos = sum(1 for i in items if i.get('kind') == 'video')
-        if videos and videos >= len(items) / 2:
-            # Skins offer most of their views (walls, posters, info panels) for movies.
-            content = 'videos' if kodi.setting('listing_content') == 'videos' else 'movies'
-        else:
-            content = 'files'
-        xbmcplugin.setContent(self.handle, content)
+        # 'videos' keeps skins on 16:9 layouts; 'movies' puts the thumbnails in 2:3 poster frames.
+        xbmcplugin.setContent(self.handle, 'videos' if videos and videos >= len(items) / 2 else 'files')
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_UNSORTED)
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_LABEL)
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_DURATION)

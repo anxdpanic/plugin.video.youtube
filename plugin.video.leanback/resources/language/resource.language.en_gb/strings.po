@@ -436,22 +436,6 @@ msgctxt "#30162"
 msgid "Read each listed video's watch page for its full description, subscribers and likes before the listing is shown. Descriptions are kept for 30 days, so only new videos are read again. Turn off for faster listings."
 msgstr ""
 
-msgctxt "#30163"
-msgid "List videos as"
-msgstr ""
-
-msgctxt "#30164"
-msgid "Skins offer most of their views (walls, posters, info panels) for movies. Choose Videos if your skin labels them wrongly."
-msgstr ""
-
-msgctxt "#30165"
-msgid "Movies (more views)"
-msgstr ""
-
-msgctxt "#30166"
-msgid "Videos"
-msgstr ""
-
 msgctxt "#30167"
 msgid "TV interface"
 msgstr ""
