@@ -16,8 +16,8 @@
         <description lang="en_GB">Browse YouTube the way the TV app shows it: the TV sidebar, shelves, subscriptions, library and search, with full video information and DASH/HLS playback through InputStream Adaptive. Sign in with a TV code, customise the main menu, hide Shorts or watched videos, and set preferred quality, codec and subtitle languages.</description>
         <platform>all</platform>
         <license>GPL-3.0-only</license>
-        <website>https://gitea.panicked.xyz/anxdpanic/youtube_tv_addon</website>
-        <source>https://gitea.panicked.xyz/anxdpanic/youtube_tv_addon</source>
+        <website>https://github.com/anxdpanic/plugin.video.youtube</website>
+        <source>https://github.com/anxdpanic/plugin.video.youtube</source>
         <news>v8.0.0~beta1
 - New add-on built around YouTube's TV layout: the TV sidebar, shelves, subscriptions, library and search
 - Sign in with a TV code, with multiple accounts
