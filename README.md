@@ -4,9 +4,6 @@ A Kodi video add-on that browses YouTube with the TV layout: the TV sidebar, she
 subscriptions, library and search, full video information, and DASH/HLS playback through
 InputStream Adaptive. It targets Kodi 21 (Omega) and later.
 
-Version 8 replaces the earlier plugin.video.youtube add-on under the same id, so it installs as an
-update to it. Its version is 8.0.0~beta1 while it is in beta.
-
 ## Screenshots
 
 | | |
