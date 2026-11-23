@@ -19,16 +19,6 @@ ROW_PAGES = 3  # pages of rows per listing at least: one page holds only three o
 ISA = 'inputstream.adaptive'
 
 
-ERRORS = {  # string id -> English fallback (Kodi only loads new strings after a restart)
-    30135: 'YouTube is busy right now, try again in a moment',
-    30136: "YouTube couldn't open this page",
-    30137: "YouTube isn't responding, try again later",
-    30138: "Can't reach YouTube, check the network connection",
-    30183: "YouTube wants to confirm you're not a bot. This mostly happens on a VPN; "
-           "try playing with Kodi left out of the VPN",
-}
-
-
 def error_message(exc):
     """A short, TV-friendly message for a failed request; the raw error goes to the log."""
     status = getattr(exc, 'status', None)
@@ -41,8 +31,8 @@ def error_message(exc):
     elif status and status >= 500:
         string_id = 30137
     else:
-        return kodi.formatted(30129, 'Request failed: %s', exc)
-    return kodi.string(string_id) or ERRORS[string_id]
+        return kodi.formatted(30129, exc)
+    return kodi.string(string_id)
 
 
 def format_count(value):
@@ -103,14 +93,14 @@ def video_plot(item, known, threshold):
         facts.append('%s likes' % format_count(known['l']))
     status = []
     if item['live']:
-        status.append(kodi.string(30127) or 'Live')
+        status.append(kodi.string(30127))
     elif item.get('upcoming'):
         status.append(item['upcoming'])
     status.extend(item['badges'])
     if item['watched_pct'] >= threshold:
-        status.append(kodi.string(30142) or 'Watched')
+        status.append(kodi.string(30142))
     elif item['watched_pct'] > 0:
-        status.append(kodi.formatted(30141, 'Watched %d%%', item['watched_pct']))
+        status.append(kodi.formatted(30141, item['watched_pct']))
     lines = [' • '.join(x for x in facts if x), ' • '.join(status)]
     if known and known.get('d'):
         lines.append('\n' + known['d'])
@@ -133,7 +123,7 @@ def _player_error_message(exc):
     if getattr(exc, 'bot_check', False):
         # YouTube's own wording ("Sign in to confirm...") reads as if signing in to Leanback would
         # help, but it judges the connection: see InnerTube.player.
-        return kodi.string(30183) or ERRORS[30183]
+        return kodi.string(30183)
     if str(exc) in ('', 'unplayable'):
         return kodi.string(30120)
     return str(exc)
@@ -218,7 +208,7 @@ def _video_menu(item, video_id, channel_id):
     menu.append((kodi.string(30104), 'Container.Update(%s)' % url_for('related', v=video_id)))
     menu.append((kodi.string(30105), 'RunPlugin(%s)' % url_for('details', v=video_id)))
     if not item['live'] and not item['short']:
-        menu.append((kodi.string(30139) or 'Chapters', 'RunPlugin(%s)' % url_for('chapters', v=video_id)))
+        menu.append((kodi.string(30139), 'RunPlugin(%s)' % url_for('chapters', v=video_id)))
     return menu
 
 
@@ -226,7 +216,7 @@ def _device_code_message(code):
     """Where to go and what code to enter, for the sign-in dialog."""
     url = code.get('verification_url') or 'youtube.com/activate'
     url = url.replace('https://', '').replace('http://', '').replace('www.', '')
-    go_to = kodi.formatted(30110, 'On a phone or computer, go to [B]%s[/B] and enter this code:', url)
+    go_to = kodi.formatted(30110, url)
     return '%s\n[B][COLOR yellow]%s[/COLOR][/B]\n%s' % (go_to, code['user_code'], kodi.string(30111))
 
 
@@ -325,7 +315,7 @@ class Plugin(pages.Pages):
                 channels = sorted(channels, key=lambda e: e['title'].lower())
             for entry in channels:
                 self._add_menu_entry(entry)
-        li = xbmcgui.ListItem(kodi.string(30167) or 'TV interface', offscreen=True)
+        li = xbmcgui.ListItem(kodi.string(30167), offscreen=True)
         li.setArt({'icon': kodi.icon_path('icon.png'), 'thumb': kodi.icon_path('icon.png')})
         # Opens a window rather than listing anything, so not a folder (see _add_accounts_entry).
         self._add(url_for('tv'), li, self._browsed_from_outside())
@@ -338,7 +328,7 @@ class Plugin(pages.Pages):
         _, account = auth.active_account()
         li = xbmcgui.ListItem(kodi.string(30108), offscreen=True)
         li.setLabel2(account.get('name') or '' if account else kodi.string(30123))
-        li.getVideoInfoTag().setPlot(kodi.formatted(30112, 'Signed in as %s', account.get('name') or '') if account
+        li.getVideoInfoTag().setPlot(kodi.formatted(30112, account.get('name') or '') if account
                                      else kodi.string(30123))
         li.setArt({'icon': 'DefaultUser.png', 'thumb': 'DefaultUser.png'})
         # Only opens a dialog: as a folder its failed listing made Kodi leave the add-on (and re-run it on Back).
@@ -525,7 +515,7 @@ class Plugin(pages.Pages):
         self._finish_listing([{'kind': 'folder'}])
 
     def _add_channels_folder(self, others, browse_id, params):
-        label = kodi.string(30134) or 'Channels'
+        label = kodi.string(30134)
         li = xbmcgui.ListItem('[B]%s[/B] (%d)' % (label, len(others)), offscreen=True)
         li.setArt({'icon': 'DefaultArtist.png', 'thumb': 'DefaultArtist.png'})
         li.getVideoInfoTag().setPlot(', '.join(t['title'] for t in others[:40]))
@@ -910,7 +900,7 @@ class Plugin(pages.Pages):
         video_id = self.params['v']
         found = parser.chapters(self.fetch({'ep': 'next', 'v': video_id}))
         if not found:
-            self._notify(kodi.string(30140) or 'This video has no chapters')
+            self._notify(kodi.string(30140))
             return
         items = []
         for chapter in found:
@@ -921,7 +911,7 @@ class Plugin(pages.Pages):
         playing = player.isPlayingVideo() and video_id in player.getPlayingFile()
         current = player.getTime() if playing else -1
         preselect = max([i for i, c in enumerate(found) if c['start'] <= current] or [0])
-        choice = xbmcgui.Dialog().select(kodi.string(30139) or 'Chapters', items, preselect=preselect,
+        choice = xbmcgui.Dialog().select(kodi.string(30139), items, preselect=preselect,
                                          useDetails=True)
         if choice < 0:
             return
@@ -1030,7 +1020,7 @@ class Plugin(pages.Pages):
             index = xbmcgui.Dialog().select(kodi.string(30121), labels)
             if index < 0:
                 return changed
-            target = xbmcgui.Dialog().select(kodi.formatted(30118, 'Move "%s" to position', labels[index]),
+            target = xbmcgui.Dialog().select(kodi.formatted(30118, labels[index]),
                                              ['%d. %s' % (i + 1, label) for i, label in enumerate(labels)],
                                              preselect=index)
             if target < 0 or target == index:
@@ -1049,17 +1039,17 @@ class Plugin(pages.Pages):
         if entry is None:
             return
         string_id, action = entry
-        label = maintenance.text(string_id)
-        question = kodi.formatted(30157, maintenance.FALLBACK[30157], label)
+        label = kodi.string(string_id)
+        question = kodi.formatted(30157, label)
         if not xbmcgui.Dialog().yesno(kodi.ADDON.getAddonInfo('name'), question):
             return
         freed = action()
         kodi.log('maintenance: cleared %s (%d bytes)' % (self.params['what'], freed))
         if freed:
             cleared = '%s, %s' % (label, maintenance.human_size(freed))
-            message = kodi.formatted(30158, maintenance.FALLBACK[30158], cleared)
+            message = kodi.formatted(30158, cleared)
         else:
-            message = maintenance.text(30159)
+            message = kodi.string(30159)
         self._notify(message)
 
     def reset_menu(self):
@@ -1104,7 +1094,7 @@ class Plugin(pages.Pages):
         try:
             code = auth.request_device_code()
         except Exception as exc:  # network or OAuth errors
-            self._notify(kodi.formatted(30113, 'Sign-in failed: %s', exc), error=True)
+            self._notify(kodi.formatted(30113, exc), error=True)
             return
         token = self._wait_for_approval(code)
         if token:
@@ -1130,7 +1120,7 @@ class Plugin(pages.Pages):
                 try:
                     token = auth.poll_token(code['device_code'])
                 except auth.AuthError as exc:
-                    self._notify(kodi.formatted(30113, 'Sign-in failed: %s', exc), error=True)
+                    self._notify(kodi.formatted(30113, exc), error=True)
                     return None
                 if token:
                     return token
@@ -1141,9 +1131,9 @@ class Plugin(pages.Pages):
 
     def _add_signed_in_account(self, token):
         account_id = auth.add_account(token)
-        name = InnerTube().account_name() or kodi.formatted(30131, 'Account %s', len(auth.accounts()))
+        name = InnerTube().account_name() or kodi.formatted(30131, len(auth.accounts()))
         auth.rename_account(account_id, name)
-        self._notify(kodi.formatted(30112, 'Signed in as %s', name))
+        self._notify(kodi.formatted(30112, name))
         xbmc.executebuiltin('Container.Refresh')
 
     def sign_out(self):

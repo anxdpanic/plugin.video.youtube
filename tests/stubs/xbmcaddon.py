@@ -1,5 +1,7 @@
 """Stand-in for Kodi's xbmcaddon module. Settings come from SETTINGS, strings from STRINGS."""
+import ast
 import os
+import re
 import tempfile
 
 PROFILE = os.path.join(tempfile.gettempdir(), 'leanback-tests', 'profile')
@@ -7,6 +9,14 @@ ADDON_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..',
 
 SETTINGS = {}
 STRINGS = {}
+
+
+def english(string_id):
+    """The en_GB text of a string id, from the add-on's strings.po."""
+    path = os.path.join(ADDON_PATH, 'resources', 'language', 'resource.language.en_gb', 'strings.po')
+    with open(path, encoding='utf-8') as po:
+        found = re.search(r'msgctxt "#%d"\nmsgid "((?:[^"\\]|\\.)*)"' % string_id, po.read())
+    return ast.literal_eval('"%s"' % found.group(1))
 
 
 class Addon:

@@ -442,7 +442,8 @@ def sign_in(monkeypatch, polls, expires_in=1800):
     return added
 
 
-def test_sign_in_adds_the_account_once_approved(monkeypatch):
+def test_sign_in_adds_the_account_once_approved(monkeypatch, english):
+    english(30112)
     assert sign_in(monkeypatch, [None, None, {'access_token': 'T'}]) == [{'access_token': 'T'}]
     assert 'Viewer' in xbmcgui.NOTIFICATIONS[-1][1]
 

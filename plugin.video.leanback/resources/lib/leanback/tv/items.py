@@ -74,10 +74,10 @@ def video_tile(item, known, threshold, fanart=''):
     li.setArt({'thumb': item['thumb'], 'fanart': fanart or item['thumb']})
     li.setProperty('plot', router.video_plot(item, known, threshold))
     if item['live']:
-        li.setProperty('badge', kodi.string(30127) or 'Live')
+        li.setProperty('badge', kodi.string(30127))
         li.setProperty('badge_color', LIVE_COLOR)
     elif item.get('upcoming'):
-        li.setProperty('badge', kodi.string(30168) or 'Upcoming')
+        li.setProperty('badge', kodi.string(30168))
         li.setProperty('badge_color', BADGE_COLOR)
     elif item['duration']:
         li.setProperty('badge', router.format_time(item['duration']))
@@ -97,7 +97,7 @@ def folder_tile(item, avatar=False):
     if avatar or item['kind'] == 'channel' or (item['target'].get('browse_id') or '').startswith('UC'):
         li.setProperty('round', '1')
     elif item['kind'] == 'playlist':
-        li.setProperty('badge', kodi.string(30169) or 'Playlist')
+        li.setProperty('badge', kodi.string(30169))
         li.setProperty('badge_color', BADGE_COLOR)
     return li
 

@@ -14,24 +14,6 @@ from . import art, descriptions, kodi
 
 PLAYING_MANIFEST = re.compile(r'/mpd/([A-Za-z0-9_-]{11})\.mpd')
 
-# Kodi loads strings at startup, so right after an update the new ones can still be empty.
-FALLBACK = {
-    30151: 'Cached pages',
-    30152: 'Temporary files',
-    30153: 'Channel art and descriptions',
-    30154: 'Search history',
-    30155: 'YouTube visitor ID',
-    30156: 'All of the above',
-    30157: '%s will be cleared. Continue?',
-    30158: 'Cleared: %s',
-    30159: 'Nothing to clear',
-}
-
-
-def text(string_id):
-    return kodi.string(string_id) or FALLBACK[string_id]
-
-
 def _size(path):
     if os.path.isdir(path):
         return sum(_size(os.path.join(path, name)) for name in os.listdir(path))

@@ -26,13 +26,9 @@ ACTION_BACK = (9, 10, 92)  # parent dir, previous menu, back
 ACTION_CONTEXT = (11, 117)  # info, context menu
 
 
-def _string(string_id, fallback):
-    return kodi.string(string_id) or fallback
-
-
 def resume_label(position):
     """Kodi's "Resume from ..." label. Kodi 19 and later word it with "{0:s}", older builds with "%s"."""
-    label = xbmc.getLocalizedString(12022) or 'Resume from {0:s}'
+    label = xbmc.getLocalizedString(12022)
     return label.replace('{0:s}', position).replace('%s', position)
 
 
@@ -104,7 +100,7 @@ class TVWindow(xbmcgui.WindowXML):
         entries, _ = self.pages.menu_entries()
         account = auth.active_account()[1]
         entries = list(entries) + [
-            {'id': 'accounts', 'title': (account or {}).get('name') or _string(30108, 'Accounts'),
+            {'id': 'accounts', 'title': (account or {}).get('name') or kodi.string(30108),
              'target': {'type': 'accounts'}, 'thumb': '', 'art': items.icon('account')},
             {'id': 'settings', 'title': xbmc.getLocalizedString(5), 'target': {'type': 'settings'},
              'thumb': '', 'art': items.icon('settings')},
@@ -146,7 +142,7 @@ class TVWindow(xbmcgui.WindowXML):
         elif kind == 'browse':
             desc = {'ep': 'browse', 'id': target['browse_id'], 'params': target.get('params')}
             self._push(model.Screen(desc, entry['title'], self._load_page, self._keep(target['browse_id']),
-                                    _string(30134, 'Channels')), replace=True, entry=entry['id'])
+                                    kodi.string(30134)), replace=True, entry=entry['id'])
 
     def _settings_changed(self):
         """Apply settings changed meanwhile: the rail (hide Shorts), the watched threshold and the page's
@@ -160,7 +156,7 @@ class TVWindow(xbmcgui.WindowXML):
             screen.refresh()
         else:
             fresh = model.Screen(screen.desc, screen.title, self._load_page, self._keep(screen.desc.get('id')),
-                                 _string(30134, 'Channels')).open()
+                                 kodi.string(30134)).open()
             fresh.ensure(self.top)
             self.stack[-1] = fresh
             screen = fresh
@@ -235,7 +231,7 @@ class TVWindow(xbmcgui.WindowXML):
         empty until you sign in."""
         if (screen.desc.get('id') or '').startswith('FE') and not self.pages.api.signed_in():
             return kodi.string(30125)
-        return _string(30124, 'This page is empty')
+        return kodi.string(30124)
 
     def _move(self, step):
         screen = self.screen
@@ -323,27 +319,27 @@ class TVWindow(xbmcgui.WindowXML):
     def _search_rows(self):
         """The search screen: New search (and Clear when there is something to clear), then past searches."""
         past = self.pages._searches()
-        actions = [{'kind': 'action', 'title': _string(30101, 'New search'), 'icon': 'search',
-                    'target': {'type': 'new_search'}, 'plot': _string(30175, 'Type what to search YouTube for')}]
+        actions = [{'kind': 'action', 'title': kodi.string(30101), 'icon': 'search',
+                    'target': {'type': 'new_search'}, 'plot': kodi.string(30175)}]
         if past:
-            actions.append({'kind': 'action', 'title': _string(30171, 'Clear search history'), 'icon': 'clear',
+            actions.append({'kind': 'action', 'title': kodi.string(30171), 'icon': 'clear',
                             'target': {'type': 'clear_searches'},
-                            'plot': kodi.formatted(30172, 'Forget all %d past searches', len(past))})
-        rows = [model.Row(_string(30100, 'Search'), actions)]
+                            'plot': kodi.formatted(30172, len(past))})
+        rows = [model.Row(kodi.string(30100), actions)]
         if past:
-            rows.append(model.Row(_string(30174, 'Recent searches'), [
+            rows.append(model.Row(kodi.string(30174), [
                 {'kind': 'query', 'title': query, 'target': {'type': 'search', 'query': query},
-                 'plot': kodi.formatted(30176, 'Search again for "%s"', query)} for query in past]))
+                 'plot': kodi.formatted(30176, query)} for query in past]))
         return rows
 
     def _search_action(self, action):
         if action == 'new_search':
-            query = xbmcgui.Dialog().input(_string(30100, 'Search'))
+            query = xbmcgui.Dialog().input(kodi.string(30100))
             if query:
                 self._search(query)
         elif action == 'clear_searches':
-            if xbmcgui.Dialog().yesno(_string(30171, 'Clear search history'),
-                                      _string(30173, 'Forget every past search?')):
+            if xbmcgui.Dialog().yesno(kodi.string(30171),
+                                      kodi.string(30173)):
                 maintenance.clear_search_history()
                 self._refresh_search()
 
@@ -365,7 +361,7 @@ class TVWindow(xbmcgui.WindowXML):
     def _open_browse(self, browse_id, params, title):
         desc = {'ep': 'browse', 'id': browse_id, 'params': params}
         self._push(model.Screen(desc, title, self._load_page, self._keep(browse_id),
-                                _string(30134, 'Channels')))
+                                kodi.string(30134)))
 
     def _play(self, item, start=None):
         video_id = router.video_id_of(item)
@@ -434,8 +430,8 @@ class TVWindow(xbmcgui.WindowXML):
             return
         item = row.items[position]
         if item['kind'] == 'query':
-            choices = [(_string(30128, 'Remove from search history'), lambda: self._forget(item['title'])),
-                       (_string(30171, 'Clear search history'), lambda: self._search_action('clear_searches'))]
+            choices = [(kodi.string(30128), lambda: self._forget(item['title'])),
+                       (kodi.string(30171), lambda: self._search_action('clear_searches'))]
             choice = xbmcgui.Dialog().contextmenu([label for label, _ in choices])
             if choice >= 0:
                 choices[choice][1]()
@@ -446,15 +442,15 @@ class TVWindow(xbmcgui.WindowXML):
         choices = []
         if item['kind'] == 'video':
             video_id = router.video_id_of(item)
-            choices.append((_string(30105, 'Full details'),
+            choices.append((kodi.string(30105),
                             lambda: xbmc.executebuiltin('RunPlugin(%s)' % router.url_for('details', v=video_id))))
-            choices.append((_string(30104, 'Related videos'), lambda: self._push(
+            choices.append((kodi.string(30104), lambda: self._push(
                 model.Screen({'ep': 'next', 'v': video_id}, item['title'], self._load_page, self._keep()))))
             if not item['live'] and not item['short']:
-                choices.append((_string(30139, 'Chapters'),
+                choices.append((kodi.string(30139),
                                 lambda: xbmc.executebuiltin('RunPlugin(%s)' % router.url_for('chapters', v=video_id))))
         if channel_id and channel_id != (self.screen.desc.get('id') if self.screen else None):
-            choices.append((_string(30103, 'Go to channel'),
+            choices.append((kodi.string(30103),
                             lambda: self._open_browse(channel_id, None, item['channel'] or item['title'])))
         if not choices:
             return
@@ -534,7 +530,7 @@ class TVWindow(xbmcgui.WindowXML):
         return parser.parse_page(self.pages.fetch(desc))
 
     def _busy(self, on):
-        self.setProperty('busy', _string(30170, 'Loading…') if on else '')
+        self.setProperty('busy', kodi.string(30170) if on else '')
 
     def _guarded(self, func, *args):
         """Run func, showing a short message instead of failing when YouTube can't be reached."""

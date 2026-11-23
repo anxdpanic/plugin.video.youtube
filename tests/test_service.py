@@ -81,18 +81,6 @@ def test_busy_port_falls_back_and_says_so(httpd):
     assert message == 'Port %d is in use, using %d' % (taken, httpd.port)
 
 
-def test_fallback_notice_before_strings_load(httpd):
-    """Kodi loads strings at startup; right after an update the new one is still empty."""
-    xbmcaddon.STRINGS[30146] = ''
-    holder = busy_port()
-    taken = holder.getsockname()[1]
-    try:
-        assert httpd.start(taken)
-    finally:
-        holder.close()
-    assert xbmcgui.NOTIFICATIONS[0][1] == service.PORT_IN_USE % (taken, httpd.port)
-
-
 def test_any_free_port_needs_no_notice(httpd):
     assert httpd.start(0)
     assert httpd.port and xbmcgui.NOTIFICATIONS == []

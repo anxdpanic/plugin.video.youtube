@@ -20,7 +20,8 @@ def test_played_videos_keep_their_description():
     assert again.get('bbbbbbbbbbb') is None
 
 
-def test_video_plot_lists_info_then_description():
+def test_video_plot_lists_info_then_description(english):
+    english(30141)
     descriptions.Descriptions().remember('aaaaaaaaaaa', 'The description.', '2026-11-18')
     plugin = router.Plugin(['plugin://plugin.video.leanback/browse', '1', ''])
     plugin._render_items([video('aaaaaaaaaaa', badges=['4K'], watched_pct=40),

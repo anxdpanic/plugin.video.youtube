@@ -25,7 +25,6 @@ PORT_PROPERTY = http.PORT_PROPERTY
 DEFAULT_PORT = 61152
 OTHER_ADDON_PORTS = (50152,)  # plugin.video.youtube
 FALLBACK_STEPS = 2  # also try the next ports before taking any free one
-PORT_IN_USE = 'Port %d is in use, using %d'
 MANIFEST = re.compile(r'^/mpd/([A-Za-z0-9_-]{11})\.mpd$')
 SUBTITLE = re.compile(r'^/sub/([A-Za-z0-9_-]{11})/(\d+)\.vtt$')
 EMPTY_VTT = b'WEBVTT\n\n'
@@ -157,7 +156,7 @@ class Httpd:
         kodi.log('manifest server on 127.0.0.1:%d' % self.port)
         if wanted and self.port != wanted:
             # Kodi loads strings at startup, so right after an update a new one can still be empty.
-            message = kodi.formatted(30146, PORT_IN_USE, wanted, self.port)
+            message = kodi.formatted(30146, wanted, self.port)
             xbmcgui.Dialog().notification(kodi.ADDON.getAddonInfo('name'), message, xbmcgui.NOTIFICATION_WARNING, 6000)
         if old is not None:
             self._close(old)

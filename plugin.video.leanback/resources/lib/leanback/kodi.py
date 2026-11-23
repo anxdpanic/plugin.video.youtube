@@ -35,17 +35,15 @@ def string(string_id):
     return ADDON.getLocalizedString(string_id)
 
 
-def formatted(string_id, fallback, *args):
-    """A localised string with %-placeholders filled in. Falls back to the English text when the string is
-    empty (Kodi loads add-on strings only at startup, so a new one is blank until a restart) or when a
-    translation's placeholders don't match the arguments, rather than raising inside a dialog or listing."""
+def formatted(string_id, *args):
+    """A localised string with %-placeholders filled in. A translation whose placeholders don't match the
+    arguments is shown as it is, rather than raising inside a dialog or listing."""
     label = string(string_id)
-    if label:
-        try:
-            return label % args
-        except (TypeError, ValueError):
-            log('string %d does not fit its arguments: %r' % (string_id, label))
-    return fallback % args
+    try:
+        return label % args
+    except (TypeError, ValueError):
+        log('string %d does not fit its arguments: %r' % (string_id, label))
+        return label
 
 
 def setting(key):

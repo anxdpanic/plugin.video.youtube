@@ -14,12 +14,6 @@ def write(path, data='x' * 100):
     return path
 
 
-@pytest.fixture(autouse=True)
-def strings_not_loaded(monkeypatch):
-    """Like Kodi right after an update: new strings are empty until restart, so fallbacks show."""
-    monkeypatch.setattr(kodi, 'string', lambda string_id: '')
-
-
 @pytest.fixture
 def stored():
     """One of everything Leanback keeps, plus the user data Maintenance must leave alone."""
@@ -88,7 +82,8 @@ def run(what, confirm, monkeypatch):
     router.Plugin(['plugin://plugin.video.leanback/maintenance', '-1', '?what=' + what]).dispatch()
 
 
-def test_route_asks_first_then_clears_and_reports(stored, monkeypatch):
+def test_route_asks_first_then_clears_and_reports(stored, monkeypatch, english):
+    english(30154, 30158)
     run('search', False, monkeypatch)
     assert 'search_history' in kodi.load_json('state.json', {})
     assert xbmcgui.NOTIFICATIONS == []
@@ -98,7 +93,8 @@ def test_route_asks_first_then_clears_and_reports(stored, monkeypatch):
     assert message.startswith('Cleared: Search history, ')
 
 
-def test_route_reports_nothing_to_clear(monkeypatch):
+def test_route_reports_nothing_to_clear(monkeypatch, english):
+    english(30159)
     run('cache', True, monkeypatch)
     assert xbmcgui.NOTIFICATIONS[0][1] == 'Nothing to clear'
 
@@ -107,6 +103,3 @@ def test_unknown_action_does_nothing(monkeypatch):
     run('everything', True, monkeypatch)
     assert xbmcgui.NOTIFICATIONS == []
 
-
-def test_messages_have_english_fallbacks():
-    assert maintenance.text(30157) % 'Cached pages' == 'Cached pages will be cleared. Continue?'

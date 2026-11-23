@@ -24,6 +24,15 @@ def no_banner_fetching(monkeypatch):
     monkeypatch.setattr(art.Banners, 'fetch_all', lambda self, channel_ids, fetch=None: 0)
 
 
+@pytest.fixture
+def english(monkeypatch):
+    """Give the named string ids their en_GB text from strings.po, as Kodi would."""
+    def load(*string_ids):
+        for string_id in string_ids:
+            monkeypatch.setitem(xbmcaddon.STRINGS, string_id, xbmcaddon.english(string_id))
+    return load
+
+
 @pytest.fixture(autouse=True)
 def clean_state():
     """Fresh profile, settings and recorded plugin output for every test."""
