@@ -35,10 +35,9 @@ def httpd():
     instance.stop()
 
 
-def test_default_port_avoids_other_addons_and_ephemeral_range():
-    assert service.DEFAULT_PORT not in service.OTHER_ADDON_PORTS
+def test_default_port_is_not_the_earlier_default_and_avoids_ephemeral_range():
+    assert service.DEFAULT_PORT != 50152  # earlier plugin.video.youtube versions' default
     fallbacks = [p for p in service.candidate_ports(service.DEFAULT_PORT) if p]
-    assert not set(fallbacks) & set(service.OTHER_ADDON_PORTS)
     assert all(p > 60999 for p in fallbacks)  # above Linux's default ephemeral range
 
 

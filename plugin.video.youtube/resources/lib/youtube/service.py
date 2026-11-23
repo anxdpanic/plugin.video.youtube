@@ -19,11 +19,10 @@ import xbmcgui
 from . import broker, history, http, kodi, playback
 
 PORT_PROPERTY = http.PORT_PROPERTY
-# Default port, kept clear of 50152, which earlier plugin.video.youtube versions bound, and above Linux's
-# ephemeral range (32768-60999), so outgoing connections never hold it. The service_port setting overrides
-# it; 0 means any free port.
+# Default port: not 50152, the default of earlier plugin.video.youtube versions, and above Linux's ephemeral
+# range (32768-60999), so outgoing connections never hold it. The service_port setting overrides it; 0 means
+# any free port.
 DEFAULT_PORT = 61152
-OTHER_ADDON_PORTS = (50152,)  # earlier plugin.video.youtube versions
 FALLBACK_STEPS = 2  # also try the next ports before taking any free one
 MANIFEST = re.compile(r'^/mpd/([A-Za-z0-9_-]{11})\.mpd$')
 SUBTITLE = re.compile(r'^/sub/([A-Za-z0-9_-]{11})/(\d+)\.vtt$')
