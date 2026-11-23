@@ -2,7 +2,8 @@
 # Kodi 21 on the target devices runs Python 3.9.
 target-version = "py39"
 line-length = 120
-extend-exclude = ["plugin.video.youtube/resources/media"]
+# .scripts holds the repository generator, kept close to the copy in plugin.video.youtube.
+extend-exclude = ["plugin.video.youtube/resources/media", ".scripts"]
 
 [tool.ruff.lint]
 select = [

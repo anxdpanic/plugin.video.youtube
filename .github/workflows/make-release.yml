@@ -1,0 +1,69 @@
+name: Make Release
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+      - '*-dev'
+
+jobs:
+  release:
+    if: github.repository == 'anxdpanic/plugin.video.youtube' || github.event_name == 'workflow_dispatch'
+    name: Make Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Add-on
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Read Add-on Version and News
+        id: addon
+        run: |
+          python - <<'EOF' >> "$GITHUB_OUTPUT"
+          import xml.etree.ElementTree as ET
+          root = ET.parse('plugin.video.youtube/addon.xml').getroot()
+          news = root.findtext("extension[@point='xbmc.addon.metadata']/news") or ''
+          print('version=' + root.get('version'))
+          print('news<<END_OF_NEWS')
+          print(news.strip())
+          print('END_OF_NEWS')
+          EOF
+
+      - name: Release Status
+        # A tag or version marked alpha, beta or dev (v8.0.0-beta1, 8.0.0~beta1, 7.1.0-dev) is a pre-release.
+        id: release
+        run: |
+          shopt -s extglob
+          tag=${GITHUB_REF/refs\/tags\//}
+          version='${{ steps.addon.outputs.version }}'
+          if [[ $tag == *[-+~]@(alpha|beta|dev)*([.0-9a-z]) || $version == *[-+~]@(alpha|beta|dev)*([.0-9a-z]) ]];
+          then
+            echo "pre-release=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "pre-release=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create Zip
+        id: zip
+        run: |
+          python scripts/package.py
+          echo "filename=dist/plugin.video.youtube-${{ steps.addon.outputs.version }}.zip" >> "$GITHUB_OUTPUT"
+
+      - name: Create Draft Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEWS: ${{ steps.addon.outputs.news }}
+        run: |
+          prerelease=()
+          if [[ '${{ steps.release.outputs.pre-release }}' == 'true' ]]; then
+            prerelease=(--prerelease)
+          fi
+          gh release create "${GITHUB_REF_NAME}" '${{ steps.zip.outputs.filename }}' \
+            --draft "${prerelease[@]}" --title "${GITHUB_REF_NAME}" --notes "${NEWS}"

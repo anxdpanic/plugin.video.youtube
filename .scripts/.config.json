@@ -1,0 +1,26 @@
+{
+  "compress_addons": true,
+  "path": {
+    "source": "./official_testing",
+    "repository": "./repository/official_testing"
+  },
+  "ignored": {
+    "addons": [
+    ],
+    "files": [
+      "README.md"
+    ],
+    "file_starts_with": [
+      "."
+    ],
+    "file_ends_with": [
+      ".pyo",
+      ".pyc"
+    ],
+    "directories": [
+      ".git",
+      ".idea",
+      "__pycache__"
+    ]
+  }
+}

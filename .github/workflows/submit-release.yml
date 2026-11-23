@@ -1,0 +1,39 @@
+name: Submit Release
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    if: github.repository == 'anxdpanic/plugin.video.youtube' || github.event_name == 'workflow_dispatch'
+    name: Submit Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Add-on
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install git+https://github.com/xbmc/kodi-addon-submitter.git
+
+      - name: Configure git
+        run: |
+          git config --global user.name "anxdpanic"
+          git config --global user.email "anxdpanic@users.noreply.github.com"
+
+      # The add-on lives in its own folder, so only that folder is submitted; its <news> in addon.xml
+      # becomes the pull request's message. Omega (Kodi 21) is the oldest Kodi the add-on supports,
+      # and repo-plugins carries a submission to omega on to later branches.
+      - name: Submit to Official Repository
+        run: |
+          submit-addon -r repo-plugins -b omega --pull-request plugin.video.youtube
+        env:
+          GH_USERNAME: anxdpanic
+          GH_TOKEN: ${{ secrets.ADDON_SUBMISSION_TOKEN }}
+          EMAIL: anxdpanic@users.noreply.github.com

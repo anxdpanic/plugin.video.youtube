@@ -1,0 +1,71 @@
+name: Generate and Publish Development Repository
+on:
+  workflow_dispatch:
+
+  push:
+    tags:
+      - 'v*'
+      - '*-dev'
+
+jobs:
+  repo-gen:
+    if: github.repository == 'anxdpanic/plugin.video.youtube' || github.event_name == 'workflow_dispatch'
+    name: Generate the official testing repository and upload it to the mirrors
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        # lftp mirrors the repository; lxml is for the repository generator script
+        run: |
+          sudo apt update
+          sudo apt install lftp
+          python -m pip install --upgrade pip
+          pip install lxml
+
+      - name: Checkout Add-on
+        uses: actions/checkout@v4
+        with:
+          path: ./checkout
+
+      - name: Stage Add-on and Repository Generator
+        # The generator zips every add-on folder in ./official_testing; the add-on is one folder of this repo.
+        run: |
+          mkdir -p ./official_testing
+          cp -r ./checkout/plugin.video.youtube ./official_testing/
+          cp ./checkout/.scripts/.prepare_repository.py .
+          cp ./checkout/.scripts/.config.json .
+
+      - name: Download Repository Add-on Files from FTP
+        # The repository add-on's source, so its zip is generated next to the add-on's
+        run: |
+          lftp -c "\
+          set ssl:verify-certificate false; \
+          set sftp:auto-confirm yes; \
+          open ${{ secrets.SFTP }}; \
+          cd /root/anxdpanic/kodi/youtube/; \
+          mirror --verbose --use-pget-n=8 -c --verbose repository.yt.testing_official ./official_testing/repository.yt.testing_official; \
+          bye \
+          "
+
+      - name: Generate Repository
+        # Generate the zips, addons.xml and addons.xml.md5
+        run: |
+          python .prepare_repository.py
+
+      - name: Mirror Official Testing Repository to FTP
+        # https://download.osmc.tv/dev/anxdpanic/kodi/youtube/official_testing/
+        run: |
+          lftp -c "\
+          set ssl:verify-certificate false; \
+          set sftp:auto-confirm yes; \
+          open ${{ secrets.SFTP }}; \
+          cd /root/anxdpanic/kodi/youtube/; \
+          lcd repository/; \
+          mirror --verbose --use-pget-n=8 -c --reverse --verbose official_testing official_testing; \
+          bye \
+          "
