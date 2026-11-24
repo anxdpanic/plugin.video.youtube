@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings version="1">
+    <section id="plugin.video.youtube">
+        <category id="general" label="30000">
+            <group id="general_main">
+                <setting id="whos_watching" type="boolean" label="30001">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="region" type="string" label="30002">
+                    <level>1</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30002</heading>
+                    </control>
+                </setting>
+            </group>
+            <group id="general_accounts" label="30040">
+                <setting id="sign_in" type="action" label="30041">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.youtube/account/sign_in)</data>
+                    <control type="button" format="action">
+                        <close>true</close>
+                    </control>
+                </setting>
+                <setting id="switch_account" type="action" label="30042">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.youtube/account/switch)</data>
+                    <control type="button" format="action">
+                        <close>true</close>
+                    </control>
+                </setting>
+                <setting id="sign_out" type="action" label="30043">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.youtube/account/sign_out)</data>
+                    <control type="button" format="action">
+                        <close>true</close>
+                    </control>
+                </setting>
+                <setting id="report_history" type="boolean" label="30044" help="30045">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+            </group>
+        </category>
+        <category id="menu" label="30010">
+            <group id="menu_main" label="30018">
+                <setting id="customise_menu" type="action" label="30011">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.youtube/menu/customise)</data>
+                    <control type="button" format="action">
+                        <close>true</close>
+                    </control>
+                </setting>
+                <setting id="reset_menu" type="action" label="30017">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.youtube/menu/reset)</data>
+                    <control type="button" format="action">
+                        <close>true</close>
+                    </control>
+                </setting>
+                <setting id="show_channels" type="boolean" label="30016">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="show_accounts" type="boolean" label="30177">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="sort_subscriptions" type="boolean" label="30015">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="shelves_as_folders" type="boolean" label="30019">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="fetch_descriptions" type="boolean" label="30161" help="30162">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="image_quality" type="integer" label="30178" help="30179">
+                    <level>0</level>
+                    <default>2</default>
+                    <constraints>
+                        <options>
+                            <option label="30180">2</option>
+                            <option label="30181">1</option>
+                            <option label="30182">0</option>
+                        </options>
+                    </constraints>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="pages_per_listing" type="integer" label="30046" help="30047">
+                    <level>0</level>
+                    <default>2</default>
+                    <constraints>
+                        <minimum>1</minimum>
+                        <step>1</step>
+                        <maximum>5</maximum>
+                    </constraints>
+                    <control type="slider" format="integer">
+                        <popup>false</popup>
+                    </control>
+                </setting>
+            </group>
+            <group id="menu_filter">
+                <setting id="hide_shorts" type="boolean" label="30012">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="hide_watched" type="boolean" label="30013">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="watched_threshold" type="integer" label="30014" parent="hide_watched">
+                    <level>0</level>
+                    <default>80</default>
+                    <constraints>
+                        <minimum>10</minimum>
+                        <step>5</step>
+                        <maximum>100</maximum>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="enable" setting="hide_watched">true</dependency>
+                    </dependencies>
+                    <control type="slider" format="percentage">
+                        <popup>false</popup>
+                    </control>
+                </setting>
+            </group>
+        </category>
+        <category id="playback" label="30020">
+            <group id="playback_video">
+                <setting id="max_quality" type="integer" label="30021">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>
+                        <options>
+                            <option label="30025">0</option>
+                            <option label="30061">4320</option>
+                            <option label="30050">2160</option>
+                            <option label="30051">1440</option>
+                            <option label="30052">1080</option>
+                            <option label="30053">720</option>
+                            <option label="30054">480</option>
+                            <option label="30055">360</option>
+                            <option label="30056">240</option>
+                            <option label="30057">144</option>
+                        </options>
+                    </constraints>
+                    <control type="list" format="integer"/>
+                </setting>
+                <setting id="codec" type="string" label="30022">
+                    <level>0</level>
+                    <default>any</default>
+                    <constraints>
+                        <options>
+                            <option label="30028">any</option>
+                            <option label="30058">vp9</option>
+                            <option label="30059">av01</option>
+                            <option label="30060">avc1</option>
+                        </options>
+                    </constraints>
+                    <control type="list" format="string"/>
+                </setting>
+                <setting id="allow_hdr" type="boolean" label="30023">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="audio_track" type="string" label="30024">
+                    <level>0</level>
+                    <default>original</default>
+                    <constraints>
+                        <options>
+                            <option label="30026">original</option>
+                            <option label="30027">kodi</option>
+                        </options>
+                    </constraints>
+                    <control type="list" format="string"/>
+                </setting>
+            </group>
+            <group id="playback_subtitles" label="30030">
+                <setting id="subs_asr" type="boolean" label="30031">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="subs_translate" type="string" label="30032">
+                    <level>0</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30032</heading>
+                    </control>
+                </setting>
+                <setting id="subs_more" type="string" label="30033">
+                    <level>1</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30033</heading>
+                    </control>
+                </setting>
+            </group>
+        </category>
+        <category id="maintenance" label="30150">
+            <group id="maintenance_clear" label="30160">
+                <setting id="clear_cache" type="action" label="30151">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.youtube/maintenance?what=cache)</data>
+                    <control type="button" format="action">
+                        <close>false</close>
+                    </control>
+                </setting>
+                <setting id="clear_temp" type="action" label="30152">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.youtube/maintenance?what=temp)</data>
+                    <control type="button" format="action">
+                        <close>false</close>
+                    </control>
+                </setting>
+                <setting id="clear_art" type="action" label="30153">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.youtube/maintenance?what=art)</data>
+                    <control type="button" format="action">
+                        <close>false</close>
+                    </control>
+                </setting>
+                <setting id="clear_search" type="action" label="30154">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.youtube/maintenance?what=search)</data>
+                    <control type="button" format="action">
+                        <close>false</close>
+                    </control>
+                </setting>
+                <setting id="clear_visitor" type="action" label="30155">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.youtube/maintenance?what=visitor)</data>
+                    <control type="button" format="action">
+                        <close>false</close>
+                    </control>
+                </setting>
+                <setting id="clear_all" type="action" label="30156">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.youtube/maintenance?what=all)</data>
+                    <control type="button" format="action">
+                        <close>false</close>
+                    </control>
+                </setting>
+            </group>
+        </category>
+        <category id="advanced" label="30143">
+            <group id="advanced_service">
+                <setting id="service_port" type="integer" label="30144" help="30145">
+                    <level>3</level>
+                    <default>61152</default>
+                    <constraints>
+                        <minimum>0</minimum>
+                        <maximum>65535</maximum>
+                    </constraints>
+                    <control type="edit" format="integer">
+                        <heading>30144</heading>
+                    </control>
+                </setting>
+            </group>
+        </category>
+    </section>
+</settings>
