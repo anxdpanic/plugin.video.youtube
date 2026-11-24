@@ -87,12 +87,13 @@ def video_tile(item, known, threshold, fanart=''):
     return li
 
 
-def folder_tile(item, avatar=False):
-    """A channel, playlist or other page; `avatar` shows its picture round, as for a channel."""
+def folder_tile(item, avatar=False, fanart=''):
+    """A channel, playlist or other page; `avatar` shows its picture round, as for a channel, and `fanart`
+    is a channel's banner, when known."""
     li = xbmcgui.ListItem(item['title'], offscreen=True)
     lines = [line for line in item['plot_lines'] if line]
     li.setLabel2(lines[0] if lines else '')
-    li.setArt({'thumb': item.get('thumb') or icon('topic'), 'fanart': item.get('thumb') or ''})
+    li.setArt({'thumb': item.get('thumb') or icon('topic'), 'fanart': fanart or item.get('thumb') or ''})
     li.setProperty('plot', '\n'.join(lines + ([' • '.join(item['badges'])] if item['badges'] else [])))
     if avatar or item['kind'] == 'channel' or (item['target'].get('browse_id') or '').startswith('UC'):
         li.setProperty('round', '1')
@@ -126,4 +127,4 @@ def tile(item, known, threshold, avatar=False, fanart=''):
         return action_tile(item)
     if item['kind'] == 'query':
         return query_tile(item)
-    return folder_tile(item, avatar)
+    return folder_tile(item, avatar, fanart)

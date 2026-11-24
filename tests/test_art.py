@@ -136,3 +136,16 @@ def test_banners_remembered_small_are_given_at_full_width():
     small = 'https://yt3.googleusercontent.com/x=w2120-fcrop64=1,00000000ffffffff-k-c0xffffffff-no-nd-rj'
     art.Banners().remember('UCcccccccccccccccccccccc', small)
     assert art.Banners().get('UCcccccccccccccccccccccc') == small.replace('=w2120-', '=w2560-')
+
+
+def test_subscribed_channels_use_their_banner_as_fanart(monkeypatch):
+    """Subscriptions > Channels: each channel's backdrop is its banner, as its videos' is."""
+    def fetch_all(self, channel_ids, fetch=None):
+        return REAL_FETCH_ALL(self, channel_ids, lambda c: 'https://yt3/%s' % c[-4:])
+
+    monkeypatch.setattr(art.Banners, 'fetch_all', fetch_all)
+    tabs = [parser._item_base('channel', name, 'https://yt3/avatar-%s' % name,
+                              {'type': 'browse', 'browse_id': 'UC' + name * 22})
+            for name in ('e', 'f')]
+    router.Plugin(['plugin://plugin.video.youtube/browse', '1', '?tabs=1'])._render_tabs(tabs)
+    assert [li.art['fanart'] for _, li, _ in xbmcplugin.ITEMS] == ['https://yt3/eeee', 'https://yt3/ffff']

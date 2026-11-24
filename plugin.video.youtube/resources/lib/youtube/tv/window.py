@@ -39,7 +39,7 @@ class TVWindow(xbmcgui.WindowXML):
         self.descriptions = descriptions.Descriptions()
         self.banners = art.Banners()
         self._banner_lock = threading.Lock()  # one banner lookup at a time: they share the store
-        self._bannered = set()  # video ids whose tile has its channel's banner, or whose channel has none
+        self._bannered = set()  # tiles (video or channel id) given their channel's banner, or whose channel has none
         self.threshold = pages.watched_threshold()
         self.entries = []
         self.stack = []
@@ -279,13 +279,22 @@ class TVWindow(xbmcgui.WindowXML):
     def _tile(self, row, item):
         self._apply_watched(item)
         known = self.descriptions.get(router.video_id_of(item))
-        fanart = self.banners.get(self._channel_of(item, known)) if item['kind'] == 'video' else ''
+        fanart = self.banners.get(self._banner_channel(item, known))
         return items.tile(item, known, self.threshold, row.avatars, fanart)
 
     @staticmethod
     def _channel_of(item, known):
         """A video's channel, from its tile or else from its watch page (Home's tiles don't name it)."""
         return item.get('channel_id') or (known or {}).get('c') or ''
+
+    @classmethod
+    def _banner_channel(cls, item, known):
+        """The channel whose banner is a tile's backdrop: a video's channel, or the channel a tile opens.
+        '' for other tiles, and for videos whose channel isn't known yet."""
+        if item['kind'] == 'video':
+            return cls._channel_of(item, known)
+        browse_id = (item['target'] or {}).get('browse_id') or ''
+        return browse_id if browse_id.startswith('UC') else ''
 
     def _activate(self, item):
         target = item['target'] or {}
@@ -482,26 +491,31 @@ class TVWindow(xbmcgui.WindowXML):
                 self._described.discard(video_id)  # not read this time: try again when it is shown next
         self._banners_soon()  # the watch pages name the channels of tiles that didn't
 
-    def _shown_videos(self):
-        """(video id, item, tile) for the videos in the shown rows."""
+    def _shown_tiles(self):
+        """(key, channel id, tile) for the shown rows' tiles whose backdrop is a channel banner: videos,
+        keyed by video id, and channels, keyed by channel id. The channel id is '' while unknown."""
         for row in (self._row(0), self._row(1)):
             if not row or not row.listitems:
                 continue
             for item, li in zip(row.items, row.listitems):
-                video_id = router.video_id_of(item) if item['kind'] == 'video' else None
-                if video_id:
-                    yield video_id, item, li
+                if item['kind'] == 'video':
+                    video_id = router.video_id_of(item)
+                    if video_id:
+                        yield video_id, self._banner_channel(item, self.descriptions.get(video_id)), li
+                else:
+                    channel_id = self._banner_channel(item, None)
+                    if channel_id:
+                        yield channel_id, channel_id, li
 
     def _banners_soon(self):
-        """Look up the channel banners of the shown videos in the background and make them the tiles'
-        fanart, the backdrop of the focused video. Videos whose channel isn't known yet wait for their
-        watch page."""
+        """Look up the channel banners of the shown videos and channels in the background and make them
+        the tiles' fanart, the backdrop of the focused tile. Videos whose channel isn't known yet wait for
+        their watch page."""
         wanted = []
-        for video_id, item, li in self._shown_videos():
-            channel_id = self._channel_of(item, self.descriptions.get(video_id))
-            if video_id not in self._bannered and channel_id.startswith('UC'):
-                self._bannered.add(video_id)
-                wanted.append((video_id, channel_id, li))
+        for key, channel_id, li in self._shown_tiles():
+            if key not in self._bannered and channel_id.startswith('UC'):
+                self._bannered.add(key)
+                wanted.append((key, channel_id, li))
         if wanted:
             threading.Thread(target=self._show_banners, args=(wanted,), name='youtube-tv-art').start()
 
@@ -511,9 +525,9 @@ class TVWindow(xbmcgui.WindowXML):
                 self.banners.fetch_all([channel_id for _, channel_id, _ in wanted])
             except (InnerTubeError, http.HTTPError) as exc:
                 kodi.log('TV interface: banners failed: %s' % exc)
-            for video_id, channel_id, li in wanted:
+            for key, channel_id, li in wanted:
                 if channel_id in self.banners.unknown([channel_id]):
-                    self._bannered.discard(video_id)  # not looked up this time: try again when shown next
+                    self._bannered.discard(key)  # not looked up this time: try again when shown next
                     continue
                 banner = self.banners.get(channel_id)
                 if banner:

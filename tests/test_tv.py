@@ -214,12 +214,35 @@ def test_window_sets_banners_and_retries_channels_not_looked_up():
     assert win._bannered == {'1', '2'}  # UCc's lookup failed: tried again next time it is shown
 
 
+def channel(channel_id):
+    return parser._item_base('channel', 'Channel', 'https://yt3/avatar', {'type': 'browse', 'browse_id': channel_id})
+
+
+def test_channel_tile_fanart_is_its_banner_when_known():
+    assert items.tile(channel('UCa'), None, 80, True).art['fanart'] == 'https://yt3/avatar'
+    assert items.tile(channel('UCa'), None, 80, True, 'https://banner').art['fanart'] == 'https://banner'
+
+
+def test_window_puts_channel_banners_behind_channel_tiles():
+    from resources.lib.youtube.tv import window
+
+    win = window.TVWindow()
+    assert win._banner_channel(channel('UCa'), None) == 'UCa'
+    assert win._banner_channel(dict(video('1'), channel_id='UCb'), None) == 'UCb'
+    assert win._banner_channel(channel('FEtopics'), None) == ''
+    win.banners = FakeBanners({'UCa': 'https://banner-a'})
+    tile = items.tile(channel('UCa'), None, 80, True)
+    win._bannered.add('UCa')
+    win._show_banners([('UCa', 'UCa', tile)])
+    assert tile.art['fanart'] == 'https://banner-a'
+
+
 def test_window_looks_up_banners_of_shown_videos_with_a_known_channel(monkeypatch):
     from resources.lib.youtube.tv import window
 
     win = window.TVWindow()
-    shown = [('1', dict(video('1'), channel_id='UCa'), 'tile1'), ('2', video('2'), 'tile2')]
-    monkeypatch.setattr(win, '_shown_videos', lambda: iter(shown))
+    shown = [('1', 'UCa', 'tile1'), ('2', '', 'tile2')]
+    monkeypatch.setattr(win, '_shown_tiles', lambda: iter(shown))
     started = []
     monkeypatch.setattr(window.threading, 'Thread',
                         lambda target, args, name: type('T', (), {'start': lambda s: started.append(args)})())
