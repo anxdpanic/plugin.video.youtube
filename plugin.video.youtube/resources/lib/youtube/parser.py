@@ -5,6 +5,7 @@
 Handles both item shapes the TV client sends: legacy `tileRenderer` and the newer
 `lockupViewModel`, plus shelves, grids, secondary-nav tabs, playlists and continuations.
 """
+import base64
 import json
 import re
 import urllib.parse
@@ -612,10 +613,30 @@ def _nav_tabs(secondary_nav):
                 yield tab_r, target
 
 
+# A channel's tab on the Subscriptions page opens FEsubscriptions narrowed to that channel, and only its
+# params say which: base64 (URL-safe) protobuf, decoded field by field 49: {1: "UC..."} (the channel id).
+SUBSCRIPTION_TAB_CHANNEL = re.compile(rb'\x0a\x18(UC[A-Za-z0-9_-]{22})')
+
+
+def _tab_channel(target):
+    """The channel a Subscriptions tab narrows the feed to, read from its params; '' for other tabs."""
+    target = target or {}  # some tabs lead nowhere
+    params = target.get('params') or ''
+    if target.get('browse_id') != 'FEsubscriptions' or not params:
+        return ''
+    try:
+        raw = base64.urlsafe_b64decode(params + '=' * (-len(params) % 4))
+    except ValueError:  # binascii.Error is a ValueError
+        return ''
+    match = SUBSCRIPTION_TAB_CHANNEL.search(raw)
+    return match.group(1).decode('ascii') if match else ''
+
+
 def _tab_entry(tab_r, target):
     entry = _item_base('tab', text(tab_r.get('title')), best_thumb(tab_r.get('thumbnail', {}).get('thumbnails')),
                        target)
     entry['selected'] = tab_r.get('selected', False)
+    entry['channel_id'] = _tab_channel(target)
     return entry
 
 

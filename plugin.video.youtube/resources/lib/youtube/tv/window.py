@@ -289,12 +289,15 @@ class TVWindow(xbmcgui.WindowXML):
 
     @classmethod
     def _banner_channel(cls, item, known):
-        """The channel whose banner is a tile's backdrop: a video's channel, or the channel a tile opens.
-        '' for other tiles, and for videos whose channel isn't known yet."""
+        """The channel whose banner is a tile's backdrop: a video's channel, the channel a tile opens, or
+        the channel a Subscriptions tab narrows the feed to. '' for other tiles, and for videos whose channel
+        isn't known yet."""
         if item['kind'] == 'video':
             return cls._channel_of(item, known)
         browse_id = (item['target'] or {}).get('browse_id') or ''
-        return browse_id if browse_id.startswith('UC') else ''
+        if browse_id.startswith('UC'):
+            return browse_id
+        return item.get('channel_id') or '' if item['kind'] == 'tab' else ''
 
     def _activate(self, item):
         target = item['target'] or {}

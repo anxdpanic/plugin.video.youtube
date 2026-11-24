@@ -388,3 +388,13 @@ def test_image_quality_setting_scales_every_kind(monkeypatch):
         assert square in parser.larger_art(avatar)
         assert width in parser.larger_art(banner)
         assert parser.larger_art(thumb) == full
+
+
+def test_subscription_tabs_name_their_channel():
+    """A Subscriptions tab only says which channel it narrows the feed to in its params."""
+    target = {'type': 'browse', 'browse_id': 'FEsubscriptions', 'params': 'igMaChhVQ0ROdlJaUmd2a0JUVWtRekZvVF84ckE='}
+    entry = parser._tab_entry({'title': {'simpleText': 'DdeunDdeun'}}, target)
+    assert entry['channel_id'] == 'UCDNvRZRgvkBTUkQzFoT_8rA'
+    assert parser._tab_channel({'browse_id': 'FEsubscriptions', 'params': 'not base64!'}) == ''
+    assert parser._tab_channel({'browse_id': 'FEwhat_to_watch', 'params': target['params']}) == ''
+    assert parser._tab_channel(None) == ''  # a tab that leads nowhere

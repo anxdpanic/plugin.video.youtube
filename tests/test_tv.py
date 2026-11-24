@@ -230,6 +230,8 @@ def test_window_puts_channel_banners_behind_channel_tiles():
     assert win._banner_channel(channel('UCa'), None) == 'UCa'
     assert win._banner_channel(dict(video('1'), channel_id='UCb'), None) == 'UCb'
     assert win._banner_channel(channel('FEtopics'), None) == ''
+    tab = dict(channel('FEsubscriptions'), kind='tab', channel_id='UCc')
+    assert win._banner_channel(tab, None) == 'UCc'  # a Subscriptions tab
     win.banners = FakeBanners({'UCa': 'https://banner-a'})
     tile = items.tile(channel('UCa'), None, 80, True)
     win._bannered.add('UCa')
