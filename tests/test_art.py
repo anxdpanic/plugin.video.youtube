@@ -1,6 +1,6 @@
 import xbmcplugin
 
-from resources.lib.youtube import art, parser, router
+from resources.lib.youtube import art, http, kodi, parser, router
 
 
 def test_banners_remember_and_report_missing(monkeypatch):
@@ -147,5 +147,53 @@ def test_subscribed_channels_use_their_banner_as_fanart(monkeypatch):
     tabs = [parser._item_base('channel', name, 'https://yt3/avatar-%s' % name,
                               {'type': 'browse', 'browse_id': 'UC' + name * 22})
             for name in ('e', 'f')]
+    tabs[1].update(kind='tab', target={'type': 'browse', 'browse_id': 'FEsubscriptions'},
+                   channel_id='UC' + 'f' * 22)  # as Subscriptions lists it: the feed narrowed to the channel
     router.Plugin(['plugin://plugin.video.youtube/browse', '1', '?tabs=1'])._render_tabs(tabs)
     assert [li.art['fanart'] for _, li, _ in xbmcplugin.ITEMS] == ['https://yt3/eeee', 'https://yt3/ffff']
+
+
+def _channel_ids(count):
+    return ['UC%022d' % i for i in range(count)]
+
+
+def test_a_long_channel_list_looks_up_one_batch_and_queues_the_rest(monkeypatch):
+    asked = []
+
+    def fetch_all(self, channel_ids, fetch=None):
+        asked.extend(channel_ids)
+        return REAL_FETCH_ALL(self, channel_ids, lambda c: 'https://yt3/' + c)
+
+    monkeypatch.setattr(art.Banners, 'fetch_all', fetch_all)
+    ids = _channel_ids(art.BATCH + 5)
+    art.Banners().fetch_batch(ids)
+    assert asked == ids[:art.BATCH]
+    assert kodi.load_json(art.QUEUE, []) == ids[art.BATCH:]
+    art.Banners().fetch_batch(ids)  # opened again: nothing new to look up or queue twice
+    assert kodi.load_json(art.QUEUE, []) == ids[art.BATCH:]
+
+
+def test_the_service_works_through_the_queue_a_few_at_a_time():
+    ids = _channel_ids(art.PER_TICK * 2)
+    art.queue_lookups(ids)
+    fetched = []
+    backfill = art.Backfill(lambda c: fetched.append(c) or 'https://yt3/' + c)
+    backfill.tick()
+    assert fetched == ids[:art.PER_TICK]
+    assert kodi.load_json(art.QUEUE, []) == ids[art.PER_TICK:]
+    backfill.tick()
+    assert fetched == ids and kodi.load_json(art.QUEUE, []) == []
+    assert art.Banners().get(ids[-1]) == 'https://yt3/' + ids[-1]
+    backfill.tick()  # an empty queue: nothing to do
+    assert len(fetched) == len(ids)
+
+
+def test_a_failed_lookup_stays_queued():
+    ids = _channel_ids(2)
+    art.queue_lookups(ids)
+
+    def refuse(channel_id):
+        raise http.HTTPError(403, b'', 'https://youtubei.googleapis.com', blocked=True)
+
+    art.Backfill(refuse).tick()
+    assert kodi.load_json(art.QUEUE, []) == ids

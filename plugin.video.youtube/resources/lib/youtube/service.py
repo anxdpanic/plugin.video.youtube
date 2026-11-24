@@ -16,7 +16,7 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 
-from . import broker, history, http, kodi, playback
+from . import art, broker, history, http, kodi, playback
 
 PORT_PROPERTY = http.PORT_PROPERTY
 # Default port: not 50152, the default of earlier plugin.video.youtube versions, and above Linux's ephemeral
@@ -216,6 +216,7 @@ def run():
     shutil.rmtree(kodi.LEGACY_TEMP_DIR, ignore_errors=True)
     _cleanup()
     tracker = history.Tracker()
+    backfill = art.Backfill()
     start_at = playback.StartAt()  # noqa: F841 (Kodi calls it while it exists)
     last_cleanup = time.time()
     while not monitor.waitForAbort(5):
@@ -227,6 +228,7 @@ def run():
             except Exception as exc:  # a failed switch must never stop the service
                 kodi.log_error('could not apply the service port setting: %s' % exc)
         tracker.tick()
+        backfill.tick()
         if time.time() - last_cleanup > 1800:
             _cleanup()
             last_cleanup = time.time()

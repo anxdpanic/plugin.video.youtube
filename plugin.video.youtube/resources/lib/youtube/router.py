@@ -620,7 +620,7 @@ class Plugin(pages.Pages):
         tabs = [t for t in tabs if not t.get('selected')]
         if kodi.setting_bool('sort_subscriptions'):
             tabs = sorted(tabs, key=lambda t: t['title'].lower())
-        self.banners.fetch_all([channel_of(tab) for tab in tabs])
+        self.banners.fetch_batch([channel_of(tab) for tab in tabs])
         for tab in tabs:
             self._add_folder_item(tab)
         self._finish_listing([{'kind': 'folder'}])
