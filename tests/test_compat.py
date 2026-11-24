@@ -34,6 +34,19 @@ def translate(path, **params):
     ('/kodion/search/remove/', {'q': 'cats'}, ('search/remove', {'q': 'cats'})),
     ('/kodion/playback_history/', {}, ('browse', {'id': 'FEhistory'})),
     ('/kodion/watch_later/list/', {}, ('browse', {'id': 'VLWL'})),
+    # Links shared from a phone (Yatse hands them over as uri2addon).
+    ('/uri2addon/', {'uri': 'https://www.youtube.com/watch?v=abcdefghijk'}, ('play', {'v': 'abcdefghijk'})),
+    ('/uri2addon/', {'uri': 'https://youtu.be/abcdefghijk?si=x&t=90'}, ('play', {'v': 'abcdefghijk', 't': '90'})),
+    ('/uri2addon/', {'uri': 'https://m.youtube.com/watch?v=abcdefghijk&t=1m30s'},
+     ('play', {'v': 'abcdefghijk', 't': '90'})),
+    ('/uri2addon/', {'uri': 'https://youtube.com/shorts/abcdefghijk'}, ('play', {'v': 'abcdefghijk'})),
+    ('/uri2addon/', {'uri': 'https://www.youtube.com/live/abcdefghijk?feature=share'}, ('play', {'v': 'abcdefghijk'})),
+    ('/uri2addon/', {'uri': 'https://music.youtube.com/watch?v=abcdefghijk&list=RDx'}, ('play', {'v': 'abcdefghijk'})),
+    ('/uri2addon/', {'uri': 'https://www.youtube.com/playlist?list=PLx'}, ('play_playlist', {'list': 'PLx'})),
+    ('/uri2addon/', {'uri': 'https://www.youtube.com/channel/UCabc'}, ('browse', {'id': 'UCabc'})),
+    # Not encoded: the link's own &t= arrives as one of the plugin's parameters.
+    ('/uri2addon/', {'uri': 'https://www.youtube.com/watch?v=abcdefghijk', 't': '2h'},
+     ('play', {'v': 'abcdefghijk', 't': '7200'})),
 ])
 def test_earlier_version_paths_map_to_routes(path, params, expected):
     assert translate(path, **params) == expected
@@ -71,3 +84,9 @@ def test_plugin_applies_translation():
     plugin = router.Plugin(['plugin://plugin.video.youtube/play/', '1', '?video_id=abcdefghijk&seek=5'])
     assert (plugin.route, plugin.params) == ('play', {'v': 'abcdefghijk', 't': '5'})
 
+
+
+def test_links_that_are_not_youtube_videos_are_left_alone():
+    assert translate('/uri2addon/', uri='https://vimeo.com/123') == ('uri2addon', {'uri': 'https://vimeo.com/123'})
+    assert translate('/uri2addon/', uri='https://www.youtube.com/@handle')[0] == 'uri2addon'
+    assert compat._seconds('soon') is None
