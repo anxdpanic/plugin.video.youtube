@@ -47,6 +47,7 @@ The add-on also accepts the plugin paths earlier versions of plugin.video.youtub
 | `/kodion/search/input/`, `/kodion/search/list/`, `/kodion/search/remove/?q=…` | new search, search history, remove a search |
 | `/kodion/playback_history/` | your YouTube history |
 | `/kodion/watch_later/list/` | Watch later |
+| `/uri2addon/?uri=LINK` (a YouTube link, as phone remotes like Yatse share it) | the video, playlist or channel it points at |
 
 ## Development
 

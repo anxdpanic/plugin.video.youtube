@@ -291,14 +291,31 @@ def test_accounts_entry_can_be_hidden(monkeypatch):
     assert router.url_for('tv') in urls
 
 
-def test_tv_interface_ends_the_listing_before_opening_the_window(monkeypatch):
+def test_tv_interface_from_a_shortcut_replaces_the_videos_window_with_home(monkeypatch):
+    """A home menu shortcut opens the entry as a folder in the Videos window, which would otherwise stay
+    behind the TV interface and show again when it closes."""
+    import xbmc
+
     from resources.lib.youtube import tv
 
     order = []
     monkeypatch.setattr(xbmcplugin, 'endOfDirectory', lambda handle, succeeded=True, **kw: order.append(succeeded))
+    monkeypatch.setattr(xbmc, 'executebuiltin', lambda command, wait=False: order.append(command))
     monkeypatch.setattr(tv, 'open_window', lambda: order.append('window'))
     run('tv').dispatch()
-    assert order == [False, 'window']
+    assert order == [False, 'ReplaceWindow(Home)', 'window']
+
+
+def test_tv_interface_run_from_the_menu_leaves_the_window_alone(monkeypatch):
+    import xbmc
+
+    from resources.lib.youtube import tv
+
+    order = []
+    monkeypatch.setattr(xbmc, 'executebuiltin', lambda command, wait=False: order.append(command))
+    monkeypatch.setattr(tv, 'open_window', lambda: order.append('window'))
+    router.Plugin([router.url_for('tv'), '-1', '']).dispatch()
+    assert order == ['window']
 
 
 def test_empty_page_shows_youtubes_own_message(monkeypatch):

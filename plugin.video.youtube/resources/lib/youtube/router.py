@@ -1042,7 +1042,12 @@ class Plugin(pages.Pages):
     def tv_interface(self):
         from .tv import open_window
 
-        self._end(False)  # opened as a folder (a home menu shortcut): don't keep Kodi waiting for a listing
+        if self.handle >= 0:
+            # Opened as a folder: a home menu shortcut (ActivateWindow(Videos,...)) or a widget. Kodi gets no
+            # listing, so it would show the Videos window behind the TV interface and again once it closes;
+            # put Home in its place instead.
+            self._end(False)
+            xbmc.executebuiltin('ReplaceWindow(Home)')
         open_window()
 
     def pin(self):
