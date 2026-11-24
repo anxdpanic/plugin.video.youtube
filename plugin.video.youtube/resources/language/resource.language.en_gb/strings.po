@@ -1,0 +1,505 @@
+# Kodi Media Center language file
+# Addon Name: YouTube
+# Addon id: plugin.video.youtube
+msgid ""
+msgstr ""
+"Project-Id-Version: plugin.video.youtube\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en_GB\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# Settings: categories and groups
+msgctxt "#30000"
+msgid "General"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Ask \"Who's watching?\" when opening the add-on"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Content region (two-letter code, empty = automatic)"
+msgstr ""
+
+msgctxt "#30010"
+msgid "Menu"
+msgstr ""
+
+msgctxt "#30011"
+msgid "Customise main menu"
+msgstr ""
+
+msgctxt "#30012"
+msgid "Hide Shorts"
+msgstr ""
+
+msgctxt "#30013"
+msgid "Hide watched videos"
+msgstr ""
+
+msgctxt "#30014"
+msgid "Treat as watched from (% played)"
+msgstr ""
+
+msgctxt "#30015"
+msgid "Sort subscribed channels A-Z"
+msgstr ""
+
+msgctxt "#30016"
+msgid "Show subscribed channels in the main menu"
+msgstr ""
+
+msgctxt "#30017"
+msgid "Reset main menu"
+msgstr ""
+
+msgctxt "#30018"
+msgid "Main menu"
+msgstr ""
+
+msgctxt "#30019"
+msgid "Show each shelf as a folder (off = list all shelves' videos on one page)"
+msgstr ""
+
+msgctxt "#30020"
+msgid "Playback"
+msgstr ""
+
+msgctxt "#30021"
+msgid "Maximum quality"
+msgstr ""
+
+msgctxt "#30022"
+msgid "Preferred video codec"
+msgstr ""
+
+msgctxt "#30023"
+msgid "Allow HDR"
+msgstr ""
+
+msgctxt "#30024"
+msgid "Preferred audio track"
+msgstr ""
+
+msgctxt "#30025"
+msgid "Automatic"
+msgstr ""
+
+msgctxt "#30026"
+msgid "Original"
+msgstr ""
+
+msgctxt "#30027"
+msgid "Kodi language"
+msgstr ""
+
+msgctxt "#30028"
+msgid "Any"
+msgstr ""
+
+msgctxt "#30050"
+msgid "2160p (4K)"
+msgstr ""
+
+msgctxt "#30051"
+msgid "1440p"
+msgstr ""
+
+msgctxt "#30052"
+msgid "1080p"
+msgstr ""
+
+msgctxt "#30053"
+msgid "720p"
+msgstr ""
+
+msgctxt "#30054"
+msgid "480p"
+msgstr ""
+
+msgctxt "#30055"
+msgid "360p"
+msgstr ""
+
+msgctxt "#30056"
+msgid "240p"
+msgstr ""
+
+msgctxt "#30057"
+msgid "144p"
+msgstr ""
+
+msgctxt "#30058"
+msgid "VP9"
+msgstr ""
+
+msgctxt "#30059"
+msgid "AV1"
+msgstr ""
+
+msgctxt "#30060"
+msgid "H.264 (AVC)"
+msgstr ""
+
+msgctxt "#30061"
+msgid "4320p (8K)"
+msgstr ""
+
+msgctxt "#30030"
+msgid "Subtitles"
+msgstr ""
+
+msgctxt "#30031"
+msgid "Include auto-generated subtitles"
+msgstr ""
+
+msgctxt "#30032"
+msgid "Translate subtitles to (language code, empty = Kodi language)"
+msgstr ""
+
+msgctxt "#30033"
+msgid "More translation languages (comma-separated codes)"
+msgstr ""
+
+msgctxt "#30040"
+msgid "Accounts"
+msgstr ""
+
+msgctxt "#30041"
+msgid "Sign in"
+msgstr ""
+
+msgctxt "#30042"
+msgid "Switch account"
+msgstr ""
+
+msgctxt "#30043"
+msgid "Sign out"
+msgstr ""
+
+msgctxt "#30044"
+msgid "Add watched videos to YouTube history"
+msgstr ""
+
+msgctxt "#30045"
+msgid "When signed in, tell YouTube what you watch so it appears in your history and keeps your progress."
+msgstr ""
+
+msgctxt "#30046"
+msgid "Pages to load at once"
+msgstr ""
+
+msgctxt "#30047"
+msgid "How many of YouTube's pages each list loads before Next page. More pages make longer lists but take longer to open."
+msgstr ""
+
+# Runtime
+msgctxt "#30100"
+msgid "Search"
+msgstr ""
+
+msgctxt "#30101"
+msgid "New search"
+msgstr ""
+
+msgctxt "#30102"
+msgid "Next page"
+msgstr ""
+
+msgctxt "#30103"
+msgid "Go to channel"
+msgstr ""
+
+msgctxt "#30104"
+msgid "Related videos"
+msgstr ""
+
+msgctxt "#30105"
+msgid "Full details"
+msgstr ""
+
+msgctxt "#30106"
+msgid "Pin to main menu"
+msgstr ""
+
+msgctxt "#30107"
+msgid "Unpin from main menu"
+msgstr ""
+
+msgctxt "#30108"
+msgid "Accounts"
+msgstr ""
+
+msgctxt "#30109"
+msgid "Sign in with a TV code"
+msgstr ""
+
+msgctxt "#30110"
+msgid "On a phone or computer, go to [B]%s[/B] and enter this code:"
+msgstr ""
+
+msgctxt "#30111"
+msgid "Waiting for you to approve the sign-in…"
+msgstr ""
+
+msgctxt "#30112"
+msgid "Signed in as %s"
+msgstr ""
+
+msgctxt "#30113"
+msgid "Sign-in failed: %s"
+msgstr ""
+
+msgctxt "#30114"
+msgid "Who's watching?"
+msgstr ""
+
+msgctxt "#30115"
+msgid "Guest (signed out)"
+msgstr ""
+
+msgctxt "#30116"
+msgid "Show or hide menu items"
+msgstr ""
+
+msgctxt "#30117"
+msgid "Reorder menu items"
+msgstr ""
+
+msgctxt "#30118"
+msgid "Move \"%s\" to position"
+msgstr ""
+
+msgctxt "#30119"
+msgid "Main menu updated"
+msgstr ""
+
+msgctxt "#30120"
+msgid "No playable streams were found for this video"
+msgstr ""
+
+msgctxt "#30121"
+msgid "Choose an item to move"
+msgstr ""
+
+msgctxt "#30122"
+msgid "Done"
+msgstr ""
+
+msgctxt "#30123"
+msgid "Signed out"
+msgstr ""
+
+msgctxt "#30124"
+msgid "This page is empty"
+msgstr ""
+
+msgctxt "#30125"
+msgid "Sign in to see this page"
+msgstr ""
+
+msgctxt "#30126"
+msgid "Play all"
+msgstr ""
+
+msgctxt "#30127"
+msgid "Live"
+msgstr ""
+
+msgctxt "#30128"
+msgid "Remove from search history"
+msgstr ""
+
+msgctxt "#30129"
+msgid "Request failed: %s"
+msgstr ""
+
+msgctxt "#30130"
+msgid "Code expired, try again"
+msgstr ""
+
+msgctxt "#30131"
+msgid "Account %s"
+msgstr ""
+
+msgctxt "#30132"
+msgid "Signed-in account no longer valid, sign in again"
+msgstr ""
+
+msgctxt "#30133"
+msgid "Featured"
+msgstr ""
+
+msgctxt "#30134"
+msgid "Channels"
+msgstr ""
+
+msgctxt "#30135"
+msgid "YouTube is busy right now, try again in a moment"
+msgstr ""
+
+msgctxt "#30136"
+msgid "YouTube couldn't open this page"
+msgstr ""
+
+msgctxt "#30137"
+msgid "YouTube isn't responding, try again later"
+msgstr ""
+
+msgctxt "#30138"
+msgid "Can't reach YouTube, check the network connection"
+msgstr ""
+
+msgctxt "#30139"
+msgid "Chapters"
+msgstr ""
+
+msgctxt "#30140"
+msgid "This video has no chapters"
+msgstr ""
+
+msgctxt "#30141"
+msgid "Watched %d%%"
+msgstr ""
+
+msgctxt "#30142"
+msgid "Watched"
+msgstr ""
+
+msgctxt "#30143"
+msgid "Advanced"
+msgstr ""
+
+msgctxt "#30144"
+msgid "Service port"
+msgstr ""
+
+msgctxt "#30145"
+msgid "Local port for the add-on's background service, which serves video manifests and subtitles to the player. Only this device can reach it. Change it if another add-on or program needs this port; 0 picks any free port."
+msgstr ""
+
+msgctxt "#30146"
+msgid "Port %d is in use, using %d"
+msgstr ""
+
+msgctxt "#30150"
+msgid "Maintenance"
+msgstr ""
+
+msgctxt "#30151"
+msgid "Cached pages"
+msgstr ""
+
+msgctxt "#30152"
+msgid "Temporary files"
+msgstr ""
+
+msgctxt "#30153"
+msgid "Channel art and descriptions"
+msgstr ""
+
+msgctxt "#30154"
+msgid "Search history"
+msgstr ""
+
+msgctxt "#30155"
+msgid "YouTube visitor ID"
+msgstr ""
+
+msgctxt "#30156"
+msgid "All of the above"
+msgstr ""
+
+msgctxt "#30157"
+msgid "%s will be cleared. Continue?"
+msgstr ""
+
+msgctxt "#30158"
+msgid "Cleared: %s"
+msgstr ""
+
+msgctxt "#30159"
+msgid "Nothing to clear"
+msgstr ""
+
+msgctxt "#30160"
+msgid "Clear"
+msgstr ""
+
+msgctxt "#30161"
+msgid "Fetch descriptions for listed videos"
+msgstr ""
+
+msgctxt "#30162"
+msgid "Read each listed video's watch page for its full description, subscribers and likes before the listing is shown. Descriptions are kept for 30 days, so only new videos are read again. Turn off for faster listings."
+msgstr ""
+
+msgctxt "#30167"
+msgid "TV interface"
+msgstr ""
+
+msgctxt "#30168"
+msgid "Upcoming"
+msgstr ""
+
+msgctxt "#30169"
+msgid "Playlist"
+msgstr ""
+
+msgctxt "#30170"
+msgid "Loading…"
+msgstr ""
+
+msgctxt "#30171"
+msgid "Clear search history"
+msgstr ""
+
+msgctxt "#30172"
+msgid "Forget all %d past searches"
+msgstr ""
+
+msgctxt "#30173"
+msgid "Forget every past search?"
+msgstr ""
+
+msgctxt "#30174"
+msgid "Recent searches"
+msgstr ""
+
+msgctxt "#30175"
+msgid "Type what to search YouTube for"
+msgstr ""
+
+msgctxt "#30176"
+msgid "Search again for \"%s\""
+msgstr ""
+
+msgctxt "#30177"
+msgid "Show Accounts in the main menu"
+msgstr ""
+
+msgctxt "#30178"
+msgid "Image quality"
+msgstr ""
+
+msgctxt "#30179"
+msgid "How large the thumbnails, channel pictures and banners are. YouTube sends them small; larger looks sharper on a big screen but takes longer to load and more room in Kodi's cache."
+msgstr ""
+
+msgctxt "#30180"
+msgid "High"
+msgstr ""
+
+msgctxt "#30181"
+msgid "Medium"
+msgstr ""
+
+msgctxt "#30182"
+msgid "As sent by YouTube"
+msgstr ""
+
+msgctxt "#30183"
+msgid "YouTube wants to confirm you're not a bot. This mostly happens on a VPN; try playing with Kodi left out of the VPN"
+msgstr ""

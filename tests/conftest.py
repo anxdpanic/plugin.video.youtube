@@ -1,0 +1,46 @@
+import shutil
+
+import pytest
+import xbmcaddon
+import xbmcgui
+import xbmcplugin
+import xbmcvfs
+
+
+@pytest.fixture(autouse=True)
+def no_request_pacing(monkeypatch):
+    """Requests are spaced out on a device; tests don't wait (test_broker and test_http check the pacing)."""
+    import xbmcgui
+
+    from resources.lib.youtube import broker
+    monkeypatch.setattr(broker, 'GAPS', {})
+    xbmcgui.Window(10000).clearProperty('youtube.port')  # no service: requests go straight to http.send
+
+
+@pytest.fixture(autouse=True)
+def no_banner_fetching(monkeypatch):
+    """Listings look up unknown channels' banners before drawing; tests stay offline."""
+    from resources.lib.youtube import art
+    monkeypatch.setattr(art.Banners, 'fetch_all', lambda self, channel_ids, fetch=None: 0)
+
+
+@pytest.fixture
+def english(monkeypatch):
+    """Give the named string ids their en_GB text from strings.po, as Kodi would."""
+    def load(*string_ids):
+        for string_id in string_ids:
+            monkeypatch.setitem(xbmcaddon.STRINGS, string_id, xbmcaddon.english(string_id))
+    return load
+
+
+@pytest.fixture(autouse=True)
+def clean_state():
+    """Fresh profile, settings and recorded plugin output for every test."""
+    shutil.rmtree(xbmcvfs.ROOT, ignore_errors=True)
+    xbmcaddon.SETTINGS.clear()
+    xbmcaddon.SETTINGS.update({'shelves_as_folders': True, 'watched_threshold': 80, 'subs_asr': True,
+                                'show_accounts': True, 'image_quality': 2})
+    xbmcplugin.reset()
+    del xbmcgui.NOTIFICATIONS[:]
+    yield
+    shutil.rmtree(xbmcvfs.ROOT, ignore_errors=True)

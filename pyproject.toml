@@ -1,0 +1,30 @@
+[tool.ruff]
+# Kodi 21 on the target devices runs Python 3.9.
+target-version = "py39"
+line-length = 120
+# .scripts holds the repository generator, kept close to the copy in plugin.video.youtube.
+extend-exclude = ["plugin.video.youtube/resources/media", ".scripts"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "B",   # bugbear
+    "I",   # import order
+    "UP",  # pyupgrade (bounded by target-version)
+    "C4",  # comprehensions
+    "SIM", # simplifications
+]
+ignore = [
+    "SIM105", # try/except/pass reads fine for best-effort cleanup
+    "UP031",  # %-formatting matches Kodi's localized "%s" strings
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["resources"]
+known-third-party = ["xbmc", "xbmcaddon", "xbmcgui", "xbmcplugin", "xbmcvfs"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["plugin.video.youtube", "tests/stubs"]

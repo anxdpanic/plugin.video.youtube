@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.youtube" name="YouTube" version="8.0.0~alpha3" provider-name="anxdpanic">
+    <requires>
+        <import addon="xbmc.python" version="3.0.1"/>
+        <import addon="inputstream.adaptive" version="21.0.0"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.python.script" library="tv.py">
+        <provides>executable</provides>
+    </extension>
+    <extension point="xbmc.service" library="service.py"/>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Browse and watch YouTube with the TV layout</summary>
+        <description lang="en_GB">Browse YouTube the way the TV app shows it: the TV sidebar, shelves, subscriptions, library and search, with full video information and DASH/HLS playback through InputStream Adaptive. Sign in with a TV code, customise the main menu, hide Shorts or watched videos, and set preferred quality, codec and subtitle languages.</description>
+        <platform>all</platform>
+        <license>GPL-3.0-only</license>
+        <website>https://github.com/anxdpanic/plugin.video.youtube</website>
+        <source>https://github.com/anxdpanic/plugin.video.youtube</source>
+        <news>v8.0.0~alpha3
+- New add-on built around YouTube's TV layout: the TV sidebar, shelves, subscriptions, library and search
+- Sign in with a TV code, with multiple accounts
+- DASH/HLS playback through InputStream Adaptive
+- Plugin paths from earlier versions keep working</news>
+        <assets>
+            <icon>resources/media/icon.png</icon>
+            <fanart>resources/media/fanart.jpg</fanart>
+            <screenshot>resources/screenshots/screenshot-01.jpg</screenshot>
+            <screenshot>resources/screenshots/screenshot-02.jpg</screenshot>
+            <screenshot>resources/screenshots/screenshot-03.jpg</screenshot>
+            <screenshot>resources/screenshots/screenshot-04.jpg</screenshot>
+            <screenshot>resources/screenshots/screenshot-05.jpg</screenshot>
+        </assets>
+        <reuselanguageinvoker>true</reuselanguageinvoker>
+    </extension>
+</addon>

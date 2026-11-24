@@ -39,7 +39,7 @@ jobs:
             echo "No strings.po were modified or added, not a translation."
             unset CLOSE
           fi
-          echo ::set-output name=close::${CLOSE}
+          echo "close=${CLOSE}" >> "$GITHUB_OUTPUT"
 
       - name: Comment on the PR
         uses: mshick/add-pr-comment@v2

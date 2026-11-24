@@ -1,12 +1,6 @@
 name: Submit Release
 on:
   workflow_dispatch:
-#  push:
-#    tags:
-#      - 'v*'
-#      - '!*dev*'
-#      - '!*alpha*'
-#      - '!*beta*'
 
 jobs:
   release:
@@ -14,26 +8,17 @@ jobs:
     name: Submit Release
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [ '3.x' ]
-
     steps:
       - name: Checkout Add-on
         uses: actions/checkout@v4
-        with:
-          path: ${{ github.event.repository.name }}
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.x'
 
       - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install libxml2-utils xmlstarlet
           python -m pip install --upgrade pip
           python -m pip install git+https://github.com/xbmc/kodi-addon-submitter.git
 
@@ -42,28 +27,12 @@ jobs:
           git config --global user.name "anxdpanic"
           git config --global user.email "anxdpanic@users.noreply.github.com"
 
-      - name: Staging for Official Repository
-        id: stage
-        run: |
-          mv .git ..
-          rm -rf .??*
-          mv ../.git .
-          rm *.md
-          git add .
-          git commit -m "Remove Unwanted Files"
-          news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//g;s/\r//')
-          xmlstarlet ed -L -P \
-            -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" \
-            addon.xml
-          git add .
-          git commit -m "Update news"
-        working-directory: ${{ github.event.repository.name }}
-
+      # The add-on lives in its own folder, so only that folder is submitted; its <news> in addon.xml
+      # becomes the pull request's message. Omega (Kodi 21) is the oldest Kodi the add-on supports,
+      # and repo-plugins carries a submission to omega on to later branches.
       - name: Submit to Official Repository
-        id: submit
         run: |
-          submit-addon -r repo-plugins -b matrix --pull-request ${{ github.event.repository.name }}
-        working-directory: ${{ github.event.repository.name }}
+          submit-addon -r repo-plugins -b omega --pull-request plugin.video.youtube
         env:
           GH_USERNAME: anxdpanic
           GH_TOKEN: ${{ secrets.ADDON_SUBMISSION_TOKEN }}

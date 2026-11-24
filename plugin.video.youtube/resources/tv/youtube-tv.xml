@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-only -->
+<!-- Copyright (C) 2026 plugin.video.youtube -->
+<!-- The TV interface's window. A template: tv/skin.py fills in @media@ (this folder's media) and
+     @font:<role>@ (the current skin's closest font for each role) before Kodi loads it. -->
+<window>
+    <defaultcontrol always="true">200</defaultcontrol>
+    <coordinates>
+        <left>0</left>
+        <top>0</top>
+    </coordinates>
+    <controls>
+        <control type="image">
+            <width>1920</width>
+            <height>1080</height>
+            <texture colordiffuse="FF0B0F1A">@media@/white.png</texture>
+        </control>
+
+        <!-- The focused video: its art on the right, fading into the background, and its details. -->
+        <control type="group">
+            <visible>!String.IsEmpty(Container(200).ListItem.Label)</visible>
+            <control type="image">
+                <left>860</left>
+                <width>1060</width>
+                <height>596</height>
+                <aspectratio>scale</aspectratio>
+                <fadetime>250</fadetime>
+                <texture background="true">$INFO[Container(200).ListItem.Art(fanart)]</texture>
+            </control>
+            <control type="image">
+                <left>858</left>
+                <width>640</width>
+                <height>596</height>
+                <texture colordiffuse="FF0B0F1A">@media@/fade_h.png</texture>
+            </control>
+            <control type="image">
+                <left>860</left>
+                <top>296</top>
+                <width>1060</width>
+                <height>302</height>
+                <texture colordiffuse="FF0B0F1A">@media@/fade_v.png</texture>
+            </control>
+            <control type="textbox">
+                <!-- Kodi scrolls a long text by itself, half lines and all; show it from the top instead. -->
+                <autoscroll>false</autoscroll>
+                <left>180</left>
+                <top>70</top>
+                <width>900</width>
+                <height>120</height>
+                <font>@font:hero_title@</font>
+                <textcolor>FFFFFFFF</textcolor>
+                <label>$INFO[Container(200).ListItem.Label]</label>
+            </control>
+            <control type="textbox">
+                <!-- Kodi scrolls a long text by itself, half lines and all; show it from the top instead. -->
+                <autoscroll>false</autoscroll>
+                <left>180</left>
+                <top>228</top>
+                <width>820</width>
+                <height>204</height>
+                <font>@font:hero_plot@</font>
+                <textcolor>FFB4BED2</textcolor>
+                <label>$INFO[Container(200).ListItem.Property(plot)]</label>
+            </control>
+        </control>
+
+        <control type="label">
+            <left>180</left>
+            <top>26</top>
+            <width>1200</width>
+            <height>40</height>
+            <font>@font:screen_title@</font>
+            <textcolor>FF5C9DFF</textcolor>
+            <label>$INFO[Window.Property(screen.title)]</label>
+        </control>
+
+        <!-- Two rows: the focused one and a peek at the next. Moving up or down shifts the rows' contents. -->
+        <control type="label">
+            <left>180</left>
+            <top>466</top>
+            <width>1500</width>
+            <height>48</height>
+            <font>@font:row_title@</font>
+            <textcolor>FFFFFFFF</textcolor>
+            <label>$INFO[Window.Property(row0.title)]</label>
+        </control>
+        <control type="fixedlist" id="200">
+            <left>160</left>
+            <top>516</top>
+            <width>1760</width>
+            <height>340</height>
+            <orientation>horizontal</orientation>
+            <focusposition>0</focusposition>
+            <scrolltime tween="cubic" easing="out">220</scrolltime>
+            <onleft>100</onleft>
+            <onup>200</onup>
+            <ondown>200</ondown>
+            <itemlayout width="424" height="340">
+                @include:tile@
+                <control type="label">
+                    <left>20</left>
+                    <top>250</top>
+                    <width>400</width>
+                    <height>36</height>
+                    <font>@font:tile_title@</font>
+                    <visible>!String.IsEqual(ListItem.Property(text_tile),1)</visible>
+                    <textcolor>FFC8D0E0</textcolor>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+            </itemlayout>
+            <focusedlayout width="424" height="340">
+                <control type="group">
+                    <animation effect="zoom" start="100" end="105" center="220,122" time="160" tween="cubic"
+                               easing="out" condition="Control.HasFocus(200)">Conditional</animation>
+                    @include:tile@
+                    <control type="image">
+                        <left>12</left>
+                        <top>2</top>
+                        <width>416</width>
+                        <height>241</height>
+                        <visible>Control.HasFocus(200) + !String.IsEqual(ListItem.Property(round),1)</visible>
+                        <texture border="20" colordiffuse="FFFFFFFF">@media@/focus.png</texture>
+                    </control>
+                    <control type="image">
+                        <left>99</left>
+                        <top>2</top>
+                        <width>241</width>
+                        <height>241</height>
+                        <visible>Control.HasFocus(200) + String.IsEqual(ListItem.Property(round),1)</visible>
+                        <texture colordiffuse="FFFFFFFF">@media@/focus_round.png</texture>
+                    </control>
+                </control>
+                <control type="label">
+                    <left>20</left>
+                    <top>256</top>
+                    <width>400</width>
+                    <height>36</height>
+                    <font>@font:tile_title@</font>
+                    <visible>!String.IsEqual(ListItem.Property(text_tile),1)</visible>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <scroll>true</scroll>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+            </focusedlayout>
+        </control>
+        <control type="group">
+            <animation effect="fade" end="55" time="0" condition="true">Conditional</animation>
+            <control type="label">
+                <left>180</left>
+                <top>866</top>
+                <width>1500</width>
+                <height>48</height>
+                <font>@font:row_title@</font>
+                <textcolor>FFFFFFFF</textcolor>
+                <label>$INFO[Window.Property(row1.title)]</label>
+            </control>
+            <control type="fixedlist" id="201">
+                <left>160</left>
+                <top>916</top>
+                <width>1760</width>
+                <height>340</height>
+                <orientation>horizontal</orientation>
+                <focusposition>0</focusposition>
+                <onup>200</onup>
+                <ondown>200</ondown>
+                <onleft>200</onleft>
+                <onright>200</onright>
+                <itemlayout width="424" height="340">
+                    @include:tile@
+                </itemlayout>
+                <focusedlayout width="424" height="340">
+                    @include:tile@
+                </focusedlayout>
+            </control>
+        </control>
+
+
+        <!-- The navigation rail: icons, widening with labels while it has focus. -->
+        <control type="image">
+            <width>1920</width>
+            <height>1080</height>
+            <visible>Control.HasFocus(100)</visible>
+            <animation effect="fade" time="160">VisibleChange</animation>
+            <texture colordiffuse="B3000000">@media@/white.png</texture>
+        </control>
+        <!-- What an empty page says: above the dimming, and moved clear of the open rail. -->
+        <control type="label">
+            <left>180</left>
+            <top>520</top>
+            <width>1400</width>
+            <height>200</height>
+            <font>@font:hero_plot@</font>
+            <textcolor>FFB4BED2</textcolor>
+            <wrapmultiline>true</wrapmultiline>
+            <animation effect="slide" end="310,0" time="160" tween="cubic" easing="out"
+                       condition="Control.HasFocus(100)">Conditional</animation>
+            <label>$INFO[Window.Property(message)]</label>
+        </control>
+        <control type="image">
+            <width>130</width>
+            <height>1080</height>
+            <visible>!Control.HasFocus(100)</visible>
+            <texture colordiffuse="FF101626">@media@/white.png</texture>
+        </control>
+        <control type="image">
+            <width>440</width>
+            <height>1080</height>
+            <visible>Control.HasFocus(100)</visible>
+            <animation effect="slide" start="-310,0" end="0,0" time="160" tween="cubic" easing="out">Visible</animation>
+            <texture colordiffuse="FF101626">@media@/white.png</texture>
+        </control>
+        <control type="image">
+            <left>37</left>
+            <top>34</top>
+            <width>56</width>
+            <height>56</height>
+            <texture diffuse="@media@/rounded.png">@icon@</texture>
+        </control>
+        <control type="list" id="100">
+            <left>0</left>
+            <top>140</top>
+            <width>440</width>
+            <height>900</height>
+            <orientation>vertical</orientation>
+            <onright>200</onright>
+            <onleft>100</onleft>
+            <scrolltime>160</scrolltime>
+            <itemlayout width="440" height="84">
+                @include:rail_item@
+                <control type="label">
+                    <left>116</left>
+                    <width>300</width>
+                    <height>84</height>
+                    <font>@font:rail@</font>
+                    <aligny>center</aligny>
+                    <textcolor>FFB4BED2</textcolor>
+                    <visible>Control.HasFocus(100)</visible>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+            </itemlayout>
+            <focusedlayout width="440" height="84">
+                <control type="image">
+                    <left>16</left>
+                    <top>6</top>
+                    <width>404</width>
+                    <height>72</height>
+                    <visible>Control.HasFocus(100)</visible>
+                    <texture border="16" colordiffuse="FF2A3A5C">@media@/rounded.png</texture>
+                </control>
+                @include:rail_item@
+                <control type="label">
+                    <left>116</left>
+                    <width>300</width>
+                    <height>84</height>
+                    <font>@font:rail@</font>
+                    <aligny>center</aligny>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <visible>Control.HasFocus(100)</visible>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+            </focusedlayout>
+        </control>
+
+        <control type="group">
+            <visible>!String.IsEmpty(Window.Property(busy))</visible>
+            <animation effect="fade" start="0" end="100" time="200" delay="250">Visible</animation>
+            <control type="image">
+                <left>1640</left>
+                <top>26</top>
+                <width>240</width>
+                <height>52</height>
+                <texture border="16" colordiffuse="E6101626">@media@/rounded.png</texture>
+            </control>
+            <control type="label">
+                <left>1640</left>
+                <top>26</top>
+                <width>240</width>
+                <height>52</height>
+                <font>@font:tile_meta@</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <textcolor>FFFFFFFF</textcolor>
+                <label>$INFO[Window.Property(busy)]</label>
+            </control>
+        </control>
+    </controls>
+
+    <!-- Snippets, pasted in by tv/skin.py where @include:<name>@ appears. -->
+    <include name="tile">
+        <control type="image">
+            <left>20</left>
+            <top>10</top>
+            <width>400</width>
+            <height>225</height>
+            <visible>!String.IsEqual(ListItem.Property(round),1)</visible>
+            <texture colordiffuse="FF1B2436" diffuse="@media@/tile_mask.png">@media@/white.png</texture>
+        </control>
+        <control type="image">
+            <left>20</left>
+            <top>10</top>
+            <width>400</width>
+            <height>225</height>
+            <aspectratio>scale</aspectratio>
+            <visible>!String.IsEqual(ListItem.Property(round),1)</visible>
+            <texture background="true" diffuse="@media@/tile_mask.png">$INFO[ListItem.Art(thumb)]</texture>
+        </control>
+        <control type="image">
+            <left>172</left>
+            <top>74</top>
+            <width>96</width>
+            <height>96</height>
+            <visible>String.IsEqual(ListItem.Property(icon_tile),1)</visible>
+            <texture colordiffuse="FFFFFFFF">$INFO[ListItem.Art(icon)]</texture>
+        </control>
+        <control type="label">
+            <left>44</left>
+            <top>10</top>
+            <width>352</width>
+            <height>225</height>
+            <visible>String.IsEqual(ListItem.Property(text_tile),1)</visible>
+            <font>@font:row_title@</font>
+            <align>center</align>
+            <aligny>center</aligny>
+            <wrapmultiline>true</wrapmultiline>
+            <textcolor>FFFFFFFF</textcolor>
+            <label>$INFO[ListItem.Label]</label>
+        </control>
+        <control type="image">
+            <left>107</left>
+            <top>10</top>
+            <width>225</width>
+            <height>225</height>
+            <aspectratio>scale</aspectratio>
+            <visible>String.IsEqual(ListItem.Property(round),1)</visible>
+            <texture background="true" diffuse="@media@/circle.png">$INFO[ListItem.Art(thumb)]</texture>
+        </control>
+        <control type="progress">
+            <left>32</left>
+            <top>225</top>
+            <width>376</width>
+            <height>6</height>
+            <visible>!String.IsEmpty(ListItem.Property(progress))</visible>
+            <info>ListItem.Property(progress)</info>
+            <texturebg colordiffuse="66FFFFFF">@media@/white.png</texturebg>
+            <midtexture colordiffuse="FF3D8BFF">@media@/white.png</midtexture>
+        </control>
+        <control type="group">
+            <left>290</left>
+            <top>190</top>
+            <visible>!String.IsEmpty(ListItem.Property(badge))</visible>
+            <control type="image">
+                <width>120</width>
+                <height>36</height>
+                <texture border="16" colordiffuse="$INFO[ListItem.Property(badge_color)]">@media@/rounded.png</texture>
+            </control>
+            <control type="label">
+                <width>120</width>
+                <height>36</height>
+                <font>@font:badge@</font>
+                <align>center</align>
+                <aligny>center</aligny>
+                <textcolor>FFFFFFFF</textcolor>
+                <label>$INFO[ListItem.Property(badge)]</label>
+            </control>
+        </control>
+        <control type="label">
+            <left>20</left>
+            <top>292</top>
+            <width>400</width>
+            <height>32</height>
+            <font>@font:tile_meta@</font>
+            <textcolor>FF8C97AD</textcolor>
+            <label>$INFO[ListItem.Label2]</label>
+        </control>
+    </include>
+    <include name="rail_item">
+        <control type="image">
+            <left>41</left>
+            <top>18</top>
+            <width>48</width>
+            <height>48</height>
+            <visible>!String.IsEqual(ListItem.Property(round),1)</visible>
+            <texture colordiffuse="$INFO[ListItem.Property(tint)]">$INFO[ListItem.Art(icon)]</texture>
+        </control>
+        <control type="image">
+            <left>41</left>
+            <top>18</top>
+            <width>48</width>
+            <height>48</height>
+            <aspectratio>scale</aspectratio>
+            <visible>String.IsEqual(ListItem.Property(round),1)</visible>
+            <texture background="true" diffuse="@media@/circle.png">$INFO[ListItem.Art(icon)]</texture>
+        </control>
+        <control type="image">
+            <left>0</left>
+            <top>22</top>
+            <width>6</width>
+            <height>40</height>
+            <visible>String.IsEqual(ListItem.Property(current),1)</visible>
+            <texture colordiffuse="FF3D8BFF">@media@/white.png</texture>
+        </control>
+    </include>
+</window>

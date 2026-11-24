@@ -1,11 +1,6 @@
-name: Generate and Publish Development Repositories
+name: Generate and Publish Development Repository
 on:
   workflow_dispatch:
-    inputs:
-      prerelease:
-        description: 'Is this a pre-release? [true|false]'
-        required: false
-        default: 'true'
 
   push:
     tags:
@@ -15,78 +10,38 @@ on:
 jobs:
   repo-gen:
     if: github.repository == 'anxdpanic/plugin.video.youtube' || github.event_name == 'workflow_dispatch'
-    name: Generate development repositories and upload them to mirrors
-    runs-on: ubuntu-22.04
-    permissions:
-      contents: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [ '3.x' ]
+    name: Generate the official testing repository and upload it to the mirrors
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Get and set release status
-        # workflow_dispatch: use pre-release variable for release status
-        # push-tag: check tag for alpha|beta|dev to determine release status
-        id: release
-        run: |
-          version=${GITHUB_REF/refs\/tags\//}
-          prerelease=${{ github.event.inputs.prerelease }}
-          if [[ ! -z "${prerelease}" ]] ;
-          then
-            echo "pre-release=${prerelease}" >> $GITHUB_OUTPUT
-          elif [[ $version == *[-+]@(alpha|beta|dev)*([.0-9a-z]) ]] ;
-          then
-            echo "pre-release=true" >> $GITHUB_OUTPUT
-          else
-            echo "pre-release=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.x'
 
       - name: Install dependencies
-        # install lftp for mirroring repository
-        # install lxml for repository generator script
+        # lftp mirrors the repository; lxml is for the repository generator script
         run: |
           sudo apt update
           sudo apt install lftp
           python -m pip install --upgrade pip
           pip install lxml
 
-      - name: Checkout Official Branch (Unstable and Stable Releases)
-        # Check out the master branch to use for official [unstable|stable] add-on zip source
+      - name: Checkout Add-on
         uses: actions/checkout@v4
         with:
-          path: ./official_testing/${{ github.event.repository.name }}
-          ref: "master"
+          path: ./checkout
 
-      - name: Checkout Unofficial Branch (Unstable and Stable Releases)
-        # Check out the nexus-unofficial branch to use for unofficial [unstable|stable] add-on zip source
-        uses: actions/checkout@v4
-        with:
-          path: ./unofficial_testing/${{ github.event.repository.name }}
-          ref: "nexus-unofficial"
-
-      - name: Checkout Unofficial Branch (Stable Releases)
-        # Check out the nexus-unofficial branch to use for unofficial [stable] add-on zip source
-        if: steps.release.outputs.pre-release == 'false'
-        uses: actions/checkout@v4
-        with:
-          path: ./unofficial/${{ github.event.repository.name }}
-          ref: "nexus-unofficial"
-
-      - name: Copy Repository Generator
-        # Copy the repository generator script from master branch to cwd
+      - name: Stage Add-on and Repository Generator
+        # The generator zips every add-on folder in ./official_testing; the add-on is one folder of this repo.
         run: |
-          cp  ./official_testing/${{ github.event.repository.name }}/.scripts/.prepare_repository.py .
-          cp  ./official_testing/${{ github.event.repository.name }}/.scripts/.config.json .
+          mkdir -p ./official_testing
+          cp -r ./checkout/plugin.video.youtube ./official_testing/
+          cp ./checkout/.scripts/.prepare_repository.py .
+          cp ./checkout/.scripts/.config.json .
 
       - name: Download Repository Add-on Files from FTP
-        # Download [un]official testing repository add-ons source from mirrors for generating new repository add-on zips from source
+        # The repository add-on's source, so its zip is generated next to the add-on's
         run: |
           lftp -c "\
           set ssl:verify-certificate false; \
@@ -94,30 +49,15 @@ jobs:
           open ${{ secrets.SFTP }}; \
           cd /root/anxdpanic/kodi/youtube/; \
           mirror --verbose --use-pget-n=8 -c --verbose repository.yt.testing_official ./official_testing/repository.yt.testing_official; \
-          mirror --verbose --use-pget-n=8 -c --verbose repository.yt.testing_unofficial ./unofficial_testing/repository.yt.testing_unofficial; \
           bye \
           "
 
-      - name: Download Unofficial Repository Add-on Files from FTP
-        # Download unofficial repository add-on source from mirrors for generating new repository add-on zips from source
-        if: steps.release.outputs.pre-release == 'false'
+      - name: Generate Repository
+        # Generate the zips, addons.xml and addons.xml.md5
         run: |
-          lftp -c "\
-          set ssl:verify-certificate false; \
-          set sftp:auto-confirm yes; \
-          open ${{ secrets.SFTP }}; \
-          cd /root/anxdpanic/kodi/youtube/; \
-          mirror --verbose --use-pget-n=8 -c --verbose repository.yt.unofficial ./unofficial/repository.yt.unofficial; \
-          bye \
-          "
+          python .prepare_repository.py
 
-      - name: Generate Repositories
-        # Run the repository generator script to generate zips, addons.xml, and addons.xml.gz
-        run: |
-          python .prepare_repository.py --prerelease=${{ steps.release.outputs.pre-release }}
-
-      - name: Mirror Official Testing Repository to FTP (Unstable and Stable Releases)
-        # Mirror the generated official testing repository to the mirrors
+      - name: Mirror Official Testing Repository to FTP
         # https://download.osmc.tv/dev/anxdpanic/kodi/youtube/official_testing/
         run: |
           lftp -c "\
@@ -127,34 +67,5 @@ jobs:
           cd /root/anxdpanic/kodi/youtube/; \
           lcd repository/; \
           mirror --verbose --use-pget-n=8 -c --reverse --verbose official_testing official_testing; \
-          bye \
-          "
-
-      - name: Mirror Unofficial Testing Repository to FTP (Unstable and Stable Releases)
-        # Mirror the generated unofficial testing repository to the mirrors
-        # https://download.osmc.tv/dev/anxdpanic/kodi/youtube/unofficial_testing/
-        run: |
-          lftp -c "\
-          set ssl:verify-certificate false; \
-          set sftp:auto-confirm yes; \
-          open ${{ secrets.SFTP }}; \
-          cd /root/anxdpanic/kodi/youtube/; \
-          lcd repository/; \
-          mirror --verbose --use-pget-n=8 -c --reverse --verbose unofficial_testing unofficial_testing; \
-          bye \
-          "
-
-      - name: Mirror Unofficial Repository to FTP (Stable Releases)
-        # Mirror the generated unofficial repository to the mirrors
-        # https://download.osmc.tv/dev/anxdpanic/kodi/youtube/unofficial/
-        if: steps.release.outputs.pre-release == 'false'
-        run: |
-          lftp -c "\
-          set ssl:verify-certificate false; \
-          set sftp:auto-confirm yes; \
-          open ${{ secrets.SFTP }}; \
-          cd /root/anxdpanic/kodi/youtube/; \
-          lcd repository/; \
-          mirror --verbose --use-pget-n=8 -c --reverse --verbose unofficial unofficial; \
           bye \
           "
