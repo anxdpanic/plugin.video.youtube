@@ -16,6 +16,9 @@ from . import kodi
 from .tv import skin
 
 CANCEL_ACTIONS = {9, 10, 13, 92}  # parent dir, previous menu, stop, back
+# Select (OK, Enter) presses the focused Cancel button. A WindowDialog that handles onAction gets every
+# action and Kodi doesn't click the focused control for it, so onControl never sees the remote's OK.
+SELECT_ACTION = 7
 
 
 def _chunk(kind, data):
@@ -90,7 +93,7 @@ class Dialog(xbmcgui.WindowDialog):
         return self.cancelled
 
     def onAction(self, action):  # noqa: N802 (Kodi API name)
-        if action.getId() in CANCEL_ACTIONS:
+        if action.getId() in CANCEL_ACTIONS or action.getId() == SELECT_ACTION:
             self._cancel()
 
     def onControl(self, control):  # noqa: N802
