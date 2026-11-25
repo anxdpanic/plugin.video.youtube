@@ -72,9 +72,17 @@ def test_dialog_shows_the_code_and_back_cancels():
     assert [c.filename for c in dialog.controls if isinstance(c, xbmcgui.ControlImage)][1] == '/tmp/qr.png'
     assert [c.text for c in dialog.controls if isinstance(c, xbmcgui.ControlTextBox)] == [
         'Go to google.com/device\nABC-DEF']
-    dialog.onAction(xbmcgui.Action(7))  # select: stays open
+    dialog.onAction(xbmcgui.Action(1))  # left: stays open
     assert not dialog.iscanceled()
     dialog.onAction(xbmcgui.Action(92))  # back
+    assert dialog.iscanceled() and not dialog.shown
+
+
+def test_dialog_select_presses_cancel():
+    """The remote's OK reaches onAction, not onControl: Kodi doesn't click the button for it."""
+    dialog = qr.Dialog('/tmp/qr.png')
+    dialog.create('Sign in', 'ABC-DEF')
+    dialog.onAction(xbmcgui.Action(7))
     assert dialog.iscanceled() and not dialog.shown
 
 
