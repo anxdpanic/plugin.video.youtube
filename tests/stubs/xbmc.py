@@ -27,7 +27,7 @@ def getCondVisibility(condition):  # noqa: N802
 
 
 # Kodi's own strings, worded as Kodi 21 ships them.
-LOCALIZED = {12021: 'Play from beginning', 12022: 'Resume from {0:s}'}
+LOCALIZED = {222: 'Cancel', 12021: 'Play from beginning', 12022: 'Resume from {0:s}'}
 
 
 def getLocalizedString(string_id):  # noqa: N802

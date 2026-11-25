@@ -111,3 +111,56 @@ class Window:
 class WindowXML(Window):
     def __init__(self, xml_file='', script_path='', default_skin='Default', default_res='720p', *args):
         Window.__init__(self)
+
+
+class WindowDialog(Window):
+    def __init__(self):
+        Window.__init__(self)
+        self.controls = []
+        self.shown = False
+
+    def addControl(self, control):  # noqa: N802
+        self.controls.append(control)
+
+    def setFocus(self, control):  # noqa: N802
+        self.focused = control
+
+    def show(self):
+        self.shown = True
+
+    def close(self):
+        self.shown = False
+
+
+class ControlImage:
+    def __init__(self, x, y, width, height, filename, aspectRatio=0, colorDiffuse=None):  # noqa: N803
+        self.filename = filename
+
+
+class ControlLabel:
+    def __init__(self, x, y, width, height, label, font=None, textColor=None):  # noqa: N803
+        self.label = label
+        self.font = font
+
+
+class ControlTextBox:
+    def __init__(self, x, y, width, height, font=None, textColor=None):  # noqa: N803
+        self.font = font
+        self.text = ''
+
+    def setText(self, text):  # noqa: N802
+        self.text = text
+
+
+class ControlButton:
+    def __init__(self, x, y, width, height, label, focusTexture=None, noFocusTexture=None,  # noqa: N803
+                 alignment=0, font=None, textColor=None, focusedColor=None):
+        self.label = label
+
+
+class Action:
+    def __init__(self, action_id):
+        self.action_id = action_id
+
+    def getId(self):  # noqa: N802
+        return self.action_id

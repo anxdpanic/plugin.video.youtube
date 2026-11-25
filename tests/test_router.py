@@ -439,7 +439,7 @@ def test_play_without_streams_fails_with_youtubes_reason(monkeypatch):
     assert xbmcgui.NOTIFICATIONS[-1][1] == 'Video unavailable'
 
 
-def sign_in(monkeypatch, polls, expires_in=1800):
+def sign_in(monkeypatch, polls, expires_in=1800, verification_url='https://www.google.com/device'):
     """Run the sign-in flow with the dialog left open and auth.poll_token returning each poll in turn."""
     import xbmc
 
@@ -447,9 +447,9 @@ def sign_in(monkeypatch, polls, expires_in=1800):
     added = []
     monkeypatch.setattr(xbmcgui.DialogProgress, 'iscanceled', lambda self: False)
     monkeypatch.setattr(xbmc.Monitor, 'waitForAbort', lambda self, timeout=0: False)
-    monkeypatch.setattr(auth, 'request_device_code', lambda: {
-        'device_code': 'D', 'user_code': 'ABC-DEF', 'verification_url': 'https://www.google.com/device',
-        'interval': 0, 'expires_in': expires_in})
+    code = {'device_code': 'D', 'user_code': 'ABC-DEF', 'verification_url': verification_url,
+            'interval': 0, 'expires_in': expires_in}
+    monkeypatch.setattr(auth, 'request_device_code', lambda: {k: v for k, v in code.items() if v is not None})
     pending = list(polls)
     monkeypatch.setattr(auth, 'poll_token', lambda device_code: pending.pop(0) if pending else None)
     monkeypatch.setattr(auth, 'add_account', lambda token: added.append(token) or 'acct')
@@ -468,6 +468,21 @@ def test_sign_in_adds_the_account_once_approved(monkeypatch, english):
 def test_sign_in_stops_when_the_code_expires(monkeypatch):
     assert sign_in(monkeypatch, [], expires_in=0) == []
     assert xbmcgui.NOTIFICATIONS
+
+
+def test_sign_in_shows_a_qr_code_of_the_address_as_given(monkeypatch):
+    made, shown = [], []
+    monkeypatch.setattr(router.qr, 'image', lambda text: made.append(text) or '/tmp/qr.png')
+    monkeypatch.setattr(router.qr.Dialog, 'create', lambda self, heading, message='': shown.append(self.qr_png))
+    assert sign_in(monkeypatch, [{'access_token': 'T'}]) == [{'access_token': 'T'}]
+    assert made == ['https://www.google.com/device'] and shown == ['/tmp/qr.png']
+
+
+def test_sign_in_has_no_qr_code_without_an_address(monkeypatch):
+    made = []
+    monkeypatch.setattr(router.qr, 'image', lambda text: made.append(text) or '/tmp/qr.png')
+    assert sign_in(monkeypatch, [{'access_token': 'T'}], verification_url=None) == [{'access_token': 'T'}]
+    assert made == []
 
 
 def test_bot_check_gets_its_own_message():
