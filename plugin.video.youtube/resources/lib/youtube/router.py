@@ -26,6 +26,7 @@ from . import (
     pages,
     parser,
     playback,
+    qr,
 )
 from .innertube import InnerTube, InnerTubeError
 
@@ -1191,7 +1192,9 @@ class Plugin(pages.Pages):
         interval = max(int(code.get('interval', 5)), 2)
         deadline = time.time() + expires_in
         message = _device_code_message(code)
-        progress = xbmcgui.DialogProgress()
+        # Only of the address Google gave, as given; never of the stand-in in _device_code_message
+        qr_png = qr.image(code['verification_url']) if code.get('verification_url') else None
+        progress = qr.Dialog(qr_png) if qr_png else xbmcgui.DialogProgress()
         progress.create(kodi.string(30109), message)
         monitor = xbmc.Monitor()
         try:
