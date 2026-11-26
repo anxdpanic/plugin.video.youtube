@@ -53,8 +53,20 @@ def select_video(formats, max_height=0, codec='any', allow_hdr=True):
     return videos
 
 
+def _is_drc(fmt):
+    """YouTube's stable volume copy of an audio stream, which shares the original's itag."""
+    return bool(fmt.get('isDrc')) or 'drc%3D1' in fmt.get('url', '')
+
+
+def _audio_key(fmt):
+    return fmt['itag'], (fmt.get('audioTrack') or {}).get('id')
+
+
 def select_audio(formats):
-    return [f for f in formats if _usable(f, 'audio', SUPPORTED_AUDIO)]
+    """Usable audio, leaving out stable volume copies of streams that are also offered as they are."""
+    audios = [f for f in formats if _usable(f, 'audio', SUPPORTED_AUDIO)]
+    plain = {_audio_key(f) for f in audios if not _is_drc(f)}
+    return [f for f in audios if not (_is_drc(f) and _audio_key(f) in plain)]
 
 
 def _duration(formats, fallback):
