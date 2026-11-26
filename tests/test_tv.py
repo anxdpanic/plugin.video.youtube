@@ -285,3 +285,14 @@ def test_window_keeps_the_focused_tile_when_a_row_loads_more(monkeypatch):
     monkeypatch.setattr(win, '_banners_soon', lambda: None)
     win._more_items()
     assert (control.size, control.selected) == (12, 8)
+
+
+def test_row_stops_at_its_last_tile():
+    import os
+    import xml.etree.ElementTree as ET
+
+    path = os.path.join(os.path.dirname(skin.__file__), '..', '..', '..', 'tv', 'youtube-tv.xml')
+    with open(path) as f:
+        xml = skin.render(f.read(), {}, '/media', '/icon.png')
+    row = ET.fromstring(xml).find(".//control[@id='200']")
+    assert row.findtext('onright') == 'noop'  # Kodi wraps a list round to its first tile without one
