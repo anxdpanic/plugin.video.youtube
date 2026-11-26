@@ -10,6 +10,12 @@
         <top>0</top>
     </coordinates>
     <controls>
+        <!-- playback going on behind the window is drawn here, under the background, or it stalls -->
+        <control type="videowindow">
+            <width>1920</width>
+            <height>1080</height>
+            <visible>Player.HasVideo</visible>
+        </control>
         <control type="image">
             <width>1920</width>
             <height>1080</height>

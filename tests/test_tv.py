@@ -251,3 +251,16 @@ def test_window_looks_up_banners_of_shown_videos_with_a_known_channel(monkeypatc
     win._banners_soon()
     win._banners_soon()  # already on its way: not asked for again
     assert started == [([('1', 'UCa', 'tile1')],)]
+
+
+def test_window_draws_playback_under_its_background():
+    import os
+    import xml.etree.ElementTree as ET
+
+    path = os.path.join(os.path.dirname(skin.__file__), '..', '..', '..', 'tv', 'youtube-tv.xml')
+    with open(path) as f:
+        xml = skin.render(f.read(), {}, '/media', '/icon.png')
+    first, second = ET.fromstring(xml).find('controls')[:2]
+    # Kodi only presents video through a videowindow outside fullscreen: without one, playback stalls
+    assert first.get('type') == 'videowindow' and first.findtext('visible') == 'Player.HasVideo'
+    assert second.get('type') == 'image'
