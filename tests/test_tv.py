@@ -251,3 +251,37 @@ def test_window_looks_up_banners_of_shown_videos_with_a_known_channel(monkeypatc
     win._banners_soon()
     win._banners_soon()  # already on its way: not asked for again
     assert started == [([('1', 'UCa', 'tile1')],)]
+
+
+class FakeList:
+    """Like Kodi's list control: adding items binds the whole list again and selects its first item."""
+
+    def __init__(self, size, selected):
+        self.size, self.selected = size, selected
+
+    def getSelectedPosition(self):  # noqa: N802 (Kodi API)
+        return self.selected
+
+    def addItems(self, new):  # noqa: N802
+        self.size += len(new)
+        self.selected = 0
+
+    def selectItem(self, position):  # noqa: N802
+        self.selected = position
+
+
+def test_window_keeps_the_focused_tile_when_a_row_loads_more(monkeypatch):
+    from resources.lib.youtube.tv import window
+
+    win = window.TVWindow()
+    row = model.Row('Row', [video(str(i)) for i in range(10)], 'more')
+    row.listitems = list(row.items)
+    control = FakeList(10, 8)
+    win.stack = [type('S', (), {'more_items': lambda self, r: [video('10'), video('11')]})()]
+    monkeypatch.setattr(win, '_row', lambda slot: row)
+    monkeypatch.setattr(win, 'getControl', lambda control_id: control, raising=False)
+    monkeypatch.setattr(win, '_tile', lambda r, item: item)
+    monkeypatch.setattr(win, '_describe_soon', lambda: None)
+    monkeypatch.setattr(win, '_banners_soon', lambda: None)
+    win._more_items()
+    assert (control.size, control.selected) == (12, 8)

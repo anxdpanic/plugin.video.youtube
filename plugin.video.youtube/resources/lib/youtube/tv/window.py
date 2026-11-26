@@ -257,7 +257,9 @@ class TVWindow(xbmcgui.WindowXML):
         if fresh:
             new = [self._tile(row, i) for i in fresh]
             row.listitems.extend(new)
+            position = control.getSelectedPosition()  # adding items binds the whole list again on its first tile
             control.addItems(new)
+            control.selectItem(position)
             self._describe_soon()
             self._banners_soon()
 
