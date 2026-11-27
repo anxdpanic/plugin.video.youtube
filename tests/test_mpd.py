@@ -31,13 +31,27 @@ FORMATS = [
 ]
 
 
-def test_select_video_caps_height_and_prefers_codec():
+def test_select_video_caps_height_and_keeps_every_codec():
     heights = {f['height'] for f in mpd.select_video(FORMATS, max_height=1080)}
     assert heights == {1080}
-    vp9 = mpd.select_video(FORMATS, codec='vp9')
-    assert {mpd.codec_family(mpd._mime_codec(f)[1]) for f in vp9} == {'vp9'}
-    # Unavailable codec preference falls back to everything.
-    assert len(mpd.select_video([FORMATS[0]], codec='av01')) == 1
+    families = {mpd.codec_family(mpd._mime_codec(f)[1]) for f in mpd.select_video(FORMATS)}
+    assert families == {'avc1', 'vp9', 'av01'}
+
+
+def video_sets(**kwargs):
+    root = ET.fromstring(mpd.build({'streamingData': {'adaptiveFormats': FORMATS}}, **kwargs))
+    return [(s.find('d:Representation', NS).get('codecs').split('.')[0], s.get('default'),
+             s.find('d:Role', NS).get('value'))
+            for s in root.findall('.//d:AdaptationSet[@contentType="video"]', NS)]
+
+
+def test_preferred_codec_is_the_first_and_default_video_set():
+    """Every codec stays in the manifest, for ISA's Manual OSD and Ask quality; ISA starts on the preferred."""
+    sets = video_sets(codec='av01')
+    assert sets[0] == ('av01', 'true', 'main')
+    assert {codec for codec, _, _ in sets} == {'avc1', 'vp9', 'vp09', 'av01'}
+    assert all(default is None and role == 'alternate' for _, default, role in sets[1:])
+    assert video_sets()[0][1:] == ('true', 'main')  # 'any': the tallest set leads
 
 
 def test_select_video_can_drop_hdr():

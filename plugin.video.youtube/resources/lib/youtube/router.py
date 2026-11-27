@@ -270,6 +270,24 @@ def _proxy_subtitles(video_id, subs, ua, port):
         sub['url'] = 'http://127.0.0.1:%s/sub/%s/%d.vtt' % (port, video_id, index)
 
 
+# ISA's resolution caps (inputstream.adaptive.chooser_resolution_max), tallest first.
+ISA_RESOLUTIONS = ((2160, '4K'), (1440, '1440p'), (1080, '1080p'), (720, '720p'), (480, '480p'))
+
+
+def isa_resolution_cap(max_quality):
+    """The Maximum quality setting as ISA's resolution cap, '' for none. ISA applies it in its Adaptive and
+    Fixed resolution modes only, so in Manual OSD and Ask quality every resolution stays on offer."""
+    if not max_quality or max_quality > ISA_RESOLUTIONS[0][0]:
+        return ''
+    return next((name for height, name in ISA_RESOLUTIONS if height <= max_quality), '')
+
+
+def manifest_height_cap(max_quality):
+    """The Maximum quality setting where ISA can't cap it (below its lowest cap, 480p): the manifest is
+    cut down to it instead. 0 otherwise."""
+    return max_quality if 0 < max_quality < ISA_RESOLUTIONS[-1][0] else 0
+
+
 def _stream_item(path, mime, ua, live):
     """The ListItem inputstream.adaptive plays, with YouTube's user agent on every request."""
     headers = 'User-Agent=%s' % urllib.parse.quote(ua)
@@ -282,6 +300,13 @@ def _stream_item(path, mime, ua, live):
     if live:
         li.setProperty(ISA + '.play_timeshift_buffer', 'true')
     return li
+
+
+def _cap_resolution(li):
+    """Hand the Maximum quality setting to ISA, which keeps the manifest whole for its other modes."""
+    cap = isa_resolution_cap(kodi.setting_int('max_quality'))
+    if cap:
+        li.setProperty(ISA + '.chooser_resolution_max', cap)
 
 
 def video_label(item):
@@ -934,6 +959,8 @@ class Plugin(pages.Pages):
         if not path:
             return self._fail_resolve(kodi.string(30120))
         li = _stream_item(path, mime, client['ua'], live)
+        if not self.params.get('choose'):
+            _cap_resolution(li)
         self._apply_details(li, parser.video_details(resp))
         if not live:
             sponsorblock.apply(li, video_id)
@@ -1012,12 +1039,13 @@ class Plugin(pages.Pages):
 
     def _serve_manifest(self, video_id, resp, ua, quality=None):
         """Write the DASH manifest for the local server and return its URL, or None. `quality` (an
-        mpd.quality_of() tuple) limits it to that quality, in place of the Maximum quality setting."""
+        mpd.quality_of() tuple) limits it to that quality; otherwise it holds every quality and codec, and
+        the Maximum quality setting goes to ISA (see _cap_resolution)."""
         port = xbmcgui.Window(10000).getProperty(http.PORT_PROPERTY)
         subs = mpd.subtitle_tracks(resp, kodi.setting_bool('subs_asr'), _subtitle_languages(self.api.hl))
         if subs and port:
             _proxy_subtitles(video_id, subs, ua, port)
-        manifest = mpd.build(resp, max_height=0 if quality else kodi.setting_int('max_quality'),
+        manifest = mpd.build(resp, max_height=0 if quality else manifest_height_cap(kodi.setting_int('max_quality')),
                              codec=kodi.setting('codec') or 'any', allow_hdr=kodi.setting_bool('allow_hdr'),
                              audio_pref=kodi.setting('audio_track') or 'original', ui_lang=self.api.hl,
                              subtitles=subs, quality=quality)
