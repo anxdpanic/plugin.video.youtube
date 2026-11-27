@@ -62,6 +62,22 @@ def test_build_produces_valid_manifest():
     assert root.get('mediaPresentationDuration') == 'PT60.000S'
 
 
+def test_select_audio_skips_stable_volume_copies():
+    opus = 'audio/webm; codecs="opus"'
+    plain = fmt(251, opus)
+    drc = fmt(251, opus, isDrc=True)
+    drc_url = dict(plain, url=plain['url'] + '&xtags=drc%3D1')
+    drc_only = fmt(250, opus, isDrc=True)
+    dub, dub_drc = (fmt(251, opus, audioTrack={'id': 'de.3'}, **extra) for extra in ({}, {'isDrc': True}))
+    assert mpd.select_audio([plain, drc, drc_url, drc_only, dub, dub_drc]) == [plain, drc_only, dub]
+
+
+def test_build_audio_has_one_representation_per_itag():
+    audio = [fmt(251, 'audio/webm; codecs="opus"'), fmt(251, 'audio/webm; codecs="opus"', isDrc=True)]
+    root = ET.fromstring(mpd.build({'streamingData': {'adaptiveFormats': [FORMATS[0]] + audio}}))
+    assert len(root.findall('.//d:AdaptationSet[@contentType="audio"]/d:Representation[@id="251"]', NS)) == 1
+
+
 def test_build_without_audio_returns_none():
     assert mpd.build({'streamingData': {'adaptiveFormats': FORMATS[:2]}}) is None
 

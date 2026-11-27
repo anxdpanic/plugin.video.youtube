@@ -99,6 +99,7 @@
             <focusposition>0</focusposition>
             <scrolltime tween="cubic" easing="out">220</scrolltime>
             <onleft>100</onleft>
+            <onright>noop</onright>
             <onup>200</onup>
             <ondown>200</ondown>
             <itemlayout width="424" height="340">
