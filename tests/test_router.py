@@ -519,8 +519,9 @@ def test_play_choose_quality_serves_only_the_chosen_one(monkeypatch):
     monkeypatch.setitem(xbmcaddon.SETTINGS, 'allow_hdr', True)
     resp = {'streamingData': {'adaptiveFormats': FORMATS}, 'videoDetails': {'videoId': 'abcdefghijk', 'title': 'T'}}
     ok, li, offered = choose_play(PlayerApi(resp), monkeypatch, 4)
-    assert offered == ['2160p HDR • str30058', '2160p • str30058', '1080p • str30059',
-                       '1080p • str30058', '1080p • str30060']
+    assert offered == ['2160p HDR • str30058 • 337 kbps', '2160p • str30058 • 313 kbps',
+                       '1080p • str30059 • 399 kbps', '1080p • str30058 • 248 kbps',
+                       '1080p • str30060 • 137 kbps']
     assert ok and li.mime == 'application/dash+xml'
     from resources.lib.youtube import kodi
     with open(kodi.temp_file('abcdefghijk.mpd'), encoding='utf-8') as handle:
@@ -544,7 +545,7 @@ def test_play_choose_quality_of_a_live_stream_plays_one_variant(monkeypatch):
     monkeypatch.setattr(http, 'request', lambda u, headers=None, **kw: (200, MASTER.encode()))
     resp = {'streamingData': {'hlsManifestUrl': url}, 'videoDetails': {'videoId': 'abcdefghijk', 'isLive': True}}
     ok, li, offered = choose_play(PlayerApi(resp), monkeypatch, 1)
-    assert offered == ['1080p', '720p60', '144p']
+    assert offered == ['1080p • 6.8 Mbps', '720p60 • 4.5 Mbps', '144p • 290 kbps']
     assert ok and li.path == 'http://127.0.0.1:50152/hls/abcdefghijk.m3u8'
     assert li.mime == 'application/vnd.apple.mpegurl'
     from resources.lib.youtube import kodi

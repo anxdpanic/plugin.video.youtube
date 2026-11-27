@@ -26,8 +26,9 @@ def _streams(lines):
 
 
 def variants(playlist, base_url):
-    """[(height, fps, url)] of the playlist's video variants, best first and one per height and frame rate
-    (the one with the most bandwidth). Height is the picture's short side, as for DASH formats."""
+    """[(height, fps, url, bits per second)] of the playlist's video variants, best first and one per height
+    and frame rate (the one with the most bandwidth). Height is the picture's short side, as for DASH
+    formats. The rate is the average one where the playlist gives it, the peak otherwise."""
     lines = [line.strip() for line in playlist.splitlines()]
     best = {}
     for info, uri in _streams(lines):
@@ -38,8 +39,9 @@ def variants(playlist, base_url):
         key = (min(int(width), int(height)), round(float(attrs.get('FRAME-RATE') or 0)))
         bandwidth = int(attrs.get('BANDWIDTH') or 0)
         if key not in best or bandwidth > best[key][0]:
-            best[key] = (bandwidth, urllib.parse.urljoin(base_url, lines[uri]))
-    return [(height, fps, best[(height, fps)][1]) for height, fps in sorted(best, reverse=True)]
+            rate = int(attrs.get('AVERAGE-BANDWIDTH') or bandwidth)
+            best[key] = (bandwidth, urllib.parse.urljoin(base_url, lines[uri]), rate)
+    return [(height, fps, best[(height, fps)][1], best[(height, fps)][2]) for height, fps in sorted(best, reverse=True)]
 
 
 def keep_variant(playlist, base_url, url):

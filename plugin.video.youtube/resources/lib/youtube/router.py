@@ -321,12 +321,22 @@ def _set_video_tag(tag, item, known, threshold):
 CODEC_NAMES = {'avc1': 30060, 'vp9': 30058, 'av01': 30059}
 
 
-def quality_label(height, fps, hdr=False, codec=None):
-    """'1080p60 HDR', '720p' as YouTube names a quality, then the codec when there is one: '1080p • VP9'."""
-    label = '%dp%s%s' % (height, fps if fps > 30 else '', ' HDR' if hdr else '')
+def format_bitrate(bits_per_second):
+    """'2.1 Mbps', '850 kbps'."""
+    if bits_per_second >= 1000000:
+        return '%.1f Mbps' % (bits_per_second / 1000000.0)
+    return '%d kbps' % round(bits_per_second / 1000.0)
+
+
+def quality_label(height, fps, hdr=False, codec=None, bitrate=0):
+    """'1080p60 HDR', '720p' as YouTube names a quality, then the codec and bitrate when known:
+    '1080p • VP9 • 2.1 Mbps'."""
+    parts = ['%dp%s%s' % (height, fps if fps > 30 else '', ' HDR' if hdr else '')]
     if codec:
-        label += ' • ' + (kodi.string(CODEC_NAMES[codec]) if codec in CODEC_NAMES else codec)
-    return label
+        parts.append(kodi.string(CODEC_NAMES[codec]) if codec in CODEC_NAMES else codec)
+    if bitrate:
+        parts.append(format_bitrate(bitrate))
+    return ' • '.join(parts)
 
 
 def _select_quality(labels):
@@ -934,7 +944,7 @@ class Plugin(pages.Pages):
             playlist = self._hls_playlist(url, ua)
             options = hls.variants(playlist, url) if playlist else []
             if options:
-                index = _select_quality([quality_label(height, fps) for height, fps, _ in options])
+                index = _select_quality([quality_label(height, fps, bitrate=rate) for height, fps, _, rate in options])
                 if index < 0:
                     return False, None
                 path = self._serve_hls(video_id, hls.keep_variant(playlist, url, options[index][2]))
@@ -944,7 +954,8 @@ class Plugin(pages.Pages):
             formats = resp.get('streamingData', {}).get('adaptiveFormats', [])
             options = mpd.qualities(formats, kodi.setting('codec') or 'any', kodi.setting_bool('allow_hdr'))
             if options:
-                index = _select_quality([quality_label(*option) for option in options])
+                index = _select_quality([quality_label(*option, bitrate=mpd.bitrate_of(formats, option))
+                                         for option in options])
                 if index < 0:
                     return False, None
                 path = self._serve_manifest(video_id, resp, ua, quality=options[index])

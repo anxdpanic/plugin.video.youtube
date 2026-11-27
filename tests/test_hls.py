@@ -19,9 +19,9 @@ BASE = 'https://manifest.googlevideo.com/api/manifest/hls_variant/id/x/file/inde
 
 def test_variants_best_first_one_per_quality():
     assert hls.variants(MASTER, BASE) == [
-        (1080, 30, 'https://manifest.googlevideo.com/api/manifest/hls_variant/id/x/file/itag/301/index.m3u8'),
-        (720, 60, 'https://manifest.googlevideo.com/hls_playlist/itag/300/index.m3u8'),  # the higher bandwidth
-        (144, 30, 'https://manifest.googlevideo.com/hls_playlist/itag/91/index.m3u8'),
+        (1080, 30, 'https://manifest.googlevideo.com/api/manifest/hls_variant/id/x/file/itag/301/index.m3u8', 6800000),
+        (720, 60, 'https://manifest.googlevideo.com/hls_playlist/itag/300/index.m3u8', 4500000),  # the higher bandwidth
+        (144, 30, 'https://manifest.googlevideo.com/hls_playlist/itag/91/index.m3u8', 290000),
     ]
 
 
@@ -41,3 +41,10 @@ def test_keep_variant_keeps_the_audio_and_only_that_variant():
 def test_keep_variant_makes_its_uri_absolute():
     kept = hls.keep_variant(MASTER, BASE, hls.variants(MASTER, BASE)[0][2])
     assert kept.splitlines()[-1] == 'https://manifest.googlevideo.com/api/manifest/hls_variant/id/x/file/itag/301/index.m3u8'
+
+
+def test_variants_prefer_the_average_bandwidth():
+    playlist = '\n'.join(['#EXTM3U',
+                          '#EXT-X-STREAM-INF:BANDWIDTH=3000000,AVERAGE-BANDWIDTH=1800000,RESOLUTION=1280x720',
+                          'https://example.com/720.m3u8'])
+    assert hls.variants(playlist, BASE) == [(720, 0, 'https://example.com/720.m3u8', 1800000)]

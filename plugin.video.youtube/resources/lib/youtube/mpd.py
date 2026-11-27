@@ -57,6 +57,14 @@ def qualities(formats, codec='any', allow_hdr=True):
     return sorted(found, key=lambda q: (-q[0], -q[1], not q[2], order.index(q[3]) if q[3] in order else len(order)))
 
 
+def bitrate_of(formats, quality):
+    """Bits per second of a quality's video, for telling a slow connection what it needs: the average
+    rate where YouTube gives one (the peak rate otherwise), the highest when several formats share it."""
+    rates = [f.get('averageBitrate') or f.get('bitrate') or 0
+             for f in select_video(formats, quality=quality)]
+    return int(max(rates, default=0))
+
+
 def select_video(formats, max_height=0, codec='any', allow_hdr=True, quality=None):
     """The video formats to offer. `quality` (a quality_of() tuple) keeps only that one quality."""
     videos = [f for f in formats if _usable(f, 'video', SUPPORTED_VIDEO) and (allow_hdr or not is_hdr(f))]

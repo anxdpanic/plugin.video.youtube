@@ -129,3 +129,10 @@ def test_build_for_one_quality_offers_only_it():
     root = ET.fromstring(mpd.build(resp, quality=(1080, 30, False, 'vp9')))
     videos = [r for r in root.iter('{%s}Representation' % NS['d']) if r.get('height')]
     assert [(r.get('id'), r.get('height')) for r in videos] == [('248', '1080')]
+
+
+def test_bitrate_of_a_quality_prefers_the_average_rate():
+    assert mpd.bitrate_of(FORMATS, (1080, 30, False, 'avc1')) == 137000
+    averaged = [dict(FORMATS[0], averageBitrate=90000)] + FORMATS[1:]
+    assert mpd.bitrate_of(averaged, (1080, 30, False, 'avc1')) == 90000
+    assert mpd.bitrate_of(FORMATS, (480, 30, False, 'avc1')) == 0
