@@ -43,8 +43,35 @@ def _usable(fmt, media, families):
                 and 'indexRange' in fmt and not fmt.get('drmFamilies') and codec_family(codecs) in families)
 
 
-def select_video(formats, max_height=0, codec='any', allow_hdr=True):
+def quality_of(fmt):
+    """(height, fps, hdr, codec family) of a video format. Height is the short side, so a vertical
+    1080x1920 is 1080. The codec is part of it because not every device decodes every codec: a low-end
+    one may only manage H.264, or play VP9 or AV1 only at lower resolutions."""
+    height = min(fmt.get('height', 0), fmt.get('width', 0)) or fmt.get('height', 0)
+    return height, fmt.get('fps', 0), is_hdr(fmt), codec_family(_mime_codec(fmt)[1])
+
+
+def qualities(formats, codec='any', allow_hdr=True):
+    """The qualities a manifest can offer, as quality_of() tuples: tallest first, then highest frame rate,
+    HDR before SDR, and at each of those the `codec` preference first, then AV1, VP9 and H.264."""
+    order = [codec] + [c for c in reversed(SUPPORTED_VIDEO) if c != codec]
+    found = {quality_of(f) for f in select_video(formats, 0, 'any', allow_hdr)}
+    return sorted(found, key=lambda q: (-q[0], -q[1], not q[2], order.index(q[3]) if q[3] in order else len(order)))
+
+
+def bitrate_of(formats, quality):
+    """Bits per second of a quality's video, for telling a slow connection what it needs: the average
+    rate where YouTube gives one (the peak rate otherwise), the highest when several formats share it."""
+    rates = [f.get('averageBitrate') or f.get('bitrate') or 0
+             for f in select_video(formats, quality=quality)]
+    return int(max(rates, default=0))
+
+
+def select_video(formats, max_height=0, codec='any', allow_hdr=True, quality=None):
+    """The video formats to offer. `quality` (a quality_of() tuple) keeps only that one quality."""
     videos = [f for f in formats if _usable(f, 'video', SUPPORTED_VIDEO) and (allow_hdr or not is_hdr(f))]
+    if quality:
+        videos = [f for f in videos if quality_of(f) == tuple(quality)]
     if max_height:
         capped = [f for f in videos if min(f.get('height', 0), f.get('width', 0)) <= max_height]
         videos = capped or sorted(videos, key=lambda f: f.get('height', 0))[:1]
@@ -198,10 +225,10 @@ def _mpd_open(duration):
 
 
 def build(player_resp, max_height=0, codec='any', allow_hdr=True, audio_pref='original', ui_lang='en',
-          subtitles=None):
+          subtitles=None, quality=None):
     """Returns the MPD as a string, or None when there is nothing usable."""
     formats = player_resp.get('streamingData', {}).get('adaptiveFormats', [])
-    videos = select_video(formats, max_height, codec, allow_hdr)
+    videos = select_video(formats, max_height, codec, allow_hdr, quality)
     audios = select_audio(formats)
     if not videos or not audios:
         return None

@@ -187,3 +187,21 @@ def test_failed_port_switch_does_not_stop_the_service(monkeypatch):
     service.run()
     assert len(ticks) == 3 and ticks[2] == ticks[0]
     assert any('boom' in msg for _, msg in xbmc.LOG)
+
+
+@pytest.mark.parametrize('name, path, content_type', [
+    ('abcdefghijk.mpd', '/mpd/abcdefghijk.mpd', 'application/dash+xml'),
+    ('abcdefghijk.m3u8', '/hls/abcdefghijk.m3u8', 'application/vnd.apple.mpegurl'),
+])
+def test_serves_the_files_written_for_the_player(httpd, name, path, content_type):
+    import urllib.error
+    import urllib.request
+
+    from resources.lib.youtube import kodi
+    with open(kodi.temp_file(name), 'w', encoding='utf-8') as handle:
+        handle.write('body')
+    assert httpd.start(free_port())
+    with urllib.request.urlopen('http://127.0.0.1:%d%s' % (httpd.port, path), timeout=5) as resp:
+        assert resp.read() == b'body' and resp.headers['Content-Type'] == content_type
+    with pytest.raises(urllib.error.HTTPError):
+        urllib.request.urlopen('http://127.0.0.1:%d/hls/zzzzzzzzzzz.m3u8' % httpd.port, timeout=5)

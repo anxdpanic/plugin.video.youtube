@@ -494,3 +494,94 @@ def test_bot_check_gets_its_own_message():
 def test_other_playability_reasons_are_shown_as_given():
     from resources.lib.youtube.innertube import InnerTubeError
     assert router._player_error_message(InnerTubeError('Video unavailable')) == 'Video unavailable'
+
+
+def choose_play(api, monkeypatch, pick):
+    """Play with ?choose=1, the quality dialog answering `pick` (an index, -1 to cancel); returns the
+    resolved item and the labels the dialog offered."""
+    offered = []
+
+    def select(self, heading, items, preselect=-1, **kwargs):
+        offered.extend(items)
+        return pick
+    monkeypatch.setattr(xbmcgui.Dialog, 'select', select)
+    monkeypatch.setitem(xbmcgui._PROPERTIES, 'youtube.port', '50152')
+    plugin = run('play', '?v=abcdefghijk&choose=1')
+    plugin.api = api
+    plugin.play()
+    [(ok, li)] = xbmcplugin.RESOLVED
+    return ok, li, offered
+
+
+def test_play_choose_quality_serves_only_the_chosen_one(monkeypatch):
+    import xbmcaddon
+    from test_mpd import FORMATS
+    monkeypatch.setitem(xbmcaddon.SETTINGS, 'allow_hdr', True)
+    resp = {'streamingData': {'adaptiveFormats': FORMATS}, 'videoDetails': {'videoId': 'abcdefghijk', 'title': 'T'}}
+    ok, li, offered = choose_play(PlayerApi(resp), monkeypatch, 4)
+    assert offered == ['2160p HDR • str30058 • 337 kbps', '2160p • str30058 • 313 kbps',
+                       '1080p • str30059 • 399 kbps', '1080p • str30058 • 248 kbps',
+                       '1080p • str30060 • 137 kbps']
+    assert ok and li.mime == 'application/dash+xml'
+    from resources.lib.youtube import kodi
+    with open(kodi.temp_file('abcdefghijk.mpd'), encoding='utf-8') as handle:
+        manifest = handle.read()
+    assert 'id="137"' in manifest  # the 1080p H.264 stream, and no other video
+    assert 'height="2160"' not in manifest and 'id="248"' not in manifest and 'id="399"' not in manifest
+
+
+def test_play_choose_quality_cancelled_plays_nothing(monkeypatch):
+    from test_mpd import FORMATS
+    resp = {'streamingData': {'adaptiveFormats': FORMATS}, 'videoDetails': {'videoId': 'abcdefghijk', 'title': 'T'}}
+    ok, _, _ = choose_play(PlayerApi(resp), monkeypatch, -1)
+    assert not ok and not xbmcgui.NOTIFICATIONS
+
+
+def test_play_choose_quality_of_a_live_stream_plays_one_variant(monkeypatch):
+    from test_hls import MASTER
+
+    from resources.lib.youtube import http
+    url = 'https://manifest.googlevideo.com/api/manifest/hls_variant/id/x/file/index.m3u8'
+    monkeypatch.setattr(http, 'request', lambda u, headers=None, **kw: (200, MASTER.encode()))
+    resp = {'streamingData': {'hlsManifestUrl': url}, 'videoDetails': {'videoId': 'abcdefghijk', 'isLive': True}}
+    ok, li, offered = choose_play(PlayerApi(resp), monkeypatch, 1)
+    assert offered == ['1080p • 6.8 Mbps', '720p60 • 4.5 Mbps', '144p • 290 kbps']
+    assert ok and li.path == 'http://127.0.0.1:50152/hls/abcdefghijk.m3u8'
+    assert li.mime == 'application/vnd.apple.mpegurl'
+    from resources.lib.youtube import kodi
+    with open(kodi.temp_file('abcdefghijk.m3u8'), encoding='utf-8') as handle:
+        served = handle.read()
+    assert 'itag/233' in served and 'itag/300' in served and 'itag/301' not in served
+
+
+def test_video_menu_offers_play_at_a_chosen_quality():
+    from resources.lib.youtube import router
+    menu = router._video_menu({'live': True, 'short': False, 'channel': 'C'}, 'abcdefghijk', None)
+    assert menu[0] == ('str30184', 'PlayMedia(plugin://plugin.video.youtube/play?v=abcdefghijk&choose=1)')
+    upcoming = router._video_menu({'live': False, 'short': False, 'upcoming': 'Upcoming', 'channel': 'C'},
+                                  'abcdefghijk', None)
+    assert all('choose=1' not in action for _, action in upcoming)
+
+
+def test_video_listings_offer_date_duration_channel_and_watched_sorts():
+    plugin = run('browse', '?id=VLPLx')
+    plugin.descriptions.remember('a', 'About a', '2026-09-12', save=False)
+    items = plugin._render_items([video('a'), video('b')], browse_id='VLPLx')
+    plugin._finish_listing(items)
+    dated = [li for url, li, _ in xbmcplugin.ITEMS if url.endswith('v=a')][0]
+    assert dated.datetime == '2026-09-12T00:00:00Z'
+    assert xbmcplugin.SORTS == [xbmcplugin.SORT_METHOD_UNSORTED, xbmcplugin.SORT_METHOD_LABEL,
+                                xbmcplugin.SORT_METHOD_DATE, xbmcplugin.SORT_METHOD_DURATION,
+                                xbmcplugin.SORT_METHOD_STUDIO, xbmcplugin.SORT_METHOD_PLAYCOUNT]
+
+
+def test_date_sort_is_left_out_when_no_upload_date_is_known():
+    plugin = run('browse', '?id=VLPLx')
+    plugin._finish_listing(plugin._render_items([video('c')], browse_id='VLPLx'))
+    assert xbmcplugin.SORT_METHOD_DATE not in xbmcplugin.SORTS
+    assert xbmcplugin.SORT_METHOD_DURATION in xbmcplugin.SORTS
+
+
+def test_folder_only_listings_sort_by_order_or_title():
+    run('browse', '?id=FEchannels')._finish_listing([{'kind': 'folder'}])
+    assert xbmcplugin.SORTS == [xbmcplugin.SORT_METHOD_UNSORTED, xbmcplugin.SORT_METHOD_LABEL]
