@@ -28,6 +28,7 @@ from . import (
     parser,
     playback,
     qr,
+    sponsorblock,
 )
 from .innertube import InnerTube, InnerTubeError
 
@@ -934,6 +935,8 @@ class Plugin(pages.Pages):
             return self._fail_resolve(kodi.string(30120))
         li = _stream_item(path, mime, client['ua'], live)
         self._apply_details(li, parser.video_details(resp))
+        if not live:
+            sponsorblock.apply(li, video_id)
         if self.params.get('t'):  # start part way in (a chapter, or a start time in the path)
             li.setProperty('StartOffset', self.params['t'])
             playback.request(video_id, self.params['t'])

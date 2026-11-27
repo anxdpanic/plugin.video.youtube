@@ -220,6 +220,68 @@
                     </control>
                 </setting>
             </group>
+            <group id="playback_sponsorblock" label="30186">
+                <setting id="sponsorblock" type="boolean" label="30187" help="30188">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="sponsorblock_categories" type="list[string]" label="30189" parent="sponsorblock">
+                    <level>0</level>
+                    <default>sponsor,selfpromo,interaction</default>
+                    <constraints>
+                        <options>
+                            <option label="30190">sponsor</option>
+                            <option label="30191">selfpromo</option>
+                            <option label="30192">interaction</option>
+                            <option label="30193">intro</option>
+                            <option label="30194">outro</option>
+                            <option label="30195">preview</option>
+                            <option label="30196">hook</option>
+                            <option label="30197">filler</option>
+                            <option label="30198">music_offtopic</option>
+                        </options>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition setting="sponsorblock" operator="is">true</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="list" format="string">
+                        <multiselect>true</multiselect>
+                    </control>
+                </setting>
+                <setting id="sponsorblock_action" type="integer" label="30199" parent="sponsorblock">
+                    <level>0</level>
+                    <default>3</default>
+                    <constraints>
+                        <options>
+                            <option label="30200">3</option>
+                            <option label="30201">2</option>
+                        </options>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition setting="sponsorblock" operator="is">true</condition>
+                        </dependency>
+                    </dependencies>
+                    <control type="spinner" format="string"/>
+                </setting>
+                <setting id="sponsorblock_seek" type="boolean" label="30202" help="30203" parent="sponsorblock">
+                    <level>1</level>
+                    <default>false</default>
+                    <dependencies>
+                        <dependency type="enable">
+                            <and>
+                                <condition setting="sponsorblock" operator="is">true</condition>
+                                <condition setting="sponsorblock_action" operator="is">3</condition>
+                            </and>
+                        </dependency>
+                    </dependencies>
+                    <control type="toggle"/>
+                </setting>
+            </group>
         </category>
         <category id="maintenance" label="30150">
             <group id="maintenance_clear" label="30160">

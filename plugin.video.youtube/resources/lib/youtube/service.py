@@ -16,7 +16,7 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 
-from . import art, broker, history, http, kodi, playback
+from . import art, broker, history, http, kodi, playback, sponsorblock
 
 PORT_PROPERTY = http.PORT_PROPERTY
 # Default port: not 50152, the default of earlier plugin.video.youtube versions, and above Linux's ephemeral
@@ -228,6 +228,7 @@ def run():
     tracker = history.Tracker()
     backfill = art.Backfill()
     start_at = playback.StartAt()  # noqa: F841 (Kodi calls it while it exists)
+    skipper = sponsorblock.Skipper()  # noqa: F841 (Kodi calls it while it exists)
     last_cleanup = time.time()
     while not monitor.waitForAbort(5):
         if monitor.settings_changed:
