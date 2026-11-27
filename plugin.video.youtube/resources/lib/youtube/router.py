@@ -35,6 +35,7 @@ from .innertube import InnerTube, InnerTubeError
 BASE_URL = 'plugin://%s/' % kodi.ADDON_ID
 ROW_PAGES = 3  # pages of rows per listing at least: one page holds only three or four rows
 ISA = 'inputstream.adaptive'
+RATE_TIMEOUT = 2  # seconds for the read of a format's index: playback waits on it
 DASH_MIME = 'application/dash+xml'
 HLS_MIME = 'application/vnd.apple.mpegurl'
 
@@ -259,6 +260,29 @@ def _subtitle_languages(hl):
     """Languages to offer machine-translated captions in: the setting (or Kodi's language) plus extras."""
     languages = [x.strip() for x in (kodi.setting('subs_translate').strip() or hl).split(',')]
     return languages + [x.strip() for x in kodi.setting('subs_more').split(',') if x.strip()]
+
+
+def _rate_kind(resp, ua):
+    """mpd.rate_kind() for the video, from one small read of the start of the smallest MP4 format's
+    index. None, so the manifest keeps YouTube's whole frame rates, when it doesn't answer."""
+    candidates = mpd.index_candidates(resp.get('streamingData', {}).get('adaptiveFormats', []))
+    if not candidates:
+        kodi.log('frame rate: no MP4 video index, using whole rates')
+        return None
+    fmt, byte_range = candidates[0]
+    try:
+        # background: it is optional, so it is refused rather than queued while the host holds requests
+        _, index = http.request(fmt['url'], headers={'User-Agent': ua, 'Range': 'bytes=' + byte_range},
+                                timeout=RATE_TIMEOUT, priority=http.BACKGROUND)
+    except http.HTTPError as exc:
+        kodi.log('frame rate: unknown, using whole rates: index of %s not read (%s)' % (fmt['itag'], exc))
+        return None
+    kind, reason = mpd.rate_kind(index, fmt['fps'])
+    if kind:
+        kodi.log('frame rate: %s, from the index of %s' % (kind, fmt['itag']))
+    else:
+        kodi.log('frame rate: unknown, using whole rates: index of %s: %s' % (fmt['itag'], reason))
+    return kind
 
 
 def _proxy_subtitles(video_id, subs, ua, port):
@@ -1048,7 +1072,7 @@ class Plugin(pages.Pages):
         manifest = mpd.build(resp, max_height=0 if quality else manifest_height_cap(kodi.setting_int('max_quality')),
                              codec=kodi.setting('codec') or 'any', allow_hdr=kodi.setting_bool('allow_hdr'),
                              audio_pref=kodi.setting('audio_track') or 'original', ui_lang=self.api.hl,
-                             subtitles=subs, quality=quality)
+                             subtitles=subs, quality=quality, rate=_rate_kind(resp, ua) if port else None)
         if not manifest:
             return None
         if not port:

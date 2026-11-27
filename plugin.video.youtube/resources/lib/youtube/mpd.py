@@ -2,6 +2,7 @@
 # Copyright (C) 2026 plugin.video.youtube
 """Builds a static DASH manifest (SegmentBase / byte ranges) from InnerTube adaptiveFormats."""
 import re
+import struct
 from functools import partial
 from xml.sax.saxutils import escape, quoteattr
 
@@ -13,8 +14,8 @@ SUPPORTED_AUDIO = ('mp4a', 'opus', 'ec-3', 'ac-3')
 TRANSFER_SCHEME = 'urn:mpeg:mpegB:cicp:TransferCharacteristics'
 CHANNEL_SCHEME = 'urn:mpeg:dash:23003:3:audio_channel_configuration:2011'
 HDR_TRANSFER = ('COLOR_TRANSFER_CHARACTERISTICS_SMPTEST2084', 'COLOR_TRANSFER_CHARACTERISTICS_ARIB_STD_B67')
-# YouTube reports 23.976, 29.97 and 59.94 fps as 24, 30 and 60.
-FRACTIONAL_FPS = {24: '24000/1001', 30: '30000/1001', 60: '60000/1001'}
+SIDX_REFS = 16  # index entries rate_kind() checks
+SIDX_READ = 400  # bytes of an index to fetch: its header and more than SIDX_REFS entries
 
 
 def _mime_codec(fmt):
@@ -95,6 +96,55 @@ def select_audio(formats):
     return [f for f in audios if not (_is_drc(f) and _audio_key(f) in plain)]
 
 
+def rate_kind(index, fps):
+    """Whether a video's frame rate is a whole number of frames a second ('whole') or 1000/1001 of one
+    ('ntsc'), from the start of a format's segment index (its sidx box) and YouTube's whole fps for it.
+    YouTube gives 23.976, 29.97 and 59.94 fps as 24, 30 and 60, and the index tells them apart: every
+    segment lasts a whole number of frames. Returns (kind, reason), kind None when it can't tell."""
+    if not fps:
+        return None, 'no fps'
+    if index[4:8] != b'sidx':
+        return None, 'no index'
+    body = 8  # the box's version byte
+    version = index[body:body + 1]
+    try:
+        timescale = struct.unpack_from('>I', index, body + 8)[0]
+        refs_at = body + (20 if version == b'\x00' else 28)
+        count = struct.unpack_from('>H', index, refs_at + 2)[0]
+    except struct.error:
+        return None, 'short index'
+    # only the start of a long index is read: check the entries that arrived
+    held = (len(index) - refs_at - 4) // 12
+    durations = [struct.unpack_from('>I', index, refs_at + 4 + 12 * i + 4)[0]
+                 for i in range(min(count, held, SIDX_REFS))]
+    if count and not durations:
+        return None, 'short index'
+    if not timescale or not durations:
+        return None, 'empty index'
+    whole = timescale % fps == 0 and all(d % (timescale // fps) == 0 for d in durations)
+    step = timescale * 1001
+    ntsc = step % (fps * 1000) == 0 and all(d % (step // (fps * 1000)) == 0 for d in durations)
+    if whole != ntsc:
+        return ('whole' if whole else 'ntsc'), ''
+    return None, 'both rates fit' if whole else 'neither rate fits'
+
+
+def index_candidates(formats):
+    """MP4 video formats whose index rate_kind() can read, smallest first, each with the byte range to
+    fetch: the start of its index, at most SIDX_READ bytes."""
+    videos = [f for f in select_video(formats) if _mime_codec(f)[0] == 'video/mp4' and f.get('fps')]
+    out = []
+    for fmt in sorted(videos, key=lambda f: f.get('bitrate') or f.get('averageBitrate') or 0):
+        start, end = int(fmt['indexRange']['start']), int(fmt['indexRange']['end'])
+        out.append((fmt, '%d-%d' % (start, min(end, start + SIDX_READ - 1))))
+    return out
+
+
+def frame_rate(fps, kind=None):
+    """The manifest's frameRate for YouTube's whole `fps`: 1000/1001 of it when the video is 'ntsc'."""
+    return '%d/1001' % (fps * 1000) if kind == 'ntsc' else str(fps)
+
+
 def _duration(formats, fallback):
     for fmt in formats:
         if fmt.get('approxDurationMs'):
@@ -102,13 +152,13 @@ def _duration(formats, fallback):
     return float(fallback or 0)
 
 
-def _representation(fmt, codecs, extra=''):
+def _representation(fmt, codecs, extra='', rate=None):
     attrs = ['id="%s"' % fmt['itag'], 'codecs=%s' % quoteattr(codecs),
              'bandwidth="%d"' % (fmt.get('bitrate') or fmt.get('averageBitrate') or 0)]
     if fmt.get('width'):
         attrs.append('width="%d" height="%d"' % (fmt['width'], fmt['height']))
     if fmt.get('fps'):
-        attrs.append('frameRate="%s"' % FRACTIONAL_FPS.get(fmt['fps'], fmt['fps']))
+        attrs.append('frameRate="%s"' % frame_rate(fmt['fps'], rate))
     if fmt.get('audioSampleRate'):
         attrs.append('audioSamplingRate="%s"' % fmt['audioSampleRate'])
     out = ['      <Representation %s>' % ' '.join(attrs)]
@@ -139,7 +189,7 @@ def _group_videos(videos, codec='any'):
     return sorted(groups.items(), key=lambda kv: (kv[0][1] != codec, -max(f.get('height', 0) for f in kv[1])))
 
 
-def _video_set(set_id, mime, hdr, group, main):
+def _video_set(set_id, mime, hdr, group, main, rate=None):
     out = ['    <AdaptationSet id="%d" contentType="video" mimeType="%s"%s subsegmentAlignment="true" '
            'startWithSAP="1" scanType="progressive">' % (set_id, mime, ' default="true"' if main else ''),
            '      <Role schemeIdUri="urn:mpeg:dash:role:2011" value="%s"/>' % ('main' if main else 'alternate')]
@@ -149,7 +199,7 @@ def _video_set(set_id, mime, hdr, group, main):
         out.append('      <SupplementalProperty schemeIdUri="%s" value="%s"/>'
                    % (TRANSFER_SCHEME, '16' if pq else '18'))
     for fmt in sorted(group, key=lambda f: (f.get('height', 0), f.get('bitrate', 0))):
-        out.extend(_representation(fmt, _mime_codec(fmt)[1]))
+        out.extend(_representation(fmt, _mime_codec(fmt)[1], rate=rate))
     out.append('    </AdaptationSet>')
     return out
 
@@ -203,11 +253,11 @@ def _subtitle_set(set_id, index, sub):
             '    </AdaptationSet>']
 
 
-def _adaptation_sets(videos, codec, audios, audio_pref, ui_lang, subtitles):
+def _adaptation_sets(videos, codec, audios, audio_pref, ui_lang, subtitles, rate=None):
     """A maker per AdaptationSet in manifest order (video with the preferred codec first, audio with the
     default first, subtitles); each takes the set's id and returns its lines."""
     for index, ((mime, _family, hdr), group) in enumerate(_group_videos(videos, codec)):
-        yield partial(_video_set, mime=mime, hdr=hdr, group=group, main=index == 0)
+        yield partial(_video_set, mime=mime, hdr=hdr, group=group, main=index == 0, rate=rate)
     groups = _group_audios(audios)
     is_main = _main_audio_test(groups, audio_pref, ui_lang)
     for key, group in sorted(groups.items(), key=lambda kv: (not is_main(kv[0]), kv[0][4] != 'opus')):
@@ -224,17 +274,18 @@ def _mpd_open(duration):
 
 
 def build(player_resp, max_height=0, codec='any', allow_hdr=True, audio_pref='original', ui_lang='en',
-          subtitles=None, quality=None):
+          subtitles=None, quality=None, rate=None):
     """Returns the MPD as a string, or None when there is nothing usable. It offers every quality and codec
     (up to `max_height`, when given), so ISA's Manual OSD and Ask quality modes can offer them all; `codec`
-    only decides which video set ISA starts on."""
+    only decides which video set ISA starts on. `rate` is rate_kind()'s answer for the video: with 'ntsc'
+    the frame rates are 1000/1001 of YouTube's, otherwise YouTube's own."""
     formats = player_resp.get('streamingData', {}).get('adaptiveFormats', [])
     videos = select_video(formats, max_height, allow_hdr, quality)
     audios = select_audio(formats)
     if not videos or not audios:
         return None
     out = _mpd_open(_duration(videos + audios, player_resp.get('videoDetails', {}).get('lengthSeconds')))
-    for set_id, make in enumerate(_adaptation_sets(videos, codec, audios, audio_pref, ui_lang, subtitles)):
+    for set_id, make in enumerate(_adaptation_sets(videos, codec, audios, audio_pref, ui_lang, subtitles, rate)):
         out.extend(make(set_id))
     out.extend(['  </Period>', '</MPD>'])
     return '\n'.join(out)
