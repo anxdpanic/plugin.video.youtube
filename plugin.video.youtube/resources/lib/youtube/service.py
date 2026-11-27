@@ -25,6 +25,10 @@ PORT_PROPERTY = http.PORT_PROPERTY
 DEFAULT_PORT = 61152
 FALLBACK_STEPS = 2  # also try the next ports before taking any free one
 MANIFEST = re.compile(r'^/mpd/([A-Za-z0-9_-]{11})\.mpd$')
+HLS_PLAYLIST = re.compile(r'^/hls/([A-Za-z0-9_-]{11})\.m3u8$')
+# Files written for the player: (path pattern, file name for the video id, content type)
+SERVED = ((MANIFEST, '%s.mpd', 'application/dash+xml'),
+          (HLS_PLAYLIST, '%s.m3u8', 'application/vnd.apple.mpegurl'))
 SUBTITLE = re.compile(r'^/sub/([A-Za-z0-9_-]{11})/(\d+)\.vtt$')
 EMPTY_VTT = b'WEBVTT\n\n'
 TEMP_MAX_AGE = 6 * 3600  # manifests and subtitle lists outlive any playback by far
@@ -58,13 +62,19 @@ class _Handler(BaseHTTPRequestHandler):
         if sub:
             self._reply(_subtitle(sub.group(1), int(sub.group(2))), 'text/vtt; charset=utf-8')
             return
-        match = MANIFEST.match(path)
-        path = os.path.join(kodi.TEMP_DIR, '%s.mpd' % match.group(1)) if match else None
-        if not path or not os.path.isfile(path):
+        for pattern, name, content_type in SERVED:
+            match = pattern.match(path)
+            if match:
+                self._reply_file(os.path.join(kodi.TEMP_DIR, name % match.group(1)), content_type)
+                return
+        self.send_error(404)
+
+    def _reply_file(self, path, content_type):
+        if not os.path.isfile(path):
             self.send_error(404)
             return
         with open(path, 'rb') as handle:
-            self._reply(handle.read(), 'application/dash+xml')
+            self._reply(handle.read(), content_type)
 
     def _reply(self, body, content_type):
         self.send_response(200)

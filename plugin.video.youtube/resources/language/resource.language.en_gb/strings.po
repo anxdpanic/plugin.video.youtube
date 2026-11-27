@@ -503,3 +503,11 @@ msgstr ""
 msgctxt "#30183"
 msgid "YouTube wants to confirm you're not a bot. This mostly happens on a VPN; try playing with Kodi left out of the VPN"
 msgstr ""
+
+msgctxt "#30184"
+msgid "Play (choose quality)"
+msgstr ""
+
+msgctxt "#30185"
+msgid "Choose quality"
+msgstr ""

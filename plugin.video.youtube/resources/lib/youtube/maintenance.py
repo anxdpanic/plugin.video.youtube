@@ -12,7 +12,7 @@ import xbmc
 
 from . import art, descriptions, kodi
 
-PLAYING_MANIFEST = re.compile(r'/mpd/([A-Za-z0-9_-]{11})\.mpd')
+PLAYING_MANIFEST = re.compile(r'/(?:mpd|hls)/([A-Za-z0-9_-]{11})\.(?:mpd|m3u8)')
 
 def _size(path):
     if os.path.isdir(path):

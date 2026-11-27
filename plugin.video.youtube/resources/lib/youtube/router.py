@@ -18,6 +18,7 @@ from . import (
     describe,
     descriptions,
     history,
+    hls,
     http,
     icons,
     kodi,
@@ -33,6 +34,8 @@ from .innertube import InnerTube, InnerTubeError
 BASE_URL = 'plugin://%s/' % kodi.ADDON_ID
 ROW_PAGES = 3  # pages of rows per listing at least: one page holds only three or four rows
 ISA = 'inputstream.adaptive'
+DASH_MIME = 'application/dash+xml'
+HLS_MIME = 'application/vnd.apple.mpegurl'
 
 
 def error_message(exc):
@@ -314,9 +317,28 @@ def _set_video_tag(tag, item, known, threshold):
         tag.setVotes(c_int(item['views']))
 
 
+# Codec families -> their names in the Preferred video codec setting.
+CODEC_NAMES = {'avc1': 30060, 'vp9': 30058, 'av01': 30059}
+
+
+def quality_label(height, fps, hdr=False, codec=None):
+    """'1080p60 HDR', '720p' as YouTube names a quality, then the codec when there is one: '1080p • VP9'."""
+    label = '%dp%s%s' % (height, fps if fps > 30 else '', ' HDR' if hdr else '')
+    if codec:
+        label += ' • ' + (kodi.string(CODEC_NAMES[codec]) if codec in CODEC_NAMES else codec)
+    return label
+
+
+def _select_quality(labels):
+    """The index of the quality the viewer picks, -1 when they cancel."""
+    return xbmcgui.Dialog().select(kodi.string(30185), labels)
+
+
 def _video_menu(item, video_id, channel_id):
-    """A video's context menu: its channel, related videos, details and chapters."""
+    """A video's context menu: play at a chosen quality, its channel, related videos, details and chapters."""
     menu = []
+    if not item.get('upcoming'):
+        menu.append((kodi.string(30184), 'PlayMedia(%s)' % url_for('play', v=video_id, choose=1)))
     if channel_id:
         menu.append((kodi.string(30103), 'Container.Update(%s)' % url_for(
             'browse', id=channel_id, title=item['channel'])))
@@ -870,7 +892,13 @@ class Plugin(pages.Pages):
             kodi.log('no streams for %s: %s' % (video_id, exc))
             return self._fail_resolve(_player_error_message(exc))
         live = _is_live(resp)
-        path, mime = self._stream_source(video_id, resp, client['ua'], live)
+        if self.params.get('choose'):
+            path, mime = self._chosen_source(video_id, resp, client['ua'], live)
+            if path is False:  # the viewer cancelled the choice
+                xbmcplugin.setResolvedUrl(self.handle, False, xbmcgui.ListItem(offscreen=True))
+                return None
+        else:
+            path, mime = self._stream_source(video_id, resp, client['ua'], live)
         if not path:
             return self._fail_resolve(kodi.string(30120))
         li = _stream_item(path, mime, client['ua'], live)
@@ -891,22 +919,73 @@ class Plugin(pages.Pages):
         if not live:
             path = self._serve_manifest(video_id, resp, ua)
             if path:
-                return path, 'application/dash+xml'
+                return path, DASH_MIME
         hls = resp.get('streamingData', {}).get('hlsManifestUrl')
         if hls:
-            return hls, 'application/vnd.apple.mpegurl'
+            return hls, HLS_MIME
         return None, None
 
-    def _serve_manifest(self, video_id, resp, ua):
-        """Write the DASH manifest for the local server and return its URL, or None."""
+    def _chosen_source(self, video_id, resp, ua, live):
+        """Like _stream_source, at a quality the viewer picks: a DASH manifest of only that quality, or a live
+        stream's HLS playlist cut down to that variant. (False, None) when they cancel. With nothing to
+        choose from, it plays as _stream_source would."""
+        if live:
+            url = resp.get('streamingData', {}).get('hlsManifestUrl')
+            playlist = self._hls_playlist(url, ua)
+            options = hls.variants(playlist, url) if playlist else []
+            if options:
+                index = _select_quality([quality_label(height, fps) for height, fps, _ in options])
+                if index < 0:
+                    return False, None
+                path = self._serve_hls(video_id, hls.keep_variant(playlist, url, options[index][2]))
+                if path:
+                    return path, HLS_MIME
+        else:
+            formats = resp.get('streamingData', {}).get('adaptiveFormats', [])
+            options = mpd.qualities(formats, kodi.setting('codec') or 'any', kodi.setting_bool('allow_hdr'))
+            if options:
+                index = _select_quality([quality_label(*option) for option in options])
+                if index < 0:
+                    return False, None
+                path = self._serve_manifest(video_id, resp, ua, quality=options[index])
+                if path:
+                    return path, DASH_MIME
+        return self._stream_source(video_id, resp, ua, live)
+
+    @staticmethod
+    def _hls_playlist(url, ua):
+        """A live stream's HLS master playlist, '' when it can't be read."""
+        if not url:
+            return ''
+        try:
+            _, body = http.request(url, headers={'User-Agent': ua})
+        except http.HTTPError as exc:
+            kodi.log('no HLS playlist: %s' % exc)
+            return ''
+        return body.decode('utf-8', 'replace')
+
+    @staticmethod
+    def _serve_hls(video_id, playlist):
+        """Write an HLS master playlist for the local server and return its URL, or None without the server."""
+        port = xbmcgui.Window(10000).getProperty(http.PORT_PROPERTY)
+        if not port:
+            kodi.log('manifest server not running, playing every quality')
+            return None
+        with open(kodi.temp_file('%s.m3u8' % video_id), 'w', encoding='utf-8') as handle:
+            handle.write(playlist)
+        return 'http://127.0.0.1:%s/hls/%s.m3u8' % (port, video_id)
+
+    def _serve_manifest(self, video_id, resp, ua, quality=None):
+        """Write the DASH manifest for the local server and return its URL, or None. `quality` (an
+        mpd.quality_of() tuple) limits it to that quality, in place of the Maximum quality setting."""
         port = xbmcgui.Window(10000).getProperty(http.PORT_PROPERTY)
         subs = mpd.subtitle_tracks(resp, kodi.setting_bool('subs_asr'), _subtitle_languages(self.api.hl))
         if subs and port:
             _proxy_subtitles(video_id, subs, ua, port)
-        manifest = mpd.build(resp, max_height=kodi.setting_int('max_quality'),
+        manifest = mpd.build(resp, max_height=0 if quality else kodi.setting_int('max_quality'),
                              codec=kodi.setting('codec') or 'any', allow_hdr=kodi.setting_bool('allow_hdr'),
                              audio_pref=kodi.setting('audio_track') or 'original', ui_lang=self.api.hl,
-                             subtitles=subs)
+                             subtitles=subs, quality=quality)
         if not manifest:
             return None
         if not port:

@@ -371,7 +371,9 @@ class TVWindow(xbmcgui.WindowXML):
         self._push(model.Screen(desc, title, self._load_page, self._keep(browse_id),
                                 kodi.string(30134)))
 
-    def _play(self, item, start=None):
+    def _play(self, item, start=None, choose=False):
+        """Play a tile's video, from where it was left off when the viewer wants that. `choose` asks for
+        the quality first."""
         video_id = router.video_id_of(item)
         if start is None and item['duration'] and 0 < item['watched_pct'] < self.threshold:
             resume_at = item['duration'] * item['watched_pct'] // 100
@@ -380,7 +382,8 @@ class TVWindow(xbmcgui.WindowXML):
             if choice < 0:
                 return
             start = resume_at if choice == 0 else 0
-        xbmc.executebuiltin('PlayMedia(%s)' % router.url_for('play', v=video_id, t=start or None))
+        xbmc.executebuiltin('PlayMedia(%s)' % router.url_for('play', v=video_id, t=start or None,
+                                                              choose=1 if choose else None))
         if item['live'] or item.get('upcoming'):
             return  # a stream keeps no progress: its position is only where the live edge was
         threading.Thread(target=self._follow_playback, args=(video_id,), name='youtube-tv-progress').start()
@@ -450,6 +453,8 @@ class TVWindow(xbmcgui.WindowXML):
         choices = []
         if item['kind'] == 'video':
             video_id = router.video_id_of(item)
+            if not item.get('upcoming'):
+                choices.append((kodi.string(30184), lambda: self._play(item, choose=True)))
             choices.append((kodi.string(30105),
                             lambda: xbmc.executebuiltin('RunPlugin(%s)' % router.url_for('details', v=video_id))))
             choices.append((kodi.string(30104), lambda: self._push(

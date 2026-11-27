@@ -154,7 +154,7 @@ def allowed(url):
     parts = urllib.parse.urlsplit(url)
     host = parts.hostname or ''
     return parts.scheme == 'https' and any(host == d or host.endswith('.' + d)
-                                           for d in ('youtube.com', 'googleapis.com', 'google.com'))
+                                           for d in ('youtube.com', 'googleapis.com', 'google.com', 'googlevideo.com'))
 
 
 def _pace(url):

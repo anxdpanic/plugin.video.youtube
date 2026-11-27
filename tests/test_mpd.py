@@ -107,3 +107,25 @@ def test_subtitle_tracks_native_asr_and_translation():
 
 def test_subtitle_tracks_none_without_captions():
     assert mpd.subtitle_tracks({}) == []
+
+
+def test_qualities_list_each_codec_best_first():
+    assert mpd.qualities(FORMATS) == [(2160, 30, True, 'vp9'), (2160, 30, False, 'vp9'),
+                                      (1080, 30, False, 'av01'), (1080, 30, False, 'vp9'), (1080, 30, False, 'avc1')]
+    assert (2160, 30, True, 'vp9') not in mpd.qualities(FORMATS, allow_hdr=False)
+
+
+def test_qualities_put_the_preferred_codec_first():
+    assert [q[3] for q in mpd.qualities(FORMATS, codec='avc1') if q[0] == 1080] == ['avc1', 'av01', 'vp9']
+
+
+def test_quality_of_a_vertical_video_is_its_short_side():
+    fmt = {'width': 1080, 'height': 1920, 'fps': 30, 'mimeType': 'video/mp4; codecs="avc1.640028"'}
+    assert mpd.quality_of(fmt) == (1080, 30, False, 'avc1')
+
+
+def test_build_for_one_quality_offers_only_it():
+    resp = {'streamingData': {'adaptiveFormats': FORMATS}, 'videoDetails': {'lengthSeconds': '60'}}
+    root = ET.fromstring(mpd.build(resp, quality=(1080, 30, False, 'vp9')))
+    videos = [r for r in root.iter('{%s}Representation' % NS['d']) if r.get('height')]
+    assert [(r.get('id'), r.get('height')) for r in videos] == [('248', '1080')]
