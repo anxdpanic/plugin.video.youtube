@@ -561,3 +561,27 @@ def test_video_menu_offers_play_at_a_chosen_quality():
     upcoming = router._video_menu({'live': False, 'short': False, 'upcoming': 'Upcoming', 'channel': 'C'},
                                   'abcdefghijk', None)
     assert all('choose=1' not in action for _, action in upcoming)
+
+
+def test_video_listings_offer_date_duration_channel_and_watched_sorts():
+    plugin = run('browse', '?id=VLPLx')
+    plugin.descriptions.remember('a', 'About a', '2026-09-12', save=False)
+    items = plugin._render_items([video('a'), video('b')], browse_id='VLPLx')
+    plugin._finish_listing(items)
+    dated = [li for url, li, _ in xbmcplugin.ITEMS if url.endswith('v=a')][0]
+    assert dated.datetime == '2026-09-12T00:00:00Z'
+    assert xbmcplugin.SORTS == [xbmcplugin.SORT_METHOD_UNSORTED, xbmcplugin.SORT_METHOD_LABEL,
+                                xbmcplugin.SORT_METHOD_DATE, xbmcplugin.SORT_METHOD_DURATION,
+                                xbmcplugin.SORT_METHOD_STUDIO, xbmcplugin.SORT_METHOD_PLAYCOUNT]
+
+
+def test_date_sort_is_left_out_when_no_upload_date_is_known():
+    plugin = run('browse', '?id=VLPLx')
+    plugin._finish_listing(plugin._render_items([video('c')], browse_id='VLPLx'))
+    assert xbmcplugin.SORT_METHOD_DATE not in xbmcplugin.SORTS
+    assert xbmcplugin.SORT_METHOD_DURATION in xbmcplugin.SORTS
+
+
+def test_folder_only_listings_sort_by_order_or_title():
+    run('browse', '?id=FEchannels')._finish_listing([{'kind': 'folder'}])
+    assert xbmcplugin.SORTS == [xbmcplugin.SORT_METHOD_UNSORTED, xbmcplugin.SORT_METHOD_LABEL]

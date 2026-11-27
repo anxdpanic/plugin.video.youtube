@@ -344,6 +344,18 @@ def _select_quality(labels):
     return xbmcgui.Dialog().select(kodi.string(30185), labels)
 
 
+def _sort_methods(items, dated):
+    """Kodi's sort options for a listing: YouTube's order and the title always; with videos listed, also
+    the upload date (when any listed video's is known), duration, channel and whether it was watched."""
+    methods = [xbmcplugin.SORT_METHOD_UNSORTED, xbmcplugin.SORT_METHOD_LABEL]
+    if any(i.get('kind') == 'video' for i in items):
+        if dated:
+            methods.append(xbmcplugin.SORT_METHOD_DATE)
+        methods.extend((xbmcplugin.SORT_METHOD_DURATION, xbmcplugin.SORT_METHOD_STUDIO,
+                        xbmcplugin.SORT_METHOD_PLAYCOUNT))
+    return methods
+
+
 def _video_menu(item, video_id, channel_id):
     """A video's context menu: play at a chosen quality, its channel, related videos, details and chapters."""
     menu = []
@@ -410,6 +422,7 @@ class Plugin(pages.Pages):
         super().__init__(InnerTube())
         self.banners = art.Banners()
         self.fanart = ''  # a channel page's banner, for everything listed on it
+        self.dated = False  # a listed video's upload date is known, so sorting by date means something
         self.descriptions = descriptions.Descriptions()
 
     def dispatch(self):
@@ -435,6 +448,10 @@ class Plugin(pages.Pages):
         except auth.AuthError:
             self._notify(kodi.string(30132), error=True)
             self._end(False)
+
+    def _add_sort_methods(self, methods):
+        for method in methods:
+            xbmcplugin.addSortMethod(self.handle, method)
 
     def _end(self, succeeded=True, cache=False):
         if self.handle >= 0:
@@ -466,6 +483,7 @@ class Plugin(pages.Pages):
         if kodi.setting_bool('show_accounts'):
             self._add_accounts_entry()
         xbmcplugin.setContent(self.handle, 'files')
+        self._add_sort_methods(_sort_methods([], False))
         self._end()
 
     def _add_accounts_entry(self):
@@ -714,9 +732,7 @@ class Plugin(pages.Pages):
         videos = sum(1 for i in items if i.get('kind') == 'video')
         # 'videos' keeps skins on 16:9 layouts; 'movies' puts the thumbnails in 2:3 poster frames.
         xbmcplugin.setContent(self.handle, 'videos' if videos and videos >= len(items) / 2 else 'files')
-        xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_UNSORTED)
-        xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_LABEL)
-        xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_DURATION)
+        self._add_sort_methods(_sort_methods(items, self.dated))
         self._end()
 
     def _add_next(self, ep, token, browse_id=None):
@@ -842,6 +858,10 @@ class Plugin(pages.Pages):
         channel_id = item['channel_id'] or (known or {}).get('c')
         li = xbmcgui.ListItem(video_label(item), offscreen=True)
         _set_video_tag(li.getVideoInfoTag(), item, known, threshold)
+        if known and known.get('p'):
+            # The upload date (YYYY-MM-DD) is what Kodi's Date sort orders by.
+            li.setDateTime(known['p'] + 'T00:00:00Z')
+            self.dated = True
         li.setArt({'thumb': item['thumb'], 'icon': item['thumb'],
                    'fanart': self._channel_fanart(channel_id) or item['thumb'], 'landscape': item['thumb']})
         li.setProperty('IsPlayable', 'true')
@@ -882,6 +902,7 @@ class Plugin(pages.Pages):
             li.setArt({'icon': icons.media('search.png'), 'thumb': icons.media('search.png')})
             li.addContextMenuItems([(kodi.string(30128), 'RunPlugin(%s)' % url_for('search/remove', q=past))])
             self._add(url_for('search', q=past), li, True)
+        self._add_sort_methods(_sort_methods([], False))
         self._end()
 
     def search_new(self):

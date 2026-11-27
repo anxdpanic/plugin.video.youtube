@@ -31,6 +31,7 @@ class ListItem:
         self.context_menu = []
         self.tag = InfoTagVideo()
         self.mime = None
+        self.datetime = ''
 
     def setLabel2(self, label):  # noqa: N802 (Kodi API name)
         self.label2 = label
@@ -58,6 +59,9 @@ class ListItem:
 
     def setContentLookup(self, enabled):  # noqa: N802
         pass
+
+    def setDateTime(self, value):  # noqa: N802
+        self.datetime = value
 
 
 class Dialog:
