@@ -1,6 +1,7 @@
 import json
 import urllib.parse
 
+import pytest
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -422,6 +423,28 @@ def test_play_serves_a_dash_manifest(monkeypatch):
     assert li.mime == 'application/dash+xml'
     assert li.properties['inputstream.adaptive.stream_headers'] == 'User-Agent=Test%20UA/1.0'
     assert 'inputstream.adaptive.play_timeshift_buffer' not in li.properties
+
+
+@pytest.mark.parametrize('max_quality, cap, manifest_cap', [
+    (0, '', 0), (4320, '', 0), (2160, '4K', 0), (1440, '1440p', 0), (1080, '1080p', 0),
+    (720, '720p', 0), (480, '480p', 0), (360, '', 360), (144, '', 144),
+])
+def test_maximum_quality_goes_to_isa_where_it_can_cap(max_quality, cap, manifest_cap):
+    assert router.isa_resolution_cap(max_quality) == cap
+    assert router.manifest_height_cap(max_quality) == manifest_cap
+
+
+def test_play_keeps_every_quality_and_caps_through_isa(monkeypatch):
+    """ISA's Manual OSD and Ask quality modes choose from the manifest, so Maximum quality doesn't trim it."""
+    from test_mpd import FORMATS
+
+    from resources.lib.youtube import kodi
+    monkeypatch.setitem(xbmcaddon.SETTINGS, 'max_quality', 1080)
+    resp = {'streamingData': {'adaptiveFormats': FORMATS}, 'videoDetails': {'videoId': 'abcdefghijk', 'title': 'T'}}
+    ok, li = play(PlayerApi(resp), monkeypatch)
+    assert ok and li.properties['inputstream.adaptive.chooser_resolution_max'] == '1080p'
+    with open(kodi.temp_file('abcdefghijk.mpd'), encoding='utf-8') as handle:
+        assert 'height="2160"' in handle.read()
 
 
 def test_play_live_uses_hls_with_timeshift(monkeypatch):
