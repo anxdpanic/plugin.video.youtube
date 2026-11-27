@@ -511,3 +511,76 @@ msgstr ""
 msgctxt "#30185"
 msgid "Choose quality"
 msgstr ""
+
+# Settings: SponsorBlock
+msgctxt "#30186"
+msgid "SponsorBlock"
+msgstr ""
+
+msgctxt "#30187"
+msgid "Skip segments using SponsorBlock"
+msgstr ""
+
+msgctxt "#30188"
+msgid "Look up crowd-sourced segment times on sponsor.ajay.app when a video plays. Only part of a hash of the video ID is sent."
+msgstr ""
+
+msgctxt "#30189"
+msgid "Segment categories"
+msgstr ""
+
+msgctxt "#30190"
+msgid "Sponsor"
+msgstr ""
+
+msgctxt "#30191"
+msgid "Unpaid/self promotion"
+msgstr ""
+
+msgctxt "#30192"
+msgid "Interaction reminder"
+msgstr ""
+
+msgctxt "#30193"
+msgid "Intermission/intro animation"
+msgstr ""
+
+msgctxt "#30194"
+msgid "Endcards/credits"
+msgstr ""
+
+msgctxt "#30195"
+msgid "Preview/recap"
+msgstr ""
+
+msgctxt "#30196"
+msgid "Hook/greetings"
+msgstr ""
+
+msgctxt "#30197"
+msgid "Tangents/jokes"
+msgstr ""
+
+msgctxt "#30198"
+msgid "Music: non-music section"
+msgstr ""
+
+msgctxt "#30199"
+msgid "Segment action"
+msgstr ""
+
+msgctxt "#30200"
+msgid "Skip automatically"
+msgstr ""
+
+msgctxt "#30201"
+msgid "Show markers only"
+msgstr ""
+
+msgctxt "#30202"
+msgid "Skip by seeking instead of using EDL"
+msgstr ""
+
+msgctxt "#30203"
+msgid "Seek past segments from the add-on rather than passing an EDL file to Kodi. Used anyway when Kodi does not support EDL for add-ons."
+msgstr ""
