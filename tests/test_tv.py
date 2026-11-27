@@ -296,3 +296,16 @@ def test_row_stops_at_its_last_tile():
         xml = skin.render(f.read(), {}, '/media', '/icon.png')
     row = ET.fromstring(xml).find(".//control[@id='200']")
     assert row.findtext('onright') == 'noop'  # Kodi wraps a list round to its first tile without one
+
+
+def test_window_draws_playback_under_its_background():
+    import os
+    import xml.etree.ElementTree as ET
+
+    path = os.path.join(os.path.dirname(skin.__file__), '..', '..', '..', 'tv', 'youtube-tv.xml')
+    with open(path) as f:
+        xml = skin.render(f.read(), {}, '/media', '/icon.png')
+    first, second = ET.fromstring(xml).find('controls')[:2]
+    # Kodi only presents video through a videowindow outside fullscreen: without one, playback stalls
+    assert first.get('type') == 'videowindow' and first.findtext('visible') == 'Player.HasVideo'
+    assert second.get('type') == 'image'
