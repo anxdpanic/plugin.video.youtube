@@ -13,6 +13,8 @@ SUPPORTED_AUDIO = ('mp4a', 'opus', 'ec-3', 'ac-3')
 TRANSFER_SCHEME = 'urn:mpeg:mpegB:cicp:TransferCharacteristics'
 CHANNEL_SCHEME = 'urn:mpeg:dash:23003:3:audio_channel_configuration:2011'
 HDR_TRANSFER = ('COLOR_TRANSFER_CHARACTERISTICS_SMPTEST2084', 'COLOR_TRANSFER_CHARACTERISTICS_ARIB_STD_B67')
+# YouTube reports 23.976, 29.97 and 59.94 fps as 24, 30 and 60.
+FRACTIONAL_FPS = {24: '24000/1001', 30: '30000/1001', 60: '60000/1001'}
 
 
 def _mime_codec(fmt):
@@ -82,7 +84,7 @@ def _representation(fmt, codecs, extra=''):
     if fmt.get('width'):
         attrs.append('width="%d" height="%d"' % (fmt['width'], fmt['height']))
     if fmt.get('fps'):
-        attrs.append('frameRate="%d"' % fmt['fps'])
+        attrs.append('frameRate="%s"' % FRACTIONAL_FPS.get(fmt['fps'], fmt['fps']))
     if fmt.get('audioSampleRate'):
         attrs.append('audioSamplingRate="%s"' % fmt['audioSampleRate'])
     out = ['      <Representation %s>' % ' '.join(attrs)]
