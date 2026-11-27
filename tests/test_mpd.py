@@ -62,6 +62,18 @@ def test_build_produces_valid_manifest():
     assert root.get('mediaPresentationDuration') == 'PT60.000S'
 
 
+def test_frame_rate_hints_fractional_rates():
+    videos = [fmt(itag, 'video/mp4; codecs="avc1.640028"', 1080, fps=fps)
+              for itag, fps in ((136, 24), (137, 25), (298, 30), (299, 60))]
+    player = {'streamingData': {'adaptiveFormats': videos + FORMATS[-1:]}}
+    root = ET.fromstring(mpd.build(player))
+    rates = {r.get('id'): r.get('frameRate') for r in root.iter('{%s}Representation' % NS['d'])}
+    assert rates['136'] == '24000/1001'
+    assert rates['137'] == '25'
+    assert rates['298'] == '30000/1001'
+    assert rates['299'] == '60000/1001'
+
+
 def test_build_without_audio_returns_none():
     assert mpd.build({'streamingData': {'adaptiveFormats': FORMATS[:2]}}) is None
 
