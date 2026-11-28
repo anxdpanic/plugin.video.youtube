@@ -1,4 +1,5 @@
 import json
+import re
 import urllib.parse
 
 import pytest
@@ -406,7 +407,14 @@ class PlayerApi:
         return False
 
 
-def play(api, monkeypatch, port='50152'):
+def play(api, monkeypatch, port='50152', reads=None):
+    """Play through the router. `reads` stands in for http.request, which reads the start of a format's
+    index for the frame rate; by default nothing answers, as offline."""
+    from resources.lib.youtube import http
+
+    def offline(url, headers=None, **kwargs):
+        raise http.HTTPError(0, b'', url)
+    monkeypatch.setattr(http, 'request', reads or offline)
     monkeypatch.setitem(xbmcgui._PROPERTIES, 'youtube.port', port)
     plugin = run('play', '?v=abcdefghijk')
     plugin.api = api
@@ -423,6 +431,56 @@ def test_play_serves_a_dash_manifest(monkeypatch):
     assert li.mime == 'application/dash+xml'
     assert li.properties['inputstream.adaptive.stream_headers'] == 'User-Agent=Test%20UA/1.0'
     assert 'inputstream.adaptive.play_timeshift_buffer' not in li.properties
+
+
+def frame_rate_play(monkeypatch, reads):
+    """Play a 24 fps video with `reads` answering the index reads; the served frame rates and the reads."""
+    from test_mpd import FORMATS, fmt
+
+    from resources.lib.youtube import kodi
+    videos = []
+    for itag, bitrate, host in ((137, 4000000, 1), (136, 2000000, 1), (135, 1000000, 2)):
+        video = fmt(itag, 'video/mp4; codecs="avc1.640028"', 1080, fps=24, bitrate=bitrate)
+        video['url'] = 'https://rr%d---sn-x.googlevideo.com/videoplayback?itag=%d' % (host, itag)
+        videos.append(video)
+    resp = {'streamingData': {'adaptiveFormats': videos + FORMATS[-1:]},
+            'videoDetails': {'videoId': 'abcdefghijk', 'title': 'T'}}
+    asked = []
+
+    def recording(url, headers=None, **kwargs):
+        asked.append((urllib.parse.urlsplit(url).hostname, headers.get('Range'), kwargs.get('timeout'),
+                      kwargs.get('priority')))
+        return reads(url)
+    ok, _ = play(PlayerApi(resp), monkeypatch, reads=recording)
+    assert ok
+    with open(kodi.temp_file('abcdefghijk.mpd'), encoding='utf-8') as handle:
+        rates = set(re.findall(r'frameRate="([^"]+)"', handle.read()))
+    return rates, asked
+
+
+def test_play_hints_the_frame_rate_the_index_gives(monkeypatch):
+    from test_mpd import index_fixture
+    rates, asked = frame_rate_play(monkeypatch, lambda url: (206, index_fixture('sidx-23.976fps.bin')))
+    assert rates == {'24000/1001'}
+    # one read, of the smallest format's index start, short, and never queued behind a hold
+    from resources.lib.youtube import http
+    assert asked == [('rr2---sn-x.googlevideo.com', 'bytes=101-200', router.RATE_TIMEOUT, http.BACKGROUND)]
+
+
+@pytest.mark.parametrize('status', [403, 0])
+def test_play_keeps_whole_rates_after_one_failed_read(monkeypatch, status):
+    from resources.lib.youtube import http
+
+    def failing(url):
+        raise http.HTTPError(status, b'', url)
+    rates, asked = frame_rate_play(monkeypatch, failing)
+    assert rates == {'24'} and len(asked) == 1
+
+
+def test_play_with_an_undecided_index_keeps_whole_rates_without_another_read(monkeypatch):
+    from test_mpd import sidx
+    rates, asked = frame_rate_play(monkeypatch, lambda url: (206, sidx(60000, [1500])))
+    assert rates == {'24'} and len(asked) == 1
 
 
 @pytest.mark.parametrize('max_quality, cap, manifest_cap', [
