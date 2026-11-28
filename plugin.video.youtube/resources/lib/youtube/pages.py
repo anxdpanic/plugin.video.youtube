@@ -10,6 +10,9 @@ PAGE_TTL = 600
 GUIDE_TTL = 3600
 # Pages that are about what was watched: watched videos stay on them even with hide_watched on.
 NO_WATCHED_FILTER = ('FEhistory', 'FElibrary', 'FEmy_youtube', 'FEplaylist_aggregation')
+# Pages whose untitled rows are one feed, newest first, cut into rows of three, with titled side rows
+# (Most relevant, Shorts) mixed in among them.
+FEEDS = ('FEsubscriptions',)
 
 
 def watched_threshold():
@@ -36,6 +39,18 @@ def visible_shelves(page):
     if kodi.setting_bool('hide_shorts'):
         shelves = [s for s in shelves if not s['shorts']]
     return [s for s in shelves if s['items']]
+
+
+def is_feed(browse_id):
+    return browse_id in FEEDS
+
+
+def split_feed(shelves):
+    """(feed rows, side rows) of a feed page: its own untitled rows, and the titled ones such as
+    Most relevant and Shorts, each in page order."""
+    feed = [s for s in shelves if not s['title'] and not s['shorts']]
+    side = [s for s in shelves if s['title'] or s['shorts']]
+    return feed, side
 
 
 def paged_token(shelves, page):

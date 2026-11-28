@@ -711,6 +711,8 @@ class Plugin(pages.Pages):
             # Like the TV app: show the selected tab ("All") and put the other tabs in one folder.
             self._add_channels_folder([t for t in tabs if not t.get('selected')], browse_id, desc.get('params'))
         shelves = self._listing_shelves(desc, page)
+        if pages.is_feed(browse_id):
+            shelves = self._feed_rows(desc, page, shelves)
         rendered = self._render_shelves(desc, page, shelves, browse_id)
         if not tabs and not shelves and not page['header']:
             self._notify(self._empty_message(page, browse_id))
@@ -733,6 +735,16 @@ class Plugin(pages.Pages):
         li.getVideoInfoTag().setPlot(', '.join(t['title'] for t in others[:40]))
         li.setProperty('SpecialSort', 'top')
         self._add(url_for('browse', id=browse_id, params=params, tabs=1), li, True)
+
+    def _feed_rows(self, desc, page, shelves):
+        """A feed's own rows, to list as one list of the newest uploads. Its side rows (Most relevant,
+        Shorts) become folders next to the channels folder, on the first page only."""
+        feed, side = pages.split_feed(shelves)
+        if not desc.get('ctoken'):
+            visible = pages.visible_shelves(page)
+            for shelf in side:
+                self._add_shelf_folder(desc, visible.index(shelf), shelf, top=True)
+        return feed
 
     @staticmethod
     def _listing_shelves(desc, page):
@@ -796,9 +808,11 @@ class Plugin(pages.Pages):
         li.setProperty('SpecialSort', 'bottom')
         self._add(url, li, True)
 
-    def _add_shelf_folder(self, desc, index, shelf):
+    def _add_shelf_folder(self, desc, index, shelf, top=False):
         title = shelf['title'] or kodi.string(30133) or shelf['items'][0]['title']
         li = xbmcgui.ListItem(title, offscreen=True)
+        if top:
+            li.setProperty('SpecialSort', 'top')
         first = shelf['items'][0]
         art = first.get('thumb') or 'DefaultFolder.png'
         li.setArt({'icon': 'DefaultFolder.png', 'thumb': art, 'fanart': self.fanart or art})
