@@ -51,7 +51,7 @@ def test_single_list_is_cut_into_rows_and_keeps_filling():
         None: page([shelf('', 'abcdef', 'G2')]),
         'G2': page([shelf('', 'fghij')]),
     })
-    screen = model.Screen({'ep': 'browse', 'id': 'FEsubscriptions'}, 'Subscriptions', load).open()
+    screen = model.Screen({'ep': 'browse', 'id': 'UCuploads'}, 'Uploads', load).open()
     assert [len(r.items) for r in screen.rows] == [4, 2]
     first = screen.rows[0]
     first.pos = 3
@@ -59,6 +59,22 @@ def test_single_list_is_cut_into_rows_and_keeps_filling():
     assert [[i['id'] for i in r.items] for r in screen.rows] == [list('abcd'), list('efgh'), list('ij')]
     assert screen.rows[0] is first and first.pos == 3  # full rows keep their state
     assert all(r.grid for r in screen.rows)
+
+
+def test_subscriptions_rows_are_new_uploads_then_most_relevant_then_shorts():
+    shorts = shelf('Shorts', ['s'])
+    shorts['shorts'] = True
+    load = loader({
+        None: page([shelf('Most relevant', 'rq'), shelf('', 'abc'), shorts, shelf('', 'd')], token='P2'),
+        'P2': page([shelf('', 'ef')], token=None),
+    })
+    screen = model.Screen({'ep': 'browse', 'id': 'FEsubscriptions'}, 'Subscriptions', load,
+                          feed_title='New uploads').open()
+    assert [r.title for r in screen.rows] == ['New uploads', 'Most relevant', 'Shorts']
+    assert [i['id'] for i in screen.rows[0].items] == list('abcd')
+    assert not screen.can_grow()  # the feed grows to the right, not with more rows
+    assert [i['id'] for i in screen.more_items(screen.rows[0])] == ['e', 'f']
+    assert screen.rows[0].token is None
 
 
 def test_tabs_row_and_filter():

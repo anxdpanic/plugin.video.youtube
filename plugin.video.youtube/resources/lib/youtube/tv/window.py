@@ -140,7 +140,7 @@ class TVWindow(xbmcgui.WindowXML):
         elif kind == 'browse':
             desc = {'ep': 'browse', 'id': target['browse_id'], 'params': target.get('params')}
             self._push(model.Screen(desc, entry['title'], self._load_page, self._keep(target['browse_id']),
-                                    kodi.string(30134)), replace=True, entry=entry['id'])
+                                    kodi.string(30134), kodi.string(30204)), replace=True, entry=entry['id'])
 
     def _settings_changed(self):
         """Apply settings changed meanwhile: the rail (hide Shorts), the watched threshold and the page's
@@ -155,7 +155,7 @@ class TVWindow(xbmcgui.WindowXML):
             screen.refresh()
         else:
             fresh = model.Screen(screen.desc, screen.title, self._load_page, self._keep(screen.desc.get('id')),
-                                 kodi.string(30134)).open()
+                                 kodi.string(30134), kodi.string(30204)).open()
             fresh.ensure(self.top)
             self.stack[-1] = fresh
             screen = fresh
@@ -371,7 +371,7 @@ class TVWindow(xbmcgui.WindowXML):
     def _open_browse(self, browse_id, params, title):
         desc = {'ep': 'browse', 'id': browse_id, 'params': params}
         self._push(model.Screen(desc, title, self._load_page, self._keep(browse_id),
-                                kodi.string(30134)))
+                                kodi.string(30134), kodi.string(30204)))
 
     def _play(self, item, start=None, choose=False):
         """Play a tile's video, from where it was left off when the viewer wants that. `choose` asks for
