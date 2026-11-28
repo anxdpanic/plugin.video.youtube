@@ -584,3 +584,7 @@ msgstr ""
 msgctxt "#30203"
 msgid "Seek past segments from the add-on rather than passing an EDL file to Kodi. Used anyway when Kodi does not support EDL for add-ons."
 msgstr ""
+
+msgctxt "#30204"
+msgid "New uploads"
+msgstr ""

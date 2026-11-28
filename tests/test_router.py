@@ -186,6 +186,31 @@ def test_flattened_search_keeps_next_page_and_rows_open_as_searches(monkeypatch)
     assert run('')._state()['search_history'] == ['cats']
 
 
+def feed_page():
+    def shelf(title, ids, shorts=False):
+        return {'title': title, 'items': [video(i, short=shorts) for i in ids], 'continuation': None,
+                'shorts': shorts, 'endpoint': None}
+    return {'header': None, 'tabs': [], 'continuation': None, 'shelves': [
+        shelf('Most relevant', 'rq'), shelf('', 'ab'), shelf('Shorts', 's', shorts=True), shelf('', 'c')]}
+
+
+@pytest.mark.parametrize('hide_shorts', [False, True])
+def test_subscriptions_list_newest_uploads_with_side_rows_as_folders(monkeypatch, hide_shorts):
+    """Most relevant and Shorts (unless hidden) open from folders at the top; the list is the newest uploads."""
+    monkeypatch.setattr(router.Plugin, 'fetch', lambda self, desc, use_cache=True: desc)
+    monkeypatch.setattr(parser, 'parse_page', lambda desc: feed_page())
+    xbmcaddon.SETTINGS['hide_shorts'] = hide_shorts
+    run('browse', '?id=FEsubscriptions').dispatch()
+    src = json.dumps({'ep': 'browse', 'id': 'FEsubscriptions', 'params': None}, sort_keys=True)
+    folders = [(li.label, url) for url, li, folder in xbmcplugin.ITEMS if folder]
+    expected = [('Most relevant', router.url_for('shelf', src=src, i=0))]
+    if not hide_shorts:
+        expected.append(('Shorts', router.url_for('shelf', src=src, i=2)))
+    assert folders == expected
+    assert all(li.properties.get('SpecialSort') == 'top' for _, li, folder in xbmcplugin.ITEMS if folder)
+    assert [u for u, _, folder in xbmcplugin.ITEMS if not folder] == [router.url_for('play', v=v) for v in 'abc']
+
+
 def test_listing_loads_several_pages_and_numbers_next_page(monkeypatch):
     def shelf(ids, token):
         return {'title': '', 'items': [video(i) for i in ids], 'continuation': token, 'shorts': False,

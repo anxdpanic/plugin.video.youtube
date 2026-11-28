@@ -46,12 +46,13 @@ class Screen:
     shelves as the focus nears the last row; a single list is cut into rows of GRID_COLUMNS tiles and loads
     more of the list the same way."""
 
-    def __init__(self, desc, title, load, keep=None, tabs_title='Channels'):
+    def __init__(self, desc, title, load, keep=None, tabs_title='Channels', feed_title='New uploads'):
         self.desc = desc
         self.title = title
         self._load = load  # desc -> parsed page
         self._keep = keep or (lambda item: True)
         self._tabs_title = tabs_title
+        self._feed_title = feed_title
         self.rows = []
         self.header = None
         self.message = ''
@@ -76,7 +77,9 @@ class Screen:
                 self.rows.append(Row('', tabs))
         shelves = pages.visible_shelves(page)
         untitled = sum(1 for s in shelves if not s['title'])
-        if len(shelves) == 1 or (shelves and untitled * 2 >= len(shelves)):
+        if pages.is_feed(self.desc.get('id')):
+            self._add_feed(shelves, page['continuation'])
+        elif len(shelves) == 1 or (shelves and untitled * 2 >= len(shelves)):
             first_title = next((s['title'] for s in shelves if s['title']), '')
             self.grid = {'items': [], 'token': None, 'start': len(self.rows), 'title': first_title}
             self._add_grid_items([i for s in shelves for i in s['items']], pages.paged_token(shelves, page))
@@ -113,6 +116,15 @@ class Screen:
             page = self._load({'ep': self.ep, 'ctoken': token})
             self._add_shelves(pages.visible_shelves(page),
                               page['continuation'] if page['continuation'] != token else None)
+
+    def _add_feed(self, shelves, token):
+        """A feed page: its own rows as one row of the newest uploads, which loads more as it scrolls
+        right, then its side rows (Most relevant, Shorts)."""
+        feed, side = pages.split_feed(shelves)
+        items = [i for s in feed for i in s['items'] if self._keep(i)]
+        if items or token:
+            self.rows.append(Row(self._feed_title, items, token))
+        self._add_shelves(side, None)
 
     def _add_shelves(self, shelves, token):
         for shelf in shelves:
