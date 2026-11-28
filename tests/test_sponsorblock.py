@@ -59,6 +59,17 @@ def test_markers_mark_both_ends(monkeypatch):
         assert edl.read() == '30.000\t30.000\t2\n40.000\t40.000\t2\n'
 
 
+
+def test_markers_ignore_a_leftover_seek_setting(monkeypatch):
+    """The seek toggle is disabled, not cleared, once markers are chosen; markers still need the EDL file."""
+    enable(monkeypatch, seek=True, action=2)
+    answer(monkeypatch, [([30, 40], 'skip')])
+    li = xbmcgui.ListItem()
+    sponsorblock.apply(li, VIDEO)
+    assert 'EDLPath' in li.properties
+    assert xbmcgui.Window(10000).getProperty(sponsorblock.PROPERTY) == ''
+
+
 def test_service_seeks_past_each_segment_once_without_edl(monkeypatch):
     enable(monkeypatch, edl=False)
     answer(monkeypatch, [([30, 40], 'skip')])

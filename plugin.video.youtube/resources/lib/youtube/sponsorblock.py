@@ -79,7 +79,9 @@ def apply(li, video_id):
     if not segments:
         return
     action = kodi.setting_int('sponsorblock_action')
-    if not kodi.setting_bool('sponsorblock_seek') and edl_path_supported():
+    # Seeking only ever skips: markers need the EDL file, whatever the (then disabled) seek setting holds.
+    seek = action == EDL_COMMERCIAL_BREAK and kodi.setting_bool('sponsorblock_seek')
+    if not seek and edl_path_supported():
         li.setProperty('EDLPath', write_edl(video_id, segments, action))
     elif action == EDL_COMMERCIAL_BREAK:
         xbmcgui.Window(10000).setProperty(PROPERTY, json.dumps({'v': video_id, 'segments': segments}))
